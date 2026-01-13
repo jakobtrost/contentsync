@@ -21,6 +21,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Check if a connection is still active
+ *
+ * @param array|string $connection_or_site_url
+ *
+ * @return bool
+ */
+function check_connection_authentication( $connection_or_site_url ) {
+	$response = send_request( $connection_or_site_url, 'check_auth' );
+	return 'true' == $response ? true : $response;
+}
+
+/**
  * Get the site name of a connection
  *
  * @param array|string $connection_or_site_url
@@ -225,7 +237,7 @@ function send_request( $connection_or_site_url, $rest_base, $body = array(), $me
 	if ( is_array( $connection_or_site_url ) ) {
 		$connection = $connection_or_site_url;
 	} else {
-		$connection = get_connection( $connection_or_site_url );
+		$connection = get_site_connection( $connection_or_site_url );
 	}
 
 	// set user auth
@@ -233,14 +245,14 @@ function send_request( $connection_or_site_url, $rest_base, $body = array(), $me
 		$request_url = untrailingslashit( esc_url( $connection['site_url'] ) );
 		$headers     = array(
 			'Authorization' => 'Basic ' . base64_encode( $connection['user_login'] . ':' . str_rot13( $connection['password'] ) ),
-			'Origin'        => get_network_url(),
+			'Origin'        => \Contentsync\Main_Helper::get_network_url(),
 		);
 	}
 	// try to get data from public endpoint
 	else {
 		$request_url = untrailingslashit( esc_url( $connection_or_site_url ) );
 		$headers     = array(
-			'Origin' => get_network_url(),
+			'Origin' => \Contentsync\Main_Helper::get_network_url(),
 		);
 	}
 
@@ -334,11 +346,8 @@ function send_response( $data, $message = '', $success = null, $status = null ) 
  * @return mixed Decoded response data on success, false or WP_Error on failure.
  */
 function handle_response( $response, $args = array() ) {
-	global $contentsync_site_connections_logs;
-
-	if ( $contentsync_site_connections_logs ) {
-		debug( $response );
-	}
+	\Contentsync\Logger::add( 'handle_response', $response );
+	\Contentsync\Logger::add( 'handle_response args', $args );
 
 	// parse arguments
 	$args = wp_parse_args(
@@ -379,9 +388,13 @@ function handle_response( $response, $args = array() ) {
 				$code     = $error;
 				$message  = $msg[0];
 				$errors[] = "REST API Error: {$message} (code: {$code})";
-				if ( $contentsync_site_connections_logs ) {
-					echo "\r\n\r\nREST API Error: {$message} (code: {$code})\r\n\r\n";
-				}
+				\Contentsync\Logger::add(
+					'REST API Error',
+					array(
+						'message' => $message,
+						'code'    => $code,
+					)
+				);
 			}
 			return $args['wp_error'] ? new \WP_Error( $code, implode( "\r\n", $errors ) ) : false;
 		}

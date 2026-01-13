@@ -13,7 +13,7 @@
  * @since 2.17.0
  */
 
-namespace Contentsync\Cluster;
+namespace Contentsync;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -48,7 +48,10 @@ function maybe_add_cluster_table() {
 	return true;
 }
 
-function maybe_add_post_review_table() {
+/**
+ * Add the table to the database.
+ */
+function maybe_add_synced_post_reviews_table() {
 
 	global $wpdb;
 	$charset_collate = $wpdb->get_charset_collate();
@@ -79,7 +82,10 @@ function maybe_add_post_review_table() {
 	return true;
 }
 
-function maybe_add_content_conditions() {
+/**
+ * Add the table to the database.
+ */
+function maybe_add_cluster_content_conditions_table() {
 	global $wpdb;
 	$charset_collate = $wpdb->get_charset_collate();
 	$table_name      = $wpdb->base_prefix . 'cluster_content_conditions';
@@ -121,6 +127,41 @@ function maybe_add_content_conditions() {
 	return true;
 }
 
+/**
+ * Add the table to the database.
+ */
+function maybe_add_queue_distribution_items_table() {
+
+	global $wpdb;
+	$charset_collate = $wpdb->get_charset_collate();
+	$table_name      = $wpdb->base_prefix . 'contentsync_queue_distribution_items';
+
+	// return if table exists
+	$query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table_name ) );
+
+	if ( $wpdb->get_var( $query ) == $table_name ) {
+		return false;
+	}
+
+	$sql = "CREATE TABLE $table_name (
+		ID int(11) NOT NULL AUTO_INCREMENT,
+		status text NOT NULL,
+		posts longtext NULL,
+		destination longtext NULL,
+		time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		origin text NULL,
+		origin_id int(11) NULL,
+		error longtext NULL,
+		PRIMARY KEY  (ID)
+	) $charset_collate;";
+
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	dbDelta( $sql );
+
+	return true;
+}
+
 add_action( 'init', __NAMESPACE__ . '\maybe_add_cluster_table' );
-add_action( 'init', __NAMESPACE__ . '\maybe_add_post_review_table' );
-add_action( 'init', __NAMESPACE__ . '\maybe_add_content_conditions' );
+add_action( 'init', __NAMESPACE__ . '\maybe_add_synced_post_reviews_table' );
+add_action( 'init', __NAMESPACE__ . '\maybe_add_cluster_content_conditions_table' );
+add_action( 'init', __NAMESPACE__ . '\maybe_add_queue_distribution_items_table' );

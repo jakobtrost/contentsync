@@ -1,8 +1,8 @@
 <?php
 /**
- * Endpoint 'add_connection'
+ * Endpoint 'add_site_connection'
  *
- * @link {{your-domain}}/wp-json/contentsync/v1/add_connection
+ * @link {{your-domain}}/wp-json/contentsync/v1/add_site_connection
  */
 namespace Contentsync\Api;
 
@@ -18,7 +18,7 @@ class Add_Connection extends Endpoint {
 	 */
 	public function __construct() {
 
-		$this->rest_base = 'add_connection';
+		$this->rest_base = 'add_site_connection';
 
 		parent::__construct();
 	}
@@ -35,7 +35,7 @@ class Add_Connection extends Endpoint {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'add_connection' ),
+					'callback'            => array( $this, 'add_site_connection' ),
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => $this->get_endpoint_args(),
 				),
@@ -48,10 +48,10 @@ class Add_Connection extends Endpoint {
 	 *
 	 * @param WP_REST_Request $request
 	 */
-	public function add_connection( $request ) {
+	public function add_site_connection( $request ) {
 
 		$request_url    = $request->get_header( 'Origin' );
-		$current_url    = \Contentsync\Site_Connections\get_network_url();
+		$current_url    = \Contentsync\Main_Helper::get_network_url();
 		$new_connection = $request->get_param( 'connection' );
 
 		if ( ! $new_connection ) {
@@ -59,7 +59,7 @@ class Add_Connection extends Endpoint {
 		}
 
 		// If the connection to the current site doesn't exist, create it.
-		$result = \Contentsync\Site_Connections\add_connection( $new_connection );
+		$result = \Contentsync\Site_Connections\add_site_connection( $new_connection );
 
 		if ( $result === null ) {
 			return new \WP_Error( 'connection_not_added', 'Connection already exists', array( 'status' => 400 ) );
@@ -74,7 +74,7 @@ class Add_Connection extends Endpoint {
 	 * Check if the user is logged in to verify the connection
 	 */
 	public function permission_callback( $request ) {
-		if ( \Contentsync\Site_Connections\is_allowed() ) {
+		if ( $this->is_request_allowed() ) {
 			return true;
 		} else {
 			return new \WP_Error( 'rest_not_authorized', esc_html__( 'You do not have the correct admin credentials to use this endpoint.' ), array( 'status' => $this->authorization_status_code() ) );

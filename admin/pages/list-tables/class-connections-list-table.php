@@ -58,7 +58,7 @@ class Connections_List_Table extends \WP_List_Table {
 		);
 
 		// set items
-		$this->items = \Contentsync\Site_Connections\get_connections();
+		$this->items = \Contentsync\get_site_connections();
 		// debug($this->items);
 	}
 

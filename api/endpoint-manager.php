@@ -12,7 +12,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Initialize endpoints by loading endpoint files.
  */
 function init_endpoints() {
-	global $contentsync_endpoints;
+
+	$contentsync_endpoints = array(
+		'add_site_connection',
+		'check_auth',
+		'connected_posts',
+		'distribution_endpoint',
+		'posts_connections',
+		'posts_meta',
+		'posts',
+		'site_name',
+	);
+
 	$endpoints = array();
 	foreach ( $contentsync_endpoints as $endpoint ) {
 		array_push( $endpoints, __DIR__ . "/endpoints/{$endpoint}.php" );

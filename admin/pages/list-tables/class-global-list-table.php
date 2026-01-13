@@ -97,7 +97,7 @@ class Global_List_Table extends \WP_List_Table {
 
 		// get posts
 		$blog_id     = get_current_blog_id();
-		$connections = is_network_admin() || ! is_multisite() ? Main_Helper::get_content_connections() : false;
+		$connections = is_network_admin() || ! is_multisite() ? \Contentsync\get_site_connections() : false;
 		$rel         = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'all';
 
 		$this->posts['all'] = Main_Helper::get_all_global_posts( $query_args );
@@ -257,7 +257,7 @@ class Global_List_Table extends \WP_List_Table {
 			array_merge(
 				$builtin,
 				$greyd,
-				array_flip( Main_Helper::call_post_export_func( 'get_supported_post_types' ) )
+				array_flip( \Contentsync\get_export_post_types() )
 			)
 		);
 
@@ -302,7 +302,7 @@ class Global_List_Table extends \WP_List_Table {
 		$views       = array();
 		$return      = array();
 		$rel         = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'all';
-		$connections = is_network_admin() || ! is_multisite() ? Main_Helper::get_content_connections() : false;
+		$connections = is_network_admin() || ! is_multisite() ? \Contentsync\get_site_connections() : false;
 
 		if ( is_network_admin() ) {
 			if ( $connections && count( $connections ) > 0 ) {

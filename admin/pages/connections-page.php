@@ -28,7 +28,7 @@ class Connections_Page {
 
 		// add the redirect actions
 		add_action( 'admin_init', array( $this, 'maybe_redirect_to_auth_page' ), 99 );
-		add_action( 'admin_init', array( $this, 'maybe_add_connection' ), 99 );
+		add_action( 'admin_init', array( $this, 'maybe_add_site_connection' ), 99 );
 
 		// check all connections on pageload
 		add_action( 'current_screen', array( $this, 'check_connections' ) );
@@ -86,8 +86,8 @@ class Connections_Page {
 
 		// add connection form
 		echo "<h1 style='margin-top:2em;'>" . __( 'Add connection', 'contentsync_hub' ) . "</h1>
-		<form method='post' class='add_connection'>
-			<input type='hidden' name='_nonce' value='" . wp_create_nonce( \Contentsync\Site_Connections\OPTION_NAME ) . "' />
+		<form method='post' class='add_site_connection'>
+			<input type='hidden' name='_nonce' value='" . wp_create_nonce( \Contentsync\get_site_connections_option_name() ) . "' />
 
 			" . ( is_ssl() ? '' : Main_Helper::render_info_box(
 				array(
@@ -106,7 +106,7 @@ class Connections_Page {
 			<p>' . __( 'In addition, a valid SSL certificate should be available on both sides and the Content Sync Plugin should be active and up-to-date.', 'contentsync_hub' ) . '</p>
 			<p>' . sprintf(
 				__( 'To add a connection to this page on another page, enter the URL %s.', 'contentsync_hub' ),
-				'<code>' . \Contentsync\Site_Connections\get_network_url() . '</code>'
+				'<code>' . Main_Helper::get_network_url() . '</code>'
 			) . '</p>
 		</form>';
 
@@ -136,7 +136,7 @@ class Connections_Page {
 
 		// verify the nonce
 		$nonce = isset( $_POST['_nonce'] ) ? $_POST['_nonce'] : null;
-		if ( ! $nonce || wp_verify_nonce( $nonce, \Contentsync\Site_Connections\OPTION_NAME ) !== 1 ) {
+		if ( ! $nonce || wp_verify_nonce( $nonce, \Contentsync\get_site_connections_option_name() ) !== 1 ) {
 			self::add_error( __( 'The request could not be verified.', 'contentsync_hub' ) );
 		}
 
@@ -158,7 +158,7 @@ class Connections_Page {
 		$success_path   = $_GET['page'] === 'gc_connections' ? 'admin.php?page=gc_connections' : 'admin.php?page=contentsync_hub&tab=connections';
 		$success_url    = is_network_admin() ? network_admin_url( $success_path ) : admin_url( $success_path );
 
-		$app_name   = urlencode( sprintf( __( 'Connection for %s', 'contentsync_hub' ), \Contentsync\Site_Connections\get_network_url() ) );
+		$app_name   = urlencode( sprintf( __( 'Connection for %s', 'contentsync_hub' ), Main_Helper::get_network_url() ) );
 		$query_args = array(
 			'app_name'    => $app_name,
 			'app_id'      => urlencode( wp_generate_uuid4() ),
@@ -174,7 +174,7 @@ class Connections_Page {
 	 * Add a connection to the database.
 	 * Usually we've just been redirected from the authorization page.
 	 */
-	public function maybe_add_connection() {
+	public function maybe_add_site_connection() {
 
 		if ( ! isset( $_GET['user_login'] ) || ! isset( $_GET['password'] ) || ! isset( $_GET['site_url'] ) ) {
 			return;
@@ -191,7 +191,7 @@ class Connections_Page {
 			'contents'   => true,
 			'search'     => true,
 		);
-		$update     = \Contentsync\Site_Connections\add_connection( $connection );
+		$update     = \Contentsync\add_site_connection( $connection );
 
 		// update successfull
 		if ( $update ) {
@@ -204,7 +204,7 @@ class Connections_Page {
 				sprintf(
 					__( 'To do this, go to the admin or network admin area of the page %1$s and enter the URL %2$s at "Add Connection".', 'contentsync_hub' ),
 					"<a href='" . esc_url( $site_url ) . "' target='_blank'>$nice_url</a>",
-					'<strong>' . \Contentsync\Site_Connections\get_network_url() . '</strong>'
+					'<strong>' . Main_Helper::get_network_url() . '</strong>'
 				)
 			);
 		}
@@ -246,7 +246,7 @@ class Connections_Page {
 		}
 
 		// get connections
-		$connections = \Contentsync\Site_Connections\get_connections();
+		$connections = \Contentsync\get_site_connections();
 		if ( ! is_array( $connections ) || empty( $connections ) ) {
 			return;
 		}
@@ -282,7 +282,7 @@ class Connections_Page {
 
 			// get current state
 			// \Contentsync\Site_Connections\enable_logs();
-			$response = \Contentsync\Site_Connections\check_auth( $connection );
+			$response = \Contentsync\Api\check_connection_authentication( $connection['site_url'] );
 
 			// display an error if necessary
 			if ( $response !== true ) {
@@ -347,7 +347,7 @@ class Connections_Page {
 
 		// update connections
 		if ( $changed ) {
-			\Contentsync\Site_Connections\update_connections( $connections );
+			\Contentsync\update_site_connections( $connections );
 		}
 	}
 

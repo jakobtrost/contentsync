@@ -1,34 +1,33 @@
 <?php
 /**
  * Blog destination class.
- * 
- * The `Blog_Destination` class models a single blog within the distribution framework.  
- * It extends the base `Destination` class and provides an interface to work with posts 
- * belonging to that blog. You use this class when you need to distribute content to 
+ *
+ * The `Blog_Destination` class models a single blog within the distribution framework.
+ * It extends the base `Destination` class and provides an interface to work with posts
+ * belonging to that blog. You use this class when you need to distribute content to
  * specific posts in a blog.
- * 
- * When you instantiate a `Blog_Destination` object you provide an identifier and an 
- * optional array of properties. The constructor calls the parent `Destination` constructor, 
- * sets the timestamp and other properties, and then parses an incoming `posts` property. 
- * If the `posts` array is present, the constructor iterates through each entry and adds 
- * them as `Post_Destination` objects using `add_post`. This design keeps the initialization 
+ *
+ * When you instantiate a `Blog_Destination` object you provide an identifier and an
+ * optional array of properties. The constructor calls the parent `Destination` constructor,
+ * sets the timestamp and other properties, and then parses an incoming `posts` property.
+ * If the `posts` array is present, the constructor iterates through each entry and adds
+ * them as `Post_Destination` objects using `add_post`. This design keeps the initialization
  * flexible and ensures the object always knows which posts it manages.
- * 
- * The class offers methods to manage posts. The `add_post` method creates a new 
- * `Post_Destination` instance and stores it in the `posts` array keyed by the root post ID. 
- * The `set_post` method updates or creates a post entry depending on whether it already 
- * exists. The `get_post` method returns the associated `Post_Destination` object or `null` 
- * if none is set. There is also a `set_properties` method that iterates through a provided 
- * array and assigns each key to a property on the current object. Finally, 
- * `inherit_properties_to_posts` iterates through each stored post and applies the given 
- * properties via `set_properties`. Use this method to propagate common configuration 
- * options across all posts. You should ensure that the properties you inherit are 
+ *
+ * The class offers methods to manage posts. The `add_post` method creates a new
+ * `Post_Destination` instance and stores it in the `posts` array keyed by the root post ID.
+ * The `set_post` method updates or creates a post entry depending on whether it already
+ * exists. The `get_post` method returns the associated `Post_Destination` object or `null`
+ * if none is set. There is also a `set_properties` method that iterates through a provided
+ * array and assigns each key to a property on the current object. Finally,
+ * `inherit_properties_to_posts` iterates through each stored post and applies the given
+ * properties via `set_properties`. Use this method to propagate common configuration
+ * options across all posts. You should ensure that the properties you inherit are
  * appropriate for every post to avoid unintended overrides.
- * 
+ *
  * @since 2.17.0
  */
-
-namespace Contentsync\Distribution;
+namespace Contentsync;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -39,14 +38,14 @@ class Blog_Destination extends Destination {
 
 	/**
 	 * Blog ID.
-	 * 
+	 *
 	 * @var int
 	 */
 	public $ID;
-	
+
 	/**
 	 * Posts.
-	 * 
+	 *
 	 * @var Post_Destination[]
 	 */
 	public $posts = array();
@@ -79,7 +78,7 @@ class Blog_Destination extends Destination {
 	 *
 	 * @return void
 	 */
-	public function add_post( $root_post_id, $linked_post_id, $properties=array() ) {
+	public function add_post( $root_post_id, $linked_post_id, $properties = array() ) {
 		$this->posts[ $root_post_id ] = new Post_Destination( $linked_post_id, $properties );
 	}
 
@@ -98,11 +97,10 @@ class Blog_Destination extends Destination {
 	 *
 	 * @return Post_Destination The updated or newly created post destination.
 	 */
-	public function set_post( $root_post_id, $linked_post_id, $properties=array() ) {
+	public function set_post( $root_post_id, $linked_post_id, $properties = array() ) {
 		if ( ! isset( $this->posts[ $root_post_id ] ) ) {
 			$this->add_post( $root_post_id, $linked_post_id, $properties );
-		}
-		else {
+		} else {
 			$this->posts[ $root_post_id ]->ID = $linked_post_id;
 			$this->posts[ $root_post_id ]->set_properties( $properties );
 		}
@@ -135,7 +133,7 @@ class Blog_Destination extends Destination {
 
 	/**
 	 * Inherit properties to all posts.
-	 * 
+	 *
 	 * @param array $properties
 	 */
 	public function inherit_properties_to_posts( $properties ) {

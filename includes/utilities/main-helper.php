@@ -338,7 +338,7 @@ class Main_Helper {
 		}
 
 		// get remote posts
-		foreach ( self::get_content_connections() as $site_url => $connection ) {
+		foreach ( \Contentsync\get_site_connections() as $site_url => $connection ) {
 
 			// continue if filter is different
 			if ( ! empty( $network_url ) && $network_url !== $site_url ) {
@@ -449,7 +449,7 @@ class Main_Helper {
 
 		$post_type = 'any';
 		if ( empty( $post_type ) || $post_type === 'any' ) {
-			$post_type = self::is_rest_request() ? 'any' : self::call_post_export_func( 'get_supported_post_types' );
+			$post_type = self::is_rest_request() ? 'any' : \Contentsync\get_export_post_types();
 		}
 
 		$args = array(
@@ -524,7 +524,7 @@ class Main_Helper {
 		$local_post = false;
 
 		if ( empty( $post_type ) || $post_type === 'any' ) {
-			$post_type = self::is_rest_request() ? 'any' : self::call_post_export_func( 'get_supported_post_types' );
+			$post_type = self::is_rest_request() ? 'any' : \Contentsync\get_export_post_types();
 		}
 
 		$result = self::get_posts(
@@ -1158,7 +1158,7 @@ class Main_Helper {
 		 * @since 1.7.5
 		 */
 		$remote_connected_posts = array();
-		foreach ( self::get_content_connections() as $site_url => $connected_site ) {
+		foreach ( \Contentsync\get_site_connections() as $site_url => $connected_site ) {
 			$remote_connected_posts = Remote_Operations::get_all_remote_connected_posts( $connected_site, $gid );
 			if ( ! empty( $remote_connected_posts ) ) {
 				$remote_connected_posts                   = (array) $remote_connected_posts;
@@ -1731,7 +1731,7 @@ class Main_Helper {
 					$update_gid = true;
 				}
 			} else {
-				$connection = self::call_connections_func( 'get_connection', $root_net_url );
+				$connection = get_site_connection( $root_net_url );
 
 				// connection doesn't exist
 				if ( ! $connection ) {
@@ -2438,7 +2438,7 @@ class Main_Helper {
 	 * @return string
 	 */
 	public static function get_network_url() {
-		return self::call_connections_func( 'get_network_url' );
+		return self::get_nice_url( network_site_url() );
 	}
 
 	/**
@@ -2453,31 +2453,10 @@ class Main_Helper {
 	}
 
 	/**
-	 * Render the contentsync status box
+	 * Whether we are in a REST REQUEST. Similar to is_admin().
 	 */
-	public static function render_status_box( $status = 'export', $text = '' ) {
-		$status = $status === 'root' ? 'export' : ( $status === 'linked' ? 'import' : $status );
-		$titles = array(
-			'export' => __( 'Root post', 'contentsync' ),
-			'import' => __( 'Linked post', 'contentsync' ),
-			'error'  => __( 'Error', 'contentsync' ),
-		);
-		$title  = isset( $titles[ $status ] ) ? $titles[ $status ] : $status;
-		$color  = 'red';
-		if ( $status === 'export' ) {
-			$color = 'purple';
-		} elseif ( $status === 'import' ) {
-			$color = 'green';
-		} elseif ( $status === 'info' ) {
-			$color = 'blue';
-		}
-		return sprintf(
-			'<span data-title="%1$s" class="contentsync_info_box %2$s contentsync_status"><img src="%3$s" style="width:auto;height:16px;">%4$s</span>',
-			/* title    */ preg_replace( '/\s{1}/', '&nbsp;', $title ),
-			/* color    */ $color,
-			/* icon src */ esc_url( plugins_url( 'assets/icon/' . $status . '.svg', __DIR__ ) ),
-			/* text     */ ! empty( $text ) ? '<span>' . $text . '</span>' : ''
-		);
+	public static function is_rest_request() {
+		return defined( 'REST_REQUEST' ) && REST_REQUEST;
 	}
 
 	/**
@@ -2541,6 +2520,41 @@ class Main_Helper {
 		return apply_filters( 'contentsync_user_can_edit_global_posts', $can_edit, $status );
 	}
 
+
+	/**
+	 * =================================================================
+	 *                          Admin UI
+	 * =================================================================
+	 */
+
+	/**
+	 * Render the contentsync status box
+	 */
+	public static function render_status_box( $status = 'export', $text = '' ) {
+		$status = $status === 'root' ? 'export' : ( $status === 'linked' ? 'import' : $status );
+		$titles = array(
+			'export' => __( 'Root post', 'contentsync' ),
+			'import' => __( 'Linked post', 'contentsync' ),
+			'error'  => __( 'Error', 'contentsync' ),
+		);
+		$title  = isset( $titles[ $status ] ) ? $titles[ $status ] : $status;
+		$color  = 'red';
+		if ( $status === 'export' ) {
+			$color = 'purple';
+		} elseif ( $status === 'import' ) {
+			$color = 'green';
+		} elseif ( $status === 'info' ) {
+			$color = 'blue';
+		}
+		return sprintf(
+			'<span data-title="%1$s" class="contentsync_info_box %2$s contentsync_status"><img src="%3$s" style="width:auto;height:16px;">%4$s</span>',
+			/* title    */ preg_replace( '/\s{1}/', '&nbsp;', $title ),
+			/* color    */ $color,
+			/* icon src */ esc_url( plugins_url( 'assets/icon/' . $status . '.svg', __DIR__ ) ),
+			/* text     */ ! empty( $text ) ? '<span>' . $text . '</span>' : ''
+		);
+	}
+
 	/**
 	 * =================================================================
 	 *                          Connections
@@ -2552,36 +2566,8 @@ class Main_Helper {
 	 *
 	 * @return array $connection_map   All saved connections.
 	 */
-	public static function get_connections() {
-		return self::call_connections_func( 'get_connections' );
-	}
-
-	/**
-	 * Get all connections for global contents
-	 */
-	public static function get_content_connections() {
-		$connections = self::call_connections_func( 'get_connections' );
-		if ( ! $connections ) {
-			return array();
-		}
-		return array_filter(
-			$connections,
-			function ( $connection ) {
-				return ! isset( $connection['contents'] ) || $connection['contents'] === true;
-			}
-		);
-	}
-
-	/**
-	 * Get all connections for global search
-	 */
-	public static function get_search_connections() {
-		return array_filter(
-			self::call_connections_func( 'get_connections' ),
-			function ( $connection ) {
-				return ! isset( $connection['search'] ) || $connection['search'] === true;
-			}
-		);
+	public static function get_site_connections() {
+		return self::call_connections_func( 'get_site_connections' );
 	}
 
 
@@ -2590,13 +2576,6 @@ class Main_Helper {
 	 *                          Compatibility
 	 * =================================================================
 	 */
-
-	/**
-	 * Whether we are in a REST REQUEST. Similar to is_admin().
-	 */
-	public static function is_rest_request() {
-		return defined( 'REST_REQUEST' ) && REST_REQUEST;
-	}
 
 	/**
 	 * Call function from core Post_Export class with backward compatiblity.

@@ -516,7 +516,7 @@ class Actions {
 		}
 
 		if ( self::$logs ) {
-			Main_Helper::call_post_export_func( 'enable_logs' );
+			\Contentsync\post_export_enable_logs();
 		}
 
 		do_action( 'post_export_log', "\r\n------\r\n\r\n" . 'All posts prepared. Now we insert them.' );
@@ -553,7 +553,7 @@ class Actions {
 		}
 
 		if ( self::$logs ) {
-			Main_Helper::call_post_export_func( 'enable_logs' );
+			\Contentsync\post_export_enable_logs();
 		}
 
 		do_action( 'post_export_log', "\r\n------\r\n\r\n" . 'All posts prepared. Now we insert only the posttype itself.' );

@@ -24,22 +24,22 @@ var contentsync = new function () {
 
 		// edit.php of root post
 		if ( $( 'body' ).hasClass( 'contentsync_root' ) ) {
-			var post_id = $( "#post_ID" ).val();
+			var post_id = $( '#post_ID' ).val();
 			if ( post_id && post_id.length > 0 ) {
 				this.checkRootConnections( post_id );
 			}
 		}
 
 		// look for similar posts
-		if ( $( "#contentsync_similar_posts" ).length ) {
-			var post_id = $( "#post_ID" ).val();
+		if ( $( '#contentsync_similar_posts' ).length ) {
+			var post_id = $( '#post_ID' ).val();
 			if ( post_id && post_id.length > 0 ) {
 				this.checkSimilarPosts( post_id );
 			}
 		}
 
 		// connection options
-		if ( $( ".contentsync_connection_options" ).length ) {
+		if ( $( '.contentsync_connection_options' ).length ) {
 			this.initConnectionOptions();
 		}
 
@@ -52,10 +52,11 @@ var contentsync = new function () {
 	this.ajax = function ( action, data ) {
 
 		data.action = action;
-		var form = $( "form#" + action + "_form" );
+		var form = $( 'form#' + action + '_form' );
 		if ( form.length > 0 ) {
 			data.form_data = form.serializeArray().reduce( function ( obj, item ) {
 				obj[ item.name ] = item.value;
+
 				return obj;
 			}, {} );
 		}
@@ -91,7 +92,7 @@ var contentsync = new function () {
 				// use for development
 				// mode = mode === 'reload' ? 'success': 'fail';
 
-				contentsync.tools.triggerOverlay( true, { "type": mode, "css": action } );
+				contentsync.tools.triggerOverlay( true, { 'type': mode, 'css': action } );
 			}
 		);
 
@@ -151,10 +152,11 @@ var contentsync = new function () {
 		var form = $( '#contentsync_import_form' );
 		this.checkImportOverlay( action, gid, postType, form );
 
-	}
+	};
+
 	this.checkImportOverlay = function( action, gid, postType, form ) {
 
-		contentsync.tools.triggerOverlay( true, { "type": "check_post", "css": action } );
+		contentsync.tools.triggerOverlay( true, { 'type': 'check_post', 'css': action } );
 
 		$.post(
 			greyd.ajax_url ?? wizzard_details.ajax_url,
@@ -176,7 +178,7 @@ var contentsync = new function () {
 					// get response: conflicting posts
 					var result = response.split( 'success::' )[ 1 ];
 					try {
-						result = result.indexOf( "[" ) === 0 ? JSON.parse( result ) : result;
+						result = result.indexOf( '[' ) === 0 ? JSON.parse( result ) : result;
 						console.log( result );
 					} catch ( e ) {
 						console.error( e );
@@ -197,11 +199,11 @@ var contentsync = new function () {
 				// complete with error
 				else if ( response.indexOf( 'error::' ) > -1 ) {
 					var msg = response.split( 'error::' )[ 1 ];
-					contentsync.tools.triggerOverlay( true, { "type": "fail", "css": action, "replace": msg } );
+					contentsync.tools.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': msg } );
 				}
 				// unknown state
 				else {
-					contentsync.tools.triggerOverlay( true, { "type": "fail", "css": action, "replace": response } );
+					contentsync.tools.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': response } );
 				}
 			}
 		);
@@ -216,10 +218,11 @@ var contentsync = new function () {
 
 		var action = 'contentsync_import';
 		var data = { gid: gid, action: action };
-		var form = $( "form#" + action + "_form" );
+		var form = $( 'form#' + action + '_form' );
 		if ( form.length > 0 ) {
 			data.form_data = form.serializeArray().reduce( function ( obj, item ) {
 				obj[ item.name ] = item.value;
+
 				return obj;
 			}, {} );
 		}
@@ -269,21 +272,21 @@ var contentsync = new function () {
 		// hook bulk submit
 		$( '#posts-filter' ).on( 'submit', ( e ) => {
 			// console.log(e);
-			const data = [ ...new FormData(e.target).entries() ];
-			  // console.log(data);
+			const data = [ ...new FormData( e.target ).entries() ];
+			
 			if (
-				Object.fromEntries(data).action == "import" ||
-				Object.fromEntries(data).action2 == "import"
+				Object.fromEntries( data ).action == 'import' ||
+				Object.fromEntries( data ).action2 == 'import'
 			) {
 				// console.log("trigger bulk import");
 				var posts = [];
 				data.forEach( entry => {
-					if ( entry[0] == "gids[]" ) {
-						const cb = document.querySelector("input[value='"+entry[1]+"']");
-						const anchor = cb.parentElement.parentElement.querySelector(".root a");
-						const title = decodeURIComponent(cb.dataset.title);
+					if ( entry[ 0 ] == 'gids[]' ) {
+						const cb = document.querySelector( 'input[value=\''+entry[ 1 ]+'\']' );
+						const anchor = cb.parentElement.parentElement.querySelector( '.root a' );
+						const title = decodeURIComponent( cb.dataset.title );
 						posts.push( {
-							gid: entry[1],
+							gid: entry[ 1 ],
 							post_title: title,
 							post_type: cb.dataset.pt,
 							relationship: cb.dataset.rel,
@@ -296,20 +299,21 @@ var contentsync = new function () {
 					// console.info("no posts selected");
 				}
 				else if ( posts.length == 1 ) {
-					if ( posts[0].relationship != 'import' ) {
+					if ( posts[ 0 ].relationship != 'import' ) {
 						// console.log("import single post:", posts[0]);
-						this.checkImportOverlay( 'contentsync_import', posts[0].gid, posts[0].post_type, $( '#contentsync_import_form' ) );
+						this.checkImportOverlay( 'contentsync_import', posts[ 0 ].gid, posts[ 0 ].post_type, $( '#contentsync_import_form' ) );
 					}
 					else {
 						// console.info("selected post is already imported:", posts[0]);
-						contentsync.tools.triggerOverlay( true, { "type": "imported", "css": 'contentsync_import_bulk', "replace": posts[0].title } );
+						contentsync.tools.triggerOverlay( true, { 'type': 'imported', 'css': 'contentsync_import_bulk', 'replace': posts[ 0 ].title } );
 						contentsync.tools.fadeOutOverlay();
 					}
 				}
 				else {
-					console.log("import posts:", posts);
+					console.log( 'import posts:', posts );
 					this.checkImportBulkOverlay( 'contentsync_import_bulk', posts, $( '#contentsync_import_bulk_form' ) );
 				}
+
 				// stop submit
 				e.preventDefault();
 			}
@@ -318,14 +322,14 @@ var contentsync = new function () {
 			// e.preventDefault();
 		} );
 
-	}
+	};
 
 	/**
 	 * Check for conflicts before importing posts
 	 */
 	this.checkImportBulkOverlay = function( action, posts, form ) {
 
-		contentsync.tools.triggerOverlay( true, { "type": "check_post", "css": action } );
+		contentsync.tools.triggerOverlay( true, { 'type': 'check_post', 'css': action } );
 		// clear old items
 		form.find( '.inner_content.item' ).remove();
 
@@ -351,11 +355,11 @@ var contentsync = new function () {
 					let result = response.split( 'success::' )[ 1 ];
 					let conflicts = {};
 					try {
-						if ( result.indexOf( "[" ) === 0 ) {
+						if ( result.indexOf( '[' ) === 0 ) {
 							result = JSON.parse( result );
 							// console.log( result );
 							result.forEach( ( res, i ) => {
-								let postConflicts = res?.conflict?.indexOf( "[" ) === 0 ? JSON.parse( res?.conflict ) : res?.conflict;
+								let postConflicts = res?.conflict?.indexOf( '[' ) === 0 ? JSON.parse( res?.conflict ) : res?.conflict;
 								console.log( 'postConflicts', postConflicts );
 								if ( typeof postConflicts !== 'string' ) {
 									conflicts[ res.gid ] = postConflicts;
@@ -367,6 +371,7 @@ var contentsync = new function () {
 						console.error( e );
 						error = true;
 					}
+
 					if ( typeof result === 'string' ) {
 						error = true;
 					}
@@ -422,14 +427,15 @@ var contentsync = new function () {
 					}
 
 				}
+
 				// complete with error
 				if ( error || response.indexOf( 'error::' ) > -1 ) {
-					var msg = response.split( 'error::' )[1];
-					contentsync.tools.triggerOverlay( true, { "type": "fail", "css": action, "replace": msg } );
+					var msg = response.split( 'error::' )[ 1 ];
+					contentsync.tools.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': msg } );
 				}
 				// unknown state
 				else if ( response.indexOf( 'success::' ) == -1 ) {
-					contentsync.tools.triggerOverlay( true, { "type": "fail", "css": action, "replace": response } );
+					contentsync.tools.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': response } );
 				}
 			}
 		);
@@ -446,23 +452,24 @@ var contentsync = new function () {
 		// get form data (all conflict options)
 		const data = form.serializeArray().reduce( function ( obj, item ) {
 			obj[ item.name ] = item.value;
+
 			return obj;
 		}, {} );
 		// console.log(posts);
 		// console.log(data);
 
 		// copy form items to loader log
-		const loaderContent = $( ".contentsync_overlay .loading .import_bulk .inner_content" );
+		const loaderContent = $( '.contentsync_overlay .loading .import_bulk .inner_content' );
 		loaderContent.children().remove();
 		const innerContent = form.find( '.inner_content' );
-		innerContent.children(':not(.multioption)').each( (i,item) => {
-			var copy = $(item).clone();
-			copy.find( 'select' ).each( (i, select) => {
+		innerContent.children( ':not(.multioption)' ).each( ( i,item ) => {
+			var copy = $( item ).clone();
+			copy.find( 'select' ).each( ( i, select ) => {
 				// js first char to uppercase
-				let text = data[select.name];
-				text = text.charAt(0).toUpperCase() + text.slice(1);
-				$(select).parent().append( '<span class="relationship">'+text+'</span>' );
-				$(select).remove();
+				let text = data[ select.name ];
+				text = text.charAt( 0 ).toUpperCase() + text.slice( 1 );
+				$( select ).parent().append( '<span class="relationship">'+text+'</span>' );
+				$( select ).remove();
 			} );
 			loaderContent.append( copy );
 		} );
@@ -472,15 +479,16 @@ var contentsync = new function () {
 
 		// make import queue
 		posts.forEach( ( item, i ) => {
-			if ( item.relationship == "import" ) {
+			if ( item.relationship == 'import' ) {
 				// skip if already imported
 				contentsync.importQueue.push( {
 					gid: item.gid,
 					action: 'skip',
 					callback: () => {
-						loaderContent.find( '[data-gid="'+item.gid+'"]' ).each( (i, item) => {
-							$(item).find( '.relationship' ).html( innerContent.data('import') );
+						loaderContent.find( '[data-gid="'+item.gid+'"]' ).each( ( i, item ) => {
+							$( item ).find( '.relationship' ).html( innerContent.data( 'import' ) );
 						} );
+
 						return true;
 					}
 				} );
@@ -502,12 +510,14 @@ var contentsync = new function () {
 								return true;
 							}
 							else {
-								console.warn(item.gid+" posttype import failed:", response );
+								console.warn( item.gid+' posttype import failed:', response );
+
 								return response;
 							}
 						}
 					} );
 				}
+
 				// import post
 				contentsync.importQueue.push( {
 					gid: item.gid,
@@ -519,9 +529,10 @@ var contentsync = new function () {
 					callback: ( response ) => {
 						// console.log( response );
 						if ( response.indexOf( 'success::' ) > -1 ) {
-							loaderContent.find( '[data-gid="'+item.gid+'"]' ).each( (i, item) => {
-								$(item).find( '.relationship' ).html( innerContent.data('success') );
+							loaderContent.find( '[data-gid="'+item.gid+'"]' ).each( ( i, item ) => {
+								$( item ).find( '.relationship' ).html( innerContent.data( 'success' ) );
 							} );
+
 							return true;
 						}
 						else {
@@ -530,10 +541,11 @@ var contentsync = new function () {
 							// 	var msg = response.split( 'error::' )[1];
 							// 	loaderContent.find( '[data-gid="'+item.gid+'"] .res .fail' ).attr( "title", msg );
 							// }
-							console.warn(item.gid+" import failed:", msg );
-							loaderContent.find( '[data-gid="'+item.gid+'"]' ).each( (i, item) => {
-								$(item).find( '.relationship' ).html( innerContent.data('fail') );
+							console.warn( item.gid+' import failed:', msg );
+							loaderContent.find( '[data-gid="'+item.gid+'"]' ).each( ( i, item ) => {
+								$( item ).find( '.relationship' ).html( innerContent.data( 'fail' ) );
 							} );
+
 							return response;
 						}
 					}
@@ -543,18 +555,20 @@ var contentsync = new function () {
 
 		// start queue
 		// console.log(contentsync.importQueue);
-		contentsync.importBulkNext(0);
+		contentsync.importBulkNext( 0 );
 
-	}
+	};
+
 	this.importBulkNext = function( index ) {
 
 		if ( contentsync.importQueue.length == index ) {
 			// finish queue
 			contentsync.importBulkFinish();
+
 			return;
 		}
 
-		var item = contentsync.importQueue[index];
+		var item = contentsync.importQueue[ index ];
 		if ( item.ajax_data ) {
 			$.post(
 				greyd.ajax_url ?? wizzard_details.ajax_url,
@@ -565,52 +579,54 @@ var contentsync = new function () {
 					'data': item.ajax_data
 				},
 				function ( response ) {
-					contentsync.importQueue[index].result = item.callback( response );
+					contentsync.importQueue[ index ].result = item.callback( response );
 					// next
-					contentsync.importBulkNext(index+1);
+					contentsync.importBulkNext( index+1 );
 				}
 			);
 		}
 		else {
 			if ( item.action && item.action == 'skip' ) {
-				contentsync.importQueue[index].result = item.callback();
+				contentsync.importQueue[ index ].result = item.callback();
 			}
+
 			// next
-			contentsync.importBulkNext(index+1);
+			contentsync.importBulkNext( index+1 );
 		}
 
-	}
+	};
+
 	this.importBulkFinish = function() {
 	
 		// success or fail (some failed)
-		var mode = "success";
+		var mode = 'success';
 		contentsync.importQueue.forEach( item => {
 			// console.log(item);
 			if ( item.result !== true ) {
-				mode = "fail";
+				mode = 'fail';
 			}
 		} );
 
 		// copy loader items to result log
-		const loaderContent = $( ".contentsync_overlay .loading .import_bulk .inner_content" );
-		const resultContent = $( ".contentsync_overlay ."+mode+" .import_bulk .inner_content" );
+		const loaderContent = $( '.contentsync_overlay .loading .import_bulk .inner_content' );
+		const resultContent = $( '.contentsync_overlay .'+mode+' .import_bulk .inner_content' );
 		resultContent.children().remove();
-		loaderContent.children(':not(.multioption)').each( (i,item) => {
-			var copy = $(item).clone();
+		loaderContent.children( ':not(.multioption)' ).each( ( i,item ) => {
+			var copy = $( item ).clone();
 			resultContent.append( copy );
 		} );
 
 		// add OK button
 		var button = '<div class="flex flex-end"><a class="button button-primary huge" href="javascript:window.location.reload()">OK</a></div>';
-		$( ".success .success_mark").parent().append( button );
-		$( ".fail .color_light.escape").parent().append( button );
-		$( ".fail .color_light.escape").remove();
+		$( '.success .success_mark' ).parent().append( button );
+		$( '.fail .color_light.escape' ).parent().append( button );
+		$( '.fail .color_light.escape' ).remove();
 
 		// show result
-		contentsync.tools.triggerOverlay( true, { "type": mode, "css": 'contentsync_import_bulk' } );
-		clearTimeout(contentsync.tools.overlayTimeout);
+		contentsync.tools.triggerOverlay( true, { 'type': mode, 'css': 'contentsync_import_bulk' } );
+		clearTimeout( contentsync.tools.overlayTimeout );
 		
-	}
+	};
 
 
 	/**
@@ -753,29 +769,30 @@ var contentsync = new function () {
 						// console.log( similar_posts );
 					} catch ( e ) {
 						console.error( e );
-						$( "#contentsync_similar_posts" ).children().addClass( "hidden" );
-						$( "#contentsync_similar_posts" ).children( ".not_found" ).removeClass( "hidden" );
+						$( '#contentsync_similar_posts' ).children().addClass( 'hidden' );
+						$( '#contentsync_similar_posts' ).children( '.not_found' ).removeClass( 'hidden' );
+
 						return;
 					}
 
 					var i = 0;
-					var wrapper = $( "#contentsync_similar_posts" ).children( ".found" );
-					var list = wrapper.find( "ul" );
-					var data_item = list.data( "item" );
+					var wrapper = $( '#contentsync_similar_posts' ).children( '.found' );
+					var list = wrapper.find( 'ul' );
+					var data_item = list.data( 'item' );
 
 					// append list item
 					for ( var gid in similar_posts ) {
 						var post = similar_posts[ gid ];
 						var item = data_item.replace(
-							"{{post_title}}", post?.post_title
+							'{{post_title}}', post?.post_title
 						).replace(
-							"{{post_id}}", post_id // current post_id set as function param
+							'{{post_id}}', post_id // current post_id set as function param
 						).replace(
-							"{{gid}}", gid // array key
+							'{{gid}}', gid // array key
 						).replace(
-							"{{href}}", post?.post_links?.edit
+							'{{href}}', post?.post_links?.edit
 						).replace(
-							"{{nice_url}}", post?.post_links?.nice
+							'{{nice_url}}', post?.post_links?.nice
 						);
 						list.append( item );
 						i++;
@@ -783,22 +800,22 @@ var contentsync = new function () {
 
 					// show singular or plural text
 					if ( i < 2 ) {
-						wrapper.find( ".singular" ).removeClass( "hidden" );
+						wrapper.find( '.singular' ).removeClass( 'hidden' );
 					} else {
-						wrapper.find( ".plural" ).removeClass( "hidden" );
+						wrapper.find( '.plural' ).removeClass( 'hidden' );
 					}
 
 					// show found div
-					$( "#contentsync_similar_posts" ).children().addClass( "hidden" );
-					wrapper.removeClass( "hidden" );
+					$( '#contentsync_similar_posts' ).children().addClass( 'hidden' );
+					wrapper.removeClass( 'hidden' );
 
 					// show overlay warning
-					$( ".export_warning_similar_posts" ).removeClass( "hidden" );
+					$( '.export_warning_similar_posts' ).removeClass( 'hidden' );
 				}
 				// complete with error OR unknown state
 				else {
-					$( "#contentsync_similar_posts" ).children().addClass( "hidden" );
-					$( "#contentsync_similar_posts" ).children( ".not_found" ).removeClass( "hidden" );
+					$( '#contentsync_similar_posts' ).children().addClass( 'hidden' );
+					$( '#contentsync_similar_posts' ).children( '.not_found' ).removeClass( 'hidden' );
 				}
 			}
 		);
@@ -813,30 +830,31 @@ var contentsync = new function () {
 		var saving = false;
 
 		// show the button when an option is changed
-		$( ".contentsync_connection_options label" ).on( "click", function () {
+		$( '.contentsync_connection_options label' ).on( 'click', function () {
 			if ( !saving ) {
-				$( this ).siblings( ".button" ).removeClass( "hidden" );
+				$( this ).siblings( '.button' ).removeClass( 'hidden' );
 			}
 		} );
 
 		// save the options
-		$( ".contentsync_connection_options .button" ).on( "click", function () {
+		$( '.contentsync_connection_options .button' ).on( 'click', function () {
 
 			// not multiple actions at once
 			if ( saving ) {
-				console.log( "saving in progress..." );
+				console.log( 'saving in progress...' );
+
 				return;
 			} else {
 				saving = true;
 			}
 
 			var button = $( this );
-			var wrapper = button.closest( ".contentsync_connection_options" );
-			var site_url = wrapper.data( "site_url" );
-			var contents = wrapper.find( "input[name='contents']" ).is( ":checked" );
-			var search = wrapper.find( "input[name='search']" ).is( ":checked" );
+			var wrapper = button.closest( '.contentsync_connection_options' );
+			var site_url = wrapper.data( 'site_url' );
+			var contents = wrapper.find( 'input[name=\'contents\']' ).is( ':checked' );
+			var search = wrapper.find( 'input[name=\'search\']' ).is( ':checked' );
 
-			button.addClass( "loading" );
+			button.addClass( 'loading' );
 
 			$.post(
 				greyd.ajax_url ?? wizzard_details.ajax_url,
@@ -845,7 +863,7 @@ var contentsync = new function () {
 					'_ajax_nonce': greyd.nonce ?? wizzard_details.nonce,
 					'mode': 'global_action',
 					'data': {
-						'action': 'contentsync_update_connections',
+						'action': 'contentsync_update_site_connections',
 						'site_url': site_url,
 						'contents': contents,
 						'search': search,
@@ -856,13 +874,13 @@ var contentsync = new function () {
 
 					var success = response.indexOf( 'success::' ) > -1;
 
-					button.addClass( success ? "success" : "fail button-danger" );
+					button.addClass( success ? 'success' : 'fail button-danger' );
 
 					// reset
 					clearTimeout( timeout );
 					timeout = setTimeout( function () {
-						button.removeClass( "success fail button-danger loading" );
-						if ( success ) button.addClass( "hidden" );
+						button.removeClass( 'success fail button-danger loading' );
+						if ( success ) button.addClass( 'hidden' );
 						saving = false;
 					}, 1500 );
 				}
@@ -875,7 +893,7 @@ var contentsync = new function () {
 	 */
 	this.checkForErrorPosts = function () {
 
-		const elem = $( "ul.subsubsub li.errors .js_check_errors" );
+		const elem = $( 'ul.subsubsub li.errors .js_check_errors' );
 
 		// don't look for errors on the error page itself
 		if ( elem.length === 0 ) return;
@@ -907,6 +925,7 @@ var contentsync = new function () {
 						console.log( posts );
 					} catch ( e ) {
 						console.error( e );
+
 						// do something on error...
 						return;
 					}
@@ -919,7 +938,7 @@ var contentsync = new function () {
 					}
 
 					elem.find( '.errors_found' ).removeClass( 'hidden' );
-					elem.find( '.count' ).text( "(" + length + ")" );
+					elem.find( '.count' ).text( '(' + length + ')' );
 				}
 				// complete with error OR unknown state
 				else {
@@ -956,7 +975,7 @@ var contentsync = new function () {
 
 			$new.hide();
 
-			if ( clear ) $list.html( "" );
+			if ( clear ) $list.html( '' );
 
 			// add multioption select
 			if ( $list.find( '.multioption' ).length == 0 ) {
@@ -989,7 +1008,8 @@ var contentsync = new function () {
 				} else {
 					right = '<select name="' + post?.ID + '">' + options + '</select>';
 				}
-				$list.append( '<div data-gid="' + ( post?.gid ?? "" ) + '">' + left + right + '</div>' );
+
+				$list.append( '<div data-gid="' + ( post?.gid ?? '' ) + '">' + left + right + '</div>' );
 
 				if ( post.post_type == 'tp_posttypes' ) {
 					$list.find( 'select[name="' + post.ID + '"] option[value="keep"]' ).attr( 'disabled', true );
@@ -1042,7 +1062,7 @@ var contentsync = new function () {
 			'post_id': post_id,
 			'message': message
 		} );
-	}
+	};
 
 	/**
 	 * Revert post review
@@ -1069,7 +1089,7 @@ var contentsync = new function () {
 			'message': message
 		} );
 
-	}
+	};
 
 	/**
 	 * Site editor functions.
@@ -1081,7 +1101,8 @@ var contentsync = new function () {
 		 */
 		this.setData = ( data ) => {
 			console.log( 'setData not initialized via useState()', data );
-		}
+		};
+
 		this.data = {
 			postReference: null,
 			post: {
@@ -1091,7 +1112,7 @@ var contentsync = new function () {
 				status: '',
 			},
 			similarPosts: null
-		}
+		};
 
 		/**
 		 * Set Notice based on response.
@@ -1101,16 +1122,16 @@ var contentsync = new function () {
 		this.setNotice = ( notice ) => {
 	
 			if ( notice && notice.length > 0 ) {
-				wp.data.dispatch( "core/notices" ).removeNotices(
+				wp.data.dispatch( 'core/notices' ).removeNotices(
 					wp.data.select( 'core/notices' ).getNotices().map( ( n ) => n.id )
 				);
 
 				// convert action onClick strings into function
 				notice[ 2 ]?.actions.forEach( action => {
-					if ( typeof action.onClick === "string" ) {
+					if ( typeof action.onClick === 'string' ) {
 						action.onClick = new Function( action.onClick );
 					}
-				});
+				} );
 
 				wp.data.dispatch( 'core/notices' ).createNotice(
 					notice[ 0 ],
@@ -1120,7 +1141,7 @@ var contentsync = new function () {
 			}
 			// remove all notices
 			else {
-				wp.data.dispatch( "core/notices" ).removeNotices(
+				wp.data.dispatch( 'core/notices' ).removeNotices(
 					wp.data.select( 'core/notices' ).getNotices().map( ( n ) => n.id )
 				);
 			}
@@ -1139,6 +1160,7 @@ var contentsync = new function () {
 
 			if ( typeof wp?.apiFetch === 'undefined' ) {
 				console.error( 'wp.apiFetch not defined' );
+
 				return;
 			}
 	
@@ -1159,6 +1181,7 @@ var contentsync = new function () {
 					} else {
 						document.body.classList.remove( 'contentsync-locked' );
 					}
+
 					contentsync.editor.setNotice( response?.data?.notice );
 					console.log( 'setData:', response?.data );
 					contentsync.editor.setData( {
@@ -1173,7 +1196,7 @@ var contentsync = new function () {
 						},
 						canonicalUrl: response?.data?.post?.canonicalUrl || '',
 						showEditOptions: false
-					} )
+					} );
 				} else {
 					document.body.classList.remove( 'contentsync-locked' );
 					contentsync.editor.setNotice( [] );
@@ -1199,7 +1222,7 @@ var contentsync = new function () {
 	
 			} ).catch( ( err ) => {
 				document.body.classList.remove( 'contentsync-locked' );
-				console.error( "apiFetch error: ", err );
+				console.error( 'apiFetch error: ', err );
 				contentsync.editor.setData( {
 					postReference: postReference,
 					post: {
@@ -1219,7 +1242,7 @@ var contentsync = new function () {
 					showEditOptions: false
 				} );
 			} );
-		}
+		};
 
 		/**
 		 * Save Contentsync options
@@ -1232,6 +1255,7 @@ var contentsync = new function () {
 
 			if ( typeof wp?.apiFetch === 'undefined' ) {
 				console.error( 'wp.apiFetch not defined' );
+
 				return;
 			}
 
@@ -1255,10 +1279,10 @@ var contentsync = new function () {
 				}
 
 			} ).catch( ( err ) => {
-				console.error( "saveOptions error: ", err );
+				console.error( 'saveOptions error: ', err );
 				greyd?.tools?.showSnackbar( 'Failed to save options', 'error', true );
 			} );
-		}
+		};
 
 		/**
 		 * Get similar posts
@@ -1290,6 +1314,7 @@ var contentsync = new function () {
 							similarPosts = Object.values( JSON.parse( response.split( 'success::' )[ 1 ] ) );
 						} catch ( e ) {
 							console.error( e );
+
 							return;
 						}
 					}
@@ -1300,7 +1325,7 @@ var contentsync = new function () {
 					} );
 				}
 			);
-		}
+		};
 
 		this.renderStatusBox = function ( status, text ) {
 			const {
@@ -1312,9 +1337,9 @@ var contentsync = new function () {
 
 			status = status === 'root' ? 'export' : ( status === 'linked' ? 'import' : status );
 			let titles = {
-				export: __( "Root post", 'contentsync' ),
-				import: __( "Linked post", 'contentsync' ),
-				error: __( "Error", 'contentsync' ),
+				export: __( 'Root post', 'contentsync' ),
+				import: __( 'Linked post', 'contentsync' ),
+				error: __( 'Error', 'contentsync' ),
 			};
 			let title = titles[ status ] ?? status;
 			let color = 'red';
@@ -1325,6 +1350,7 @@ var contentsync = new function () {
 			} else if ( status === 'info' ) {
 				color = 'blue';
 			}
+
 			let icons = {
 				export: el( 'svg', {
 					width: '24',
@@ -1356,7 +1382,8 @@ var contentsync = new function () {
 					d: 'M12 21C14.3869 21 16.6761 20.0518 18.364 18.364C20.0518 16.6761 21 14.3869 21 12C21 9.61305 20.0518 7.32387 18.364 5.63604C16.6761 3.94821 14.3869 3 12 3C9.61305 3 7.32387 3.94821 5.63604 5.63604C3.94821 7.32387 3 9.61305 3 12C3 14.3869 3.94821 16.6761 5.63604 18.364C7.32387 20.0518 9.61305 21 12 21V21ZM10.65 16.05C10.65 15.692 10.7922 15.3486 11.0454 15.0954C11.2986 14.8422 11.642 14.7 12 14.7C12.358 14.7 12.7014 14.8422 12.9546 15.0954C13.2078 15.3486 13.35 15.692 13.35 16.05C13.35 16.408 13.2078 16.7514 12.9546 17.0046C12.7014 17.2578 12.358 17.4 12 17.4C11.642 17.4 11.2986 17.2578 11.0454 17.0046C10.7922 16.7514 10.65 16.408 10.65 16.05ZM11.1144 7.338C11.152 7.13049 11.2612 6.94277 11.4231 6.80759C11.5849 6.6724 11.7891 6.59835 12 6.59835C12.2109 6.59835 12.4151 6.6724 12.5769 6.80759C12.7388 6.94277 12.848 7.13049 12.8856 7.338L12.9 7.5V12L12.8856 12.162C12.848 12.3695 12.7388 12.5572 12.5769 12.6924C12.4151 12.8276 12.2109 12.9016 12 12.9016C11.7891 12.9016 11.5849 12.8276 11.4231 12.6924C11.2612 12.5572 11.152 12.3695 11.1144 12.162L11.1 12V7.5L11.1144 7.338Z',
 					fill: 'currentColor'
 				} ) ),
-			}
+			};
+
 			return el(
 				'span', {
 					'data-title': title,
@@ -1365,8 +1392,8 @@ var contentsync = new function () {
 				icons[ status ] ?? '',
 				text ? el( 'span', null, text ) : ''
 			);
-		}
-	}
+		};
+	};
 };
 
 contentsync.tools = new function() {
@@ -1376,51 +1403,51 @@ contentsync.tools = new function() {
 	this.init = function() {
 
 		// add trigger to escape-button
-		$(".contentsync_overlay .button[role='escape']").on("click", function() {
-			contentsync.tools.triggerOverlay(false, {
-				id: $(this).closest(".contentsync_overlay").attr("id")
+		$( '.contentsync_overlay .button[role=\'escape\']' ).on( 'click', function() {
+			contentsync.tools.triggerOverlay( false, {
+				id: $( this ).closest( '.contentsync_overlay' ).attr( 'id' )
 			} );
-		});
+		} );
 
 		// greyd info popup
-		$(".contentsync_popup_wrapper").on("click", function(e){
-			contentsync.tools.togglePopup(e, $(this));
-		});
+		$( '.contentsync_popup_wrapper' ).on( 'click', function( e ){
+			contentsync.tools.togglePopup( e, $( this ) );
+		} );
 
 		// tabs
-		$(".block_tabs .block_tab").on("click", function(){
-			if ( $(this).hasClass("active") ) return;
+		$( '.block_tabs .block_tab' ).on( 'click', function(){
+			if ( $( this ).hasClass( 'active' ) ) return;
 
-			$(this).siblings(".block_tab.active").removeClass("active");
-			$(this).addClass("active");
-		})
-	}
+			$( this ).siblings( '.block_tab.active' ).removeClass( 'active' );
+			$( this ).addClass( 'active' );
+		} );
+	};
 
-	this.togglePopup = function(e, clicked) {
+	this.togglePopup = function( e, clicked ) {
 		// console.log('Pop Up!');
 		e.stopPropagation();
-		var $toggle = clicked.children('.toggle');
-		var dialog  = clicked.children('dialog');
+		var $toggle = clicked.children( '.toggle' );
+		var dialog  = clicked.children( 'dialog' );
 		if ( dialog.length ) {
-			if ( dialog[0].open ) dialog[0].close();
-			else dialog[0].showModal();
+			if ( dialog[ 0 ].open ) dialog[ 0 ].close();
+			else dialog[ 0 ].showModal();
 		} else {
-			$toggle.toggleClass("checked dashicons-info dashicons-no");
-			$(document).one('click', function() {
-				$toggle.removeClass("checked dashicons-no").addClass("dashicons-info");
-			});
+			$toggle.toggleClass( 'checked dashicons-info dashicons-no' );
+			$( document ).one( 'click', function() {
+				$toggle.removeClass( 'checked dashicons-no' ).addClass( 'dashicons-info' );
+			} );
 		}
-	}
+	};
 
-	this.toggleElemByClass = function(cls) {
-		toggle = $(".toggle_"+cls);
-		if (toggle.length !== 0) toggle.toggleClass("hidden");
-	}
+	this.toggleElemByClass = function( cls ) {
+		toggle = $( '.toggle_'+cls );
+		if ( toggle.length !== 0 ) toggle.toggleClass( 'hidden' );
+	};
 
-	this.toggleRadioByClass = function(cls, val) {
-		$("[class*='"+cls+"']:not(."+cls+"_"+val+")").addClass("hidden");
-		$("."+cls+"_"+val).removeClass("hidden");
-	}
+	this.toggleRadioByClass = function( cls, val ) {
+		$( '[class*=\''+cls+'\']:not(.'+cls+'_'+val+')' ).addClass( 'hidden' );
+		$( '.'+cls+'_'+val ).removeClass( 'hidden' );
+	};
 
 	/**
 	 * Show an overlay for different states and actions.
@@ -1440,41 +1467,41 @@ contentsync.tools = new function() {
 		show = typeof show !== 'undefined' ? show : true;
 		atts = atts ? atts : {};
 
-		var type    = typeof atts.type !== "undefined"      ? atts.type     : "loading";
-		var css     = typeof atts.css !== "undefined"       ? atts.css      : "init";
-		var replace = typeof atts.replace !== "undefined"   ? atts.replace  : "";
-		var id      = typeof atts.id !== "undefined"        ? atts.id       : "overlay";
+		var type    = typeof atts.type !== 'undefined'      ? atts.type     : 'loading';
+		var css     = typeof atts.css !== 'undefined'       ? atts.css      : 'init';
+		var replace = typeof atts.replace !== 'undefined'   ? atts.replace  : '';
+		var id      = typeof atts.id !== 'undefined'        ? atts.id       : 'overlay';
 
 		console.log( show, type, css, replace, id );
 
-		clearTimeout(contentsync.tools.overlayTimeout);
-		var overlay = $(".contentsync_overlay#"+id);
-		if (overlay.length === 0) return false;
+		clearTimeout( contentsync.tools.overlayTimeout );
+		var overlay = $( '.contentsync_overlay#'+id );
+		if ( overlay.length === 0 ) return false;
 
-		if (show === true) {
+		if ( show === true ) {
 
 			// show type
-			var wrapper = overlay.children("."+type+", .always");
-			wrapper.siblings().addClass("hidden");
-			wrapper.each(function() {
-				$(this).removeClass("hidden");
-			});
+			var wrapper = overlay.children( '.'+type+', .always' );
+			wrapper.siblings().addClass( 'hidden' );
+			wrapper.each( function() {
+				$( this ).removeClass( 'hidden' );
+			} );
 
 			// replace elements
-			if (replace.length > 0) {
-				wrapper.find(".replace").html(replace);
+			if ( replace.length > 0 ) {
+				wrapper.find( '.replace' ).html( replace );
 			}
 
 			// show elements
-			wrapper.find(".depending").addClass("hidden");
+			wrapper.find( '.depending' ).addClass( 'hidden' );
 			// if multiple classes are defined, show each
 
 			if ( css && css.length ) {
-				String(css).split(" ").forEach( k => {
-					wrapper.find( ".depending."+k ).removeClass("hidden");
-				});
+				String( css ).split( ' ' ).forEach( k => {
+					wrapper.find( '.depending.'+k ).removeClass( 'hidden' );
+				} );
 				// show elements were both classes need to be set
-				wrapper.find( ".depending." + css.split(" ").join('-') ).removeClass("hidden");
+				wrapper.find( '.depending.' + css.split( ' ' ).join( '-' ) ).removeClass( 'hidden' );
 			}
 
 
@@ -1483,38 +1510,38 @@ contentsync.tools = new function() {
 			 * we then loop through the wrappers and search for wrapper where only hidden containers are.
 			 * Now we know that the overlay is not needed and can finally hide it
 			 */
-			if (overlay.length === 2) {
+			if ( overlay.length === 2 ) {
 				// console.log("found 2 overlays");
-				wrapper.each(function() {
-					if ($(this).children(".depending").not(".hidden").length == 0) {
+				wrapper.each( function() {
+					if ( $( this ).children( '.depending' ).not( '.hidden' ).length == 0 ) {
 						// console.log("found not needed overlay --> hiding it");
-						$(this).parent().addClass("hidden");
+						$( this ).parent().addClass( 'hidden' );
 					} else {
-						$(this).parent().removeClass("hidden");
+						$( this ).parent().removeClass( 'hidden' );
 					}
-				});
+				} );
 			} else {
 				// finally show overlay
-				overlay.removeClass("hidden");
+				overlay.removeClass( 'hidden' );
 			}
 
 
 			// hide overlay...
-			if (type === "success") {
+			if ( type === 'success' ) {
 				contentsync.tools.fadeOutOverlay();
-			} else if (type === "fail") {
+			} else if ( type === 'fail' ) {
 				// contentsync.tools.fadeOutOverlay(5000);
 			}
 			// ...or reload page
-			else if (type === "reload") {
+			else if ( type === 'reload' ) {
 				contentsync.tools.reloadPage();
 			}
 		}
 		else {
-			$(".contentsync_overlay").addClass("hidden");
-			clearTimeout(contentsync.tools.overlayTimeout);
+			$( '.contentsync_overlay' ).addClass( 'hidden' );
+			clearTimeout( contentsync.tools.overlayTimeout );
 		}
-	}
+	};
 
 	/**
 	 * Confirm action via overlay
@@ -1524,22 +1551,23 @@ contentsync.tools = new function() {
 	 * @param string callback   name of function to be called after confirmation
 	 * @param array  args       arguments to be applied to the callback-function
 	 */
-	this.confirm = function(css, replace, callback, args, id) {
+	this.confirm = function( css, replace, callback, args, id ) {
 		var overlayArgs = {
-			type: "confirm",
+			type: 'confirm',
 			css: css,
 			replace: replace,
 			id: id
-		}
-		this.triggerOverlay(true, overlayArgs);
-		$(".contentsync_overlay .button[role='confirm']").off("click").on("click", function() {
+		};
+		this.triggerOverlay( true, overlayArgs );
+		$( '.contentsync_overlay .button[role=\'confirm\']' ).off( 'click' ).on( 'click', function() {
 			if ( typeof callback === 'function' ) {
-				callback.apply(this, args);
+				callback.apply( this, args );
 			}
-			overlayArgs.type = "loading";
+
+			overlayArgs.type = 'loading';
 			contentsync.tools.triggerOverlay( true, overlayArgs );
-		});
-	}
+		} );
+	};
 
 	/**
 	 * Decide between two action via overlay
@@ -1549,8 +1577,8 @@ contentsync.tools = new function() {
 	 *  @property {function} callback  name of function to be called after confirmation
 	 *  @property {array} args         arguments to be applied to the callback-function
 	 */
-	this.decide = function(css, callbacks, deprecated1, deprecated2, deprecated3 ) {
-		this.triggerOverlay(true, {"type": "decision", "css": css, "replace": ""});
+	this.decide = function( css, callbacks, deprecated1, deprecated2, deprecated3 ) {
+		this.triggerOverlay( true, { 'type': 'decision', 'css': css, 'replace': '' } );
 
 		// console.log( typeof callbacks, callbacks, deprecated1, deprecated2, deprecated3 );
 
@@ -1559,11 +1587,12 @@ contentsync.tools = new function() {
 			if ( callbacks?.callback ) {
 				callbacks = [ callbacks ];
 			}
-			callback1 = callbacks[0]?.callback;
-			args1     = callbacks[0]?.args;
-			if ( callbacks[1]?.callback ) {
-				callback2 = callbacks[1]?.callback;
-				args2     = callbacks[1]?.args;
+
+			callback1 = callbacks[ 0 ]?.callback;
+			args1     = callbacks[ 0 ]?.args;
+			if ( callbacks[ 1 ]?.callback ) {
+				callback2 = callbacks[ 1 ]?.callback;
+				args2     = callbacks[ 1 ]?.args;
 			}
 		} else {
 			callback1 = callbacks;
@@ -1572,54 +1601,54 @@ contentsync.tools = new function() {
 			args2     = deprecated3;
 		}
 
-		$(".contentsync_overlay .button[role='decision'][decision='0']").off("click").on("click", function() {
-			if ( typeof callback1 === 'function' ) callback1.apply(this, args1);
-		});
-		$(".contentsync_overlay .button[role='decision'][decision='1']").off("click").on("click", function() {
-			if ( typeof callback2 === 'function' ) callback2.apply(this, args2);
-		});
-	}
+		$( '.contentsync_overlay .button[role=\'decision\'][decision=\'0\']' ).off( 'click' ).on( 'click', function() {
+			if ( typeof callback1 === 'function' ) callback1.apply( this, args1 );
+		} );
+		$( '.contentsync_overlay .button[role=\'decision\'][decision=\'1\']' ).off( 'click' ).on( 'click', function() {
+			if ( typeof callback2 === 'function' ) callback2.apply( this, args2 );
+		} );
+	};
 
 	this.fadeOutOverlay = function( time ) {
 		time = time ? time : 2400;
-		clearTimeout(contentsync.tools.overlayTimeout);
+		clearTimeout( contentsync.tools.overlayTimeout );
 		contentsync.tools.overlayTimeout = setTimeout( function() {
-			contentsync.tools.triggerOverlay(false);
+			contentsync.tools.triggerOverlay( false );
 		}, time );
-	}
+	};
 
 	this.reloadPage = function( time ) {
-		var form = $("form#reload_page");
+		var form = $( 'form#reload_page' );
 		if ( form.length === 0 ) {
-			form = $("#wpfooter").after("<form method='post' id='reload_page'></form>");
+			form = $( '#wpfooter' ).after( '<form method=\'post\' id=\'reload_page\'></form>' );
 		}
 
 		time = time ? time : 1500;
-		clearTimeout(contentsync.tools.overlayTimeout);
+		clearTimeout( contentsync.tools.overlayTimeout );
 		contentsync.tools.overlayTimeout = setTimeout( function() {
-			$("form#reload_page").submit();
+			$( 'form#reload_page' ).submit();
 		}, time );
-	}
+	};
 
 	this.addPageTitleAction = function( label, args ) {
-		if (typeof label === 'string') {
-			var css     = args.css ? args.css : "";
-			var url     = args.url ? " href='"+args.url+"'" : "";
-			var id      = args.id  ? " id='"+args.id+"'" : "";
-			var onclick = args.onclick ? " onclick='"+args.onclick+"'" : "";
-			$("hr.wp-header-end").before("<a class='button-ghost page-title-action "+css+"'"+id+url+onclick+">"+label+"</a>");
+		if ( typeof label === 'string' ) {
+			var css     = args.css ? args.css : '';
+			var url     = args.url ? ' href=\''+args.url+'\'' : '';
+			var id      = args.id  ? ' id=\''+args.id+'\'' : '';
+			var onclick = args.onclick ? ' onclick=\''+args.onclick+'\'' : '';
+			$( 'hr.wp-header-end' ).before( '<a class=\'button-ghost page-title-action '+css+'\''+id+url+onclick+'>'+label+'</a>' );
 		}
-	}
+	};
 
-	this.toggleOverlay = function(id) {
-		$(".contentsync_overlay_v2"+( id ? "#"+id : "" )).toggleClass("is-active");
-	}
+	this.toggleOverlay = function( id ) {
+		$( '.contentsync_overlay_v2'+( id ? '#'+id : '' ) ).toggleClass( 'is-active' );
+	};
 
-	this.openOverlay = function(id) {
-		$(".contentsync_overlay_v2"+( id ? "#"+id : "" )).addClass("is-active");
-	}
+	this.openOverlay = function( id ) {
+		$( '.contentsync_overlay_v2'+( id ? '#'+id : '' ) ).addClass( 'is-active' );
+	};
 
-	this.closeOverlay = function(id) {
-		$(".contentsync_overlay_v2"+( id ? "#"+id : "" )).removeClass("is-active");
-	}
-}
+	this.closeOverlay = function( id ) {
+		$( '.contentsync_overlay_v2'+( id ? '#'+id : '' ) ).removeClass( 'is-active' );
+	};
+};

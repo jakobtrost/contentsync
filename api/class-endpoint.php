@@ -74,10 +74,26 @@ class Endpoint {
 	 * @param WP_REST_Request $request
 	 */
 	public function permission_callback( $request ) {
-		if ( ! \Contentsync\Site_Connections\is_allowed() ) {
+		if ( ! $this->is_request_allowed() ) {
 			return new \WP_Error( 'rest_forbidden', esc_html__( 'You are not allowed to use this endpoint.' ), array( 'status' => $this->authorization_status_code() ) );
 		}
 		return true;
+	}
+
+	/**
+	 * Is the request from the connection allowed?
+	 */
+	public function is_request_allowed() {
+
+		if ( is_multisite() && is_super_admin() ) {
+			return true;
+		}
+
+		if ( ! is_multisite() && current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+
+		return apply_filters( 'contentsync_is_request_allowed', false );
 	}
 
 
@@ -91,7 +107,7 @@ class Endpoint {
 	 * Sets up the proper HTTP status code for authorization.
 	 */
 	public function authorization_status_code() {
-		return \Contentsync\Site_Connections\is_allowed() || is_user_logged_in() ? 403 : 401;
+		return $this->is_request_allowed() || is_user_logged_in() ? 403 : 401;
 	}
 
 	/**

@@ -179,7 +179,7 @@ class Connected_Posts extends Endpoint {
 					/**
 					 * We now import all the posts to the target blog.
 					 */
-					Main_Helper::call_post_export_func( 'enable_logs' );
+					\Contentsync\post_export_enable_logs();
 					$result = Main_Helper::import_posts( $all_posts, $conflict_actions );
 
 					if ( $result ) {
@@ -343,7 +343,7 @@ class Connected_Posts extends Endpoint {
 		// echo "\r\n".sprintf( "Match gid before import: %s", $gid );
 
 		$origin  = $this->origin;
-		$current = Main_Helper::get_network_url();
+		$current = \Contentsync\Main_Helper::get_network_url();
 
 		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $gid );
 		if ( ! empty( $post_id ) && ! empty( $origin ) ) {
@@ -412,7 +412,7 @@ class Connected_Posts extends Endpoint {
 	public function allow_request_from_same_origin( $request ) {
 
 		$origin  = $request->get_header( 'Origin' );
-		$current = Main_Helper::get_network_url();
+		$current = \Contentsync\Main_Helper::get_network_url();
 
 		if ( $current == $origin ) {
 			return true;

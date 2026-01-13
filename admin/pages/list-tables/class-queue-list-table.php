@@ -270,7 +270,7 @@ class Queue_List_Table extends \WP_List_Table {
 			$destination_url = get_blog_option( $item->destination->ID, 'siteurl' );
 		}
 		else if ( is_a( $item->destination, 'Contentsync\Distribution\Remote_Destination' ) ) {
-			$connection = Main_Helper::call_connections_func( 'get_connection', $item->destination->ID );
+			$connection = get_site_connection( $item->destination->ID );
 			if ( $connection ) {
 				$title           = $connection['site_name'];
 				$destination_url = $connection['site_url'];

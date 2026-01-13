@@ -7,7 +7,7 @@
  *
  * @see https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
  */
-namespace Contentsync\Site_Connections;
+namespace Contentsync;
 
 use Contentsync\Main_Helper;
 
@@ -16,51 +16,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Holds the name of the (network) option
- */
-const OPTION_NAME = 'gc_connections';
-
-/**
- * Whether logs are echoed.
- * Usually set via function @see enable_logs() or via url parameter ?debug
- * Logs are especiallly usefull when debugging ajax actions.
- *
- * @var bool
- */
-$contentsync_site_connections_logs = isset( $_GET['debug'] ) ? true : false;
-
-
-/**
  * Activate the application password extension
  */
 add_filter( 'wp_is_application_passwords_available', '__return_true', 99 );
 
 /**
- * Disable SSL verification (for development purposes)
+ * Get the name of the site connections option
+ *
+ * @return string
  */
-// add_filter( 'https_ssl_verify', '__return_false' );
-
-/**
- * Is the request from the connection allowed?
- */
-function is_allowed() {
-
-	if ( is_multisite() && is_super_admin() ) {
-		return true;
-	}
-
-	if ( ! is_multisite() && current_user_can( 'manage_options' ) ) {
-		return true;
-	}
-
-	return apply_filters( 'contentsync_connection_is_allowed', false );
+function get_site_connections_option_name() {
+	return 'contentsync_site_connections';
 }
-
-/**
- * =================================================================
- *                          Connections
- * =================================================================
- */
 
 /**
  * Get the current connections
@@ -71,18 +38,16 @@ function is_allowed() {
  *      @property string user_login Username on the remote site.
  *      @property string password   Encoded application password.
  *      @property bool   active     Whether the connection is active (default: true).
- *      @property bool   contents   Whether the connection is used for global contents (default: true).
- *      @property bool   search     Whether the connection is used for global search (default: true).
  */
-function get_connections() {
+function get_site_connections() {
 
 	if ( is_multisite() ) {
-		$connections = get_network_option( null, OPTION_NAME, array() );
+		$connections = get_network_option( null, get_site_connections_option_name(), array() );
 	} else {
-		$connections = get_option( OPTION_NAME, array() );
+		$connections = get_option( get_site_connections_option_name(), array() );
 	}
 
-	return apply_filters( 'contentsync_get_connections', (array) $connections );
+	return apply_filters( 'contentsync_get_site_connections', (array) $connections );
 }
 
 /**
@@ -92,18 +57,13 @@ function get_connections() {
  *
  * @return array|null
  */
-function get_connection( $site_url ) {
-	global $contentsync_site_connections_logs;
+function get_site_connection( $site_url ) {
 
 	$site_url = apply_filters( 'contentsync_connection_key', Main_Helper::get_nice_url( $site_url ) );
-	if ( $contentsync_site_connections_logs ) {
-		echo "\r\n\r\nget_connection: {$site_url}\r\n\r\n";
-	}
+	\Contentsync\Logger::add( 'get_site_connection', $site_url );
 
-	$connections = get_connections();
-	if ( $contentsync_site_connections_logs ) {
-		debug( $connections );
-	}
+	$connections = get_site_connections();
+	\Contentsync\Logger::add( 'get_site_connections', $connections );
 	if ( isset( $connections[ $site_url ] ) ) {
 		$connection = $connections[ $site_url ];
 	} else {
@@ -111,7 +71,7 @@ function get_connection( $site_url ) {
 		$connection = isset( $connections[ $site_url ] ) ? $connections[ $site_url ] : null;
 	}
 
-	return apply_filters( 'contentsync_get_connection', $connection, $site_url );
+	return apply_filters( 'contentsync_get_site_connection', $connection, $site_url );
 }
 
 /**
@@ -123,21 +83,19 @@ function get_connection( $site_url ) {
  *      @property string user_login Username on the remote site.
  *      @property string password   Encoded application password.
  *      @property bool   active     Whether the connection is active (default: true).
- *      @property bool   contents   Whether the connection is used for global contents (default: true).
- *      @property bool   search     Whether the connection is used for global search (default: true).
  *
  * @return bool $result         Whether the update was successfull.
  */
-function update_connections( $connections = array() ) {
+function update_site_connections( $connections = array() ) {
 
 	if ( ! is_array( $connections ) ) {
 		$connections = array();
 	}
 
 	if ( is_multisite() ) {
-		$result = update_network_option( null, OPTION_NAME, $connections );
+		$result = update_network_option( null, get_site_connections_option_name(), $connections );
 	} else {
-		$result = update_option( OPTION_NAME, $connections );
+		$result = update_option( get_site_connections_option_name(), $connections );
 	}
 
 	return (bool) $result;
@@ -152,18 +110,16 @@ function update_connections( $connections = array() ) {
  *      @property string user_login Username on the remote site.
  *      @property string password   Encoded application password.
  *      @property bool   active     Whether the connection is active (default: true).
- *      @property bool   contents   Whether the connection is used for global contents (default: true).
- *      @property bool   search     Whether the connection is used for global search (default: true).
  *
  * @return bool $result         Whether the update was successfull.
  */
-function update_connection( $connection = array() ) {
+function update_site_connection( $connection = array() ) {
 
 	if ( ! is_array( $connection ) ) {
 		return false;
 	}
 
-	$connections = get_connections();
+	$connections = get_site_connections();
 	$site_url    = isset( $connection['site_url'] ) ? Main_Helper::get_nice_url( $connection['site_url'] ) : null;
 
 	if ( empty( $site_url ) ) {
@@ -178,9 +134,9 @@ function update_connection( $connection = array() ) {
 	);
 
 	if ( is_multisite() ) {
-		$result = update_network_option( null, OPTION_NAME, $connections );
+		$result = update_network_option( null, get_site_connections_option_name(), $connections );
 	} else {
-		$result = update_option( OPTION_NAME, $connections );
+		$result = update_option( get_site_connections_option_name(), $connections );
 	}
 
 	return (bool) $result;
@@ -195,12 +151,10 @@ function update_connection( $connection = array() ) {
  *      @property string user_login Username on the remote site.
  *      @property string password   Encoded application password.
  *      @property bool   active     Whether the connection is active (default: true).
- *      @property bool   contents   Whether the connection is used for global contents (default: true).
- *      @property bool   search     Whether the connection is used for global search (default: true).
  *
  * @return true|false|null True on success, false on failure, null if already exists.
  */
-function add_connection( $connection ) {
+function add_site_connection( $connection ) {
 
 	if ( ! is_array( $connection ) || ! isset( $connection['site_url'] ) ) {
 		return false;
@@ -209,7 +163,7 @@ function add_connection( $connection ) {
 	$site_url = Main_Helper::get_nice_url( $connection['site_url'] );
 
 	// get connections
-	$connections = get_connections();
+	$connections = get_site_connections();
 	// debug( $connections );
 
 	// don't add if it already exists
@@ -218,14 +172,14 @@ function add_connection( $connection ) {
 	}
 
 	// don't add if from this network
-	if ( $site_url === get_network_url() ) {
+	if ( $site_url === Main_Helper::get_network_url() ) {
 		return null;
 	}
 
 	$connections[ $site_url ] = $connection;
 
 	// update the connections
-	$result = update_connections( $connections );
+	$result = update_site_connections( $connections );
 
 	return (bool) $result;
 }
@@ -246,7 +200,7 @@ function delete_connection( $site_url ) {
 	$site_url = Main_Helper::get_nice_url( $site_url );
 
 	// get connections
-	$connections = get_connections();
+	$connections = get_site_connections();
 
 	// don't delete if it doesn't exist
 	if ( ! isset( $connections[ $site_url ] ) ) {
@@ -257,50 +211,7 @@ function delete_connection( $site_url ) {
 	unset( $connections[ $site_url ] );
 
 	// update the connections
-	$result = update_connections( $connections );
+	$result = update_site_connections( $connections );
 
 	return (bool) $result;
-}
-
-
-/**
- * =================================================================
- *                          Endpoints
- * =================================================================
- */
-
-/**
- * Check if a connection is still active
- *
- * @param array|string $connection_or_site_url
- *
- * @return bool
- */
-function check_auth( $connection_or_site_url ) {
-	$response = send_request( $connection_or_site_url, 'check_auth' );
-	return 'true' == $response ? true : $response;
-}
-
-
-/**
- * =================================================================
- *                          MISC
- * =================================================================
- */
-
-/**
- * Get network url without protocol and trailing slash.
- *
- * @return string
- */
-function get_network_url() {
-	return Main_Helper::get_nice_url( network_site_url() );
-}
-
-/**
- * Enable debug logs
- */
-function enable_logs() {
-	global $contentsync_site_connections_logs;
-	$contentsync_site_connections_logs = true;
 }

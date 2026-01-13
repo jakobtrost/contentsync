@@ -12,9 +12,9 @@
  *
  * @since 2.17.0
  */
+namespace Contentsync;
 
-
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -67,14 +67,14 @@ final class Synced_Post_Review_Message {
 	 * @param array $args              The message arguments
 	 */
 	public function __construct( $synced_post_review_id, $args ) {
-		if ( !is_array( $args ) ) {
+		if ( ! is_array( $args ) ) {
 			$args = array();
 		}
-		
-		$this->timestamp         = isset( $args['timestamp'] ) ? $args['timestamp'] : '';
-		$this->reviewer          = isset( $args['reviewer'] ) ? $args['reviewer'] : 0;
-		$this->content           = isset( $args['content'] ) ? $args['content'] : '';
-		$this->action            = isset( $args['action'] ) ? $args['action'] : '';
+
+		$this->timestamp             = isset( $args['timestamp'] ) ? $args['timestamp'] : '';
+		$this->reviewer              = isset( $args['reviewer'] ) ? $args['reviewer'] : 0;
+		$this->content               = isset( $args['content'] ) ? $args['content'] : '';
+		$this->action                = isset( $args['action'] ) ? $args['action'] : '';
 		$this->synced_post_review_id = $synced_post_review_id;
 	}
 
@@ -99,14 +99,14 @@ final class Synced_Post_Review_Message {
 		// save to db
 		global $wpdb;
 
-		$post_review_id = (int)$this->synced_post_review_id;
-		if ( !$post_review_id ) {
+		$post_review_id = (int) $this->synced_post_review_id;
+		if ( ! $post_review_id ) {
 			return false;
 		}
 
 		// get messages
 		$messages = get_messages_by_synced_post_review_id( $post_review_id );
-		if ( !is_array( $messages ) ) {
+		if ( ! is_array( $messages ) ) {
 			$messages = array();
 		}
 		$new_message = array(
@@ -120,7 +120,7 @@ final class Synced_Post_Review_Message {
 		$messages[] = $new_message;
 
 		$wpdb->update(
-			$wpdb->base_prefix.'synced_post_reviews',
+			$wpdb->base_prefix . 'synced_post_reviews',
 			array(
 				'messages' => serialize( $messages ),
 			),

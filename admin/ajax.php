@@ -16,7 +16,7 @@
 
 namespace Contentsync\Contents;
 
-use \Contentsync\Main_Helper;
+use Contentsync\Main_Helper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -58,7 +58,7 @@ class Ajax {
 			$this->fail( 'action is invalid.' );
 		}
 
-		Main_Helper::call_post_export_func( 'enable_logs' );
+		\Contentsync\post_export_enable_logs();
 
 		/** EXPORT */
 		if ( $action === 'contentsync_export' ) {
@@ -141,14 +141,13 @@ class Ajax {
 			else {
 				$this->success( $result );
 			}
-		}
-		elseif ( $action === 'contentsync_check_import_bulk' ) {
+		} elseif ( $action === 'contentsync_check_import_bulk' ) {
 
 			if ( self::DEBUG ) {
 				echo "\r\n" . '* check to be imported posts...';
 			}
 
-			$posts = isset( $data['posts'] ) ? (array)$data['posts'] : array();
+			$posts = isset( $data['posts'] ) ? (array) $data['posts'] : array();
 
 			if ( empty( $posts ) ) {
 				$this->fail( 'global IDs are not defined.' );
@@ -156,22 +155,22 @@ class Ajax {
 
 			$results = array();
 			foreach ( $posts as $post ) {
-				$conflict = Actions::contentsync_check_import( $post["gid"] );
+				$conflict = Actions::contentsync_check_import( $post['gid'] );
 				if ( $conflict ) {
 					$results[] = array(
-						"gid" => $post["gid"],
-						"conflict" => $conflict
+						'gid'      => $post['gid'],
+						'conflict' => $conflict,
 					);
 				}
 			}
 
 			// failure
-			if ( empty($results) ) {
+			if ( empty( $results ) ) {
 				$this->fail( 'posts could not be checked for conflicts.' );
 			}
 			// success
 			else {
-				$this->success( json_encode($results) );
+				$this->success( json_encode( $results ) );
 			}
 		}
 
@@ -434,7 +433,7 @@ class Ajax {
 		}
 
 		/** CONNECTION OPTIONS */
-		elseif ( $action === 'contentsync_update_connections' ) {
+		elseif ( $action === 'contentsync_update_site_connections' ) {
 
 			if ( self::DEBUG ) {
 				echo "\r\n" . '* try to update connection options...';
@@ -444,14 +443,14 @@ class Ajax {
 			$site_url   = isset( $data['site_url'] ) ? esc_attr( $data['site_url'] ) : null;
 			$contents   = isset( $data['contents'] ) ? $data['contents'] === 'true' : true;
 			$search     = isset( $data['search'] ) ? $data['search'] === 'true' : true;
-			$connection = Main_Helper::call_connections_func( 'get_connection', $site_url );
+			$connection = get_site_connection( $site_url );
 
 			// debug( $connection );
 
 			if ( $connection ) {
 				$connection['contents'] = $contents;
 				$connection['search']   = $search;
-				$result                 = Main_Helper::call_connections_func( 'update_connection', $connection );
+				$result                 = update_site_connection( $connection );
 			}
 
 			if ( $result ) {
@@ -481,7 +480,7 @@ class Ajax {
 			if ( count( $posts ) ) {
 				$return = array_filter(
 					$posts,
-					function( $post ) {
+					function ( $post ) {
 						return isset( $post->error ) && ! Main_Helper::is_error_repaired( $post->error );
 					}
 				);
@@ -493,7 +492,7 @@ class Ajax {
 
 		/** REVIEW: APPROVE */
 		elseif ( $action === 'contentsync_review_approve' ) {
-			
+
 			if ( self::DEBUG ) {
 				echo "\r\n" . '* try to approve review...';
 			}
@@ -512,7 +511,7 @@ class Ajax {
 
 		/** REVIEW: DENY */
 		elseif ( $action === 'contentsync_review_deny' ) {
-			
+
 			if ( self::DEBUG ) {
 				echo "\r\n" . '* try to deny review...';
 			}
@@ -532,7 +531,7 @@ class Ajax {
 
 		/** REVIEW: REVERT */
 		elseif ( $action === 'contentsync_review_revert' ) {
-			
+
 			if ( self::DEBUG ) {
 				echo "\r\n" . '* try to revert review...';
 			}
