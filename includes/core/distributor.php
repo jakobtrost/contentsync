@@ -59,7 +59,7 @@ class Distributor {
 		// Logger::add( 'destination_ids_or_arrays', $destination_ids_or_arrays );
 		// Logger::add( 'export_args', $export_args );
 
-		if ( !$root_post ) {
+		if ( ! $root_post ) {
 			return new WP_Error( 'post_not_found', __( 'Post not found.', 'global-contents' ) );
 		}
 
@@ -79,7 +79,7 @@ class Distributor {
 		// Prepare posts for distribution.
 		$preparred_posts = self::prepare_posts_for_distribution(
 			$post_ids,
-			!empty( $export_args ) ? $export_args : Main_Helper::get_contentsync_meta( $root_post, 'contentsync_options' ),
+			! empty( $export_args ) ? $export_args : Main_Helper::get_contentsync_meta( $root_post, 'contentsync_options' ),
 			$root_post_id
 		);
 
@@ -106,13 +106,13 @@ class Distributor {
 		// Logger::add( 'destination_ids_or_arrays', $destination_ids_or_arrays );
 		// Logger::add( 'export_args', $export_args );
 
-		if ( !$post_ids_or_objects ) {
+		if ( ! $post_ids_or_objects ) {
 			return new WP_Error( 'invalid_posts', __( 'Invalid posts.', 'global-contents' ) );
 		}
-			
+
 		// split the call into smaller chunks
 		$chunk_size = defined( 'CONTENTSYNC_DISTRIBUTOR_CHUNK_SIZE' ) ? CONTENTSYNC_DISTRIBUTOR_CHUNK_SIZE : 10;
-		if ( count( $post_ids_or_objects ) > $chunk_size) {
+		if ( count( $post_ids_or_objects ) > $chunk_size ) {
 			$chunks = array_chunk( $post_ids_or_objects, $chunk_size );
 			$errors = array();
 
@@ -144,7 +144,7 @@ class Distributor {
 		// Prepare posts for distribution.
 		$preparred_posts = self::prepare_posts_for_distribution(
 			$post_ids_or_objects,
-			!empty( $export_args ) ? $export_args : array()
+			! empty( $export_args ) ? $export_args : array()
 		);
 
 		if ( is_wp_error( $preparred_posts ) ) {
@@ -169,7 +169,6 @@ class Distributor {
 
 		Logger::add( 'distribute_posts_per_blog' );
 
-
 		foreach ( $posts_keyed_by_blog as $blog_id => $posts ) {
 
 			Main_Helper::switch_to_blog( $blog_id );
@@ -177,7 +176,7 @@ class Distributor {
 			$result = self::distribute_posts( $posts, $destination_ids_or_arrays, $export_args );
 
 			if ( is_wp_error( $result ) ) {
-				Logger::add( 'Error distributing posts to blog '.$blog_id.': '.$result->get_error_message(), $posts, 'error' );
+				Logger::add( 'Error distributing posts to blog ' . $blog_id . ': ' . $result->get_error_message(), $posts, 'error' );
 				$errors[] = $result;
 			}
 		}
@@ -201,27 +200,27 @@ class Distributor {
 	 * Distribute cluster posts to all destinations.
 	 *
 	 * @param Contentsync_Cluster|int $cluster_or_cluster_id
-	 * @param array          $before
+	 * @param array                   $before
 	 *   @property array posts              Posts before the distribution, per blog_id.
 	 *   @property array destination_ids    Destination IDs before the distribution.
-	 * 
+	 *
 	 * @return WP_Error|true  WP_Error on failure, true on success.
 	 */
 	public static function distribute_contentsync_cluster_posts( $cluster_or_cluster_id, $before = array() ) {
-	
+
 		Logger::add( 'distribute_contentsync_cluster_posts' );
 		// Logger::add( "Cluster or ID:", $cluster_or_cluster_id );
 		// Logger::add( "Before:", $before );
-	
-		if ( !$cluster_or_cluster_id instanceof \Contentsync_Cluster ) {
-			$cluster = get_contentsync_cluster_by_id( $cluster_or_cluster_id );
-			if ( !$cluster ) {
+
+		if ( ! $cluster_or_cluster_id instanceof \Contentsync_Cluster ) {
+			$cluster = get_cluster_by_id( $cluster_or_cluster_id );
+			if ( ! $cluster ) {
 				return false;
 			}
 		} else {
 			$cluster = $cluster_or_cluster_id;
 		}
-	
+
 		// format destinations
 		$destination_arrays = array();
 		foreach ( $cluster->destination_ids as $destination_id ) {
@@ -230,22 +229,22 @@ class Distributor {
 			}
 			$destination_arrays[ $destination_id ] = array();
 		}
-	
-		$cluster_posts = get_contentsync_cluster_posts_per_blog( $cluster );
+
+		$cluster_posts = get_cluster_posts_per_blog( $cluster );
 
 		// Logger::add( 'Cluster:', $cluster );
 		// Logger::add( 'Cluster posts:', $cluster_posts );
-	
+
 		/**
 		 * If posts were in this cluster, but are not anymore, they need to be
 		 * removed from all destinations.
 		 */
 		$cluster_posts_before = isset( $before['posts'] ) ? $before['posts'] : array();
-		if ( !empty( $cluster_posts_before ) ) {
+		if ( ! empty( $cluster_posts_before ) ) {
 			foreach ( $cluster_posts_before as $blog_id => $posts_before ) {
-	
+
 				// posts from an entire blog were removed from the cluster
-				if ( !isset( $cluster_posts[ $blog_id ] ) ) {
+				if ( ! isset( $cluster_posts[ $blog_id ] ) ) {
 					$cluster_posts[ $blog_id ] = array();
 					foreach ( $posts_before as $post_id => $post ) {
 						$post->import_action                   = 'delete';
@@ -254,7 +253,7 @@ class Distributor {
 				} else {
 					foreach ( $posts_before as $post_id => $post ) {
 						// all posts that are not selected anymore, need to be removed
-						if ( !isset( $cluster_posts[ $blog_id ][ $post_id ] ) ) {
+						if ( ! isset( $cluster_posts[ $blog_id ][ $post_id ] ) ) {
 							$post->import_action                   = 'delete';
 							$cluster_posts[ $blog_id ][ $post_id ] = $post;
 						}
@@ -262,59 +261,59 @@ class Distributor {
 				}
 			}
 		}
-	
+
 		/**
 		 * If a destination was removed, all posts from this cluster need to be
 		 * removed from that destination.
 		 */
 		$destination_ids_before = isset( $before['destination_ids'] ) ? $before['destination_ids'] : array();
-		if ( !empty( $destination_ids_before ) ) {
+		if ( ! empty( $destination_ids_before ) ) {
 			foreach ( $destination_ids_before as $destination_id ) {
 				if ( empty( $destination_id ) ) {
 					continue;
 				}
-				if ( !isset( $destination_arrays[ $destination_id ] ) ) {
+				if ( ! isset( $destination_arrays[ $destination_id ] ) ) {
 					$destination_arrays[ $destination_id ] = array(
 						'import_action' => 'delete',
 					);
 				}
 			}
 		}
-	
+
 		/**
 		 * Distribute posts to all destinations, step by step per blog.
 		 */
 		$result = self::distribute_posts_per_blog( $cluster_posts, $destination_arrays );
-	
+
 		return $result;
 	}
-	
+
 	/**
 	 * Distribute posts just for a specific condition.
-	 * 
+	 *
 	 * @param Cluster_Content_Condition|int $condition_or_condition_id  The condition or the condition ID.
-	 * @param array                    $posts_before               Posts before the distribution.
-	 * 
+	 * @param array                         $posts_before               Posts before the distribution.
+	 *
 	 * @return bool
 	 */
-	public static function distribute_contentsync_content_condition_posts( $condition_or_condition_id, $posts_before = array() ) {
-	
-		Logger::add( 'distribute_contentsync_content_condition_posts' );
-	
-		if ( !$condition_or_condition_id instanceof \Cluster_Content_Condition ) {
-			$condition = get_contentsync_content_condition_by_id( $condition_or_condition_id );
+	public static function distribute_cluster_content_condition_posts( $condition_or_condition_id, $posts_before = array() ) {
+
+		Logger::add( 'distribute_cluster_content_condition_posts' );
+
+		if ( ! $condition_or_condition_id instanceof \Cluster_Content_Condition ) {
+			$condition = get_cluster_content_condition_by_id( $condition_or_condition_id );
 			if ( ! $condition ) {
 				return false;
 			}
 		} else {
 			$condition = $condition_or_condition_id;
 		}
-	
-		$cluster = get_contentsync_cluster_by_id( $condition->contentsync_cluster_id );
-		if ( !$cluster ) {
+
+		$cluster = get_cluster_by_id( $condition->contentsync_cluster_id );
+		if ( ! $cluster ) {
 			return false;
 		}
-	
+
 		// format destinations
 		$destination_arrays = array();
 		foreach ( $cluster->destination_ids as $destination_id ) {
@@ -323,39 +322,40 @@ class Distributor {
 			}
 			$destination_arrays[ $destination_id ] = array();
 		}
-	
+
 		// get posts for this condition
-		$condition_posts = get_posts_by_contentsync_content_condition( $condition );
+		$condition_posts = get_posts_by_cluster_content_condition( $condition );
 
 		// export arguments
-		$export_arguments = isset( $condition->export_arguments ) ? wp_parse_args( (array) $condition->export_arguments,
+		$export_arguments = isset( $condition->export_arguments ) ? wp_parse_args(
+			(array) $condition->export_arguments,
 			array(
-				'append_nested'   => false,
-				'whole_posttype'  => false,
-				'all_terms'       => false,
-				'resolve_menus'   => false,
-				'translations'    => false,
+				'append_nested'  => false,
+				'whole_posttype' => false,
+				'all_terms'      => false,
+				'resolve_menus'  => false,
+				'translations'   => false,
 			)
 		) : array();
-	
+
 		/**
 		 * If posts were in this condition, but are not anymore, they need to be
 		 * removed from all destinations.
 		 */
-		if ( !empty( $posts_before ) ) {
+		if ( ! empty( $posts_before ) ) {
 			foreach ( $posts_before as $post_id => $post ) {
-	
+
 				// all posts that are not selected anymore, need to be removed
-				if ( !isset( $condition_posts[ $post_id ] ) ) {
+				if ( ! isset( $condition_posts[ $post_id ] ) ) {
 					$post->import_action         = 'delete';
 					$condition_posts[ $post_id ] = $post;
 				}
 			}
 		}
-	
+
 		// Distribute posts to all destinations
 		$result = self::distribute_posts( $condition_posts, $destination_arrays, $export_arguments );
-	
+
 		return $result;
 	}
 
@@ -431,14 +431,14 @@ class Distributor {
 
 				$remote_network_url = Main_Helper::get_nice_url( $remote_network_url );
 
-				if ( !isset( $destinations[ $remote_network_url ] ) ) {
+				if ( ! isset( $destinations[ $remote_network_url ] ) ) {
 					$destinations[ $remote_network_url ] = new Remote_Destination( $remote_network_url );
 				}
 
 				$blog = $destinations[ $remote_network_url ]->set_blog( $remote_blog_id );
 
 				// add destination properties to the blog
-				if ( !empty( $destination_array ) ) {
+				if ( ! empty( $destination_array ) ) {
 					$destinations[ $remote_network_url ]->blogs[ $remote_blog_id ]->set_properties( $destination_array );
 				}
 			}
@@ -453,7 +453,7 @@ class Distributor {
 					continue;
 				}
 
-				if ( !isset( $destinations[ $blog_id ] ) ) {
+				if ( ! isset( $destinations[ $blog_id ] ) ) {
 					$destinations[ $blog_id ] = new Blog_Destination(
 						$blog_id,
 						array(
@@ -463,7 +463,7 @@ class Distributor {
 				}
 
 				// add destination properties to the blog
-				if ( !empty( $destination_array ) ) {
+				if ( ! empty( $destination_array ) ) {
 					$destinations[ $blog_id ]->set_properties( $destination_array );
 				}
 			}
@@ -504,7 +504,7 @@ class Distributor {
 					$blod_id         = $blog_id_or_net_url;
 					$post_connection = $post_connection_or_blogs;
 
-					if ( !isset( $destinations[ $blod_id ] ) ) {
+					if ( ! isset( $destinations[ $blod_id ] ) ) {
 						$destinations[ $blod_id ] = new Blog_Destination(
 							$blod_id,
 							array(
@@ -528,7 +528,7 @@ class Distributor {
 					$remote_network_url = $blog_id_or_net_url;
 					$blogs              = $post_connection_or_blogs;
 
-					if ( !isset( $destinations[ $remote_network_url ] ) ) {
+					if ( ! isset( $destinations[ $remote_network_url ] ) ) {
 						$destinations[ $remote_network_url ] = new Remote_Destination( $remote_network_url );
 					}
 
@@ -572,7 +572,7 @@ class Distributor {
 		// Logger::add( 'posts_or_ids', $post_ids_or_objects );
 		// Logger::add( 'export_args', $export_args );
 
-		if ( !is_array( $post_ids_or_objects ) ) {
+		if ( ! is_array( $post_ids_or_objects ) ) {
 			return new WP_Error( 'invalid_post_ids', __( 'Invalid post IDs.', 'global-contents' ) );
 		}
 
@@ -637,7 +637,7 @@ class Distributor {
 			 */
 			if ( isset( $post_objects[ $post_id ] ) ) {
 				foreach ( $inherit_properties as $property ) {
-					if ( isset( $post_objects[ $post_id ]->$property ) && !empty( $post_objects[ $post_id ]->$property ) ) {
+					if ( isset( $post_objects[ $post_id ]->$property ) && ! empty( $post_objects[ $post_id ]->$property ) ) {
 						$preparred_posts[ $post_id ]->$property = $post_objects[ $post_id ]->$property;
 						// Logger::add( 'inherit property from post_objects: '.$property.' = ', $post_objects[ $post_id ]->$property );
 					}
@@ -651,17 +651,17 @@ class Distributor {
 
 		/**
 		 * Filter to modify the prepared posts before distribution.
-		 * 
+		 *
 		 * This filter allows developers to customize the posts that are prepared
 		 * for distribution, enabling modifications to post data, structure, or
 		 * filtering before the actual distribution process begins.
-		 * 
+		 *
 		 * @filter contentsync_prepared_posts_for_distribution
-		 * 
+		 *
 		 * @param Prepared_Post[] $preparred_posts Array of prepared posts for distribution.
 		 * @param int[]           $post_ids        Array of post IDs being distributed.
 		 * @param array           $export_args     Export arguments and configuration.
-		 * 
+		 *
 		 * @return Prepared_Post[] Modified array of prepared posts for distribution.
 		 */
 		return apply_filters( 'contentsync_prepared_posts_for_distribution', $preparred_posts, $post_ids_or_objects, $export_args );
@@ -671,7 +671,7 @@ class Distributor {
 	 * Schedule post distribution.
 	 *
 	 * @param Prepared_Post[] $preparred_posts  Array of preparred posts.
-	 * @param Destination[]    $destinations        Array of Blog_Destination and Remote_Destination objects.
+	 * @param Destination[]   $destinations        Array of Blog_Destination and Remote_Destination objects.
 	 *
 	 * @return WP_Error|true  WP_Error on failure, true on success.
 	 */
@@ -681,18 +681,18 @@ class Distributor {
 		// Logger::add( 'preparred_posts', $preparred_posts );
 		// Logger::add( 'destinations', $destinations );
 
-		if ( empty( $preparred_posts ) || !is_array( $preparred_posts ) ) {
+		if ( empty( $preparred_posts ) || ! is_array( $preparred_posts ) ) {
 			return new WP_Error( 'invalid_preparred_posts', __( 'Invalid preparred posts.', 'global-contents' ) );
 		}
 
-		if ( empty( $destinations ) || !is_array( $destinations ) ) {
+		if ( empty( $destinations ) || ! is_array( $destinations ) ) {
 			return new WP_Error( 'invalid_destinations', __( 'Invalid destinations.', 'global-contents' ) );
 		}
 
 		$errors = array();
 
 		foreach ( $destinations as $destination ) {
-			
+
 			$distribution_item_properties = array(
 				'posts'       => $preparred_posts,
 				'destination' => $destination,
@@ -714,7 +714,7 @@ class Distributor {
 				},
 				$errors
 			);
-			return new WP_Error( 'failed_to_schedule_distribution_items', implode( "<br>- ", $error_messages ) );
+			return new WP_Error( 'failed_to_schedule_distribution_items', implode( '<br>- ', $error_messages ) );
 		}
 
 		return true;
@@ -722,15 +722,15 @@ class Distributor {
 
 	/**
 	 * Schedule a distribution item.
-	 * 
+	 *
 	 * @param array $distribution_item_properties  The distribution item properties.
 	 *   @property Prepared_Post[] $posts       Array of preparred posts.
 	 *   @property Destination      $destination The destination object
-	 * 
+	 *
 	 * @return WP_Error|int  WP_Error on failure, the action ID on success.
 	 */
 	public static function schedule_distribution_item( $distribution_item_properties ) {
-		
+
 		// create class instance
 		$distribution_item = new Distribution_Item( $distribution_item_properties );
 
@@ -756,7 +756,7 @@ class Distributor {
 			$error = new WP_Error(
 				'failed_to_schedule_distribution_item',
 				sprintf(
-					__( 'Failed to schedule posts to the destination (ID: %s, URL: %s)', 'global-contents' ),
+					__( 'Failed to schedule posts to the destination (ID: %1$s, URL: %2$s)', 'global-contents' ),
 					$distribution_item->destination->ID ?? '',
 					$distribution_item->destination->url ?? '-'
 				)
@@ -765,10 +765,12 @@ class Distributor {
 			Logger::add( 'error', $error );
 
 			// update the distribution item status to failed
-			$result = $distribution_item->update( array(
-				'status' => 'failed',
-				'error' => $error
-			) );
+			$result = $distribution_item->update(
+				array(
+					'status' => 'failed',
+					'error'  => $error,
+				)
+			);
 
 			if ( is_wp_error( $result ) ) {
 				Logger::add( 'error', $result );
@@ -782,13 +784,13 @@ class Distributor {
 
 	/**
 	 * Schedule a distribution item by ID.
-	 * 
+	 *
 	 * @param int $distribution_item_id  The ID of the distribution item to schedule.
-	 * 
+	 *
 	 * @return WP_Error|Distribution_Item  WP_Error on failure, the distribution item on success.
 	 */
 	public static function schedule_distribution_item_by_id( $distribution_item_id ) {
-		
+
 		// get the distribution item from the database
 		$distribution_item = get_distribution_item( $distribution_item_id );
 
@@ -811,7 +813,7 @@ class Distributor {
 			$error = new WP_Error(
 				'failed_to_schedule_distribution_item',
 				sprintf(
-					__( 'Failed to schedule posts to the destination (ID: %s, URL: %s)', 'global-contents' ),
+					__( 'Failed to schedule posts to the destination (ID: %1$s, URL: %2$s)', 'global-contents' ),
 					$distribution_item->destination->ID ?? '',
 					$distribution_item->destination->url ?? '-'
 				)
@@ -820,22 +822,25 @@ class Distributor {
 			Logger::add( 'error', $error );
 
 			// update the distribution item status to failed
-			$result = $distribution_item->update( array(
-				'status' => 'failed',
-				'error' => $error
-			) );
+			$result = $distribution_item->update(
+				array(
+					'status' => 'failed',
+					'error'  => $error,
+				)
+			);
 
 			if ( is_wp_error( $result ) ) {
 				Logger::add( 'error', $result );
 			}
 
 			return $error;
-		}
-		else {
-			$distribution_item->update( array(
-				'status' => 'init',
-				'error' => null,
-			) );
+		} else {
+			$distribution_item->update(
+				array(
+					'status' => 'init',
+					'error'  => null,
+				)
+			);
 		}
 
 		return $distribution_item;
@@ -843,11 +848,11 @@ class Distributor {
 
 	/**
 	 * Distribute a single item.
-	 * 
+	 *
 	 * Called by the action scheduler with the action 'contentsync_distributor_distribute_item'.
-	 * 
+	 *
 	 * @param int $item_id  The Distribution_Item ID.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public static function distribute_item( $item_id ) {
@@ -858,11 +863,13 @@ class Distributor {
 			return false;
 		}
 
-		$status = "started";
-		
-		$result = $item->update( array(
-			'status' => $status,
-		) );
+		$status = 'started';
+
+		$result = $item->update(
+			array(
+				'status' => $status,
+			)
+		);
 
 		// Distribute to local blog.
 		if ( is_a( $item->destination, 'Contentsync\Distribution\Blog_Destination' ) ) {
@@ -870,46 +877,48 @@ class Distributor {
 			$result = self::distribute_to_blog( $item );
 
 			if ( ! $result ) {
-				$status = "failed";
+				$status = 'failed';
 			} else {
-				$status = "success";
+				$status = 'success';
 			}
 		}
 
 		// Distribute to remote site.
 		if ( is_a( $item->destination, 'Contentsync\Distribution\Remote_Destination' ) ) {
-			
+
 			$result = self::distribute_to_remote_site( $item );
-			
+
 			if ( ! $result ) {
-				$status = "failed";
+				$status = 'failed';
 			} else {
 				// item is not completed yet, as the remote site will start its own distribution
 				// queue and will let us know when it is done separately.
-				$status = "started";
+				$status = 'started';
 			}
 		}
-		
+
 		Logger::add( 'Distribution to destination ' . $item->destination->ID . ' completed with status: ' . $status );
-		
-		$result = $item->update( array(
-			'status' => $status,
-		) );
-		
+
+		$result = $item->update(
+			array(
+				'status' => $status,
+			)
+		);
+
 		return $result;
 	}
 
 	/**
 	 * Distribute posts to local site.
-	 * 
+	 *
 	 * @param Distribution_Item $item  The distribution item.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public static function distribute_to_blog( $item ) {
 
 		Logger::add( 'Distributing to blog: ' . $item->destination->ID . ' - ' . $item->destination->url );
-		
+
 		Main_Helper::switch_to_blog( $item->destination->ID );
 
 		/**
@@ -919,27 +928,26 @@ class Distributor {
 		 * the comment below for the workaround.
 		 */
 		// $inherit_properties = array(
-		// 	'import_action',
-		// 	'conflict_action',
-		// 	'export_arguments',
+		// 'import_action',
+		// 'conflict_action',
+		// 'export_arguments',
 		// );
 		// // inherit properties from the destination
 		// foreach( $inherit_properties as $property ) {
-		// 	if ( isset($item->destination->$property) && ! empty($item->destination->$property) ) {
-		// 		foreach ( $item->posts as $post_id => $preparred_post ) {
-		// 			Logger::add( 'inherit property from destination: ' . $property . ' = ' . $item->destination->$property );
-		// 			$item->posts[ $post_id ]->$property = $item->destination->$property;
-		// 		}
-		// 	}
+		// if ( isset($item->destination->$property) && ! empty($item->destination->$property) ) {
+		// foreach ( $item->posts as $post_id => $preparred_post ) {
+		// Logger::add( 'inherit property from destination: ' . $property . ' = ' . $item->destination->$property );
+		// $item->posts[ $post_id ]->$property = $item->destination->$property;
+		// }
+		// }
 		// }
 
 		// find the local posts and delete them
-		if ( isset($item->destination->import_action) && $item->destination->import_action == 'delete' ) {
+		if ( isset( $item->destination->import_action ) && $item->destination->import_action == 'delete' ) {
 			$result = self::delete_posts_from_blog( $item );
-		}
-		else {
+		} else {
 
-			if ( isset($item->destination->import_action) && $item->destination->import_action != 'insert' ) {
+			if ( isset( $item->destination->import_action ) && $item->destination->import_action != 'insert' ) {
 				// map the import action to each post
 				foreach ( $item->posts as $post_id => $preparred_post ) {
 					$item->posts[ $post_id ]->import_action = $item->destination->import_action;
@@ -956,9 +964,9 @@ class Distributor {
 
 	/**
 	 * Import posts to blog.
-	 * 
+	 *
 	 * @param Distribution_Item $item  The distribution item.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public static function import_posts_to_blog( &$item ) {
@@ -966,7 +974,7 @@ class Distributor {
 
 		// if debug mode is enabled, add the log action
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			add_action( 'synced_post_export_log', array( '\Contentsync\Distribution\Logger', 'add' ), 10, 2 );
+			add_action( 'post_export_log', array( '\Contentsync\Distribution\Logger', 'add' ), 10, 2 );
 		}
 
 		// import the posts
@@ -977,37 +985,49 @@ class Distributor {
 			$item->destination->error = $result;
 			return false;
 		}
-		
+
 		// add imported post ids to destination
 		$imported_post_ids = method_exists( '\Contentsync\Post_Import', 'get_all_posts' ) ? \Contentsync\Post_Import::get_all_posts() : false;
 		if ( $imported_post_ids ) {
 			foreach ( $imported_post_ids as $root_post_id => $imported_post_id ) {
-				$item->destination->set_post( $root_post_id, $imported_post_id, array(
-					'status' => 'success',
-					'url' => Main_Helper::get_edit_post_link( $imported_post_id )
-				) );
+				$item->destination->set_post(
+					$root_post_id,
+					$imported_post_id,
+					array(
+						'status' => 'success',
+						'url'    => Main_Helper::get_edit_post_link( $imported_post_id ),
+					)
+				);
 			}
 		}
 
 		$item->destination->status = 'success';
-		
+
 		return true;
 	}
 
 	/**
 	 * Delete posts from blog.
-	 * 
+	 *
 	 * @param Distribution_Item $item  The distribution item.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public static function delete_posts_from_blog( &$item ) {
-		Logger::add( 'Deleting posts from blog: ' . $item->destination->ID, array_map( function( $post ) { return $post->post_name; }, $item->posts ) );
+		Logger::add(
+			'Deleting posts from blog: ' . $item->destination->ID,
+			array_map(
+				function ( $post ) {
+					return $post->post_name;
+				},
+				$item->posts
+			)
+		);
 
-		$errors = [];
+		$errors = array();
 
 		foreach ( $item->posts as $post_id => $preparred_post ) {
-			$gid = isset($preparred_post->meta['synced_post_id']) ? $preparred_post->meta['synced_post_id'][0] : false;
+			$gid = isset( $preparred_post->meta['synced_post_id'] ) ? $preparred_post->meta['synced_post_id'][0] : false;
 			// Logger::add( 'Deleting post with gid: ' . $gid );
 			if ( $gid ) {
 				$posttype   = $preparred_post->post_type;
@@ -1038,9 +1058,9 @@ class Distributor {
 
 	/**
 	 * Distribute posts to remote site.
-	 * 
+	 *
 	 * @param Distribution_Item $item  The distribution item.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public static function distribute_to_remote_site( &$item ) {
@@ -1074,78 +1094,91 @@ class Distributor {
 			return false;
 		}
 
-		return !! $result;
+		return (bool) $result;
 	}
 
 	/**
 	 * Before import global posts: Filter the HTML tags that are allowed for a given context.
-	 * 
+	 *
 	 * @param array $posts  The posts to import.
 	 * @param array $conflict_actions  The conflict actions.
-	 * 
+	 *
 	 * @return void
 	 */
 	public static function before_import_global_posts( $posts, $conflict_actions ) {
-		add_filter( 'wp_kses_allowed_html', array(self::class, 'filter_allowed_html_tags_during_distribution'), 98, 2 );
+		add_filter( 'wp_kses_allowed_html', array( self::class, 'filter_allowed_html_tags_during_distribution' ), 98, 2 );
 	}
 
 	/**
 	 * After import global posts: Remove the filter for the HTML tags that are allowed for a given context.
-	 * 
+	 *
 	 * @param array $posts  The posts to import.
 	 * @param array $conflict_actions  The conflict actions.
-	 * 
+	 *
 	 * @return void
 	 */
 	public static function after_import_global_posts( $posts, $conflict_actions ) {
-		remove_filter( 'wp_kses_allowed_html', array(self::class, 'filter_allowed_html_tags_during_distribution'), 98 );
+		remove_filter( 'wp_kses_allowed_html', array( self::class, 'filter_allowed_html_tags_during_distribution' ), 98 );
 	}
 
 	/**
 	 * Filters the HTML tags that are allowed for a given context.
-	 * 
+	 *
 	 * HTML tags and attribute names are case-insensitive in HTML but must be
 	 * added to the KSES allow list in lowercase. An item added to the allow list
 	 * in upper or mixed case will not recognized as permitted by KSES.
-	 * 
+	 *
 	 * @param array[] $html    Allowed HTML tags.
 	 * @param string  $context Context name.
 	 */
 	public static function filter_allowed_html_tags_during_distribution( $html, $context ) {
 
-		if ( $context !== 'post' ) return $html;
+		if ( $context !== 'post' ) {
+			return $html;
+		}
 
 		$default_attributes = array(
-			"id" => true,
-			"class" => true,
-			"href" => true,
-			"name" => true,
-			"target" => true,
-			"download" => true,
-			"data-*" => true,
-			"style" => true,
-			"title" => true,
-			'role' => true,
-			'onclick' => true,
-			"aria-*" => true,
+			'id'            => true,
+			'class'         => true,
+			'href'          => true,
+			'name'          => true,
+			'target'        => true,
+			'download'      => true,
+			'data-*'        => true,
+			'style'         => true,
+			'title'         => true,
+			'role'          => true,
+			'onclick'       => true,
+			'aria-*'        => true,
 			'aria-expanded' => true,
 			'aria-controls' => true,
-			'aria-label' => true,
-			'tabindex' => true,
+			'aria-label'    => true,
+			'tabindex'      => true,
 		);
 
 		// iframe
 		$html['iframe'] = array_merge(
-			isset($html['iframe']) ? $html['iframe'] : array(),
+			isset( $html['iframe'] ) ? $html['iframe'] : array(),
 			$default_attributes,
-			array( 'src' => true, 'width' => true, 'height' => true, 'frameborder' => true, 'allowfullscreen' => true )
+			array(
+				'src'             => true,
+				'width'           => true,
+				'height'          => true,
+				'frameborder'     => true,
+				'allowfullscreen' => true,
+			)
 		);
 
 		// script
 		$html['script'] = array_merge(
-			isset($html['script']) ? $html['script'] : array(),
+			isset( $html['script'] ) ? $html['script'] : array(),
 			$default_attributes,
-			array( 'src' => true, 'type' => true, 'async' => true, 'defer' => true )
+			array(
+				'src'   => true,
+				'type'  => true,
+				'async' => true,
+				'defer' => true,
+			)
 		);
 
 		return $html;

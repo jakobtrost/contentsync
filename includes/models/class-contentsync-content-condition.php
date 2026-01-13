@@ -15,7 +15,7 @@
  * @since 2.17.0
  */
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -78,8 +78,9 @@ final class Cluster_Content_Condition {
 
 	/**
 	 * The arguments used to export the posts.
+	 *
 	 * @since new
-	 * 
+	 *
 	 * @var array
 	 *    @property bool  append_nested   Append nested posts to the export.
 	 *    @property bool  whole_posttype  Export the whole post type.
@@ -100,14 +101,14 @@ final class Cluster_Content_Condition {
 	public static function get_instance( $content_condition_id ) {
 		global $wpdb;
 
-		$content_condition_id = (int)$content_condition_id;
-		if ( !$content_condition_id ) {
+		$content_condition_id = (int) $content_condition_id;
+		if ( ! $content_condition_id ) {
 			return false;
 		}
-		$table_name         = $wpdb->base_prefix.'contentsync_content_conditions';
+		$table_name         = $wpdb->base_prefix . 'cluster_content_conditions';
 		$_content_condition = $wpdb->get_row( "SELECT * FROM $table_name WHERE ID = $content_condition_id" );
 
-		if ( !$_content_condition ) {
+		if ( ! $_content_condition ) {
 			return false;
 		}
 
@@ -136,11 +137,11 @@ final class Cluster_Content_Condition {
 				continue;
 			}
 			if ( 'id' === $key ) {
-				$this->ID = (int)$value;
+				$this->ID = (int) $value;
 				continue;
 			}
 			if ( 'make_posts_global_automatically' === $key ) {
-				$this->$key = (bool)$value;
+				$this->$key = (bool) $value;
 				continue;
 			}
 
@@ -160,9 +161,9 @@ final class Cluster_Content_Condition {
 		global $wpdb;
 
 		$wpdb->insert(
-			$wpdb->base_prefix.'contentsync_content_conditions',
+			$wpdb->base_prefix . 'cluster_content_conditions',
 			array(
-				'contentsync_cluster_id'                   => $this->contentsync_cluster_id,
+				'contentsync_cluster_id'          => $this->contentsync_cluster_id,
 				'blog_id'                         => $this->blog_id,
 				'post_type'                       => $this->post_type,
 				'filter'                          => serialize( $this->filter ),
@@ -178,10 +179,10 @@ final class Cluster_Content_Condition {
 	/**
 	 * Get all content conditions by properties
 	 * eg. get all content conditions by blog ID AND post type
-	 * 
+	 *
 	 * @param array $args  Array of properties to filter by, supported properties are:
 	 *                     contentsync_cluster_id, blog_id, post_type, taxonomy, terms
-	 * 
+	 *
 	 * @return Cluster_Content_Condition[]|false
 	 */
 	public static function get_conditions_by( $args ) {
@@ -193,14 +194,14 @@ final class Cluster_Content_Condition {
 			'post_type',
 			'taxonomy',
 			'terms',
-			'export_arguments'
+			'export_arguments',
 		);
 
 		$sql_args = array();
-		
+
 		foreach ( $args as $key => $value ) {
 			if ( in_array( $key, $valid_args ) ) {
-				$sql_args[ $key ] = is_numeric( $value ) ? (int)$value : $value;
+				$sql_args[ $key ] = is_numeric( $value ) ? (int) $value : $value;
 			}
 		}
 
@@ -210,7 +211,7 @@ final class Cluster_Content_Condition {
 		$sql_phrase = implode( ' = %s AND ', array_keys( $sql_args ) ) . ' = %s';
 
 		$prepare = $wpdb->prepare(
-			"SELECT * FROM {$wpdb->base_prefix}contentsync_content_conditions WHERE " . $sql_phrase,
+			"SELECT * FROM {$wpdb->base_prefix}cluster_content_conditions WHERE " . $sql_phrase,
 			array_values( $sql_args )
 		);
 
@@ -219,10 +220,10 @@ final class Cluster_Content_Condition {
 		if ( empty( $results ) ) {
 			return false;
 		}
-		
+
 		$conditions = array();
 		foreach ( $results as $condition ) {
-			$condition_object = new Cluster_Content_Condition( $condition );
+			$condition_object             = new Cluster_Content_Condition( $condition );
 			$conditions[ $condition->ID ] = $condition_object;
 		}
 

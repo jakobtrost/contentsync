@@ -16,7 +16,7 @@
  * @since 2.17.0
  */
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -68,14 +68,14 @@ final class Contentsync_Cluster {
 	public static function get_instance( $cluster_id ) {
 		global $wpdb;
 
-		$cluster_id = (int)$cluster_id;
-		if ( !$cluster_id ) {
+		$cluster_id = (int) $cluster_id;
+		if ( ! $cluster_id ) {
 			return false;
 		}
-		$table_name = $wpdb->base_prefix.'contentsync_clusters';
+		$table_name = $wpdb->base_prefix . 'contentsync_clusters';
 		$_cluster   = $wpdb->get_row( "SELECT * FROM $table_name WHERE ID = $cluster_id" );
 
-		if ( !$_cluster ) {
+		if ( ! $_cluster ) {
 			return false;
 		}
 
@@ -90,19 +90,19 @@ final class Contentsync_Cluster {
 	public function __construct( $cluster ) {
 		foreach ( get_object_vars( $cluster ) as $key => $value ) {
 			if ( 'id' === $key ) {
-				$this->ID = (int)$value;
+				$this->ID = (int) $value;
 				continue;
-			} else if ( 'enable_reviews' === $key ) {
-				$this->$key = (bool)$value;
+			} elseif ( 'enable_reviews' === $key ) {
+				$this->$key = (bool) $value;
 				continue;
-			} else if ( 'destination_ids' === $key ) {
+			} elseif ( 'destination_ids' === $key ) {
 				$this->$key = empty( $value ) ? array() : explode( ',', $value );
 				continue;
-			} else if ( 'reviewer_ids' === $key ) {
+			} elseif ( 'reviewer_ids' === $key ) {
 				$this->$key = empty( $value ) ? array() : explode( ',', $value );
 				continue;
-			} else if ( 'content_conditions' === $key ) {
-				$this->$key = empty( $value ) ? array() : array_map( 'get_contentsync_content_condition_by_id', (array)unserialize( $value ) );
+			} elseif ( 'content_conditions' === $key ) {
+				$this->$key = empty( $value ) ? array() : array_map( 'get_cluster_content_condition_by_id', (array) unserialize( $value ) );
 				continue;
 			}
 
@@ -117,7 +117,7 @@ final class Contentsync_Cluster {
 		global $wpdb;
 
 		$wpdb->update(
-			$wpdb->base_prefix.'contentsync_clusters',
+			$wpdb->base_prefix . 'contentsync_clusters',
 			array(
 				'title'              => sanitize_text_field( $this->title ),
 				'destination_ids'    => $this->destination_ids,

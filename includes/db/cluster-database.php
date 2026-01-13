@@ -15,7 +15,7 @@
 
 namespace Contentsync\Cluster;
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -23,7 +23,7 @@ function maybe_add_cluster_table() {
 
 	global $wpdb;
 	$charset_collate = $wpdb->get_charset_collate();
-	$table_name      = $wpdb->base_prefix.'contentsync_clusters';
+	$table_name      = $wpdb->base_prefix . 'contentsync_clusters';
 
 	// return if table exists
 	$query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table_name ) );
@@ -42,7 +42,7 @@ function maybe_add_cluster_table() {
 		PRIMARY KEY  (ID)
 	) $charset_collate;";
 
-	require_once ABSPATH.'wp-admin/includes/upgrade.php';
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	dbDelta( $sql );
 
 	return true;
@@ -52,7 +52,7 @@ function maybe_add_post_review_table() {
 
 	global $wpdb;
 	$charset_collate = $wpdb->get_charset_collate();
-	$table_name      = $wpdb->base_prefix.'synced_post_reviews';
+	$table_name      = $wpdb->base_prefix . 'synced_post_reviews';
 
 	// return if table exists
 	$query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table_name ) );
@@ -73,7 +73,7 @@ function maybe_add_post_review_table() {
 		PRIMARY KEY  (ID)
 	) $charset_collate;";
 
-	require_once ABSPATH.'wp-admin/includes/upgrade.php';
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	dbDelta( $sql );
 
 	return true;
@@ -82,7 +82,7 @@ function maybe_add_post_review_table() {
 function maybe_add_content_conditions() {
 	global $wpdb;
 	$charset_collate = $wpdb->get_charset_collate();
-	$table_name      = $wpdb->base_prefix.'contentsync_content_conditions';
+	$table_name      = $wpdb->base_prefix . 'cluster_content_conditions';
 
 	// return if table exists
 	$query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table_name ) );
@@ -90,7 +90,7 @@ function maybe_add_content_conditions() {
 	if ( $wpdb->get_var( $query ) == $table_name ) {
 
 		// if table row 'export_arguments' does not exist, add it
-		$column_name = 'export_arguments';
+		$column_name   = 'export_arguments';
 		$column_exists = $wpdb->get_results( "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '$table_name' AND COLUMN_NAME = '$column_name'" );
 
 		if ( empty( $column_exists ) ) {
@@ -115,12 +115,12 @@ function maybe_add_content_conditions() {
 		PRIMARY KEY  (ID)
 	) $charset_collate;";
 
-	require_once ABSPATH.'wp-admin/includes/upgrade.php';
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	dbDelta( $sql );
 
 	return true;
 }
 
-add_action( 'init', __NAMESPACE__.'\maybe_add_cluster_table' );
-add_action( 'init', __NAMESPACE__.'\maybe_add_post_review_table' );
-add_action( 'init', __NAMESPACE__.'\maybe_add_content_conditions' );
+add_action( 'init', __NAMESPACE__ . '\maybe_add_cluster_table' );
+add_action( 'init', __NAMESPACE__ . '\maybe_add_post_review_table' );
+add_action( 'init', __NAMESPACE__ . '\maybe_add_content_conditions' );

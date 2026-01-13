@@ -21,7 +21,7 @@ use Contentsync\Post_Export;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Distribution\Logger;
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -117,8 +117,8 @@ class Trigger {
 	public function after_insert_post( $post_id, $post, $update, $post_before ) {
 
 		if (
-			!$update
-			|| !is_object( $post )
+			! $update
+			|| ! is_object( $post )
 			|| $post->post_status === 'auto-draft'
 			|| wp_is_post_revision( $post_id )
 			|| $post->post_type === 'revision'
@@ -141,7 +141,7 @@ class Trigger {
 		}
 
 		// update contentsync options
-		if ( !empty( $_POST ) && is_array( $_POST ) ) {
+		if ( ! empty( $_POST ) && is_array( $_POST ) ) {
 			Actions::update_contentsync_options( $post_id, $_POST );
 		}
 
@@ -159,10 +159,10 @@ class Trigger {
 		 * an article is saved within the block editor. In those cases, there
 		 * are 2 requests sent to the server. One request is the initial save,
 		 * the second request is mostly used to save metadata.
-		 * 
+		 *
 		 * We prevent that by identifying the correct scenario and only triggering
 		 * the actions when necessary.
-		 * 
+		 *
 		 * @since 2.18.0
 		 */
 		if ( $this->maybe_ignore_this_post_update_action( $post_id ) ) {
@@ -176,31 +176,29 @@ class Trigger {
 
 		if ( empty( $contentsync_status ) ) {
 			self::after_update_local_post( $post_id, $post, $post_before );
-		}
-		else if ( $contentsync_status === 'root' ) {
+		} elseif ( $contentsync_status === 'root' ) {
 			self::after_update_global_post( $post_id, $post, $post_before );
-		}
-		else if ( $contentsync_status === 'linked' ) {
+		} elseif ( $contentsync_status === 'linked' ) {
 
 			/**
 			 * Filter to control whether linked posts can be updated locally.
-			 * 
+			 *
 			 * This filter allows developers to override the default behavior that prevents
 			 * linked posts from being updated locally. By default, linked posts are not
 			 * allowed to be updated to maintain content synchronization.
-			 * 
+			 *
 			 * @filter contentsync_allow_update_of_linked_post
-			 * 
+			 *
 			 * @param bool   $allow_update_of_linked_post Whether to allow updating linked posts.
 			 * @param int    $post_id                     The post ID being updated.
 			 * @param WP_Post $post                       The current post object.
 			 * @param WP_Post $post_before                The post object before the update.
-			 * 
+			 *
 			 * @return bool Whether to allow updating linked posts.
 			 */
 			$allow_update_of_linked_post = apply_filters( 'contentsync_allow_update_of_linked_post', false, $post_id, $post, $post_before );
 
-			if ( !$allow_update_of_linked_post ) {
+			if ( ! $allow_update_of_linked_post ) {
 
 				// prevent updating linked posts
 				wp_die(
@@ -213,19 +211,19 @@ class Trigger {
 
 	/**
 	 * Compare the conditions before and after the post update.
-	 * 
+	 *
 	 * A condition could be "all posts from category x", "the latest
 	 * 3 posts", etc. Here we compare the conditions for changes:
-	 * 
+	 *
 	 * Scenario A)
 	 *   The post was not part of a condition and is still not part
 	 *   of a condition. We have nothing to do and can continue.
-	 * 
+	 *
 	 * Scenario B)
 	 *   The post was part of at least one condition and is still
 	 *   part of the same conditions. We have nothing to do and
 	 *   can continue.
-	 * 
+	 *
 	 * Scenario C)
 	 *   The post was part of at least one condition and is now not
 	 *   part of the same conditions. Or the post was part of a condition
@@ -241,8 +239,8 @@ class Trigger {
 	 *      category 'events'"
 	 *    - as this could be the same cluster, we really need to check
 	 *      every condition that includes the post.
-	 * 
-	 * @param int $post_id The ID of the post being updated.
+	 *
+	 * @param int     $post_id The ID of the post being updated.
 	 * @param WP_Post $post_before The post object before the update.
 	 */
 	public function compare_conditions_before_and_after_post_update( $post_id, $post_before ) {
@@ -256,7 +254,7 @@ class Trigger {
 		$condition_ids_including_this_post_before = $this->get_condition_ids_including_this_post_before( $post_id );
 
 		// get the conditions right now (after the post update)
-		$content_conditions_including_post = get_contentsync_content_conditions_including_post( $post_id );
+		$content_conditions_including_post = get_cluster_content_conditions_including_post( $post_id );
 		if ( ! empty( $content_conditions_including_post ) ) {
 			$condition_ids_including_this_post = array_keys( $content_conditions_including_post );
 		} else {
@@ -295,13 +293,13 @@ class Trigger {
 			$posts_before = $all_conditions[ $condition_id ]['posts'];
 
 			// check if cluster has reviews enabled
-			$cluster = get_contentsync_cluster_by_id( $condition->contentsync_cluster_id );
+			$cluster = get_cluster_by_id( $condition->contentsync_cluster_id );
 			if ( $cluster->enable_reviews ) {
 				Actions::create_post_review( $post_id, $post_before );
 			}
 
 			// check if the post is still in this cluster.
-			if ( ! is_post_in_contentsync_cluster( $post_id, $condition->contentsync_cluster_id ) ) {
+			if ( ! is_post_in_cluster( $post_id, $condition->contentsync_cluster_id ) ) {
 				Logger::add( 'post is removed from cluster: ', $condition->contentsync_cluster_id );
 				$this->add_cluster_id_the_post_is_removed_from( $post_id, $condition->contentsync_cluster_id );
 			}
@@ -310,7 +308,7 @@ class Trigger {
 			$condition_has_count_filter = false;
 			if ( isset( $condition->filter ) ) {
 				foreach ( $condition->filter as $filter ) {
-					if ( isset( $filter['count'] ) && !empty( $filter['count'] ) ) {
+					if ( isset( $filter['count'] ) && ! empty( $filter['count'] ) ) {
 						$condition_has_count_filter = true;
 						break;
 					}
@@ -321,16 +319,16 @@ class Trigger {
 			// enabled. In all other cases the other posts are not affected by
 			// this post being removed from the condition.
 			// Example:
-			//   1.) Condition: "all posts from category 'news'"
-			//       The other posts in the condition are not affected by this post
-			//       being removed from the condition. They remain in 'news'.
-			//   2.) Condition: "the latest 3 posts"
-			//       The other posts in the condition could be affected because the
-			//       '3' posts likely now includes 1 other post that has not been
-			//       included yet.
+			// 1.) Condition: "all posts from category 'news'"
+			// The other posts in the condition are not affected by this post
+			// being removed from the condition. They remain in 'news'.
+			// 2.) Condition: "the latest 3 posts"
+			// The other posts in the condition could be affected because the
+			// '3' posts likely now includes 1 other post that has not been
+			// included yet.
 			if ( $condition_has_count_filter ) {
 				// Logger::add( 'distributing condition (removed post id: '.$post_id.'): ', $condition );
-				Distributor::distribute_contentsync_content_condition_posts( $condition, $posts_before );
+				Distributor::distribute_cluster_content_condition_posts( $condition, $posts_before );
 			}
 		}
 
@@ -344,7 +342,7 @@ class Trigger {
 			}
 
 			// check if cluster has reviews enabled
-			$cluster = get_contentsync_cluster_by_id( $condition->contentsync_cluster_id );
+			$cluster = get_cluster_by_id( $condition->contentsync_cluster_id );
 			if ( $cluster->enable_reviews ) {
 				Actions::create_post_review( $post_id, $post_before );
 			}
@@ -353,7 +351,7 @@ class Trigger {
 			$condition_has_count_filter = false;
 			if ( isset( $condition->filter ) ) {
 				foreach ( $condition->filter as $filter ) {
-					if ( isset( $filter['count'] ) && !empty( $filter['count'] ) ) {
+					if ( isset( $filter['count'] ) && ! empty( $filter['count'] ) ) {
 						$condition_has_count_filter = true;
 						break;
 					}
@@ -364,16 +362,16 @@ class Trigger {
 			// enabled. In all other cases the other posts are not affected by
 			// this post being added to the condition.
 			// Example:
-			//   1.) Condition: "all posts from category 'news'"
-			//       The other posts in the condition are not affected by this post
-			//       being added to the condition. They remain in 'news'.
-			//   2.) Condition: "the latest 3 posts"
-			//       The other posts in the condition could be affected because the
-			//       '3' posts likely now includes 1 less other post that has been
-			//       included before, but now needs to be removed from the condition.
+			// 1.) Condition: "all posts from category 'news'"
+			// The other posts in the condition are not affected by this post
+			// being added to the condition. They remain in 'news'.
+			// 2.) Condition: "the latest 3 posts"
+			// The other posts in the condition could be affected because the
+			// '3' posts likely now includes 1 less other post that has been
+			// included before, but now needs to be removed from the condition.
 			if ( $condition_has_count_filter ) {
 				// Logger::add( 'distributing condition (added post id: '.$post_id.'): ', $condition );
-				Distributor::distribute_contentsync_content_condition_posts( $condition, $posts_before );
+				Distributor::distribute_cluster_content_condition_posts( $condition, $posts_before );
 			}
 		}
 	}
@@ -398,7 +396,7 @@ class Trigger {
 		$post_needs_review = false;
 		$export_args       = Main_Helper::default_export_args();
 		$destination_ids   = array();
-		
+
 		/**
 		 * Check if the post is inside a cluster with reviews enabled
 		 */
@@ -408,7 +406,7 @@ class Trigger {
 				break;
 			}
 			// save the destination ids, where the post is added to
-			$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
+			$destination_ids  = array_merge( $destination_ids, $cluster->destination_ids );
 			$make_post_global = true;
 		}
 
@@ -452,7 +450,7 @@ class Trigger {
 
 		$post_needs_review = false;
 		$destination_ids   = array();
-		
+
 		/**
 		 * Check if the post is inside a cluster with reviews enabled
 		 */
@@ -475,13 +473,13 @@ class Trigger {
 		else {
 
 			// get the destinations the post is removed from
-			$destinations_to_be_removed_from = array();
+			$destinations_to_be_removed_from      = array();
 			$cluster_ids_the_post_is_removed_from = $this->get_cluster_ids_the_post_is_removed_from( $post_id );
 			if ( ! empty( $cluster_ids_the_post_is_removed_from ) ) {
 				foreach ( $cluster_ids_the_post_is_removed_from as $cluster_id ) {
-					$cluster = get_contentsync_cluster_by_id( $cluster_id );
+					$cluster = get_cluster_by_id( $cluster_id );
 					if ( $cluster ) {
-						if ( $cluster->destination_ids && !empty($cluster->destination_ids) ) {
+						if ( $cluster->destination_ids && ! empty( $cluster->destination_ids ) ) {
 							foreach ( $cluster->destination_ids as $destination_id ) {
 
 								if ( empty( $destination_id ) ) {
@@ -627,7 +625,7 @@ class Trigger {
 		if ( $status === 'linked' ) {
 			// remove connection from root post
 			Main_Helper::remove_post_connection_from_connection_map( $gid, get_current_blog_id(), $post_id );
-		} else if ( $status === 'root' ) {
+		} elseif ( $status === 'root' ) {
 			if ( self::post_needs_review( $post_id ) ) {
 				$post_before              = $post;
 				$post_before->post_status = $previous_status;
@@ -649,7 +647,7 @@ class Trigger {
 		if ( $status === 'linked' ) {
 			$gid = get_post_meta( $post_id, 'synced_post_id', true );
 			Main_Helper::add_post_connection_to_connection_map( $gid, get_current_blog_id(), $post_id );
-		} else if ( $status === 'root' ) {
+		} elseif ( $status === 'root' ) {
 			if ( self::post_needs_review( $post_id ) ) {
 				$post_before              = get_post( $post_id );
 				$post_before->post_status = 'trash';
@@ -682,7 +680,7 @@ class Trigger {
 					Main_Helper::restore_blog();
 				}
 			}
-		} else if ( $status === 'root' ) {
+		} elseif ( $status === 'root' ) {
 			if ( self::post_needs_review( $post_id ) ) {
 				Actions::create_post_review( $post_id, $post );
 				return;
@@ -724,9 +722,9 @@ class Trigger {
 		if ( $connection_map && is_array( $connection_map ) && count( $connection_map ) ) {
 			set_transient(
 				'contentsync_transient_notice',
-				'info::'.
-				__( '<strong>You have trashed a global source post, which is used on other pages.</strong> This does not delete the linked posts.', 'contentsync' ).
-				'</p><p>'.
+				'info::' .
+				__( '<strong>You have trashed a global source post, which is used on other pages.</strong> This does not delete the linked posts.', 'contentsync' ) .
+				'</p><p>' .
 				__( 'If you want to delete this post everywhere, restore the post and use the "Delete everywhere" feature via "Content Sync > Network Overview".', 'contentsync' )
 			);
 		}
@@ -789,11 +787,9 @@ class Trigger {
 			if ( $trash_global_post_setting == 'trash' ) {
 				// search for trashed posts and delete them
 				Actions::untrash_connected_posts( $post->ID, true );
-			}
-			else if ( $trash_global_post_setting == 'delete' ) {
+			} elseif ( $trash_global_post_setting == 'delete' ) {
 				// do nothing, linked posts are already deleted
-			}
-			else if ( $trash_global_post_setting == 'localize' ) {
+			} elseif ( $trash_global_post_setting == 'localize' ) {
 				// search for localized (unlinked) posts and delete them
 				Actions::delete_unlinked_posts( $post );
 			}
@@ -808,11 +804,9 @@ class Trigger {
 			if ( $trash_global_post_setting == 'trash' ) {
 				// search for trashed posts and untrash them
 				Actions::untrash_connected_posts( $post - ID );
-			}
-			else if ( $trash_global_post_setting == 'delete' ) {
+			} elseif ( $trash_global_post_setting == 'delete' ) {
 				// do nothing, linked posts are gone
-			}
-			else if ( $trash_global_post_setting == 'localize' ) {
+			} elseif ( $trash_global_post_setting == 'localize' ) {
 				// do nothing, posts are already unlinked
 			}
 		}
@@ -831,14 +825,14 @@ class Trigger {
 	 * =================================================================
 	 *                          RETRIEVEVAL & CACHING
 	 * =================================================================
-	 * 
+	 *
 	 * This section contains functions that retrieve and cache data.
 	 * This is necessary to prevent duplicate processing. WordPress often
 	 * fires the 'insert post actions' twice, which would trigger the same post
 	 * update multiple times (eg. 2x 'wp_after_insert_post')
-	 * 
+	 *
 	 * This can lead to a lot of unexpected behavior and issues. It makes the
-	 * evaluation very trickyof what has actually changed since before the post 
+	 * evaluation very trickyof what has actually changed since before the post
 	 * was updated. This is why we cache the data in transients. Doing that we
 	 * generally follow the rule:
 	 *      "If it's in the transient, it's already been processed".
@@ -847,33 +841,33 @@ class Trigger {
 	 * during the entire update post flow. Those include:
 	 *  - the post object before it was changed
 	 *  - the cluster conditions the post has been a part of before
-	 * 
+	 *
 	 * Additionally, we want the actual distribution to only take place once the
 	 * post-object, meta, terms etc. are fully up-to-date. In order ro achieve this,
 	 * we might ignore the first 'insert post action' firing and wait for the second.
 	 * But in order to do so, we need to be sure, that a second action is about to
 	 * fire. Take a look at the comment @see maybe_ignore_this_post_update_action()
 	 * to understand how we achieve and evaluate that.
-	 * 
+	 *
 	 * @since 2.18.0
 	 */
 
 	/**
 	 * How many seconds to keep the transients for the post update.
-	 * 
+	 *
 	 * This is intentionally short to allow legitimate rapid updates
 	 * while preventing duplicate processing.
-	 * 
+	 *
 	 * @since 2.18.0
 	 */
 	const TRANSIENT_LIFETIME = 2;
 
 	/**
 	 * Check if an action has already been processed in the last 2 seconds for the same post.
-	 * 
+	 *
 	 * @param string $action The action that has been processed.
-	 * @param int $post_id The ID of the post being updated.
-	 * 
+	 * @param int    $post_id The ID of the post being updated.
+	 *
 	 * @return bool True if the action has already been processed, false otherwise.
 	 */
 	public function already_processed( $action, $post_id ) {
@@ -888,12 +882,12 @@ class Trigger {
 	/**
 	 * Get cluster condition ids before post update. This is used to compare the specific
 	 * conditions the post has been added to or removed from after the update.
-	 * 
+	 *
 	 * The result is saved in a transient. This is necessary to prevent
 	 * duplicate processing. WordPress often fires the hook 'wp_insert_post_parent' multiple times,
 	 * which would trigger the same post update multiple times.
-	 * 
-	 * @param int $post_id The ID of the post being updated.
+	 *
+	 * @param int  $post_id The ID of the post being updated.
 	 * @param bool $use_cache Whether to use the cache.
 	 *      If true, the function will check the transient.
 	 *      If false, the function will return the condition IDs including this post from the database.
@@ -910,12 +904,11 @@ class Trigger {
 		}
 
 		// get content conditions including this post
-		$content_conditions_including_post = get_contentsync_content_conditions_including_post( $post_id );
+		$content_conditions_including_post = get_cluster_content_conditions_including_post( $post_id );
 
 		if ( ! empty( $content_conditions_including_post ) ) {
 			$content_conditions_including_post = array_keys( $content_conditions_including_post );
-		}
-		else {
+		} else {
 			// we set an empty array to make the transient valid and returnable.
 			$content_conditions_including_post = array();
 		}
@@ -933,16 +926,16 @@ class Trigger {
 	 * not already part of, it would not be enough to only get the conditions that include
 	 * the post right now. But the post can only ever be part of a condition that affects
 	 * the same posttype - therefore we retrieve all conditions based on the post type.
-	 * 
+	 *
 	 * The result is saved in the transient. This is necessary to prevent
 	 * duplicate processing. WordPress often fires the hook 'wp_insert_post_parent' multiple times,
 	 * which would trigger the same post update multiple times.
-	 * 
-	 * @param string|array|object $postarr_object_or_type The post array, object or type to get the conditions for.
-	 * @param bool $use_cache Whether to use the cache.
-	 *      If true, the function will check the transient.
-	 *      If false, the function will return the all conditions that could be affected by the post update from the database.
-	 * 
+	 *
+	 * @param string|array|object                 $postarr_object_or_type The post array, object or type to get the conditions for.
+	 * @param bool                                $use_cache Whether to use the cache.
+	 *                                     If true, the function will check the transient.
+	 *                                     If false, the function will return the all conditions that could be affected by the post update from the database.
+	 *
 	 * @return array Keyed by condition_id, value is an array with the condition and the posts.
 	 *      @param Cluster_Content_Condition condition
 	 *      @param WP_Post[] posts
@@ -952,7 +945,7 @@ class Trigger {
 		// get the post type from the post array, object or type
 		if ( is_object( $postarr_object_or_type ) ) {
 			$post_type = $postarr_object_or_type->post_type;
-		} else if ( is_array( $postarr_object_or_type ) ) {
+		} elseif ( is_array( $postarr_object_or_type ) ) {
 			$post_type = $postarr_object_or_type['post_type'];
 		} else {
 			$post_type = $postarr_object_or_type;
@@ -967,15 +960,15 @@ class Trigger {
 		}
 
 		$conditions_with_this_posttype_before = array();
-		$content_conditions_with_posttype = get_contentsync_content_conditions_including_posttype( $post_type );
+		$content_conditions_with_posttype     = get_cluster_content_conditions_including_posttype( $post_type );
 
 		if ( ! empty( $content_conditions_with_posttype ) ) {
-			
+
 			foreach ( $content_conditions_with_posttype as $condition_id => $condition ) {
 
 				$conditions_with_this_posttype_before[ $condition_id ] = array(
 					'condition' => $condition,
-					'posts' => get_posts_by_contentsync_content_condition( $condition ),
+					'posts'     => get_posts_by_cluster_content_condition( $condition ),
 				);
 			}
 		}
@@ -990,17 +983,17 @@ class Trigger {
 
 	/**
 	 * Get the post before update.
-	 * 
+	 *
 	 * This function uses a transient to store the post before update. This is necessary to prevent
 	 * duplicate processing. WordPress often fires the hook 'wp_insert_post_parent' multiple times,
 	 * which would trigger the same post update multiple times.
-	 * 
-	 * @param int $post_id The ID of the post being updated.
+	 *
+	 * @param int     $post_id The ID of the post being updated.
 	 * @param WP_Post $post_before The post object to use if no post before update is found.
-	 * @param bool $use_cache Whether to use the cache.
-	 *      If true, the function will check the transient.
-	 *      If false, the function will return the post before update from the database.
-	 * 
+	 * @param bool    $use_cache Whether to use the cache.
+	 *         If true, the function will check the transient.
+	 *         If false, the function will return the post before update from the database.
+	 *
 	 * @return WP_Post The post before update.
 	 */
 	public function get_post_before_update( $post_id, $post_before = null, $use_cache = true ) {
@@ -1021,7 +1014,7 @@ class Trigger {
 
 	/**
 	 * Get the cluster ids the post is removed from.
-	 * 
+	 *
 	 * The updated post can have destinations, outside of a cluster. After
 	 * distributing the cluster, the root post itself is distributed. This
 	 * means, the post is distributed to all destinations, saved in the
@@ -1029,11 +1022,11 @@ class Trigger {
 	 * At the time the post is scheduled for distribution, the post meta
 	 * is not updated yet. This means, the post would be distributed to
 	 * already removed destinations.
-	 * 
+	 *
 	 * We need to make sure, that the post is NOT distributed
 	 * to the destinations that have been removed from the
 	 * cluster condition.
-	 * 
+	 *
 	 * @param int $post_id The ID of the post being updated.
 	 * @return array The cluster ids the post is removed from.
 	 */
@@ -1049,14 +1042,14 @@ class Trigger {
 
 	/**
 	 * Add a cluster id to the list of cluster ids the post is removed from.
-	 * 
+	 *
 	 * @param int $post_id The ID of the post being updated.
 	 * @param int $cluster_id The ID of the cluster the post is removed from.
 	 */
 	public function add_cluster_id_the_post_is_removed_from( $post_id, $cluster_id ) {
-		$cluster_ids = $this->get_cluster_ids_the_post_is_removed_from( $post_id );
+		$cluster_ids   = $this->get_cluster_ids_the_post_is_removed_from( $post_id );
 		$cluster_ids[] = $cluster_id;
-		$cluster_ids = array_unique( $cluster_ids );
+		$cluster_ids   = array_unique( $cluster_ids );
 		set_transient( 'synced_post_update_cluster_ids_the_post_is_removed_from_' . $post_id, $cluster_ids, self::TRANSIENT_LIFETIME );
 	}
 

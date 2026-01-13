@@ -10,11 +10,13 @@ namespace Contentsync\Cluster;
 
 use Contentsync\Main_Helper;
 
-if ( !defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 // include the parent class
-if ( !class_exists( 'WP_List_Table' ) ) {
-	require_once ABSPATH.'wp-admin/includes/class-wp-list-table.php';
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
 class Cluster_List_Table extends \WP_List_Table {
@@ -59,12 +61,12 @@ class Cluster_List_Table extends \WP_List_Table {
 		$hidden                = $this->get_hidden_columns();
 		$sortable              = $this->get_sortable_columns();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
-		$items                 = get_contentsync_clusters();
+		$items                 = get_clusters();
 
 		// sort
 		$orderby  = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'post_date';
 		$order    = isset( $_GET['order'] ) ? $_GET['order'] : 'desc';
-		$callback = method_exists( __CLASS__, 'sortby_'.$orderby.'_'.$order ) ? array( __CLASS__, 'sortby_'.$orderby.'_'.$order ) : array( __CLASS__, 'sortby_date_desc' );
+		$callback = method_exists( __CLASS__, 'sortby_' . $orderby . '_' . $order ) ? array( __CLASS__, 'sortby_' . $orderby . '_' . $order ) : array( __CLASS__, 'sortby_date_desc' );
 		usort( $items, $callback );
 
 		// pagination
@@ -104,7 +106,7 @@ class Cluster_List_Table extends \WP_List_Table {
 	 */
 	public function render() {
 		echo '<div class="wrap">';
-		echo '<h1 class="wp-heading-inline" style="margin-right: 8px">'.esc_html( get_admin_page_title() ).'</h1>';
+		echo '<h1 class="wp-heading-inline" style="margin-right: 8px">' . esc_html( get_admin_page_title() ) . '</h1>';
 		// echo sprintf(
 		// '<a href="%s" class="page-title-action">%s</a>',
 		// admin_url( 'site-editor.php' ),
@@ -112,7 +114,7 @@ class Cluster_List_Table extends \WP_List_Table {
 		// );
 		echo '<hr class="wp-header-end">';
 
-		echo '<p>'.__( 'Here you can manage all global content clusters.', 'contentsync' ).'</p>';
+		echo '<p>' . __( 'Here you can manage all global content clusters.', 'contentsync' ) . '</p>';
 
 		echo '<form id="posts-filter" method="post">';
 
@@ -130,7 +132,7 @@ class Cluster_List_Table extends \WP_List_Table {
 	 */
 	protected function display_tablenav( $which ) {
 		if ( 'top' === $which ) {
-			wp_nonce_field( 'bulk-'.$this->_args['plural'] );
+			wp_nonce_field( 'bulk-' . $this->_args['plural'] );
 			// $this->search_box( __( 'Search' ), 'search-box-id' );
 		}
 		?>
@@ -174,7 +176,7 @@ class Cluster_List_Table extends \WP_List_Table {
 
 		$text = __( 'No clusters found.', 'contentsync' );
 
-		echo '<div style="margin: 4px 0;">'.$text.'</div>';
+		echo '<div style="margin: 4px 0;">' . $text . '</div>';
 	}
 
 
@@ -191,8 +193,8 @@ class Cluster_List_Table extends \WP_List_Table {
 	 */
 	public function column_title( $post ) {
 
-		$edit_post_link = network_admin_url( 'admin.php?page=contentsync_clusters&cluster_id='.$post->ID );
-		// $trash_post_link = Theme_Posts_Helper::get_delete_post_link( $post );
+		$edit_post_link = network_admin_url( 'admin.php?page=contentsync_clusters&cluster_id=' . $post->ID );
+		// $trash_post_link = \Contentsync\get_delete_post_link( $post );
 		// $delete_post_link = wp_nonce_url( admin_url( 'admin-post.php?action=contentsync_delete_cluster&cluster_id=' . $post->ID ), 'contentsync_delete_cluster' )
 
 		$row_actions = array(
@@ -216,7 +218,7 @@ class Cluster_List_Table extends \WP_List_Table {
 		$post_status = '';
 
 		// render the post title
-		if ( empty( $error ) && !empty( $edit_post_link ) ) {
+		if ( empty( $error ) && ! empty( $edit_post_link ) ) {
 			$content = sprintf(
 				'<strong><a class="row-title" href="%s">%s</a>%s</strong>',
 				$edit_post_link,
@@ -250,7 +252,9 @@ class Cluster_List_Table extends \WP_List_Table {
 
 		foreach ( $destinations as $destination_id ) {
 
-			if ( empty( $destination_id ) ) break;
+			if ( empty( $destination_id ) ) {
+				break;
+			}
 
 			$destination_label = null;
 			$destination_url   = null;
@@ -262,8 +266,7 @@ class Cluster_List_Table extends \WP_List_Table {
 				$destination_label = $blog['name'];
 				$destination_slug  = $blog['domain'];
 				$destination_url   = untrailingslashit( $blog['http'] . '://' . $blog['domain'] );
-			}
-			else {
+			} else {
 				$destination_label = get_blogaddress_by_id( $destination_id );
 			}
 
@@ -273,8 +276,8 @@ class Cluster_List_Table extends \WP_List_Table {
 					? $destination_label
 					: "<a href='{$destination_url}' target='_blank'>{$destination_label}</a>" . (
 						! empty( $destination_slug )
-						? " – " . $destination_slug
-						: ""
+						? ' – ' . $destination_slug
+						: ''
 					)
 				);
 			}
@@ -315,56 +318,60 @@ class Cluster_List_Table extends \WP_List_Table {
 
 		$contents = array();
 
-		foreach( $post->content_conditions as $condition ) {
+		foreach ( $post->content_conditions as $condition ) {
 
 			// debug( $condition );
 
 			// post type
 			$post_type = $condition->post_type;
-			$post_type = str_replace( array(
-				'tp_',
-				'wp_',
-				'-',
-				'_'
-			), array(
-				'',
-				'WP ',
-				' ',
-				' '
-			), $post_type );
-			
+			$post_type = str_replace(
+				array(
+					'tp_',
+					'wp_',
+					'-',
+					'_',
+				),
+				array(
+					'',
+					'WP ',
+					' ',
+					' ',
+				),
+				$post_type
+			);
+
 			/* translators: %s is the post type */
 			$content_description = sprintf( __( '%s(s)', 'contentsync' ), '<strong>' . ucwords( $post_type ) . '</strong>' );
-			
+
 			// source blog
 			$blog = $this->get_blog_by_destination_id( $condition->blog_id );
 			if ( $blog ) {
 				$destination_label = $blog['name'];
 				$destination_slug  = $blog['domain'];
 				$destination_url   = untrailingslashit( $blog['http'] . '://' . $blog['domain'] );
-				$source ="<a href='{$destination_url}' target='_blank'>{$destination_label}</a>";
+				$source            = "<a href='{$destination_url}' target='_blank'>{$destination_label}</a>";
 			} else {
 				$source = get_blogaddress_by_id( $destination_id );
 			}
 
 			/* translators: %s is the source blog name & url */
-			$content_description .= " " . sprintf( __( 'from %s', 'contentsync' ), $source );
+			$content_description .= ' ' . sprintf( __( 'from %s', 'contentsync' ), $source );
 
 			// terms
 			if ( ! empty( $condition->terms ) && ! empty( $condition->taxonomy ) ) {
 
 				/* translators: %1$s is the terms, %2$s is the taxonomy */
-				$content_description .= " " . sprintf( __( 'assigned to %1$s (%2$s)', 'contentsync' ), '<u>' . $condition->terms . '</u>', $condition->taxonomy );
+				$content_description .= ' ' . sprintf( __( 'assigned to %1$s (%2$s)', 'contentsync' ), '<u>' . $condition->terms . '</u>', $condition->taxonomy );
 			}
 
 			// filter
 			$has_filter = false;
 			if ( ! empty( $condition->filter ) ) {
-				foreach( $condition->filter as $filter ) {
-					
+				foreach ( $condition->filter as $filter ) {
+
 					if ( isset( $filter['count'] ) && ! empty( $filter['count'] ) ) {
-						$content_description = $filter['count'] . " " . $content_description;
-						$has_filter = true;
+						$content_description = $filter['count'] . ' ' . $content_description;
+						$has_filter          = true;
 					}
 
 					if ( isset( $filter['date_mode'] ) ) {
@@ -380,24 +387,22 @@ class Cluster_List_Table extends \WP_List_Table {
 							if ( isset( $filter['date_value_from'] ) && isset( $filter['date_value_to'] ) ) {
 
 								/* translators: %1$s is the start date, %2$s is the end date, eg. 2025-02-01 to 2025-02-28 */
-								$content_description .= " " . sprintf( __( 'from %1$s to %2$s', 'contentsync' ), $filter['date_value_from'], $filter['date_value_to'] );
-								$has_filter = true;
+								$content_description .= ' ' . sprintf( __( 'from %1$s to %2$s', 'contentsync' ), $filter['date_value_from'], $filter['date_value_to'] );
+								$has_filter           = true;
 							}
-						}
-						else if ( $filter['date_mode'] == 'static' ) {
+						} elseif ( $filter['date_mode'] == 'static' ) {
 							if ( isset( $filter['date_value'] ) ) {
 
 								/* translators: %s is the date, eg. 2025-02-01 */
-								$content_description .= " " . sprintf( __( 'since %s', 'contentsync' ), $filter['date_value'] );
-								$has_filter = true;
+								$content_description .= ' ' . sprintf( __( 'since %s', 'contentsync' ), $filter['date_value'] );
+								$has_filter           = true;
 							}
-						}
-						else if ( $filter['date_mode'] == 'dynamic' ) {
+						} elseif ( $filter['date_mode'] == 'dynamic' ) {
 							if ( isset( $filter['date_since'] ) && isset( $filter['date_since_value'] ) ) {
 
 								/* translators: %1$s is the number, %2$s is the time unit, eg. 42 days or 1 week */
-								$content_description .= " " . sprintf( __( 'from the last %1$s %2$s(s)', 'contentsync' ), $filter['date_since_value'], $filter['date_since'] );
-								$has_filter = true;
+								$content_description .= ' ' . sprintf( __( 'from the last %1$s %2$s(s)', 'contentsync' ), $filter['date_since_value'], $filter['date_since'] );
+								$has_filter           = true;
 							}
 						}
 					}
@@ -408,16 +413,14 @@ class Cluster_List_Table extends \WP_List_Table {
 					// debug( $condition );
 			if ( $condition->make_posts_global_automatically ) {
 				if ( $has_filter ) {
-					$content_description .= ", " . __( 'automatically', 'contentsync' );
+					$content_description .= ', ' . __( 'automatically', 'contentsync' );
 				} else {
-					$content_description = __( 'All', 'contentsync' ) . " " . $content_description;
+					$content_description = __( 'All', 'contentsync' ) . ' ' . $content_description;
 				}
+			} elseif ( $has_filter ) {
+					$content_description .= ', ' . __( 'manually', 'contentsync' );
 			} else {
-				if ( $has_filter ) {
-					$content_description .= ", " . __( 'manually', 'contentsync' );
-				} else {
-					$content_description = __( 'All global', 'contentsync' ) . " " . $content_description;
-				}
+				$content_description = __( 'All global', 'contentsync' ) . ' ' . $content_description;
 			}
 
 			$contents[] = $content_description;
@@ -458,8 +461,8 @@ class Cluster_List_Table extends \WP_List_Table {
 	public function process_bulk_action() {
 
 		// verify the nonce
-		if ( !isset( $_REQUEST['_wpnonce'] ) ||
-			!wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-'.$this->_args['plural'] )
+		if ( ! isset( $_REQUEST['_wpnonce'] ) ||
+			! wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-' . $this->_args['plural'] )
 		) {
 			return false;
 		}
@@ -479,7 +482,7 @@ class Cluster_List_Table extends \WP_List_Table {
 		}
 		// but if the user confirmed the action (eg. on 'delete'),
 		// the values are set as an encoded string
-		else if ( is_string( $post_ids ) ) {
+		elseif ( is_string( $post_ids ) ) {
 			$post_ids = esc_sql( json_decode( stripslashes( $post_ids ), true ) );
 		}
 
@@ -496,7 +499,7 @@ class Cluster_List_Table extends \WP_List_Table {
 					$post = get_post( $post_id );
 					if ( $post ) {
 						$post_title = $post->post_title;
-						$result     = (bool)wp_trash_post( $post_id );
+						$result     = (bool) wp_trash_post( $post_id );
 						if ( $result ) {
 							$post_titles[] = $post_title;
 						}
@@ -525,7 +528,7 @@ class Cluster_List_Table extends \WP_List_Table {
 		if ( $result === true ) {
 			if ( count( $post_titles ) > 1 ) {
 				$last        = array_pop( $post_titles );
-				$post_titles = implode( ', ', $post_titles ).' & '.$last;
+				$post_titles = implode( ', ', $post_titles ) . ' & ' . $last;
 			} else {
 				$post_titles = implode( ', ', $post_titles );
 			}
@@ -533,13 +536,13 @@ class Cluster_List_Table extends \WP_List_Table {
 		} else {
 			$notice_class = 'error';
 			$content      = $notices[ $bulk_action ]['fail'];
-			if ( is_string( $result ) && !empty( $result ) ) {
-				$content .= ' '.__( 'Error message:', 'contentsync' ).' '.$result;
+			if ( is_string( $result ) && ! empty( $result ) ) {
+				$content .= ' ' . __( 'Error message:', 'contentsync' ) . ' ' . $result;
 			}
 		}
 
 		// display the admin notice
-		$this->show_message( $content.$notice_content, $notice_class );
+		$this->show_message( $content . $notice_content, $notice_class );
 	}
 
 	public function render_status_box( $text = '', $color = '' ) {
@@ -559,23 +562,28 @@ class Cluster_List_Table extends \WP_List_Table {
 	 * @param bool   $list    Add to hub msg list (default: false).
 	 */
 	public static function show_message( $msg, $mode = 'info', $list = false ) {
-		if ( empty( $msg ) ) return;
-		if ( $list ) echo "<p class='hub_msg msg_list {$mode}'>{$msg}</p>";
-		else echo "<div class='notice notice-{$mode} is-dismissible'><p>{$msg}</p></div>";
+		if ( empty( $msg ) ) {
+			return;
+		}
+		if ( $list ) {
+			echo "<p class='hub_msg msg_list {$mode}'>{$msg}</p>";
+		} else {
+			echo "<div class='notice notice-{$mode} is-dismissible'><p>{$msg}</p></div>";
+		}
 	}
 
 	public function get_blog_by_destination_id( $destination_id ) {
 		if ( strpos( $destination_id, '|' ) === false ) {
 			return $this->get_local_blog( $destination_id );
 		}
-		
+
 		list( $blog_id, $connection_slug ) = explode( '|', $destination_id );
 
 		if ( isset( $this->all_destination_blogs['remote'] ) && isset( $this->all_destination_blogs['remote'][ $connection_slug ] ) ) {
 
 			$network_blogs = $this->all_destination_blogs['remote'][ $connection_slug ];
 
-			foreach( $network_blogs as $blog ) {
+			foreach ( $network_blogs as $blog ) {
 				if ( $blog['blog_id'] == $blog_id ) {
 					return $blog;
 				}
@@ -584,7 +592,7 @@ class Cluster_List_Table extends \WP_List_Table {
 	}
 
 	public function get_local_blog( $blog_id ) {
-		foreach( $this->all_destination_blogs['local'] as $blog ) {
+		foreach ( $this->all_destination_blogs['local'] as $blog ) {
 			if ( $blog['blog_id'] == $blog_id ) {
 				return $blog;
 			}
