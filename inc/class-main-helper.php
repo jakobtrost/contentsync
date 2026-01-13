@@ -3031,11 +3031,51 @@ class Main_Helper {
 		return null;
 	}
 
-	/*
-	====================================================================================
-		Messages and Infos 
-	====================================================================================
-	*/
+	/**
+	 * Get all active Plugins from Option.
+	 * Including all active sitewide Plugins.
+	 * @param string $mode  all|site|global (default: all)
+	 */
+	public static function active_plugins($mode = 'all') {
+
+		$plugins = array();
+
+		// get all active plugins
+		if ( $mode == 'all' || $mode == 'site' ) {
+			$plugins = get_option('active_plugins');
+			if ( !is_array($plugins) ) {
+				$plugins = array();
+			}
+		}
+
+		// on multisite, get all active sitewide plugins as well
+		if (
+			is_multisite()
+			&& ( $mode == 'all' || $mode == 'global' )
+		) {
+			$plugins_multi = get_site_option('active_sitewide_plugins');
+			if ( is_array($plugins_multi) && !empty($plugins_multi) ) {
+				foreach ($plugins_multi as $key => $value) {
+					$plugins[] = $key;
+				}
+				$plugins = array_unique($plugins);
+				sort($plugins);
+			}
+		}
+
+		return $plugins;
+	}
+
+	/**
+	 * Check if single Plugin is active.
+	 */
+	public static function is_active_plugin($file) {
+		// check for active plugins
+		$plugins = self::active_plugins();
+		$active = false;
+		if (in_array($file, $plugins)) $active = true;
+		return $active;
+	}
 
 	/**
 	 * Render a frontend message box.

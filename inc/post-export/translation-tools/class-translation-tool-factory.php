@@ -10,6 +10,8 @@
 
 namespace Contentsync\Translation_Tools;
 
+use Contentsync\Main_Helper as Main_Helper;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -104,7 +106,7 @@ class Translation_Tool_Factory {
 	private static function detect_tool() {
 		$tool = null;
 
-		$plugins = \Greyd\Helper::active_plugins();
+		$plugins = Main_Helper::active_plugins();
 		if ( in_array( 'sitepress-multilingual-cms/sitepress.php', $plugins ) ) {
 			$tool = 'wpml';
 		}

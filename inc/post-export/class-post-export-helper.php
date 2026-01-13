@@ -49,10 +49,6 @@ class Post_Export_Helper {
 		$include   = array( 'page', 'post', 'attachment', 'wp_template', 'wp_template_part', 'wp_block', 'wp_navigation' );
 		$exclude   = array();
 
-		if ( Helper::is_contentsync_alpha() ) {
-			$include[] = 'wp_global_styles';
-		}
-
 		$posttypes = array_keys( get_post_types( array( '_builtin' => false ) ) );
 
 		$supported = array_diff( array_merge( $include, $posttypes ), $exclude );
@@ -196,20 +192,7 @@ class Post_Export_Helper {
 			do_action( 'synced_post_export_log', "  - skipped oembed option '$meta_key'" );
 			$skip = true;
 		}
-		// skip wpml meta if plugin not active
-		elseif ( strpos( $meta_key, '_wpml_' ) === 0 ) {
-			if ( Translation_Manager::get_translation_tool() !== 'wpml' ) {
-				do_action( 'synced_post_export_log', "  - skipped wpml option '$meta_key'" );
-				$skip = true;
-			}
-		}
-		// skip yoast meta if plugin not active
-		elseif ( strpos( $meta_key, '_yoast_' ) === 0 ) {
-			if ( ! Helper::is_active_plugin( 'wordpress-seo/wp-seo.php' ) ) {
-				do_action( 'synced_post_export_log', "  - skipped yoast option '$meta_key'" );
-				$skip = true;
-			}
-		}
+		
 		/**
 		 * Filter to determine whether a specific meta option should be skipped during export or import.
 		 * 

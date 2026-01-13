@@ -8,23 +8,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-new Post_Export_Admin( $config );
+new Post_Export_Admin();
 
 class Post_Export_Admin {
 
 	/**
-	 * Plugin config
-	 *
-	 * @var object
-	 */
-	private $config;
-
-	/**
 	 * Constructor
 	 */
-	public function __construct( $config ) {
-
-		$this->config = (object) $config;
+	public function __construct() {
 
 		// UI
 		add_filter( 'contentsync_overlay_contents', array( $this, 'add_overlay_contents' ) );

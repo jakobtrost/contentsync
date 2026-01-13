@@ -43,10 +43,6 @@ function get_contentsync_cluster_by_id( $cluster_id ) {
  */
 function get_contentsync_clusters() {
 
-	if ( ! Main_Helper::setup_complete() ) {
-		return array();
-	}
-
 	global $wpdb;
 
 	$table_name = $wpdb->base_prefix.'contentsync_clusters';
@@ -73,10 +69,6 @@ function get_contentsync_clusters() {
  * @return array
  */
 function get_contentsync_clusters_by_destination_id( $blog_id ) {
-
-	if ( ! Main_Helper::setup_complete() ) {
-		return array();
-	}
 
 	global $wpdb;
 
@@ -195,10 +187,6 @@ function delete_contentsync_cluster( $cluster_id ) {
  */
 function is_post_in_contentsync_cluster( $post_or_post_id, $cluster_or_cluster_id ) {
 
-	if ( ! Main_Helper::setup_complete() ) {
-		return false;
-	}
-
 	if ( !$cluster_or_cluster_id instanceof Contentsync_Cluster ) {
 		$cluster = get_contentsync_cluster_by_id( $cluster_or_cluster_id );
 		if ( !$cluster ) {
@@ -247,10 +235,6 @@ function is_post_in_contentsync_cluster( $post_or_post_id, $cluster_or_cluster_i
  */
 function get_contentsync_clusters_with_date_mode_condition() {
 
-	if ( ! Main_Helper::setup_complete() ) {
-		return array();
-	}
-
 	$clusters = array();
 
 	foreach ( get_contentsync_clusters() as $cluster ) {
@@ -286,10 +270,6 @@ function get_contentsync_clusters_with_date_mode_condition() {
  * @return Contentsync_Cluster[]             All clusters containing the post, keyed by cluster ID.
  */
 function get_clusters_including_post( $post, $with_filter = null ) {
-
-	if ( ! Main_Helper::setup_complete() ) {
-		return array();
-	}
 
 	// Logger::add( "get_clusters_including_post" );
 
@@ -336,11 +316,6 @@ function get_clusters_including_post( $post, $with_filter = null ) {
  * @return Contentsync_Cluster[]             All clusters containing the post type, keyed by cluster ID.
  */
 function get_clusters_including_posttype( $post_or_posttype ) {
-	// Logger::add( "get_clusters_including_posttype" );
-
-	if ( ! Main_Helper::setup_complete() ) {
-		return array();
-	}
 
 	if ( is_object( $post_or_posttype ) ) {
 		$posttype = $post_or_posttype->post_type;
@@ -403,10 +378,6 @@ function get_clusters_including_posttype( $post_or_posttype ) {
  */
 function get_contentsync_cluster_posts_per_blog( $cluster_or_cluster_id ) {
 
-	if ( ! Main_Helper::setup_complete() ) {
-		return array();
-	}
-
 	Logger::add( 'get_contentsync_cluster_posts_per_blog' );
 
 	if ( !$cluster_or_cluster_id instanceof Contentsync_Cluster ) {
@@ -443,10 +414,6 @@ function get_contentsync_cluster_posts_per_blog( $cluster_or_cluster_id ) {
  * Called from the save function of any cluster edit screen.
  */
 function schedule_contentsync_cluster_date_check() {
-
-	if ( ! Main_Helper::setup_complete() ) {
-		return;
-	}
 
 	// save cluster posts next schedule
 	$clusters_with_date_condition_before = array();
@@ -490,10 +457,6 @@ function schedule_contentsync_cluster_date_check() {
  * @action cron_action_check_cluster
  */
 function check_contentsync_clusters_on_date_change( $clusters_with_date_condition_before ) {
-
-	if ( ! Main_Helper::setup_complete() ) {
-		return;
-	}
 
 	$clusters_with_date_condition = array();
 	foreach ( get_contentsync_clusters_with_date_mode_condition() as $cluster_id => $cluster ) {
