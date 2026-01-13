@@ -46,10 +46,10 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		// remove the first char '_' from argument
 		$posttype = isset( $_GET['post_type'] ) ? substr( $_GET['post_type'], 1 ) : '';
 
-		if ( in_array( $posttype, Theme_Posts_Helper::get_supported_post_types() ) ) {
+		if ( in_array( $posttype, \Contentsync\get_theme_post_types() ) ) {
 			$this->post_type = $posttype;
 		} else {
-			$this->post_type = Theme_Posts_Helper::get_supported_post_types();
+			$this->post_type = \Contentsync\get_theme_post_types();
 		}
 	}
 
@@ -62,27 +62,27 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		$this->process_bulk_action();
 
 		// Define the columns and data for the list table
-		$columns  = $this->get_columns();
-		$hidden   = array();
-		$sortable = $this->get_sortable_columns();
+		$columns               = $this->get_columns();
+		$hidden                = array();
+		$sortable              = $this->get_sortable_columns();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
 		// get items
 		$args = array(
-			'post_type' => $this->post_type
+			'post_type' => $this->post_type,
 		);
 		if ( isset( $_REQUEST['s'] ) ) {
 			$args['s'] = esc_attr( $_REQUEST['s'] );
 		}
 		// Only show trashed items if Trash tab is active
-		if ( isset($_GET['post_status']) && $_GET['post_status'] === 'trash' ) {
+		if ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' ) {
 			$args['post_status'] = 'trash';
 		} else {
-			$args['post_status'] = array('publish', 'future', 'draft', 'pending', 'private');
+			$args['post_status'] = array( 'publish', 'future', 'draft', 'pending', 'private' );
 		}
 
 		// Filter by current theme if current theme view is active
-		if ( isset($_GET['view']) && ( $_GET['view'] === 'current_theme' || $_GET['view'] === 'inactive' ) ) {
+		if ( isset( $_GET['view'] ) && ( $_GET['view'] === 'current_theme' || $_GET['view'] === 'inactive' ) ) {
 
 			$current_post_type = (array) $this->post_type;
 			if (
@@ -90,22 +90,25 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				|| in_array( 'wp_template_part', $current_post_type )
 				|| in_array( 'wp_global_styles', $current_post_type )
 			) {
-				$current_theme = get_option( 'stylesheet' );
+				$current_theme     = get_option( 'stylesheet' );
 				$args['tax_query'] = array(
 					array(
 						'taxonomy' => 'wp_theme',
 						'field'    => 'slug',
 						'terms'    => $current_theme,
-						'operator' => ($_GET['view'] === 'inactive' ? 'NOT IN' : 'IN'),
-					)
+						'operator' => ( $_GET['view'] === 'inactive' ? 'NOT IN' : 'IN' ),
+					),
 				);
-				$args['post_type'] = array_filter( $current_post_type, function($post_type) {
-					return $post_type == 'wp_template' || $post_type == 'wp_template_part' || $post_type == 'wp_global_styles';
-				} );
+				$args['post_type'] = array_filter(
+					$current_post_type,
+					function ( $post_type ) {
+						return $post_type == 'wp_template' || $post_type == 'wp_template_part' || $post_type == 'wp_global_styles';
+					}
+				);
 			}
 		}
 
-		$items = Theme_Posts_Helper::get_posts( $args );
+		$items = \Contentsync\get_theme_posts( $args );
 
 		// sort
 		$orderby  = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'post_date';
@@ -127,7 +130,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		// debug( $items );
 
 		// debug( Post_Export::handle_export_bulk_action( 'localhost', 'contentsync_export', array_map( function( $item ) {
-		// 	return $item->ID;
+		// return $item->ID;
 		// }, $items ) ) );
 
 		// set items
@@ -140,11 +143,10 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	 *                          RENDER
 	 * =================================================================
 	 */
-
 	public function render() {
 		echo '<div class="wrap">';
 		echo '<h1 class="wp-heading-inline">' . esc_html( get_admin_page_title() ) . '</h1>';
-		echo sprintf(
+		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
 			admin_url( 'site-editor.php' ),
 			__( 'Site Editor', 'contentsync_hub' )
@@ -194,14 +196,17 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	}
 
 	public function get_columns() {
-		return apply_filters( 'contentsync_theme_manage_assets_columns', array(
-			'cb'         => '<input type="checkbox" />',
-			'title'      => __( 'Post Title', 'contentsync_hub' ),
-			'post_name'  => __( 'Slug', 'contentsync_hub' ),
-			'post_type'  => __( 'Post Type', 'contentsync_hub' ),
-			'author'     => __( 'Author', 'contentsync_hub' ),
-			'date'       => __( 'Date', 'contentsync_hub' )
-		) );
+		return apply_filters(
+			'contentsync_theme_manage_assets_columns',
+			array(
+				'cb'        => '<input type="checkbox" />',
+				'title'     => __( 'Post Title', 'contentsync_hub' ),
+				'post_name' => __( 'Slug', 'contentsync_hub' ),
+				'post_type' => __( 'Post Type', 'contentsync_hub' ),
+				'author'    => __( 'Author', 'contentsync_hub' ),
+				'date'      => __( 'Date', 'contentsync_hub' ),
+			)
+		);
 	}
 
 	public function get_sortable_columns() {
@@ -219,27 +224,27 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	 */
 	public function tabs() {
 
-		$current = is_string( $this->post_type ) ? $this->post_type : '';
-		$trashed = isset($_GET['post_status']) && $_GET['post_status'] === 'trash';
-		$all_url = remove_query_arg( array('post_type', 'post_status', 'paged') );
-		$trash_url = add_query_arg( array('post_status' => 'trash'), $all_url );
+		$current   = is_string( $this->post_type ) ? $this->post_type : '';
+		$trashed   = isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash';
+		$all_url   = remove_query_arg( array( 'post_type', 'post_status', 'paged' ) );
+		$trash_url = add_query_arg( array( 'post_status' => 'trash' ), $all_url );
 
 		echo "<div class='contentsync_tabs'>";
-		echo sprintf(
+		printf(
 			"<a href='%s' class='tab %s'>%s</a>",
 			$all_url,
-			(!$trashed && empty($current)) ? 'active' : '',
+			( ! $trashed && empty( $current ) ) ? 'active' : '',
 			__( 'All', 'contentsync_hub' )
 		);
-		foreach ( Theme_Posts_Helper::get_supported_post_types() as $post_type ) {
+		foreach ( \Contentsync\get_theme_post_types() as $post_type ) {
 			$post_type_obj = get_post_type_object( $post_type );
-			echo sprintf(
+			printf(
 				"<a href='%s' class='tab blue %s'>%s</a>",
 				add_query_arg(
-					array('post_type' => '_' . $post_type),
+					array( 'post_type' => '_' . $post_type ),
 					$all_url
 				),
-				(!$trashed && $current == $post_type) ? 'active' : '',
+				( ! $trashed && $current == $post_type ) ? 'active' : '',
 				$post_type_obj ? $post_type_obj->labels->singular_name : $post_type
 			);
 		}
@@ -250,28 +255,31 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	 * Renders WP-style views (status filters) above the table.
 	 */
 	protected function get_views() {
-		$trashed             = ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' );
-		$all_url             = remove_query_arg( array( 'post_status', 'paged', 'view' ) );
-		$trash_url           = add_query_arg( array( 'post_status' => 'trash' ), $all_url );
+		$trashed   = ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' );
+		$all_url   = remove_query_arg( array( 'post_status', 'paged', 'view' ) );
+		$trash_url = add_query_arg( array( 'post_status' => 'trash' ), $all_url );
 
-		$current_theme_view  = ( isset( $_GET['view'] ) && $_GET['view'] === 'current_theme' );
-		$current_theme_url   = add_query_arg( array( 'view' => 'current_theme' ), $all_url );
+		$current_theme_view = ( isset( $_GET['view'] ) && $_GET['view'] === 'current_theme' );
+		$current_theme_url  = add_query_arg( array( 'view' => 'current_theme' ), $all_url );
 
-		$inactive_view       = ( isset( $_GET['view'] ) && $_GET['view'] === 'inactive' );
-		$inactive_url        = add_query_arg( array( 'view' => 'inactive' ), $all_url );
+		$inactive_view = ( isset( $_GET['view'] ) && $_GET['view'] === 'inactive' );
+		$inactive_url  = add_query_arg( array( 'view' => 'inactive' ), $all_url );
 
 		// Determine which post types are currently in scope for counting
-		$scoped_post_types = is_string( $this->post_type ) ? array( $this->post_type ) : Theme_Posts_Helper::get_supported_post_types();
-		$theme_post_types  = array_filter( $scoped_post_types, function($post_type) {
-			return $post_type == 'wp_template' || $post_type == 'wp_template_part' || $post_type == 'wp_global_styles';
-		} );
+		$scoped_post_types = is_string( $this->post_type ) ? array( $this->post_type ) : \Contentsync\get_theme_post_types();
+		$theme_post_types  = array_filter(
+			$scoped_post_types,
+			function ( $post_type ) {
+				return $post_type == 'wp_template' || $post_type == 'wp_template_part' || $post_type == 'wp_global_styles';
+			}
+		);
 
 		$all_count           = 0;
 		$trash_count         = 0;
 		$current_theme_count = 0;
 		$inactive_count      = 0;
 		$status_keys         = array( 'publish', 'future', 'draft', 'pending', 'private' );
-		
+
 		foreach ( $scoped_post_types as $type ) {
 			$counts = wp_count_posts( $type );
 			if ( ! $counts ) {
@@ -284,13 +292,13 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		}
 
 		// Count current theme posts
-		$current_theme = get_option( 'stylesheet' );
-		$current_theme_args = array(
+		$current_theme       = get_option( 'stylesheet' );
+		$current_theme_args  = array(
 			// only wp-template & wp-template-part
-			'post_type' => $theme_post_types,
-			'post_status' => $status_keys,
+			'post_type'      => $theme_post_types,
+			'post_status'    => $status_keys,
 			'posts_per_page' => -1,
-			'tax_query' => array(
+			'tax_query'      => array(
 				array(
 					'taxonomy' => 'wp_theme',
 					'field'    => 'slug',
@@ -298,18 +306,18 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				),
 			),
 		);
-		$current_theme_posts  = Theme_Posts_Helper::get_posts( $current_theme_args );
-		$current_theme_count  = count( $current_theme_posts );
+		$current_theme_posts = \Contentsync\get_theme_posts( $current_theme_args );
+		$current_theme_count = count( $current_theme_posts );
 
 		$current_theme_args['tax_query'][0]['operator'] = 'NOT IN';
-		$inactive_theme_posts = Theme_Posts_Helper::get_posts( $current_theme_args );
-		$inactive_theme_count = count( $inactive_theme_posts );
+		$inactive_theme_posts                           = \Contentsync\get_theme_posts( $current_theme_args );
+		$inactive_theme_count                           = count( $inactive_theme_posts );
 
-		$views = array();
+		$views        = array();
 		$views['all'] = sprintf(
 			'<a href="%s" class="%s">%s <span class="count">(<span class="all-count">%d</span>)</span></a>',
 			esc_url( $all_url ),
-			(!$trashed && !$current_theme_view) ? 'current' : '',
+			( ! $trashed && ! $current_theme_view ) ? 'current' : '',
 			esc_html__( 'All', 'contentsync_hub' ),
 			$all_count
 		);
@@ -328,7 +336,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				esc_html__( 'Current Theme', 'contentsync_hub' ),
 				$current_theme_count
 			);
-			$views['inactive'] = sprintf(
+			$views['inactive']      = sprintf(
 				'<a href="%s" class="%s">%s <span class="count">(<span class="nactive-count">%d</span>)</span></a>',
 				esc_url( $inactive_url ),
 				$inactive_view ? 'current' : '',
@@ -372,14 +380,13 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	public function column_title( $post ) {
 
 		$edit_post_link  = Main_Helper::get_edit_post_link( $post );
-		$trash_post_link = Theme_Posts_Helper::get_delete_post_link( $post );
+		$trash_post_link = \Contentsync\get_delete_post_link( $post );
 
-
-		$is_trash = ( isset($_GET['post_status']) && $_GET['post_status'] === 'trash' );
+		$is_trash    = ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' );
 		$row_actions = array();
 		if ( $is_trash ) {
 			// Restore
-			$restore_link = Theme_Posts_Helper::get_untrash_post_link( $post );
+			$restore_link           = \Contentsync\get_untrash_post_link( $post );
 			$row_actions['restore'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
 				$restore_link,
@@ -387,7 +394,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				__( 'Restore', 'contentsync_hub' )
 			);
 			// Delete Permanently
-			$delete_link = Theme_Posts_Helper::get_permanent_delete_post_link( $post );
+			$delete_link           = \Contentsync\get_permanent_delete_post_link( $post );
 			$row_actions['delete'] = sprintf(
 				'<a href="%s" aria-label="%s" onclick="return confirm(\'Are you sure you want to delete this item permanently?\');">%s</a>',
 				$delete_link,
@@ -420,7 +427,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				$post->ID,
 				__( 'Export', 'contentsync_hub' )
 			);
-			$row_actions['rename_template'] = sprintf(
+			$row_actions['rename_template']    = sprintf(
 				'<a style="cursor:pointer;" onclick="contentsync.postExport.openRenameTemplate(this);" data-post_id="%s" data-post_title="%s" data-post_name="%s">%s</a>',
 				$post->ID,
 				$post->post_title,
@@ -448,12 +455,12 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 			if ( $theme_object instanceof \WP_Theme ) {
 				$template_theme_name = $theme_object->get( 'Name' );
 			}
-	
+
 			// check if the template is from the current theme
 			if ( get_option( 'stylesheet' ) != $template_theme ) {
 
 				$error = sprintf(
-					__( 'This asset was created with a different theme (%s) and is not available for the current theme (%s).', 'contentsync_hub' ),
+					__( 'This asset was created with a different theme (%1$s) and is not available for the current theme (%2$s).', 'contentsync_hub' ),
 					$template_theme_name,
 					get_option( 'stylesheet' )
 				);
@@ -465,10 +472,9 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 						$post->ID,
 						__( 'Assign to current theme', 'contentsync_hub' )
 					);
-				}
-				else if ( $post->post_type == 'wp_global_styles' ) {
+				} elseif ( $post->post_type == 'wp_global_styles' ) {
 					$row_actions['switch_global_styles'] = sprintf(
-						'<a style="cursor:pointer;" onclick="contentsync.postExport.openSwitchGlobalStyles(this, \''.$template_theme.'\');" data-post_id="%s">%s</a>',
+						'<a style="cursor:pointer;" onclick="contentsync.postExport.openSwitchGlobalStyles(this, \'' . $template_theme . '\');" data-post_id="%s">%s</a>',
 						$post->ID,
 						__( 'Assign to current theme', 'contentsync_hub' )
 					);
@@ -483,15 +489,14 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 
 		// render the post title
 		// In Trash view, the title should not be linked.
-		if ( empty( $error ) && ! empty( $edit_post_link ) && ! ( isset($_GET['post_status']) && $_GET['post_status'] === 'trash' ) ) {
+		if ( empty( $error ) && ! empty( $edit_post_link ) && ! ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' ) ) {
 			$content = sprintf(
 				'<strong><a class="row-title" href="%s">%s</a>%s</strong>',
 				$edit_post_link,
 				$post->post_title,
 				$post_status
 			);
-		}
-		else {
+		} else {
 			$content = sprintf(
 				'<strong><span class="row-title">%s</span>%s&nbsp;%s</strong>',
 				$post->post_title,
@@ -617,7 +622,6 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	 *                          BULK ACTIONS
 	 * =================================================================
 	 */
-
 	public function column_cb( $item ) {
 		return sprintf(
 			'<input type="checkbox" name="post[]" value="%s" />',
@@ -636,7 +640,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	 * @return array
 	 */
 	public function get_bulk_actions() {
-		$is_trash = ( isset($_GET['post_status']) && $_GET['post_status'] === 'trash' );
+		$is_trash = ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' );
 		if ( $is_trash ) {
 			$actions = array(
 				'untrash' => __( 'Restore', 'contentsync_hub' ),
@@ -661,16 +665,16 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		// Check for single post actions first (from row action links)
 		if ( isset( $_GET['action'] ) && isset( $_GET['post'] ) && isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' ) {
 			$single_action = sanitize_text_field( $_GET['action'] );
-			$post_id = intval( $_GET['post'] );
-			
+			$post_id       = intval( $_GET['post'] );
+
 			if ( $single_action === 'delete' && current_user_can( 'delete_post', $post_id ) ) {
 				$post = get_post( $post_id );
 				if ( $post ) {
 					$result = wp_delete_post( $post_id, true );
 					if ( $result ) {
-						Main_Helper::show_message( 
-							sprintf( __( 'The post "%s" has been permanently deleted.', 'contentsync_hub' ), $post->post_title ), 
-							'success' 
+						Main_Helper::show_message(
+							sprintf( __( 'The post "%s" has been permanently deleted.', 'contentsync_hub' ), $post->post_title ),
+							'success'
 						);
 					} else {
 						Main_Helper::show_message( __( 'Error occurred when deleting the post permanently.', 'contentsync_hub' ), 'error' );
@@ -747,7 +751,6 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				break;
 
 			case 'trash':
-				
 				foreach ( $post_ids as $post_id ) {
 					$post = get_post( $post_id );
 					if ( $post ) {
@@ -755,8 +758,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 						$result     = (bool) wp_trash_post( $post_id );
 						if ( $result ) {
 							$post_titles[] = $post_title;
-						}
-						else {
+						} else {
 							__debug( $result, true );
 						}
 					}
@@ -765,26 +767,22 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				break;
 
 			case 'switch_theme':
-				
 				foreach ( $post_ids as $post_id ) {
 					$post = get_post( $post_id );
 					if ( $post ) {
 						$post_title = $post->post_title;
-						
-						if ( $post->post_type == 'wp_template' || $post->post_type == 'wp_template_part') {
-							$result = Theme_Posts_Helper::set_wp_template_theme( $post, true );
-						}
-						else if ( $post->post_type == 'wp_global_styles' ) {
-							$result = Theme_Posts_Helper::set_wp_global_styles_theme( $post );
-						}
-						else {
+
+						if ( $post->post_type == 'wp_template' || $post->post_type == 'wp_template_part' ) {
+							$result = \Contentsync\set_wp_template_theme( $post, true );
+						} elseif ( $post->post_type == 'wp_global_styles' ) {
+							$result = \Contentsync\set_wp_global_styles_theme( $post );
+						} else {
 							$result = false;
 						}
 
 						if ( $result ) {
 							$post_titles[] = $post_title;
-						}
-						else {
+						} else {
 							__debug( $result, true );
 						}
 					}
@@ -793,7 +791,6 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				break;
 
 			case 'export':
-				
 				$zip_uri = Post_Export::handle_export_bulk_action( '', 'contentsync_export', $post_ids );
 
 				if ( empty( $zip_uri ) ) {
@@ -806,7 +803,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				$unique_id = uniqid( 'contentsync_export_download_' );
 				echo '<a id="' . $unique_id . '" href="' . $zip_uri . '" download style="display:none;"></a>';
 				echo '<script>document.getElementById("' . $unique_id . '").click();</script>';
-				
+
 				break;
 
 			default:
@@ -815,27 +812,27 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 
 		// set the admin notice content
 		$notices = array(
-			'edit'             => array(
+			'edit'         => array(
 				'success' => __( 'The posts %s have been successfully edited.', 'contentsync_hub' ),
 				'fail'    => __( 'There were errors when editing the posts.', 'contentsync_hub' ),
 			),
-			'trash'            => array(
+			'trash'        => array(
 				'success' => __( 'The posts %s have been successfully moved to the trash.', 'contentsync_hub' ),
 				'fail'    => __( 'Errors occurred when moving posts to the trash.', 'contentsync_hub' ),
 			),
-			'untrash'          => array(
+			'untrash'      => array(
 				'success' => __( 'The posts %s have been successfully restored.', 'contentsync_hub' ),
 				'fail'    => __( 'Errors occurred when restoring the posts.', 'contentsync_hub' ),
 			),
-			'delete'           => array(
+			'delete'       => array(
 				'success' => __( 'The posts %s have been permanently deleted.', 'contentsync_hub' ),
 				'fail'    => __( 'Errors occurred when deleting the posts permanently.', 'contentsync_hub' ),
 			),
-			'switch_theme'     => array(
+			'switch_theme' => array(
 				'success' => __( 'The posts %s have been successfully assigned to the current theme', 'contentsync_hub' ),
 				'fail'    => __( 'Errors occurred when assigning posts to the current theme.', 'contentsync_hub' ),
 			),
-			'export'           => array(
+			'export'       => array(
 				'success' => __( 'The posts %s were exported successfully.', 'contentsync_hub' ),
 				'fail'    => __( 'Errors occurred when exporting the posts.', 'contentsync_hub' ),
 			),
@@ -868,7 +865,6 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	 *                          SORT CALLBACKS
 	 * =================================================================
 	 */
-
 	public function sort_alphabet( $a, $b ) {
 		return strcasecmp( $b, $a );
 	}
