@@ -87,7 +87,7 @@ if ( ! is_multisite() ) {
  */
 
 // general
-include_once __DIR__ . '/inc/class-main-helper.php';
+include_once __DIR__ . '/inc/main-helper.php';
 include_once __DIR__ . '/inc/class-synced-post.php';
 
 // load frontend extensions
@@ -115,7 +115,7 @@ if ( is_admin() ) {
 
 	// contents
 	include_once __DIR__ . '/enqueue.php';
-	include_once __DIR__ . '/inc/contents/global-list-table.php';
+	include_once __DIR__ . '/inc/contents/class-global-list-table.php';
 	include_once __DIR__ . '/inc/contents/admin.php';
 	include_once __DIR__ . '/inc/contents/ajax.php';
 
