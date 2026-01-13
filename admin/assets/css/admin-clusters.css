@@ -1,0 +1,467 @@
+/**
+ * Admin Styles for the 'cluster' feature
+ * 
+ * @since 2.17.0
+ */
+
+.cluster_wizard .wizard_box.big {
+  max-width: 550px;
+  min-height: 450px;
+}
+.cluster_wizard .wizard_content h2 {
+  line-height: 1.1em;
+}
+.cluster_wizard .wizard_content .content_option.posttype {
+  -webkit-box-flex: 0;
+  -ms-flex-positive: 0;
+  flex-grow: 0;
+  width: calc(33% - 24px);
+}
+.cluster_wizard.wizard .wizard_content .content_option > p {
+  margin-bottom: 15px;
+}
+.cluster_wizard [data-show],
+.cluster_wizard [data-warning] {
+  display: none;
+}
+.cluster_wizard input[type="text"],
+.cluster_wizard select {
+  min-width: 250px;
+}
+
+#contentsync_cluster_settings .input_section .tagarea,
+#contentsync_cluster_conditions .input_section .tagarea {
+  line-height: 2;
+  min-height: 72px;
+  padding: 0px 8px;
+  border-radius: 4px;
+  border: 1px solid rgb(126, 137, 147);
+  background-color: rgb(255, 255, 255);
+  color: rgb(50, 55, 60);
+  cursor: text;
+  resize: vertical;
+  overflow: auto;
+}
+
+#contentsync_cluster_settings .input_section .tagarea .tag,
+#contentsync_cluster_conditions .input_section .tagarea .tag {
+  display: inline-block;
+  margin: 7px 5px 0px 0px;
+  padding: 2px 8px;
+  line-height: normal;
+  border-radius: 4px;
+  border: 1px solid #868a8f;
+  background: #f5f5f5;
+  color: #868a8f;
+}
+
+#contentsync_cluster_settings .input_section .tagarea .tag .tag_close,
+#contentsync_cluster_conditions .input_section .tagarea .tag .tag_close {
+  cursor: pointer;
+  padding-left: 5px;
+  font-size: 18px;
+  height: auto;
+}
+
+#contentsync_cluster_settings .input_section .tagarea .tag .tag_close:hover,
+#contentsync_cluster_conditions .input_section .tagarea .tag .tag_close:hover {
+  color: #007cba;
+}
+
+#contentsync_cluster_settings .input_section .tagarea .tag_input,
+#contentsync_cluster_conditions .input_section .tagarea .tag_input {
+  min-width: unset;
+  border: 0;
+  box-shadow: none;
+}
+
+#contentsync_cluster_settings .input_section .tagarea .tag_suggestions,
+#contentsync_cluster_conditions .input_section .tagarea .tag_suggestions {
+  display: none;
+  position: absolute;
+  padding: 5px 15px;
+  margin-top: -5px;
+  min-width: 150px;
+  max-height: 200px;
+  overflow: auto;
+  border-radius: 4px;
+  border: 1px solid #868a8f;
+  background: #f5f5f5;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.175);
+  z-index: 1000;
+}
+
+#contentsync_cluster_settings .input_section .tagarea .tag_suggest,
+#contentsync_cluster_conditions .input_section .tagarea .tag_suggest {
+  display: block;
+  line-height: normal;
+  padding: 1px 0px;
+  color: #868a8f;
+}
+
+#contentsync_cluster_settings .input_section .tagarea .tag_suggest.option,
+#contentsync_cluster_conditions .input_section .tagarea .tag_suggest.option {
+  padding-left: 10px;
+  color: inherit;
+  cursor: pointer;
+}
+
+#contentsync_cluster_settings .input_section .tagarea .tag_suggest.option:hover,
+#contentsync_cluster_conditions
+  .input_section
+  .tagarea
+  .tag_suggest.option:hover {
+  color: #007cba;
+}
+
+/*
+ * Table Styles
+ */
+
+.contentsync_table.cluster_edit_table {
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+#poststuff .postbox#contentsync_cluster_settings .inside,
+#poststuff .postbox#contentsync_cluster_conditions .inside {
+  padding: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.contentsync_table.cluster_edit_table.vertical th,
+.contentsync_table.cluster_edit_table.vertical td {
+  vertical-align: top;
+  border-bottom: 1px solid var(--wp-admin-color-light);
+  padding: 20px;
+}
+.cluster_edit_table.vertical tr:last-child th,
+.cluster_edit_table.vertical tr:last-child td {
+  border-bottom: none;
+}
+@media (min-width: 1300px) {
+  .cluster_edit_table.vertical th {
+    width: 240px;
+  }
+}
+@media (max-width: 1299px) {
+  .cluster_edit_table.vertical th {
+    min-width: 150px;
+    width: 30%;
+    max-width: 200px;
+  }
+}
+.cluster_edit_table .input_section.flex {
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+}
+.cluster_edit_table .input_section > * {
+  position: relative;
+  margin-right: 12px;
+}
+.cluster_edit_table .input_section > *:last-child {
+  margin-right: 0;
+}
+.cluster_edit_table .flex.stretch > * {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.cluster_edit_table .flex.stretch input {
+  width: 100%;
+}
+
+.cluster_edit_table label {
+  display: inline-block;
+  margin-bottom: 3px;
+}
+@media (min-width: 1300px) {
+  .cluster_edit_table input:not([type="checkbox"], ),
+  .cluster_edit_table input:not([type="radio"], ),
+  .cluster_edit_table select {
+    min-width: 240px;
+  }
+}
+.cluster_edit_table input[type="checkbox"] {
+  display: inline-block;
+  margin: 0 7px 7px 0;
+  vertical-align: text-top;
+}
+.cluster_edit_table input[type="number"] {
+  width: 100px;
+}
+.cluster_edit_table textarea {
+  width: 100%;
+  padding: 6px 8px;
+}
+
+.cluster_edit_table .input_section .autotags {
+  width: 100%;
+  margin-top: 15px;
+}
+
+/*
+	Fields Table
+*/
+.contentsync_table.conditions_table .tbody .tr {
+  position: relative;
+  overflow-x: auto;
+  background-color: white;
+}
+.contentsync_table.conditions_table
+  .tbody
+  .row_container:nth-last-child(2)
+  .tr {
+  border-bottom: none;
+}
+.contentsync_table.conditions_table .tbody {
+  position: relative;
+  min-height: 40px;
+  border-bottom: 1px solid var(--wp-admin-color-light);
+}
+.contentsync_table.conditions_table .tbody::before {
+  content: attr(data-empty);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  top: calc(50% - 0.5em);
+  font-size: smaller;
+  height: 1em;
+  line-height: 1em;
+  color: #575756;
+}
+/* First Column (Handle) */
+.conditions_table .th:first-child,
+.conditions_table .tbody .td:first-child {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 2 60px;
+  flex: 0 2 60px;
+}
+/* Second Column (Name) */
+.conditions_table .th:nth-child(2),
+.conditions_table .tbody .td:nth-child(2) {
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+}
+a.field_label {
+  text-decoration: none;
+  font-size: 1.2em;
+}
+.required-star {
+  display: none;
+  color: #a12424;
+}
+.required > .required-star:not(.hidden) {
+  display: inline;
+}
+/* Last Column (Buttons) */
+.conditions_table .th:last-child,
+.conditions_table .tbody .td:last-child {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 1 240px;
+  flex: 0 1 240px;
+}
+.conditions_table .tbody .td:last-child {
+  white-space: nowrap;
+  text-align: right;
+}
+.conditions_table .tbody .td:last-child .button:not(:last-child) {
+  margin-right: 5px;
+}
+/* Table Footer (add button) */
+.conditions_table .tbody + .tfoot .td {
+  text-align: right;
+}
+.conditions_table .tbody.empty + .tfoot .td {
+  text-align: center;
+  padding: 30px;
+}
+.conditions_table .tbody.empty + .tfoot .button {
+  font-size: 16px;
+  padding: 6px 20px;
+}
+/* Drag n Drop */
+.sortable_placeholder {
+  border: 1px dashed var(--wp-admin-color-light);
+  background-color: #f5f5f5;
+  height: 54px;
+}
+.sortable_handle {
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+.sortable_handle .dashicons {
+  opacity: 0.6;
+}
+.sortable_handle:hover .dashicons {
+  opacity: 1;
+}
+/* file picker */
+.contentsync_table.conditions_table .custom_filepicker .image_preview {
+  max-width: 50px;
+}
+.contentsync_table.conditions_table .custom_filepicker .image_url {
+  display: none;
+}
+
+/*
+	Inner Table
+*/
+.row_container .sub {
+  position: relative;
+  z-index: 1;
+  height: 0;
+  margin: -1px;
+  border: 1px solid transparent;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.row_container.open .sub {
+  border-color: #afafaf;
+}
+.row_container > .tr::after {
+  content: " ";
+  position: absolute;
+  bottom: 0;
+  right: 166px;
+  border: 0px solid transparent;
+  border-bottom-color: #afafaf;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+.row_container.open > .tr::after {
+  border-width: 6px 6px 7px;
+  right: 160px;
+}
+.inner_table {
+  background-color: #f9f9f9;
+}
+
+/*
+	Taxonomy Table
+*/
+.filter_table {
+  margin: 0;
+  background-color: #fdfdfd;
+}
+.filter_table .empty {
+  display: none;
+}
+.filter_table .empty:nth-last-child(2) {
+  display: table-row;
+}
+/* remove vertical styling */
+.filter_table .th {
+  width: auto !important;
+  min-width: 0 !important;
+  border-right: none !important;
+  border-bottom: 1px solid var(--wp-admin-color-light) !important;
+}
+.filter_table input {
+  min-width: 0 !important;
+}
+.filter_table .td {
+  padding: 8px 12px !important;
+}
+.filter_table .td .small {
+  display: block;
+  line-height: 1;
+}
+
+.filter_table .tbody .td:first-child {
+  flex: unset;
+}
+.filter_table .tfoot .tr {
+  justify-content: flex-end;
+}
+.filter_table .tfoot .td:first-child,
+.filter_table .tfoot .td:last-child {
+  flex: 1;
+}
+
+.filter_section[data-mode="date"] {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.filter_section.hidden,
+.flex.input_section.hidden {
+  display: none;
+}
+.contentsync_table.conditions_table .tbody .tr.filter_table_row {
+  overflow-x: clip;
+  overflow-clip-margin: 500px;
+}
+
+.filter_table_row .settings_input_option.autotags {
+  width: 100%;
+  margin-top: 15px;
+}
+.row_container.open .sub {
+  overflow: visible;
+}
+
+#contentsync_cluster_deletion_form fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.global-content_page_contentsync_clusters .row-actions .delete a {
+  cursor: pointer;
+}
+
+/**
+ * Distribution item table
+ */
+@media screen and (min-width: 782.1px) {
+  .queue-table .column-import_action {
+    width: 70px;
+  }
+
+  .queue-table .column-destination {
+    width: min(400px, 20vw);
+  }
+
+  .queue-table .column-status {
+    width: 120px;
+  }
+
+  .queue-table .column-raw {
+    width: 60px;
+  }
+
+  .queue-table .column-time {
+    width: 160px;
+  }
+}
+
+.queue-table .remote-blogs-list {
+  margin-top: 0.5em;
+}
+
+.queue-table .remote-blogs-list ul {
+  margin: 0.5em 0;
+  padding-left: 1em;
+  font-size: small;
+  list-style-type: disc;
+}
+
+.queue-table dialog {
+  padding: 12px;
+  margin: 2em;
+  width: auto;
+  font-family: "Courier New", Courier, monospace;
+  color: #2c3338;
+  background-color: #f0f0f1;
+  border: 1px solid #8c8f94;
+  border-radius: 4px;
+  box-shadow: 0 0 0 transparent;
+}
