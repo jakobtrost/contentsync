@@ -1,4 +1,7 @@
 <?php
+
+namespace Contentsync\Mails;
+
 /**
  * Generate the subject and body for a review denied email.
  *
@@ -15,7 +18,7 @@
  *
  * @return array Array with 'subject' and 'message' keys for use with wp_mail().
  */
-function contentsync_reviews_editor_denied( $review, $post ) {
+function get_mail_content_for_reviews_editor_denied( $review, $post ) {
 	$subject = __( 'The reviewer requested modifications', 'contentsync' );
 
 	$reviewer_message         = get_latest_message_by_synced_post_review_id( $review->ID );
@@ -31,15 +34,15 @@ function contentsync_reviews_editor_denied( $review, $post ) {
 	);
 
 	$mail_note = '';
-	if ( !empty( $reviewer_message ) ) {
-		$mail_note = '<br><br>'.sprintf( __( 'The reviewer (%s) left the following message:', 'contentsync' ), $reviewer ).'<br><br><em>'.$reviewer_message_content.'</em><br><br>';
+	if ( ! empty( $reviewer_message ) ) {
+		$mail_note = '<br><br>' . sprintf( __( 'The reviewer (%s) left the following message:', 'contentsync' ), $reviewer ) . '<br><br><em>' . $reviewer_message_content . '</em><br><br>';
 	}
 
-	$mail_note .= __( 'Please review the requested modifications and make the necessary changes.', 'contentsync' ).'<br><br>';
+	$mail_note .= __( 'Please review the requested modifications and make the necessary changes.', 'contentsync' ) . '<br><br>';
 
-	$links = "<a href='".\Contentsync\Main_Helper::get_edit_post_link( $post->ID )."'>".sprintf( __( 'View %s', 'contentsync' ), $post->post_type ).'</a>';
+	$links = "<a href='" . \Contentsync\Main_Helper::get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
 
-	$message = $mail_title.$mail_note.$links;
+	$message = $mail_title . $mail_note . $links;
 
 	return array(
 		'subject' => $subject,

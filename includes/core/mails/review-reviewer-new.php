@@ -1,4 +1,7 @@
 <?php
+
+namespace Contentsync\Mails;
+
 /**
  * Generate the subject and body for a new review notification email.
  *
@@ -13,21 +16,21 @@
  *
  * @return array Array with 'subject' and 'message' keys for use with wp_mail().
  */
-function contentsync_reviews_reviewer_new( $review, $post ) {
+function get_mail_content_for_reviews_reviewer_new( $review, $post ) {
 	$subject = __( 'A new review was requested', 'contentsync' );
 
 	$mail_title = sprintf(
 		__( 'On your WordPress site "%1$s" a new review for "%2$s" was requested.', 'contentsync' ),
 		get_bloginfo( 'name' ),
 		get_the_title( $post->ID )
-	).'<br><br>';
+	) . '<br><br>';
 
-	$mail_note = sprintf( __( 'Please review the %s and make the necessary changes.', 'contentsync' ).'<br><br>', $post->post_type );
+	$mail_note = sprintf( __( 'Please review the %s and make the necessary changes.', 'contentsync' ) . '<br><br>', $post->post_type );
 
-	$links  = "<a href='".\Contentsync\Main_Helper::get_edit_post_link( $post->ID )."'>".sprintf( __( 'View %s', 'contentsync' ), $post->post_type ).'</a>';
-	$links .= " | <a href='".network_admin_url( 'admin.php?page=contentsync-post-reviews' )."'>".__( 'View all reviews', 'contentsync' ).'</a>';
+	$links  = "<a href='" . \Contentsync\Main_Helper::get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
+	$links .= " | <a href='" . network_admin_url( 'admin.php?page=contentsync-post-reviews' ) . "'>" . __( 'View all reviews', 'contentsync' ) . '</a>';
 
-	$message = $mail_title.$mail_note.$links;
+	$message = $mail_title . $mail_note . $links;
 
 	return array(
 		'subject' => $subject,

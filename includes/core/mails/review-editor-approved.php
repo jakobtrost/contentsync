@@ -1,4 +1,7 @@
 <?php
+
+namespace Contentsync\Mails;
+
 /**
  * Generate the subject and body for a review approved email.
  *
@@ -14,34 +17,34 @@
  *
  * @return array Array with 'subject' and 'message' keys for use with wp_mail().
  */
-function contentsync_reviews_editor_approved( $review, $post ) {
+function get_mail_content_for_reviews_editor_approved( $review, $post ) {
 	$subject = __( 'The reviewer approved your request', 'contentsync' );
 
 	$reviewer_message = get_latest_message_by_synced_post_review_id( $review->ID );
-	if ( !$reviewer_message ) {
+	if ( ! $reviewer_message ) {
 		// If no reviewer message is found, use a default message
 		$mail_title = sprintf(
 			__( 'Your requested change on the %1$s "%2$s" on the "%3$s" site has been approved:', 'contentsync' ),
 			$post->post_type,
 			get_the_title( $post->ID ),
 			get_bloginfo( 'name' ),
-		).'<br><br>';
+		) . '<br><br>';
 	} else {
-		$reviewer = $reviewer_message->get_reviewer();
+		$reviewer   = $reviewer_message->get_reviewer();
 		$mail_title = sprintf(
 			__( 'The reviewer (%1$s) has approved your requested change on the %2$s "%3$s" on the "%4$s" site:', 'contentsync' ),
 			$reviewer,
 			$post->post_type,
 			get_the_title( $post->ID ),
 			get_bloginfo( 'name' ),
-		).'<br><br>';
+		) . '<br><br>';
 	}
 
-	$mail_note = __( 'No further action is needed.', 'contentsync' ).'<br><br>';
+	$mail_note = __( 'No further action is needed.', 'contentsync' ) . '<br><br>';
 
-	$links = "<a href='".\Contentsync\Main_Helper::get_edit_post_link( $post->ID )."'>".sprintf( __( 'View %s', 'contentsync' ), $post->post_type ).'</a>';
+	$links = "<a href='" . \Contentsync\Main_Helper::get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
 
-	$message = $mail_title.$mail_note.$links;
+	$message = $mail_title . $mail_note . $links;
 
 	return array(
 		'subject' => $subject,
