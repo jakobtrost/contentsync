@@ -17,10 +17,9 @@
 
 namespace Contentsync\Contents;
 
-use \Contentsync\Main_Helper;
-use \Contentsync\Cluster\Mail;
-use \Contentsync\Distribution\Distributor;
-use \Contentsync\Connections\Remote_Operations;
+use Contentsync\Main_Helper;
+use Contentsync\Distribution\Distributor;
+use Contentsync\Connections\Remote_Operations;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -58,10 +57,10 @@ class Actions {
 
 	/**
 	 * Make a post global
+	 *
 	 * @formerly contentsync_export_post
 	 *
 	 * This sets the default post meta for global posts
-	 * 
 	 *
 	 * @param int   $post_id    Post ID.
 	 * @param array $args       Export arguments.
@@ -124,11 +123,11 @@ class Actions {
 
 	/**
 	 * Update global content meta options.
-	 * 
+	 *
 	 * @since 1.7.6
-	 * 
-	 * @param int     $post_id            Post ID.
-	 * @param array   $request_post_data  $_POST data.
+	 *
+	 * @param int   $post_id            Post ID.
+	 * @param array $request_post_data  $_POST data.
 	 */
 	public static function update_contentsync_options( $post_id, $request_post_data ) {
 
@@ -144,8 +143,8 @@ class Actions {
 				echo "\r\n\r\n" . "Update 'contentsync_options'.";
 			}
 
-			$meta_updated   = false;
-			$contentsync_options     = $old_contentsync_options = Main_Helper::get_contentsync_meta( $post_id, 'contentsync_options' );
+			$meta_updated        = false;
+			$contentsync_options = $old_contentsync_options = Main_Helper::get_contentsync_meta( $post_id, 'contentsync_options' );
 			foreach ( $request_post_data['editable_contentsync_options'] as $option_name => $raw_value ) {
 				$contentsync_options[ $option_name ] = $raw_value === 'on';
 				if ( self::$logs ) {
@@ -166,7 +165,7 @@ class Actions {
 			}
 
 			$contentsync_canonical_url = esc_url( trim( strval( $request_post_data['contentsync_canonical_url'] ) ) );
-			$meta_updated     = update_post_meta( $post_id, 'contentsync_canonical_url', $contentsync_canonical_url );
+			$meta_updated              = update_post_meta( $post_id, 'contentsync_canonical_url', $contentsync_canonical_url );
 			if ( self::$logs ) {
 				echo "\r\n" . '→ ' . ( $meta_updated ? 'contentsync_canonical_url has been updated.' : 'contentsync_canonical_url could not be updated' );
 			}
@@ -183,19 +182,19 @@ class Actions {
 
 	/**
 	 * Create a post review or update an existing one.
-	 * 
+	 *
 	 * @param int     $post_id      Post ID.
 	 * @param WP_Post $post_before  Post object before the update.
-	 * 
+	 *
 	 * @return void
 	 */
-	public static function create_post_review( $post_id, $post_before=null ) {
+	public static function create_post_review( $post_id, $post_before = null ) {
 
 		$send_mail = true;
 
 		// check if the post has been distributed yet
 		$post_connection_map = Main_Helper::get_post_connection_map( $post_id );
-		$state = empty( $post_connection_map ) ? 'new' : 'in_review';
+		$state               = empty( $post_connection_map ) ? 'new' : 'in_review';
 
 		// is there an active review?
 		$synced_post_review = get_synced_post_review_by_post( $post_id, get_current_blog_id() );
@@ -211,29 +210,29 @@ class Actions {
 			}
 
 			$update = array(
-				'editor'  => get_current_user_id(),
-				'date'    => date( 'Y-m-d H:i:s', time() ),
-				'state'   => $state
+				'editor' => get_current_user_id(),
+				'date'   => date( 'Y-m-d H:i:s', time() ),
+				'state'  => $state,
 			);
 
 			$review_id = update_synced_post_review( $synced_post_review->ID, $update );
 
 		} else {
 
-			$post_before_id = $post_before ? $post_before->ID : $post_id;
+			$post_before_id     = $post_before ? $post_before->ID : $post_id;
 			$post_before_export = Main_Helper::export_post( $post_before_id, array() );
 			if ( $post_before ) {
 				// loop through all keys of the $post_before object and compare them with the export
 				foreach ( $post_before as $key => $value ) {
-					if ( isset($post_before_export->$key) && $value !== $post_before_export->$key ) {
+					if ( isset( $post_before_export->$key ) && $value !== $post_before_export->$key ) {
 						$post_before_export->$key = $value;
 					}
 				}
 				// var_error_log( $post_before_export );
 			}
-			if ( !empty( $post_connection_map ) ) {
+			if ( ! empty( $post_connection_map ) ) {
 				// add contentsync_connection_map meta to handle deleted post
-				$post_before_export->meta["contentsync_connection_map"] = $post_connection_map;
+				$post_before_export->meta['contentsync_connection_map'] = $post_connection_map;
 			}
 
 			$insert = array(
@@ -242,26 +241,26 @@ class Actions {
 				'editor'        => get_current_user_id(),
 				'date'          => date( 'Y-m-d H:i:s', time() ),
 				'state'         => $state,
-				'previous_post' => $post_before_export
+				'previous_post' => $post_before_export,
 			);
 
 			$review_id = insert_synced_post_review( $insert );
 		}
 
 		if ( $send_mail ) {
-			$mail_result = Mail::send_review_mail( $review_id, $state, 'reviewers' );
+			$mail_result = \contentsync\mails\send_review_mail( $review_id, $state, 'reviewers' );
 		}
 	}
 
 	/**
 	 * Approve a post review.
-	 * 
+	 *
 	 * @param int $review_id  Review ID.
 	 * @param int $post_id    Post ID.
-	 * 
+	 *
 	 * @return bool
 	 */
-	public static function approve_post_review( $review_id, $post_id=null ) {
+	public static function approve_post_review( $review_id, $post_id = null ) {
 
 		if ( ! $review_id ) {
 			return false;
@@ -287,21 +286,18 @@ class Actions {
 		// still technicaly in review
 		set_synced_post_review_state( $review_id, 'approved' );
 
-		if ( !$post ) {
+		if ( ! $post ) {
 			// debug("on_delete_global_post");
 			$result = Trigger::on_delete_global_post( $post_review->previous_post );
-		}
-		else if ( $post->post_status == 'trash' ) {
+		} elseif ( $post->post_status == 'trash' ) {
 			// debug("on_trash_global_post");
 			$result = Trigger::on_trash_global_post( $post_review->previous_post );
-		}
-		else if ( $post_review->previous_post->post_status == 'trash' ) {
+		} elseif ( $post_review->previous_post->post_status == 'trash' ) {
 			// debug("on_untrash_global_post");
 			$result = Trigger::on_untrash_global_post( $post_id );
-		}
-		else {
+		} else {
 			// debug("distribute_post");
-			$destination_ids   = array();
+			$destination_ids = array();
 			foreach ( get_clusters_including_post( $post ) as $cluster ) {
 				$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
 			}
@@ -316,28 +312,31 @@ class Actions {
 			return false;
 		}
 
-		$new_message = new \Synced_Post_Review_Message( $review_id, array(
-			'content' => '',
-			'timestamp' => time(),
-			'action' => 'approved',
-			'reviewer' => get_current_user_id() // $post_review->editor
-		) );
+		$new_message = new \Synced_Post_Review_Message(
+			$review_id,
+			array(
+				'content'   => '',
+				'timestamp' => time(),
+				'action'    => 'approved',
+				'reviewer'  => get_current_user_id(), // $post_review->editor
+			)
+		);
 		$new_message->save();
 
-		Mail::send_review_mail( $review_id, 'approved', 'editor' );
+		\contentsync\mails\send_review_mail( $review_id, 'approved', 'editor' );
 
 		return true;
 	}
 
 	/**
 	 * Deny a post review.
-	 * 
+	 *
 	 * @param int $review_id  Review ID.
 	 * @param int $post_id    Post ID.
-	 * 
+	 *
 	 * @return bool
 	 */
-	public static function deny_post_review( $review_id, $post_id=null, $message_content='' ) {
+	public static function deny_post_review( $review_id, $post_id = null, $message_content = '' ) {
 
 		if ( ! $review_id ) {
 			return false;
@@ -348,16 +347,16 @@ class Actions {
 			// review already finished
 			return false;
 		}
-		
+
 		if ( ! $post_id ) {
 			$post_id = $post_review->post_id;
 		}
 
 		$new_message_args = array(
-			'content' => $message_content,
+			'content'   => $message_content,
 			'timestamp' => time(),
-			'action' => 'denied',
-			'reviewer' => get_current_user_id() // $post_review->editor
+			'action'    => 'denied',
+			'reviewer'  => get_current_user_id(), // $post_review->editor
 		);
 
 		$new_message = new \Synced_Post_Review_Message( $review_id, $new_message_args );
@@ -365,36 +364,36 @@ class Actions {
 
 		$result = set_synced_post_review_state( $review_id, 'denied' );
 
-		Mail::send_review_mail( $review_id, 'denied', 'editor' );
+		\contentsync\mails\send_review_mail( $review_id, 'denied', 'editor' );
 
 		return $result;
 	}
 
 	/**
 	 * Revert a post review.
-	 * 
+	 *
 	 * @param int $review_id  Review ID.
 	 * @param int $post_id    Post ID.
-	 * 
+	 *
 	 * @return bool
 	 */
-	public static function revert_post_review( $review_id, $post_id=null, $message_content='' ) {
+	public static function revert_post_review( $review_id, $post_id = null, $message_content = '' ) {
 
 		if ( ! $review_id ) {
 			return false;
 		}
 
 		$post_review = get_synced_post_review_by_id( $review_id );
-		
+
 		if ( ! $post_id ) {
 			$post_id = $post_review->post_id;
 		}
 
 		$new_message_args = array(
-			'content' => $message_content,
+			'content'   => $message_content,
 			'timestamp' => time(),
-			'action' => 'reverted',
-			'reviewer' => get_current_user_id() // $post_review->editor
+			'action'    => 'reverted',
+			'reviewer'  => get_current_user_id(), // $post_review->editor
 		);
 
 		$new_message = new \Synced_Post_Review_Message( $review_id, $new_message_args );
@@ -403,7 +402,7 @@ class Actions {
 		$previous_post = $post_review->previous_post;
 
 		// get the destination ids
-		$destination_ids   = array();
+		$destination_ids = array();
 		foreach ( get_clusters_including_post( $post_id ) as $cluster ) {
 			$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
 		}
@@ -411,8 +410,7 @@ class Actions {
 		// if post_status is 'auto-draft', the post did not exist before
 		if ( $previous_post && $previous_post->post_status === 'auto-draft' ) {
 			wp_trash_post( $post_id );
-		}
-		else {
+		} else {
 			// revert the post to the previous state
 			$result = Main_Helper::import_posts(
 				// posts
@@ -421,8 +419,8 @@ class Actions {
 				array(
 					$post_id => array(
 						'post_id' => $post_id,
-						'action'  => 'replace'
-					)
+						'action'  => 'replace',
+					),
 				)
 			);
 
@@ -430,7 +428,7 @@ class Actions {
 			$result = Distributor::distribute_single_post( $post_id, $destination_ids );
 		}
 
-		Mail::send_review_mail( $review_id, 'reverted', 'editor' );
+		\contentsync\mails\send_review_mail( $review_id, 'reverted', 'editor' );
 
 		$result = set_synced_post_review_state( $review_id, 'reverted' );
 
@@ -521,7 +519,7 @@ class Actions {
 			Main_Helper::call_post_export_func( 'enable_logs' );
 		}
 
-		do_action( 'synced_post_export_log', "\r\n------\r\n\r\n" . 'All posts prepared. Now we insert them.' );
+		do_action( 'post_export_log', "\r\n------\r\n\r\n" . 'All posts prepared. Now we insert them.' );
 
 		$result = Main_Helper::import_posts( $posts, $conflict_actions );
 
@@ -544,9 +542,12 @@ class Actions {
 	 */
 	public static function contentsync_import_posttype( $gid, $conflict_actions = array() ) {
 
-		$posts = Main_Helper::prepare_global_post_for_import( $gid, array(
-			'whole_posttype' => false,
-		) );
+		$posts = Main_Helper::prepare_global_post_for_import(
+			$gid,
+			array(
+				'whole_posttype' => false,
+			)
+		);
 		if ( ! $posts ) {
 			return false;
 		}
@@ -555,7 +556,7 @@ class Actions {
 			Main_Helper::call_post_export_func( 'enable_logs' );
 		}
 
-		do_action( 'synced_post_export_log', "\r\n------\r\n\r\n" . 'All posts prepared. Now we insert only the posttype itself.' );
+		do_action( 'post_export_log', "\r\n------\r\n\r\n" . 'All posts prepared. Now we insert only the posttype itself.' );
 
 		$posts  = array_slice( $posts, 0, 1, true );
 		$result = Main_Helper::import_posts( $posts, $conflict_actions );
@@ -597,16 +598,16 @@ class Actions {
 
 			/**
 			 * Filter to modify the GID (Global ID) used for conflict resolution during import.
-			 * 
+			 *
 			 * This filter allows developers to customize how the GID is generated or retrieved
 			 * when checking for conflicts between global posts during import operations.
-			 * 
+			 *
 			 * @filter filter_gid_for_conflict_action
-			 * 
+			 *
 			 * @param string $gid    The GID (Global ID) for the post.
 			 * @param int    $post_id The post ID.
 			 * @param object $post   The post object.
-			 * 
+			 *
 			 * @return string $gid   The modified GID for conflict resolution.
 			 */
 			$gid = apply_filters( 'filter_gid_for_conflict_action', Main_Helper::get_gid( $post ), $post->ID, (object) $post );
@@ -616,7 +617,7 @@ class Actions {
 
 				$action = isset( $post->is_contentsync_root_post ) && $post->is_contentsync_root_post ? 'replace' : 'skip';
 				// if ( isset( $post->is_contentsync_root_post ) && $post->is_contentsync_root_post ) {
-				// 	\Contentsync\Distribution\Logger::log( 'Post is contentsync_root_post: ' . $post->is_contentsync_root_post );
+				// \Contentsync\Distribution\Logger::log( 'Post is contentsync_root_post: ' . $post->is_contentsync_root_post );
 				// }
 
 				$conflict_actions[ $post->ID ] = array(
@@ -763,7 +764,7 @@ class Actions {
 
 		$result = true;
 
-		if ( !$connection_map ) {
+		if ( ! $connection_map ) {
 			$connection_map = Main_Helper::get_post_connection_map( $post_id );
 		}
 		\Contentsync\Distribution\Logger::add( 'trash_connected_posts', $post_id );
@@ -775,7 +776,7 @@ class Actions {
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
 			$destination_arrays[ $destination_id ] = array(
-				'import_action' => 'trash'
+				'import_action' => 'trash',
 			);
 		}
 		\Contentsync\Distribution\Logger::add( 'destination_arrays', $destination_arrays );
@@ -787,29 +788,28 @@ class Actions {
 		$result = Distributor::distribute_single_post( $post_id, $destination_arrays );
 
 		// if ( $connection_map && !empty($connection_map) ) {
-		// 	foreach ( $connection_map as $blog_id => $post_connection ) {
-		// 		if ( is_numeric( $blog_id ) ) {
-		// 			Main_Helper::switch_to_blog( $blog_id );
-		// 			$result = wp_trash_post( $post_connection['post_id'], true );
-		// 			if ( self::$logs ) {
-		// 				if ( $result ) {
-		// 					echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} trashed.";
-		// 				} else {
-		// 					echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} could NOT be trashed.";
-		// 				}
-		// 			}
-		// 			Main_Helper::restore_blog();
-		// 		}
-		// 		// else {
-		// 		// 	$remote_network_url = $blog_id;
-		// 		// 	$remote_gid         = $root_blog_id . '-' . $root_post_id . '-' . Main_Helper::get_network_url();
-		// 		// 	$response           = Remote_Operations::delete_all_remote_connected_posts( $remote_network_url, $remote_gid, $post_connection );
-		// 		// }
-		// 	}
+		// foreach ( $connection_map as $blog_id => $post_connection ) {
+		// if ( is_numeric( $blog_id ) ) {
+		// Main_Helper::switch_to_blog( $blog_id );
+		// $result = wp_trash_post( $post_connection['post_id'], true );
+		// if ( self::$logs ) {
+		// if ( $result ) {
+		// echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} trashed.";
+		// } else {
+		// echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} could NOT be trashed.";
+		// }
+		// }
+		// Main_Helper::restore_blog();
+		// }
+		// else {
+		// $remote_network_url = $blog_id;
+		// $remote_gid         = $root_blog_id . '-' . $root_post_id . '-' . Main_Helper::get_network_url();
+		// $response           = Remote_Operations::delete_all_remote_connected_posts( $remote_network_url, $remote_gid, $post_connection );
+		// }
+		// }
 		// }
 
 		return $result;
-
 	}
 
 	/**
@@ -819,7 +819,7 @@ class Actions {
 
 		$result = true;
 
-		$root_gid    = Main_Helper::get_contentsync_meta( $post_id, 'synced_post_id', true );
+		$root_gid = Main_Helper::get_contentsync_meta( $post_id, 'synced_post_id', true );
 		// debug($root_gid);
 
 		// debug("untrash linked posts");
@@ -832,36 +832,37 @@ class Actions {
 			if ( empty( $destination_id ) ) {
 				continue;
 			}
-			Main_Helper::switch_to_blog($destination_id);
+			Main_Helper::switch_to_blog( $destination_id );
 			$trashed = Main_Helper::get_posts(
 				array(
 					'numberposts' => -1,
-					'post_status' => 'trash'
+					'post_status' => 'trash',
 				)
 			);
 			// debug($trashed);
-			if ( $trashed ) foreach ( $trashed as $trash ) {
-				$status = Main_Helper::get_contentsync_meta( $trash->ID, 'synced_post_status', true );
-				$gid    = Main_Helper::get_contentsync_meta( $trash->ID, 'synced_post_id', true );
-				if ( $status == 'linked' && $gid == $root_gid ) {
-					// debug($trash);
-					if ( !$delete ) {
-						$result = wp_untrash_post( $trash->ID, true );
-						if ( self::$logs ) {
-							if ( $result ) {
-								echo "\r\n" . "post {$trash->ID} on blog {$destination_id} untrashed.";
-							} else {
-								echo "\r\n" . "post {$trash->ID} on blog {$destination_id} could NOT be untrashed.";
+			if ( $trashed ) {
+				foreach ( $trashed as $trash ) {
+					$status = Main_Helper::get_contentsync_meta( $trash->ID, 'synced_post_status', true );
+					$gid    = Main_Helper::get_contentsync_meta( $trash->ID, 'synced_post_id', true );
+					if ( $status == 'linked' && $gid == $root_gid ) {
+						// debug($trash);
+						if ( ! $delete ) {
+							$result = wp_untrash_post( $trash->ID, true );
+							if ( self::$logs ) {
+								if ( $result ) {
+									echo "\r\n" . "post {$trash->ID} on blog {$destination_id} untrashed.";
+								} else {
+									echo "\r\n" . "post {$trash->ID} on blog {$destination_id} could NOT be untrashed.";
+								}
 							}
-						}
-					}
-					else {
-						$result = wp_delete_post( $trash->ID, true );
-						if ( self::$logs ) {
-							if ( $result ) {
-								echo "\r\n" . "post {$trash->ID} on blog {$destination_id} deleted.";
-							} else {
-								echo "\r\n" . "post {$trash->ID} on blog {$destination_id} could NOT be deleted.";
+						} else {
+							$result = wp_delete_post( $trash->ID, true );
+							if ( self::$logs ) {
+								if ( $result ) {
+									echo "\r\n" . "post {$trash->ID} on blog {$destination_id} deleted.";
+								} else {
+									echo "\r\n" . "post {$trash->ID} on blog {$destination_id} could NOT be deleted.";
+								}
 							}
 						}
 					}
@@ -871,7 +872,6 @@ class Actions {
 		}
 
 		return $result;
-
 	}
 
 	/**
@@ -879,7 +879,7 @@ class Actions {
 	 */
 	public static function delete_connected_posts( $post_id, $connection_map = null ) {
 
-		if ( !$connection_map ) {
+		if ( ! $connection_map ) {
 			$connection_map = Main_Helper::get_post_connection_map( $post_id );
 		}
 		\Contentsync\Distribution\Logger::log( 'delete_connected_posts', $post_id );
@@ -891,7 +891,7 @@ class Actions {
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
 			$destination_arrays[ $destination_id ] = array(
-				'import_action' => 'delete'
+				'import_action' => 'delete',
 			);
 		}
 		\Contentsync\Distribution\Logger::log( 'destination_arrays', $destination_arrays );
@@ -899,28 +899,28 @@ class Actions {
 		$result = Distributor::distribute_single_post( $post_id, $destination_arrays );
 
 		// if ( $connection_map && !empty($connection_map) ) {
-		// 	foreach ( $connection_map as $blog_id => $post_connection ) {
-		// 		if ( is_numeric( $blog_id ) ) {
-		// 			Main_Helper::switch_to_blog( $blog_id );
-		// 			$result = wp_delete_post( $post_connection['post_id'], true );
-		// 			Main_Helper::restore_blog();
-		// 		}
-		// 		else {
-		// 			if ( strpos($blog_id, '|') !== false) {
-		// 				list ($blog_id, $remote_network_url) = explode('|', $blog_id);
-		// 				$root_gid = Main_Helper::get_contentsync_meta( $post_id, 'synced_post_id' );
-		// 				$result = Remote_Operations::delete_all_remote_connected_posts( $remote_network_url, $root_gid, $post_connection );
-		// 			} 
-		// 		}
+		// foreach ( $connection_map as $blog_id => $post_connection ) {
+		// if ( is_numeric( $blog_id ) ) {
+		// Main_Helper::switch_to_blog( $blog_id );
+		// $result = wp_delete_post( $post_connection['post_id'], true );
+		// Main_Helper::restore_blog();
+		// }
+		// else {
+		// if ( strpos($blog_id, '|') !== false) {
+		// list ($blog_id, $remote_network_url) = explode('|', $blog_id);
+		// $root_gid = Main_Helper::get_contentsync_meta( $post_id, 'synced_post_id' );
+		// $result = Remote_Operations::delete_all_remote_connected_posts( $remote_network_url, $root_gid, $post_connection );
+		// }
+		// }
 
-		// 		if ( self::$logs ) {
-		// 			if ( $result ) {
-		// 				echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} deleted.";
-		// 			} else {
-		// 				echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} could NOT be deleted.";
-		// 			}
-		// 		}
-		// 	}
+		// if ( self::$logs ) {
+		// if ( $result ) {
+		// echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} deleted.";
+		// } else {
+		// echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} could NOT be deleted.";
+		// }
+		// }
+		// }
 		// }
 
 		return true;
@@ -946,7 +946,6 @@ class Actions {
 		}
 
 		return $result;
-
 	}
 
 
@@ -955,7 +954,7 @@ class Actions {
 	 */
 	public static function delete_unlinked_posts( $post ) {
 
-		if ( !$connection_map ) {
+		if ( ! $connection_map ) {
 			$connection_map = Main_Helper::get_post_connection_map( $post );
 		}
 		\Contentsync\Distribution\Logger::log( 'delete_unlinked_posts', $post );
@@ -967,7 +966,7 @@ class Actions {
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
 			$destination_arrays[ $destination_id ] = array(
-				'import_action' => 'delete'
+				'import_action' => 'delete',
 			);
 		}
 		\Contentsync\Distribution\Logger::log( 'destination_arrays', $destination_arrays );
@@ -975,20 +974,19 @@ class Actions {
 		$result = Distributor::distribute_single_post( $post, $destination_arrays );
 
 		return $result;
-
 	}
-	
+
 	/**
 	 * Permanently delete a global post and all it's linked posts.
 	 * The root post needs to be on the current network. This can not be undone.
-	 * 
+	 *
 	 * @todo REWORK with new distributor (test)
 	 *
 	 * @param string $gid
 	 *
 	 * @return WP_Post|false|null Post data on success, false or null on failure.
 	 */
-	public static function delete_global_post( $gid, $keep_root_post=false ) {
+	public static function delete_global_post( $gid, $keep_root_post = false ) {
 
 		if ( self::$logs ) {
 			echo "\r\n" . sprintf( "DELETE global post with gid '%s'", $gid ) . "\r\n";
@@ -1021,7 +1019,7 @@ class Actions {
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
 			$destination_arrays[ $destination_id ] = array(
-				'import_action' => 'delete'
+				'import_action' => 'delete',
 			);
 		}
 		\Contentsync\Distribution\Logger::log( 'destination_arrays', $destination_arrays );
@@ -1033,7 +1031,6 @@ class Actions {
 			$result = wp_delete_post( $root_post_id, true );
 		}
 
-
 		// restore blog
 		Main_Helper::restore_blog();
 
@@ -1043,8 +1040,8 @@ class Actions {
 	/**
 	 * @deprecated 2.8.0 Use make_post_global() instead.
 	 */
-	public static function contentsync_export_post($post_id, $args) {
-		_deprecated_function(__FUNCTION__, '2.8.0', 'make_post_global');
-		return self::make_post_global($post_id, $args);
+	public static function contentsync_export_post( $post_id, $args ) {
+		_deprecated_function( __FUNCTION__, '2.8.0', 'make_post_global' );
+		return self::make_post_global( $post_id, $args );
 	}
 }

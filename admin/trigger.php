@@ -17,7 +17,6 @@
 namespace Contentsync\Contents;
 
 use Contentsync\Main_Helper;
-use Contentsync\Cluster\Mail;
 use Contentsync\Post_Export;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Distribution\Logger;

@@ -17,7 +17,6 @@
 namespace Contentsync\Contents;
 
 use \Contentsync\Main_Helper;
-use \Contentsync\Cluster\Mail;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
