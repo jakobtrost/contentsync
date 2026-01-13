@@ -17,7 +17,7 @@
  */
 namespace Contentsync;
 
-use \WP_Error;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -43,7 +43,7 @@ class Post_Import {
 
 	/**
 	 * Collect strings during import to replace them later.
-	 * 
+	 *
 	 * @var array Key => Value pairs of strings to be replaced.
 	 */
 	public static $collected_replace_strings = array();
@@ -70,9 +70,9 @@ class Post_Import {
 	 */
 	public function check_import( $data ) {
 
-		Post_Export_Helper::enable_logs();
+		\Contentsync\post_export_enable_logs();
 
-		do_action( 'synced_post_export_log', "\r\n\r\n" . 'CHECK IMPORT POST DATA' . "\r\n\r\n", $data );
+		do_action( 'post_export_log', "\r\n\r\n" . 'CHECK IMPORT POST DATA' . "\r\n\r\n", $data );
 
 		set_time_limit( 5000 );
 
@@ -83,14 +83,14 @@ class Post_Import {
 					__( "The uploaded file exceeds the server's maximum file limit (max %s MB). The limit is defined in the <u>php.ini</u> file.", 'contentsync_hub' ),
 					intval( ini_get( 'upload_max_filesize' ) )
 				),
-				2 => __( "The uploaded file exceeds the allowed file size of the html form.", 'contentsync_hub' ),
-				3 => __( "The uploaded file was only partially uploaded.", 'contentsync_hub' ),
-				4 => __( "No file was uploaded.", 'contentsync_hub' ),
-				6 => __( "Missing a temporary folder.", 'contentsync_hub' ),
-				7 => __( "Failed to save the file.", 'contentsync_hub' ),
-				8 => __( "The file was stopped while uploading.", 'contentsync_hub' ),
+				2 => __( 'The uploaded file exceeds the allowed file size of the html form.', 'contentsync_hub' ),
+				3 => __( 'The uploaded file was only partially uploaded.', 'contentsync_hub' ),
+				4 => __( 'No file was uploaded.', 'contentsync_hub' ),
+				6 => __( 'Missing a temporary folder.', 'contentsync_hub' ),
+				7 => __( 'Failed to save the file.', 'contentsync_hub' ),
+				8 => __( 'The file was stopped while uploading.', 'contentsync_hub' ),
 			);
-			Post_Export_Helper::error( $file_errors[ $data['error'] ] );
+			\Contentsync\post_export_return_error( $file_errors[ $data['error'] ] );
 		}
 
 		// file info
@@ -100,20 +100,20 @@ class Post_Import {
 
 		// check filetype
 		if ( $filetype != 'application/zip' && $filetype != 'application/x-zip-compressed' ) {
-			Post_Export_Helper::error( __( "Please select a valid ZIP archive.", 'contentsync_hub' ) );
+			\Contentsync\post_export_return_error( __( 'Please select a valid ZIP archive.', 'contentsync_hub' ) );
 		}
-		do_action( 'synced_post_export_log', '  - file is valid ZIP.' );
+		do_action( 'post_export_log', '  - file is valid ZIP.' );
 
 		// create tmp zip
-		$new_file = Post_Export_Helper::get_file_path( 'tmp' ) . $filename;
+		$new_file = \Contentsync\get_export_file_path( 'tmp' ) . $filename;
 		$result   = move_uploaded_file( $filepath, $new_file );
-		do_action( 'synced_post_export_log', sprintf( '  - temporary file "%s" created.', $new_file ) );
+		do_action( 'post_export_log', sprintf( '  - temporary file "%s" created.', $new_file ) );
 
 		// get post data
 		$post_data = self::get_zip_posts_file_contents( $new_file );
 
 		if ( ! is_array( $post_data ) ) {
-			Post_Export_Helper::error( $post_data );
+			\Contentsync\post_export_return_error( $post_data );
 		}
 
 		// get conflicting posts
@@ -127,7 +127,7 @@ class Post_Import {
 			$return = $filename;
 		}
 
-		Post_Export_Helper::success( $return );
+		post_export_return_success( $return );
 	}
 
 	/**
@@ -139,25 +139,25 @@ class Post_Import {
 	 */
 	public function handle_import( $data ) {
 
-		Post_Export_Helper::enable_logs();
+		\Contentsync\post_export_enable_logs();
 
-		do_action( 'synced_post_export_log', "\r\n\r\n" . 'HANDLE IMPORT' . "\r\n", $data );
+		do_action( 'post_export_log', "\r\n\r\n" . 'HANDLE IMPORT' . "\r\n", $data );
 
 		set_time_limit( 5000 );
 
 		$filename = isset( $data['filename'] ) ? $data['filename'] : '';
 
 		if ( empty( $filename ) ) {
-			Post_Export_Helper::error( __( "The file name is empty.", 'contentsync_hub' ) );
+			\Contentsync\post_export_return_error( __( 'The file name is empty.', 'contentsync_hub' ) );
 		}
 
 		// get post data
-		$zip_file  = Post_Export_Helper::get_file_path( 'tmp' ) . $filename;
+		$zip_file  = \Contentsync\get_export_file_path( 'tmp' ) . $filename;
 		$post_data = self::get_zip_posts_file_contents( $zip_file );
 
 		// error
 		if ( ! is_array( $post_data ) ) {
-			Post_Export_Helper::error( $post_data );
+			\Contentsync\post_export_return_error( $post_data );
 		}
 
 		// get conflicts with current posts
@@ -167,13 +167,13 @@ class Post_Import {
 		$result = self::import_posts( $post_data, $conflict_actions, $zip_file );
 
 		if ( is_wp_error( $result ) ) {
-			Post_Export_Helper::error( $result->get_error_message() );
+			\Contentsync\post_export_return_error( $result->get_error_message() );
 		}
 
 		// delete tmp file
 		self::delete_tmp_files();
 
-		Post_Export_Helper::success( sprintf( __( "Post file '%s' has been imported successfully.", 'contentsync_hub' ), $filename ) );
+		post_export_return_success( sprintf( __( "Post file '%s' has been imported successfully.", 'contentsync_hub' ), $filename ) );
 	}
 
 	/**
@@ -194,25 +194,25 @@ class Post_Import {
 	 */
 	public function handle_posttype_import( $data ) {
 
-		Post_Export_Helper::enable_logs();
+		\Contentsync\post_export_enable_logs();
 
-		do_action( 'synced_post_export_log', "\r\n\r\n" . 'HANDLE IMPORT POSTTYPE' . "\r\n", $data );
+		do_action( 'post_export_log', "\r\n\r\n" . 'HANDLE IMPORT POSTTYPE' . "\r\n", $data );
 
 		set_time_limit( 5000 );
 
 		$filename = isset( $data['filename'] ) ? $data['filename'] : '';
 
 		if ( empty( $filename ) ) {
-			Post_Export_Helper::error( __( "The file name is empty.", 'contentsync_hub' ) );
+			\Contentsync\post_export_return_error( __( 'The file name is empty.', 'contentsync_hub' ) );
 		}
 
 		// get post data
-		$zip_file  = Post_Export_Helper::get_file_path( 'tmp' ) . $filename;
+		$zip_file  = \Contentsync\get_export_file_path( 'tmp' ) . $filename;
 		$post_data = self::get_zip_posts_file_contents( $zip_file );
 
 		// error
 		if ( ! is_array( $post_data ) ) {
-			Post_Export_Helper::error( $post_data );
+			\Contentsync\post_export_return_error( $post_data );
 		}
 
 		// get conflicts with current posts
@@ -227,7 +227,7 @@ class Post_Import {
 		$result = self::import_posts( $new_post_data, $conflict_actions, $zip_file );
 
 		if ( is_wp_error( $result ) ) {
-			Post_Export_Helper::error( $result->get_error_message() );
+			\Contentsync\post_export_return_error( $result->get_error_message() );
 		}
 
 		// add the newly created post to the conflict actions
@@ -240,18 +240,18 @@ class Post_Import {
 		);
 
 		// return the new conflicts array to the Javascript handler
-		Post_Export_Helper::success( json_encode( $new_conflicts ) );
+		post_export_return_success( json_encode( $new_conflicts ) );
 	}
 
 	/**
 	 * Import posts
 	 *
 	 * @param Prepared_Post[] $posts       Preparred post objects.
-	 * @param array     $conflict_actions   Array of posts that already exist on the current blog.
-	 *                                      Keyed by the same ID as in the @param $posts.
+	 * @param array           $conflict_actions   Array of posts that already exist on the current blog.
+	 *                                            Keyed by the same ID as in the @param $posts.
 	 *                                  @property post_id: ID of the current post.
 	 *                                  @property action: Action to be done (skip|replace|keep)
-	 * @param string    $zip_file          Path to imported ZIP archive. (optional)
+	 * @param string          $zip_file          Path to imported ZIP archive. (optional)
 	 *
 	 * @return mixed                    True on success. WP_Error on fatal conflict.
 	 */
@@ -265,16 +265,16 @@ class Post_Import {
 
 		/**
 		 * Filter to modify conflict actions before processing post imports.
-		 * 
+		 *
 		 * This filter allows developers to customize how conflicts between existing posts
 		 * and posts being imported are handled. It's useful for implementing custom
 		 * conflict resolution logic or modifying the default conflict handling behavior.
-		 * 
+		 *
 		 * @filter contentsync_import_conflict_actions
-		 * 
+		 *
 		 * @param array $conflict_actions   Array of existing posts with conflicts, keyed by post ID.
 		 * @param array $posts              Array of posts to be imported, keyed by post ID.
-		 * 
+		 *
 		 * @return array $conflict_actions  Modified array of conflict actions.
 		 */
 		$conflict_actions = (array) apply_filters( 'contentsync_import_conflict_actions', $conflict_actions, $posts );
@@ -284,12 +284,12 @@ class Post_Import {
 		 */
 		foreach ( $posts as $post_id => $post ) {
 
-			do_action( 'synced_post_export_log', "\r\n----------\r\n" );
+			do_action( 'post_export_log', "\r\n----------\r\n" );
 
 			// typecasting $post arrays (eg. via remote requests)
 			$post = is_array( $post ) ? (object) $post : $post;
 			if ( ! is_object( $post ) ) {
-				do_action( 'synced_post_export_log', sprintf( "  - WP_Post object for post of ID '%s' not set correctly:", $post_id ), $post );
+				do_action( 'post_export_log', sprintf( "  - WP_Post object for post of ID '%s' not set correctly:", $post_id ), $post );
 				continue;
 			}
 
@@ -299,7 +299,7 @@ class Post_Import {
 				$is_first_post = true;
 			}
 
-			do_action( 'synced_post_export_log', "\r\n" . sprintf( "Insert post '%s'.", $post->post_name ) );
+			do_action( 'post_export_log', "\r\n" . sprintf( "Insert post '%s'.", $post->post_name ) );
 
 			// handle the post language
 			// Analyze whether this translation should be imported
@@ -307,35 +307,35 @@ class Post_Import {
 
 			// Handle the decision based on the analysis
 			if ( ! $translation_analysis['should_import'] ) {
-				
+
 				// Log the reason for skipping
 				switch ( $translation_analysis['reason'] ) {
 					case 'skip_better_translation':
-						do_action( 
-							'synced_post_export_log', 
-							'  - There is at least 1 supported language for this post: ' . implode( ', ', $translation_analysis['supported_translations'] ) 
+						do_action(
+							'post_export_log',
+							'  - There is at least 1 supported language for this post: ' . implode( ', ', $translation_analysis['supported_translations'] )
 						);
 						break;
-					
+
 					case 'reuse_imported':
-						do_action( 'synced_post_export_log', '  - Another translation of this post has already been imported - we skip this one.' );
-						
+						do_action( 'post_export_log', '  - Another translation of this post has already been imported - we skip this one.' );
+
 						// Add the post to the class var for later replacement,
 						// e.g. as nested posts inside the post content
 						self::$posts[ $post_id ] = $translation_analysis['reuse_post_id'];
 						break;
 
 					default:
-						do_action( 'synced_post_export_log', '  - We skip this post because of the reason: ' . $translation_analysis['reason'] );
+						do_action( 'post_export_log', '  - We skip this post because of the reason: ' . $translation_analysis['reason'] );
 						break;
 				}
 
 				// Delete all copies of this post (which is not supported, and a worse translation...)
 				if ( isset( $conflict_actions[ $post_id ] ) && isset( $conflict_actions[ $post_id ]['post_id'] ) ) {
 					$translated_id = $conflict_actions[ $post_id ]['post_id'];
-					$deleted = wp_trash_post( $translated_id );
+					$deleted       = wp_trash_post( $translated_id );
 					if ( $deleted ) {
-						do_action( 'synced_post_export_log', "  - This version (id: $translated_id ) was trashed, we import a better suited translation." );
+						do_action( 'post_export_log', "  - This version (id: $translated_id ) was trashed, we import a better suited translation." );
 					}
 				}
 
@@ -346,10 +346,10 @@ class Post_Import {
 
 			// Post should be imported - log success if language was switched
 			if ( $translation_analysis['language_switched'] ) {
-				do_action( 'synced_post_export_log', '  - language supported and switched!' );
+				do_action( 'post_export_log', '  - language supported and switched!' );
 			} elseif ( $translation_analysis['reason'] === 'import_fallback' ) {
-				do_action( 'synced_post_export_log', '  - There is no supported language for this post.' );
-				do_action( 'synced_post_export_log', '  - No other translation of this post has been imported - we import this one.' );
+				do_action( 'post_export_log', '  - There is no supported language for this post.' );
+				do_action( 'post_export_log', '  - No other translation of this post has been imported - we import this one.' );
 			}
 
 			// Extract language data from analysis for use later in the import process
@@ -359,17 +359,17 @@ class Post_Import {
 
 			/**
 			 * Filter to modify the post array before importing a post.
-			 * 
+			 *
 			 * This filter allows developers to customize the post data that will be used
 			 * when creating or updating posts during import. It's useful for modifying
 			 * post attributes, adding custom fields, or implementing custom import logic.
-			 * 
+			 *
 			 * @filter contentsync_import_postarr
-			 * 
+			 *
 			 * @param array $postarr        Array of post parameters used for wp_insert_post().
 			 * @param Prepared_Post $post  Preparred post object with meta, taxonomy terms, etc.
 			 * @param bool $is_first_post   Whether this is the first post of the import batch.
-			 * 
+			 *
 			 * @return array $postarr       Modified array of post parameters for import.
 			 */
 			$postarr = apply_filters(
@@ -395,7 +395,6 @@ class Post_Import {
 				$is_first_post
 			);
 
-			
 			/**
 			 * Get conflicting post and action.
 			 */
@@ -408,22 +407,20 @@ class Post_Import {
 				$conflict_data    = (array) $conflict_actions[ $post_id ];
 				$existing_post_id = $conflict_data['post_id'];
 				$conflict_action  = $conflict_data['action'];
+			} else {
+				$existing_post_id = $existing_post_id ? $existing_post_id : \Contentsync\get_existing_post_id( $post );
 			}
-			else {
-				$existing_post_id = $existing_post_id ? $existing_post_id : Post_Export_Helper::get_existing_post_id( $post );
-			}
-
 
 			/**
 			 * Filter to determine the import action for a post.
-			 * 
+			 *
 			 * This filter allows developers to customize how posts are handled during import,
 			 * including whether to insert, update, set as draft, trash, or delete existing posts.
 			 * It's useful for implementing custom import strategies or business logic.
-			 * 
+			 *
 			 * @since 1.7.0
 			 * @filter contentsync_import_action
-			 * 
+			 *
 			 * @param string $import_action    The import action to be taken. ('insert'|'draft'|'trash'|'delete')
 			 *   @default 'insert'  Insert or update the post if it already exists.
 			 *   @value   'draft'   Set the post to draft status.
@@ -431,64 +428,61 @@ class Post_Import {
 			 *   @value   'delete'  Delete the post permanently.
 			 * @param Prepared_Post $post     The post object being imported.
 			 * @param int $existing_post_id    The ID of the existing post if there's a conflict.
-			 * 
+			 *
 			 * @return string                  The import action to be taken.
 			 */
-			$import_action = apply_filters('contentsync_import_action', isset( $post->import_action ) ? $post->import_action : 'insert', $post, $existing_post_id );
+			$import_action = apply_filters( 'contentsync_import_action', isset( $post->import_action ) ? $post->import_action : 'insert', $post, $existing_post_id );
 
 			if ( $import_action === 'draft' ) {
 				$postarr['post_status'] = 'draft';
-			}
-			elseif ( $import_action === 'trash' ) {
+			} elseif ( $import_action === 'trash' ) {
 
 				$postarr['post_status'] = 'trash';
 				if ( $existing_post_id ) {
 					// trash existing post
-					do_action( 'synced_post_export_log', "\r\n" . '  - trash existing post with ID: ' . $existing_post_id );
+					do_action( 'post_export_log', "\r\n" . '  - trash existing post with ID: ' . $existing_post_id );
 					wp_trash_post( $existing_post_id );
 				}
-				
+
 				// we do not insert trashed posts
-				do_action( 'synced_post_export_log', "\r\n" . '  - import action is "trash", we stop here.' );
+				do_action( 'post_export_log', "\r\n" . '  - import action is "trash", we stop here.' );
 				unset( $posts[ $post_id ] );
 				continue;
-			}
-			elseif ( $import_action === 'delete' ) {
-				
+			} elseif ( $import_action === 'delete' ) {
+
 				if ( $existing_post_id ) {
 					// delete existing post
-					do_action( 'synced_post_export_log', "\r\n" . '  - delete existing post with ID: ' . $existing_post_id );
+					do_action( 'post_export_log', "\r\n" . '  - delete existing post with ID: ' . $existing_post_id );
 					wp_delete_post( $existing_post_id, true );
 				}
 
 				// we do not insert deleted posts
-				do_action( 'synced_post_export_log', "\r\n" . '  - import action is "delete", we stop here.' );
+				do_action( 'post_export_log', "\r\n" . '  - import action is "delete", we stop here.' );
 				unset( $posts[ $post_id ] );
 				continue;
 			}
 
 			/**
 			 * Filter to modify the conflict action for a specific post during import.
-			 * 
+			 *
 			 * This filter allows developers to customize how conflicts are resolved for individual
 			 * posts during import. It's useful for implementing custom conflict resolution logic
 			 * or overriding default conflict handling behavior on a per-post basis.
-			 * 
+			 *
 			 * @since new
 			 * @filter contentsync_import_conflict_action
-			 * 
+			 *
 			 * @param string $conflict_action    The conflict action to be taken ('replace'|'skip'|'keep').
 			 * @param Prepared_Post $post       The post object being imported.
 			 * @param int $existing_post_id      The ID of the existing post if there's a conflict.
-			 * 
+			 *
 			 * @return string                    The modified conflict action to be taken.
 			 */
 			$conflict_action = apply_filters( 'contentsync_import_conflict_action', $conflict_action, $post, $existing_post_id );
 
-
 			/**
 			 * Handle different conflict actions.
-			 * 
+			 *
 			 * (1) replace: Replace the existing post with the new one.
 			 * (2) skip:    Skip this post and use the existing post.
 			 * (3) keep:    Keep the existing post and insert the new one with a new ID. (default)
@@ -496,14 +490,13 @@ class Post_Import {
 			if ( $conflict_action === 'replace' ) {
 
 				if ( $existing_post_id ) {
-	
-					do_action( 'synced_post_export_log', sprintf( '  - replace existing post with ID: %s.', $existing_post_id ) );
-	
+
+					do_action( 'post_export_log', sprintf( '  - replace existing post with ID: %s.', $existing_post_id ) );
+
 					// add @property ID to the array to replace the existing post.
 					$postarr['ID'] = $existing_post_id;
 				}
-			}
-			elseif ( $conflict_action === 'skip' ) {
+			} elseif ( $conflict_action === 'skip' ) {
 
 				if ( $existing_post_id ) {
 
@@ -520,36 +513,36 @@ class Post_Import {
 							// we reset some post data from $postarr to not update the existing post
 							// except for reuploading the attachment file.
 							$existing_post = get_post( $existing_post_id );
-							$postarr = array_merge( $postarr, array(
-								'post_title'    => $existing_post->post_title,
-								'post_name'     => $existing_post->post_name,
-								'post_content'  => $existing_post->post_content,
-								'post_excerpt'  => $existing_post->post_excerpt,
-								'post_type'     => $existing_post->post_type,
-								'post_author'   => $existing_post->post_author,
-								'post_date_gmt' => $existing_post->post_date_gmt,
-								'post_status'   => $existing_post->post_status,
-							) );
+							$postarr       = array_merge(
+								$postarr,
+								array(
+									'post_title'    => $existing_post->post_title,
+									'post_name'     => $existing_post->post_name,
+									'post_content'  => $existing_post->post_content,
+									'post_excerpt'  => $existing_post->post_excerpt,
+									'post_type'     => $existing_post->post_type,
+									'post_author'   => $existing_post->post_author,
+									'post_date_gmt' => $existing_post->post_date_gmt,
+									'post_status'   => $existing_post->post_status,
+								)
+							);
 
-							do_action( 'synced_post_export_log', '  - file does not exist, we import the attachment even if the post should be skipped.' );
-						}
-						else {
-							if ( isset( $post->media ) ) {
+							do_action( 'post_export_log', '  - file does not exist, we import the attachment even if the post should be skipped.' );
+						} elseif ( isset( $post->media ) ) {
 
-								if ( ! is_array( $post->media ) ) {
-									$post->media = (array) $post->media;
-								}
+							if ( ! is_array( $post->media ) ) {
+								$post->media = (array) $post->media;
+							}
 
-								if ( isset( $post->media['path'] ) ) {
-									self::add_attachment_files_to_replace_strings( $post->media, $file_path );
-								}
+							if ( isset( $post->media['path'] ) ) {
+								self::add_attachment_files_to_replace_strings( $post->media, $file_path );
 							}
 						}
 					}
 
 					if ( $skip ) {
-					
-						do_action( 'synced_post_export_log', sprintf( '  - skip this post and use the existing post: %s.', $existing_post_id ) );
+
+						do_action( 'post_export_log', sprintf( '  - skip this post and use the existing post: %s.', $existing_post_id ) );
 
 						// add the post to the class var for later replacement,
 						// eg. as nested posts inside the post content.
@@ -561,24 +554,26 @@ class Post_Import {
 						continue;
 					}
 				}
-			}
-			else {
-				do_action( 'synced_post_export_log', '  - insert post with new ID' );
+			} else {
+				do_action( 'post_export_log', '  - insert post with new ID' );
 			}
 
 			// now we insert the post
-			do_action( 'synced_post_export_log', '  - try to insert post with the following data:', array_map(
-				function( $value ) {
-					return is_string( $value ) ? esc_attr( $value ) : $value;
-				},
-				$postarr
-			) );
+			do_action(
+				'post_export_log',
+				'  - try to insert post with the following data:',
+				array_map(
+					function ( $value ) {
+						return is_string( $value ) ? esc_attr( $value ) : $value;
+					},
+					$postarr
+				)
+			);
 			$result = self::create_post( $postarr, $post, $zip_file );
 
 			if ( is_wp_error( $result ) ) {
 				return $result;
-			}
-			elseif ( $result ) {
+			} elseif ( $result ) {
 				self::$posts[ $post_id ] = $result;
 
 				/**
@@ -591,32 +586,31 @@ class Post_Import {
 						if ( $lang_code != $post_language_code ) {
 							$old_post_id                 = $translation_post_ids[ $lang_code ];
 							self::$posts[ $old_post_id ] = $post_id;
-							do_action( 'synced_post_export_log', "  - unsupported translation of this post has been linked with this post (old_post_id: $old_post_id, new_id: $post_id)" );
+							do_action( 'post_export_log', "  - unsupported translation of this post has been linked with this post (old_post_id: $old_post_id, new_id: $post_id)" );
 						}
 					}
 				}
 
 				/**
 				 * Set the post language after the post was inserted.
-				 * 
+				 *
 				 * @since 2.15.0 In tools like polylang this is essential to setup the
 				 * post correctly and in order for actions and filters to work as expected,
 				 * like setting taxonomy terms.
 				 */
 				if ( isset( $post_language_code ) ) {
-					do_action( 'synced_post_export_log', '  - set post language after the post was inserted: ' . $post_language_code );
+					do_action( 'post_export_log', '  - set post language after the post was inserted: ' . $post_language_code );
 					$result = Translation_Manager::set_post_language( $result, $post_language_code );
 					if ( $result ) {
-						do_action( 'synced_post_export_log', '  - post language successfully set.' );
-					}
-					else {
-						do_action( 'synced_post_export_log', '  - post language could not be set.' );
+						do_action( 'post_export_log', '  - post language successfully set.' );
+					} else {
+						do_action( 'post_export_log', '  - post language could not be set.' );
 					}
 				}
 			}
 		}
 
-		do_action( 'synced_post_export_log', "\r\n----------\r\n\r\n" . 'All posts imported. Now we loop through them.' );
+		do_action( 'post_export_log', "\r\n----------\r\n\r\n" . 'All posts imported. Now we loop through them.' );
 
 		/**
 		 * After we inserted all the posts, we can now do additional actions
@@ -631,7 +625,7 @@ class Post_Import {
 
 			$new_post_id = self::$posts[ $old_post_id ];
 
-			do_action( 'synced_post_export_log', sprintf( "\r\n" . "Check new post '%s' (old id: %s)", $new_post_id, $old_post_id ) );
+			do_action( 'post_export_log', sprintf( "\r\n" . "Check new post '%s' (old id: %s)", $new_post_id, $old_post_id ) );
 
 			// switch to the post's language
 			Translation_Manager::switch_to_language_context( $post );
@@ -656,17 +650,17 @@ class Post_Import {
 
 				/**
 				 * Filter to modify post content before it's imported into the database.
-				 * 
+				 *
 				 * This filter allows developers to customize post content during import,
 				 * such as cleaning up HTML, replacing placeholders, or applying custom
 				 * formatting before the content is saved to the database.
-				 * 
+				 *
 				 * @filter contentsync_filter_post_content_before_post_import
-				 * 
+				 *
 				 * @param string    $content    The post content after string replacements.
 				 * @param int       $post_id    The ID of the newly created/updated post.
 				 * @param object    $post       The original Prepared_Post object.
-				 * 
+				 *
 				 * @return string               The modified post content for import.
 				 */
 				$content = apply_filters( 'contentsync_filter_post_content_before_post_import', $content, $new_post_id, $post );
@@ -675,16 +669,16 @@ class Post_Import {
 				$result = wp_update_post(
 					array(
 						'ID'           => $new_post_id,
-						'post_content' =>  wp_slash( $content ),
+						'post_content' => wp_slash( $content ),
 					),
 					true,
 					false
 				);
 
 				if ( is_wp_error( $result ) ) {
-					do_action( 'synced_post_export_log', '  - post-content could not be updated.' );
+					do_action( 'post_export_log', '  - post-content could not be updated.' );
 				} else {
-					do_action( 'synced_post_export_log', '  - post-content successfully updated.' );
+					do_action( 'post_export_log', '  - post-content successfully updated.' );
 				}
 			}
 
@@ -719,15 +713,15 @@ class Post_Import {
 
 			// replace thumbnail ID
 			if ( $thumbnail_id  = get_post_thumbnail_id( $new_post_id ) ) {
-				do_action( 'synced_post_export_log', "\r\n" . sprintf( "Replace thumbnail for post '%s'.", $post->post_name ) );
+				do_action( 'post_export_log', "\r\n" . sprintf( "Replace thumbnail for post '%s'.", $post->post_name ) );
 				$result = false;
 				if ( isset( self::$posts[ $thumbnail_id ] ) ) {
 					$result = set_post_thumbnail( $new_post_id, self::$posts[ $thumbnail_id ] );
 				}
 				if ( $result ) {
-					do_action( 'synced_post_export_log', sprintf( "  - thumbnail ID changed from '%s' to '%s'", $thumbnail_id, self::$posts[ $thumbnail_id ] ) );
+					do_action( 'post_export_log', sprintf( "  - thumbnail ID changed from '%s' to '%s'", $thumbnail_id, self::$posts[ $thumbnail_id ] ) );
 				} else {
-					do_action( 'synced_post_export_log', sprintf( "  - thumbnail ID '%s' could not be changed.", $thumbnail_id ) );
+					do_action( 'post_export_log', sprintf( "  - thumbnail ID '%s' could not be changed.", $thumbnail_id ) );
 				}
 			}
 
@@ -747,15 +741,15 @@ class Post_Import {
 	 *
 	 * if $postarr['ID'] is set, the post gets updated. otherwise a new post is created.
 	 *
-	 * @param array   $postarr      All arguments to be set via wp_insert_post().
+	 * @param array         $postarr      All arguments to be set via wp_insert_post().
 	 * @param Prepared_Post $post  Preparred post object.
-	 * @param string  $zip_file     Full path to the imported ZIP archive. (optional)
+	 * @param string        $zip_file     Full path to the imported ZIP archive. (optional)
 	 *
 	 * @return int|WP_Error         Post-ID on success. WP_Error on failure.
 	 */
 	public static function create_post( $postarr, $post, $zip_file = '' ) {
 
-		// do_action( "synced_post_export_log", "  - create post with the following attributes: ", $postarr );
+		// do_action( "post_export_log", "  - create post with the following attributes: ", $postarr );
 
 		// normal post
 		if ( $postarr['post_type'] !== 'attachment' ) {
@@ -765,11 +759,11 @@ class Post_Import {
 
 			// error
 			if ( is_wp_error( $new_post_id ) ) {
-				do_action( 'synced_post_export_log', "\r\nPost could not be inserted: " . $new_post_id->get_error_message() );
+				do_action( 'post_export_log', "\r\nPost could not be inserted: " . $new_post_id->get_error_message() );
 			}
 			// success
 			else {
-				do_action( 'synced_post_export_log', sprintf( "\r\nPost inserted with the ID '%s'", strval( $new_post_id ) ) );
+				do_action( 'post_export_log', sprintf( "\r\nPost inserted with the ID '%s'", strval( $new_post_id ) ) );
 			}
 		}
 		// attachment
@@ -780,11 +774,11 @@ class Post_Import {
 
 			// error
 			if ( is_wp_error( $new_post_id ) ) {
-				do_action( 'synced_post_export_log', "\r\nAttachment could not be inserted: " . $new_post_id->get_error_message() );
+				do_action( 'post_export_log', "\r\nAttachment could not be inserted: " . $new_post_id->get_error_message() );
 			}
 			// success
 			else {
-				do_action( 'synced_post_export_log', sprintf( "\r\nAttachment inserted with the ID '%s'", strval( $new_post_id ) ) );
+				do_action( 'post_export_log', sprintf( "\r\nAttachment inserted with the ID '%s'", strval( $new_post_id ) ) );
 			}
 		}
 
@@ -793,18 +787,18 @@ class Post_Import {
 
 	/**
 	 * Insert an attachment.
-	 * 
-	 * @param array   $postarr          All arguments to be set via wp_insert_post().
+	 *
+	 * @param array  $postarr          All arguments to be set via wp_insert_post().
 	 * @param array  $media_file_info   Array with the media file info.
 	 *     @property string name           Post name (slug) of the media file.
 	 *     @property string path           DIR path of the media file.
 	 *     @property string url            URL to the media file.
 	 *     @property string relative_path  Relative path to the wp upload basedir. @since 2.18.0
-	 * @param string  $zip_file         Full path to the imported ZIP archive. (optional)
-	 * 
+	 * @param string $zip_file         Full path to the imported ZIP archive. (optional)
+	 *
 	 * @return int|WP_Error              Post-ID on success. WP_Error on failure.
 	 */
-	public static function insert_attachment( $postarr, $media_file_info, $zip_file='' ) {
+	public static function insert_attachment( $postarr, $media_file_info, $zip_file = '' ) {
 
 		if (
 			! $media_file_info
@@ -814,7 +808,7 @@ class Post_Import {
 		) {
 			return new WP_Error( 'media_file_info', 'Media file info is missing.' );
 		}
-		
+
 		$filename = $media_file_info['name'];
 
 		if ( ! empty( $zip_file ) ) {
@@ -846,14 +840,14 @@ class Post_Import {
 
 		// delete old files if attachment is being replaced
 		if ( isset( $postarr['ID'] ) ) {
-			do_action( 'synced_post_export_log', '  - delete old attachment files.' );
+			do_action( 'post_export_log', '  - delete old attachment files.' );
 
 			$result = self::delete_current_attachment_files( $postarr['ID'], $file );
 
 			if ( ! $result ) {
-				do_action( 'synced_post_export_log', '  - old attachment files could not be deleted.' );
+				do_action( 'post_export_log', '  - old attachment files could not be deleted.' );
 			} else {
-				do_action( 'synced_post_export_log', '  - old attachment files deleted.' );
+				do_action( 'post_export_log', '  - old attachment files deleted.' );
 			}
 		}
 
@@ -863,7 +857,7 @@ class Post_Import {
 			new WP_Error( 'file', 'Attachment file ' . $file . ' could not be written.' );
 		}
 
-		do_action( 'synced_post_export_log', "  - attachment file '$file' written (size: {$bytes}b)." );
+		do_action( 'post_export_log', "  - attachment file '$file' written (size: {$bytes}b)." );
 
 		// add mime type
 		$postarr['post_mime_type'] = wp_check_filetype( $filename, null )['type'];
@@ -874,8 +868,8 @@ class Post_Import {
 		if ( is_wp_error( $new_post_id ) ) {
 			return $new_post_id;
 		}
-		
-		do_action( 'synced_post_export_log', '  - regenerate attachment meta data.' );
+
+		do_action( 'post_export_log', '  - regenerate attachment meta data.' );
 
 		// regenerate attachment metadata
 		require_once ABSPATH . 'wp-admin/includes/image.php';
@@ -888,8 +882,7 @@ class Post_Import {
 		// add all media file path to the replace strings array
 		self::add_attachment_files_to_replace_strings( $media_file_info, $file );
 
-		
-		// do_action( 'synced_post_export_log', '  - attachment meta data updated: ', $attach_data );
+		// do_action( 'post_export_log', '  - attachment meta data updated: ', $attach_data );
 
 		return $new_post_id;
 	}
@@ -922,8 +915,8 @@ class Post_Import {
 
 	/**
 	 * Add the attachment filepaths to the replace strings array.
-	 * 
-	 * @param array $media_file_info       The media file info array.
+	 *
+	 * @param array  $media_file_info       The media file info array.
 	 *     @property string name           Name of the media file (eg. 'my-image.jpg').
 	 *     @property string path           DIR path of the media file (eg. '/htdocs/www/public/wp-content/uploads/sites/9/2025/10/my-image.jpg').
 	 *     @property string url            URL to the media file (eg. 'https://jakobtrost.de/wp-content/uploads/sites/9/2025/10/my-image.jpg').
@@ -940,15 +933,14 @@ class Post_Import {
 
 		/**
 		 * @since 2.18.0 Use the 'relative_path' of the old file if present.
-		 * 
+		 *
 		 * We need to use this path to replace the relative part of the old url with the new
 		 * relative path of the uploaded file here, as the upload directory and the option
 		 * 'uploads_use_yearmonth_folders' were probably different when the file was exported.
 		 */
 		if ( isset( $media_file_info['relative_path'] ) ) {
 			$old_relative_path = $media_file_info['relative_path'];
-		}
-		else if ( isset( $media_file_info['path'] ) ) {
+		} elseif ( isset( $media_file_info['path'] ) ) {
 			/**
 			 * If the 'relative_path' is not present (eg. old export did not contain this information),
 			 * we need to evaluate the 'path' of the old file and try to extract the relative path to
@@ -963,7 +955,7 @@ class Post_Import {
 			 *             → '/my-image.jpg'
 			 */
 			$old_relative_path = $media_file_info['path'];
-			
+
 			// first we check if the path contains '/wp-content'
 			if ( strpos( $old_relative_path, '/wp-content' ) !== false ) {
 				$old_relative_path = explode( '/wp-content', $old_relative_path )[1];
@@ -980,9 +972,8 @@ class Post_Import {
 					$old_relative_path = '/' . explode( '/sites/' . $matches[1] . '/', $old_relative_path )[1];
 				}
 			}
-		}
-		else {
-			do_action( 'synced_post_export_log', "  - no relative path found for the old file.", $media_file_info );
+		} else {
+			do_action( 'post_export_log', '  - no relative path found for the old file.', $media_file_info );
 			return false;
 		}
 
@@ -1017,11 +1008,11 @@ class Post_Import {
 			empty( $nested ) ||
 			empty( $subject )
 		) {
-			do_action( 'synced_post_export_log', "\r\n" . sprintf( "No nested elements found for post '%s'.", $post->post_name ) );
+			do_action( 'post_export_log', "\r\n" . sprintf( "No nested elements found for post '%s'.", $post->post_name ) );
 			return $subject;
 		}
 
-		do_action( 'synced_post_export_log', "\r\n" . sprintf( "Replace nested elements for post '%s'.", $post->post_name ) );
+		do_action( 'post_export_log', "\r\n" . sprintf( "Replace nested elements for post '%s'.", $post->post_name ) );
 
 		foreach ( $nested as $nested_id => $nested_postarr ) {
 
@@ -1032,7 +1023,7 @@ class Post_Import {
 
 			// replace the string
 			$marked_string = '{{' . $nested_id . '}}';
-			$subject = str_replace( $marked_string, $replace_string, $subject );
+			$subject       = str_replace( $marked_string, $replace_string, $subject );
 
 			// replace the front url if post ID was found
 			if ( is_numeric( $replace_string ) ) {
@@ -1043,10 +1034,10 @@ class Post_Import {
 				$subject = str_replace( '{{' . $nested_id . '-front-url}}', $replace_front_url, $subject );
 			}
 
-			do_action( 'synced_post_export_log', sprintf( "  - replace '%s' with '%s'.", $marked_string, $replace_string ) );
+			do_action( 'post_export_log', sprintf( "  - replace '%s' with '%s'.", $marked_string, $replace_string ) );
 		}
 
-		do_action( 'synced_post_export_log', '=> nested elements were replaced' );
+		do_action( 'post_export_log', '=> nested elements were replaced' );
 		return $subject;
 	}
 
@@ -1068,7 +1059,7 @@ class Post_Import {
 			$replace_string = $nested_id;
 		}
 		// post exists: use existing post-ID
-		elseif ( $existing_post = Post_Export_Helper::get_post_by_name_and_type( (object) $nested_postarr ) ) {
+		elseif ( $existing_post = \Contentsync\get_post_by_name_and_type( (object) $nested_postarr ) ) {
 			$replace_string = $existing_post->ID;
 		}
 		// attachments: use the frontend url
@@ -1099,16 +1090,16 @@ class Post_Import {
 			empty( $nested ) ||
 			empty( $subject )
 		) {
-			do_action( 'synced_post_export_log', "\r\n" . sprintf( "No nested elements found for post '%s'.", $post->post_name ) );
+			do_action( 'post_export_log', "\r\n" . sprintf( "No nested elements found for post '%s'.", $post->post_name ) );
 			return $subject;
 		}
 
-		do_action( 'synced_post_export_log', "\r\n" . sprintf( "Replace nested terms for post '%s'.", $post->post_name ) );
+		do_action( 'post_export_log', "\r\n" . sprintf( "Replace nested terms for post '%s'.", $post->post_name ) );
 
 		foreach ( $nested as $nested_id => $nested_term_object ) {
 
 			if ( empty( $nested_term_object ) ) {
-				do_action( 'synced_post_export_log', "  - term object is not set correctly.", $nested_term_object );
+				do_action( 'post_export_log', '  - term object is not set correctly.', $nested_term_object );
 				continue;
 			}
 
@@ -1117,7 +1108,7 @@ class Post_Import {
 			}
 
 			if ( ! isset( $nested_term_object->taxonomy ) || ! isset( $nested_term_object->slug ) ) {
-				do_action( 'synced_post_export_log', "  - term object is not set correctly.", $nested_term_object );
+				do_action( 'post_export_log', '  - term object is not set correctly.', $nested_term_object );
 				continue;
 			}
 
@@ -1125,16 +1116,16 @@ class Post_Import {
 
 			if ( $term_object ) {
 				$replace_string = $term_object->term_id;
-				do_action( 'synced_post_export_log', "  - term of taxonomy '{$nested_term_object->taxonomy}' with slug '{$nested_term_object->slug}' found.", $term_object );
+				do_action( 'post_export_log', "  - term of taxonomy '{$nested_term_object->taxonomy}' with slug '{$nested_term_object->slug}' found.", $term_object );
 			} else {
 
 				$new_term_ids = self::insert_taxonomy_terms( $nested_term_object->taxonomy, array( $nested_term_object ) );
 				if ( ! empty( $new_term_ids ) ) {
 					$replace_string = $new_term_ids[0];
-					do_action( 'synced_post_export_log', "  - term of taxonomy '{$nested_term_object->taxonomy}' with slug '{$nested_term_object->slug}' inserted.", $new_term_ids );
+					do_action( 'post_export_log', "  - term of taxonomy '{$nested_term_object->taxonomy}' with slug '{$nested_term_object->slug}' inserted.", $new_term_ids );
 				} else {
 					$replace_string = $nested_id;
-					do_action( 'synced_post_export_log', "  - term of taxonomy '{$nested_term_object->taxonomy}' with slug '{$nested_term_object->slug}' could not be found." );
+					do_action( 'post_export_log', "  - term of taxonomy '{$nested_term_object->taxonomy}' with slug '{$nested_term_object->slug}' could not be found." );
 				}
 			}
 
@@ -1145,10 +1136,10 @@ class Post_Import {
 			}
 			$subject = str_replace( $marked_string, $replace_string, $subject );
 
-			do_action( 'synced_post_export_log', sprintf( "  - replace '%s' with '%s'.", $marked_string, $replace_string ) );
+			do_action( 'post_export_log', sprintf( "  - replace '%s' with '%s'.", $marked_string, $replace_string ) );
 		}
 
-		do_action( 'synced_post_export_log', '=> nested elements were replaced' );
+		do_action( 'post_export_log', '=> nested elements were replaced' );
 		return $subject;
 	}
 
@@ -1167,7 +1158,7 @@ class Post_Import {
 		}
 
 		if ( $log ) {
-			do_action( 'synced_post_export_log', "\r\n" . 'Replace strings.' );
+			do_action( 'post_export_log', "\r\n" . 'Replace strings.' );
 		}
 
 		// get patterns
@@ -1175,28 +1166,25 @@ class Post_Import {
 		foreach ( $replace_strings as $name => $string ) {
 			$subject = str_replace( '{{' . $name . '}}', $string, $subject );
 			if ( $log ) {
-				do_action( 'synced_post_export_log', sprintf( "  - '%s' was replaced with '%s'.", $name, $string ) );
+				do_action( 'post_export_log', sprintf( "  - '%s' was replaced with '%s'.", $name, $string ) );
 			}
 		}
 
-		if ( !empty( self::$collected_replace_strings ) ) {
+		if ( ! empty( self::$collected_replace_strings ) ) {
 			foreach ( self::$collected_replace_strings as $original => $new ) {
 				if ( strpos( $subject, $original ) !== false ) {
 					$subject = str_replace( $original, $new, $subject );
 					if ( $log ) {
-						do_action( 'synced_post_export_log', sprintf( "  - '%s' was replaced with '%s'.", $original, $new ) );
+						do_action( 'post_export_log', sprintf( "  - '%s' was replaced with '%s'.", $original, $new ) );
 					}
-				}
-				else {
-					if ( $log ) {
-						do_action( 'synced_post_export_log', sprintf( "  - '%s' was not found.", $original ) );
-					}
+				} elseif ( $log ) {
+						do_action( 'post_export_log', sprintf( "  - '%s' was not found.", $original ) );
 				}
 			}
 		}
 
 		if ( $log ) {
-			do_action( 'synced_post_export_log', '=> strings were replaced' );
+			do_action( 'post_export_log', '=> strings were replaced' );
 		}
 
 		return $subject;
@@ -1205,23 +1193,23 @@ class Post_Import {
 	/**
 	 * Given an array of meta, set meta to another post.
 	 *
-	 * @param int     $post_id      Post ID.
-	 * @param array   $meta         Array of meta as key => value.
+	 * @param int           $post_id      Post ID.
+	 * @param array         $meta         Array of meta as key => value.
 	 * @param Prepared_Post $post  The preparred post object (optional).
 	 */
 	public static function set_meta( $post_id, $meta, $post = null ) {
-		do_action( 'synced_post_export_log', "\r\n" . 'Set post meta.' );
+		do_action( 'post_export_log', "\r\n" . 'Set post meta.' );
 
 		$existing_meta = (array) get_post_meta( $post_id );
 
 		foreach ( (array) $meta as $meta_key => $meta_values ) {
 
 			// don't import blacklisted meta
-			if ( in_array( $meta_key, Post_Export_Helper::blacklisted_meta( 'import', $post_id ), true ) ) {
+			if ( in_array( $meta_key, \Contentsync\get_blacklisted_meta_for_export( 'import', $post_id ), true ) ) {
 				continue;
 			}
 			// skip certain meta keys
-			elseif ( Post_Export_Helper::maybe_skip_meta_option( $meta_key, $meta_values, 'import', $post_id ) ) {
+			elseif ( \Contentsync\maybe_skip_meta_option( $meta_key, $meta_values, 'import', $post_id ) ) {
 				continue;
 			}
 
@@ -1241,17 +1229,17 @@ class Post_Import {
 
 				/**
 				 * Filter to modify specific post meta values before import.
-				 * 
+				 *
 				 * This filter allows developers to customize individual post meta values
 				 * during import. The filter name is dynamic based on the meta key,
 				 * allowing for targeted modifications of specific meta fields.
-				 * 
+				 *
 				 * @filter contentsync_import_post_meta-{{meta_key}}
-				 * 
+				 *
 				 * @param mixed $meta_value     The meta value to be imported.
 				 * @param int   $post_id        The ID of the post being imported.
 				 * @param Prepared_Post $post  The original Prepared_Post object.
-				 * 
+				 *
 				 * @return mixed             The modified meta value for import.
 				 */
 				$meta_value = apply_filters( 'contentsync_import_post_meta-' . $meta_key, $meta_value, $post_id, $post );
@@ -1263,22 +1251,22 @@ class Post_Import {
 				}
 			}
 		}
-		do_action( 'synced_post_export_log', '=> post meta set' );
+		do_action( 'post_export_log', '=> post meta set' );
 	}
 
 	/**
 	 * Filter to modify dynamic meta values after import processing.
-	 * 
+	 *
 	 * This filter allows developers to customize how dynamic meta values are processed
 	 * after they've been imported. It's useful for implementing custom logic for
 	 * handling dynamic post type fields, resolving placeholders, or applying
 	 * post-import transformations.
-	 * 
+	 *
 	 * @filter contentsync_import_post_meta-dynamic_meta
-	 * 
+	 *
 	 * @param mixed $meta_value  The meta value after initial import processing.
 	 * @param int   $post_id     The ID of the post that was imported.
-	 * 
+	 *
 	 * @return mixed $meta_value  The modified meta value ready for final storage.
 	 */
 	public function set_dynamic_meta( $meta_value, $post_id ) {
@@ -1293,10 +1281,10 @@ class Post_Import {
 				if ( is_numeric( $inner ) ) {
 					$replace_string     = isset( self::$posts[ $inner ] ) ? self::$posts[ $inner ] : $inner;
 					$meta_value[ $key ] = preg_replace( '/\{\{(.+?)\}\}/', $replace_string, $value );
-					do_action( 'synced_post_export_log', sprintf( "  - ID '%s' in the field '%s' was replaced with '%s'", $inner, $key, $replace_string ) );
+					do_action( 'post_export_log', sprintf( "  - ID '%s' in the field '%s' was replaced with '%s'", $inner, $key, $replace_string ) );
 				} else {
 					$meta_value[ $key ] = self::replace_strings( $value, $post_id, false );
-					do_action( 'synced_post_export_log', sprintf( "  - All strings in the field '%s' were replaced", $key ) );
+					do_action( 'post_export_log', sprintf( "  - All strings in the field '%s' were replaced", $key ) );
 				}
 			}
 		}
@@ -1312,9 +1300,8 @@ class Post_Import {
 	 * @param array $taxonomy_terms Array with taxonomy as key and array of terms as values.
 	 */
 	public static function set_taxonomy_terms( $post_id, $taxonomy_terms, $post ) {
-		do_action( 'synced_post_export_log', "\r\n" . 'Set taxonomy terms.' );
+		do_action( 'post_export_log', "\r\n" . 'Set taxonomy terms.' );
 
-		
 		/**
 		 * @since 2.10.0
 		 * If the post is a dynamic taxonomy, insert the terms without assigning them to the post.
@@ -1334,74 +1321,73 @@ class Post_Import {
 				register_taxonomy( $taxonomy_name, $post_types );
 			}
 
-			$new_term_ids = self::insert_taxonomy_terms( $taxonomy_name, $taxonomy_terms);
-		}
-		else {
+			$new_term_ids = self::insert_taxonomy_terms( $taxonomy_name, $taxonomy_terms );
+		} else {
 			foreach ( (array) $taxonomy_terms as $taxonomy => $terms ) {
 
 				/**
 				 * Skip this taxonomy during import.
-				 * 
+				 *
 				 * @since 2.19.0
 				 * @filter contentsync_import_skip_taxonomy
-				 * 
+				 *
 				 * @param bool $skip            Whether to skip the taxonomy.
 				 * @param string $taxonomy      The taxonomy to skip.
 				 * @param array $terms          The terms to skip.
 				 * @param Prepared_Post $post  The Prepared_Post object.
-				 * 
+				 *
 				 * @return bool Whether to skip the taxonomy.
 				 */
 				$skip_this_taxonomy = apply_filters( 'contentsync_import_skip_taxonomy', false, $taxonomy, $terms, $post );
 				if ( $skip_this_taxonomy ) {
-					do_action( 'synced_post_export_log', "  - taxonomy '{$taxonomy}' is skipped." );
+					do_action( 'post_export_log', "  - taxonomy '{$taxonomy}' is skipped." );
 					continue;
 				}
 
 				/**
 				 * Filter the terms to be inserted before inserting them.
-				 * 
+				 *
 				 * @since 2.19.0
 				 * @filter contentsync_import_terms_before_insert
-				 * 
+				 *
 				 * @param array $terms          The terms to be inserted.
 				 * @param string $taxonomy      The taxonomy.
 				 * @param Prepared_Post $post  The Prepared_Post object.
-				 * 
+				 *
 				 * @return array The filtered terms.
 				 */
 				$terms = apply_filters( 'contentsync_import_terms_before_insert', $terms, $taxonomy, $post );
 
 				$term_ids = self::insert_taxonomy_terms( $taxonomy, $terms, $post->post_type );
-	
+
 				// set term ids
 				$new_term_ids = wp_set_object_terms( $post_id, $term_ids, $taxonomy );
-	
+
 				if ( is_wp_error( $new_term_ids ) ) {
-					do_action( 'synced_post_export_log', "  - term ids of taxonomy '$taxonomy' could not be set to post: " . $new_term_ids->get_error_message() );
+					do_action( 'post_export_log', "  - term ids of taxonomy '$taxonomy' could not be set to post: " . $new_term_ids->get_error_message() );
 				} else {
-					do_action( 'synced_post_export_log', "  - term ids '" . implode( ', ', $new_term_ids ) . "' of taxonomy '$taxonomy' set to post." );
+					do_action( 'post_export_log', "  - term ids '" . implode( ', ', $new_term_ids ) . "' of taxonomy '$taxonomy' set to post." );
 				}
 			}
 		}
 
-		do_action( 'synced_post_export_log', isset( $new_term_ids ) ? '=> all taxonomy terms set' : '=> no taxonomy terms' );
+		do_action( 'post_export_log', isset( $new_term_ids ) ? '=> all taxonomy terms set' : '=> no taxonomy terms' );
 	}
 
 	/**
 	 * Insert all terms of a taxonomy.
-	 * 
+	 *
 	 * @param string $taxonomy          The taxonomy slug.
-	 * @param array $terms              The terms array.
+	 * @param array  $terms              The terms array.
 	 * @param string $post_type         The post type.
-	 * 
+	 *
 	 * @return array|false $term_ids    The term IDs of the inserted terms.
 	 */
-	public static function insert_taxonomy_terms( string $taxonomy, $terms, $post_type=null ) {
+	public static function insert_taxonomy_terms( string $taxonomy, $terms, $post_type = null ) {
 
 		// make sure taxonomy exists
 		if ( ! taxonomy_exists( $taxonomy ) ) {
-			do_action( 'synced_post_export_log', "  - taxonomy '{$taxonomy}' doesn't exist." );
+			do_action( 'post_export_log', "  - taxonomy '{$taxonomy}' doesn't exist." );
 			return false;
 		}
 
@@ -1419,25 +1405,29 @@ class Post_Import {
 
 			/**
 			 * Skip this term during import.
-			 * 
+			 *
 			 * @since 2.19.0
 			 * @filter contentsync_import_skip_term
-			 * 
+			 *
 			 * @param bool $skip         Whether to skip the term.
 			 * @param array $term_array  The term array.
 			 * @param string $taxonomy   The taxonomy.
 			 * @param string $post_type  The post type.
-			 * 
+			 *
 			 * @return bool Whether to skip the term.
 			 */
 			$skip_this_term = apply_filters( 'contentsync_import_skip_term', false, $term_array, $taxonomy, $post_type );
 			if ( $skip_this_term ) {
-				do_action( 'synced_post_export_log', "  - term '{$term_array['name']}' of taxonomy '$taxonomy' is skipped." );
+				do_action( 'post_export_log', "  - term '{$term_array['name']}' of taxonomy '$taxonomy' is skipped." );
 				continue;
 			}
 
-			if ( $term_array['name'] == '{{theme}}' ) $term_array['name'] = get_stylesheet();
-			if ( $term_array['slug'] == '{{theme}}' ) $term_array['slug'] = get_stylesheet();
+			if ( $term_array['name'] == '{{theme}}' ) {
+				$term_array['name'] = get_stylesheet();
+			}
+			if ( $term_array['slug'] == '{{theme}}' ) {
+				$term_array['slug'] = get_stylesheet();
+			}
 
 			$term = get_term_by( 'slug', $term_array['slug'], $taxonomy );
 
@@ -1453,16 +1443,16 @@ class Post_Import {
 				);
 
 				if ( is_wp_error( $term ) ) {
-					do_action( 'synced_post_export_log', "    - term '{$term_array['name']}' of taxonomy '$taxonomy' could not be inserted: " . $term->get_error_message() );
+					do_action( 'post_export_log', "    - term '{$term_array['name']}' of taxonomy '$taxonomy' could not be inserted: " . $term->get_error_message() );
 				} else {
 					$term_id_mapping[ $term_array['term_id'] ] = $term['term_id'];
 					$term_ids[]                                = $term['term_id'];
-					do_action( 'synced_post_export_log', "    - term '{$term_array['name']}' of taxonomy '$taxonomy' inserted with id '{$term['term_id']}'." );
+					do_action( 'post_export_log', "    - term '{$term_array['name']}' of taxonomy '$taxonomy' inserted with id '{$term['term_id']}'." );
 				}
 			} else {
 				$term_id_mapping[ $term_array['term_id'] ] = $term->term_id;
 				$term_ids[]                                = $term->term_id;
-				do_action( 'synced_post_export_log', "    - term '{$term_array['name']}' of taxonomy '$taxonomy' found with id {$term->term_id}." );
+				do_action( 'post_export_log', "    - term '{$term_array['name']}' of taxonomy '$taxonomy' found with id {$term->term_id}." );
 			}
 		}
 
@@ -1474,40 +1464,38 @@ class Post_Import {
 
 			/**
 			 * Skip this term during import.
-			 * 
+			 *
 			 * @since 2.19.0
 			 * @filter contentsync_import_skip_term
-			 * 
+			 *
 			 * @param bool $skip         Whether to skip the term.
 			 * @param array $term_array  The term array.
 			 * @param string $taxonomy   The taxonomy.
 			 * @param string $post_type  The post type.
-			 * 
+			 *
 			 * @return bool Whether to skip the term.
 			 */
 			$skip_this_term = apply_filters( 'contentsync_import_skip_term', false, $term_array, $taxonomy, $post_type );
 			if ( $skip_this_term ) {
-				do_action( 'synced_post_export_log', "  - term '{$term_array['name']}' of taxonomy '$taxonomy' is skipped." );
+				do_action( 'post_export_log', "  - term '{$term_array['name']}' of taxonomy '$taxonomy' is skipped." );
 				continue;
 			}
 
 			$parent = '';
 
-			if ( isset($term_array['parent']) && is_array( $term_array['parent'] ) ) {
+			if ( isset( $term_array['parent'] ) && is_array( $term_array['parent'] ) ) {
 				$parent = self::set_taxonomy_term_parents( $taxonomy, $term_array['parent'], $term_id_mapping );
-			}
-			else if ( isset($term_array['parent']) && is_object( $term_array['parent'] ) ) {
+			} elseif ( isset( $term_array['parent'] ) && is_object( $term_array['parent'] ) ) {
 				$parent = self::set_taxonomy_term_parents( $taxonomy, (array) $term_array['parent'], $term_id_mapping );
-			}
-			else if (
-				isset($term_array['parent']) 
-				&& !empty( $term_array['parent'] )
+			} elseif (
+				isset( $term_array['parent'] )
+				&& ! empty( $term_array['parent'] )
 				&& ( is_string( $term_array['parent'] ) || is_numeric( $term_array['parent'] ) )
 				&& isset( $term_id_mapping[ $term_array['parent'] ] )
 			) {
 				$parent = $term_id_mapping[ $term_array['parent'] ];
 			}
-			
+
 			$term = wp_update_term(
 				$term_id_mapping[ $term_array['term_id'] ],
 				$taxonomy,
@@ -1525,18 +1513,18 @@ class Post_Import {
 	 * On post-export, the parents term object is nested into the original term object.
 	 * On import, the nested parents get resolved recursively, created if not existent, but not assigned to the post.
 	 * That way, a term hierarchy is preserved even if the post does not have all terms of the hierarchy assigend.
-	 * 
-	 * @param string $taxonomy		The terms taxonomy.
-	 * @param object $terms_array	The terms array (serialized WP_Term object)
-	 * @param array $prepared		All already set term IDs.
-	 * 
-	 * @return int|empty $term_id	The parents term ID.
+	 *
+	 * @param string $taxonomy      The terms taxonomy.
+	 * @param object $terms_array   The terms array (serialized WP_Term object)
+	 * @param array  $prepared       All already set term IDs.
+	 *
+	 * @return int|empty $term_id   The parents term ID.
 	 */
 	public static function set_taxonomy_term_parents( $taxonomy, $term_array, $prepared ) {
 
 		// get parent term
 		$term_id = '';
-		$term = get_term_by( 'slug', $term_array['slug'], $taxonomy );
+		$term    = get_term_by( 'slug', $term_array['slug'], $taxonomy );
 		if ( empty( $term ) ) {
 			// make parent term
 			$term = wp_insert_term(
@@ -1548,37 +1536,33 @@ class Post_Import {
 				)
 			);
 			if ( is_wp_error( $term ) ) {
-				do_action( 'synced_post_export_log', "      - parent term '{$term_array['name']}' of taxonomy '$taxonomy' could not be inserted: " . $term->get_error_message() );
-			}
-			else {
+				do_action( 'post_export_log', "      - parent term '{$term_array['name']}' of taxonomy '$taxonomy' could not be inserted: " . $term->get_error_message() );
+			} else {
 				$term_id = $term['term_id'];
-				do_action( 'synced_post_export_log', "      - parent term '{$term_array['name']}' of taxonomy '$taxonomy' inserted with id '{$term['term_id']}'." );
+				do_action( 'post_export_log', "      - parent term '{$term_array['name']}' of taxonomy '$taxonomy' inserted with id '{$term['term_id']}'." );
 			}
-		}
-		else {
+		} else {
 			$term_id = $term->term_id;
-			do_action( 'synced_post_export_log', "      - parent term '{$term_array['name']}' of taxonomy '$taxonomy' found with id {$term->term_id}." );
+			do_action( 'post_export_log', "      - parent term '{$term_array['name']}' of taxonomy '$taxonomy' found with id {$term->term_id}." );
 		}
 
 		// set parent
-		if ( !empty( $term_id ) ) {
+		if ( ! empty( $term_id ) ) {
 
 			$parent = '';
 
 			if ( is_array( $term_array['parent'] ) ) {
 				$parent = self::set_taxonomy_term_parents( $taxonomy, $term_array['parent'], $prepared );
-			}
-			else if ( is_object( $term_array['parent'] ) ) {
+			} elseif ( is_object( $term_array['parent'] ) ) {
 				$parent = self::set_taxonomy_term_parents( $taxonomy, (array) $term_array['parent'], $prepared );
-			}
-			else if (
-				!empty( $term_array['parent'] )
+			} elseif (
+				! empty( $term_array['parent'] )
 				&& ( is_string( $term_array['parent'] ) || is_numeric( $term_array['parent'] ) )
 				&& isset( $term_id_mapping[ $term_array['parent'] ] )
 			) {
 				$parent = $prepared[ $term_array['parent'] ];
 			}
-			
+
 			$term = wp_update_term(
 				$term_id,
 				$taxonomy,
@@ -1595,7 +1579,7 @@ class Post_Import {
 	 * Set the language of a post and link it to it's source post if possible.
 	 *
 	 * @since 2.19.0 Fully refactored to delegate all translation logic to Translation_Manager.
-	 * @param int     $post_id      Post ID on this stage.
+	 * @param int           $post_id      Post ID on this stage.
 	 * @param Prepared_Post $post  Old Prepared_Post object (Post ID might differ).
 	 *
 	 * @return bool
@@ -1634,27 +1618,27 @@ class Post_Import {
 
 	/**
 	 * Set the post hierarchy.
-	 * 
+	 *
 	 * @since 2.18.0
-	 * 
+	 *
 	 * During export, we collected data about the previous post hierarchy. This contains
 	 * information about the parent post (if any) and all child posts (if any are found).
 	 * This information is used now to try to restore the same hierarchy based on the posts
 	 * that exist on the destination site or are part of the posts that are being imported.
 	 * @see \Contentsync\Prepared_Post::prepare_post_hierarchy()
-	 * 
-	 * @param int     $post_id      Post ID on this stage.
+	 *
+	 * @param int           $post_id      Post ID on this stage.
 	 * @param Prepared_Post $post  Old Prepared_Post object (Post ID might differ).
-	 * 
+	 *
 	 * @return void
 	 */
 	public static function set_post_hierarchy( $post_id, $post ) {
-		do_action( 'synced_post_export_log', "\r\n" . 'Set post hierarchy.' );
+		do_action( 'post_export_log', "\r\n" . 'Set post hierarchy.' );
 
 		/**
 		 * @since 2.18.0 Post hierarchy information.
 		 * @see \Contentsync\Prepared_Post->post_hierarchy property.
-		 * 
+		 *
 		 * @var array $post->post_hierarchy Information about the post hierarchy.
 		 *    @property array $parent       Information about the parent post.
 		 *        @property int $id         The parent post ID.
@@ -1670,7 +1654,7 @@ class Post_Import {
 			if ( ! is_array( $post->post_hierarchy ) ) {
 				$post->post_hierarchy = (array) $post->post_hierarchy;
 			}
-			
+
 			// set post parent
 			if ( isset( $post->post_hierarchy['parent'] ) && ! empty( $post->post_hierarchy['parent'] ) ) {
 
@@ -1680,7 +1664,7 @@ class Post_Import {
 					$post_parent_info = (array) $post_parent_info;
 				}
 
-				do_action( 'synced_post_export_log', '  - post parent information:', $post_parent_info );
+				do_action( 'post_export_log', '  - post parent information:', $post_parent_info );
 
 				if ( isset( $post_parent_info['id'] ) && ! empty( $post_parent_info['id'] ) ) {
 
@@ -1689,22 +1673,26 @@ class Post_Import {
 					// if the parent post is part of the posts that are being imported, use the new post ID
 					if ( isset( self::$posts[ $post_parent_info['id'] ] ) ) {
 						$new_parent_post_id = self::$posts[ $post_parent_info['id'] ];
-					}
-					else {
-						$parent_posts = get_posts( array(
-							'post_type' => $post_parent_info['type'],
-							'name' => $post_parent_info['name'],
-							'post_status' => 'publish',
-							'numberposts' => 1
-						) );
+					} else {
+						$parent_posts = get_posts(
+							array(
+								'post_type'   => $post_parent_info['type'],
+								'name'        => $post_parent_info['name'],
+								'post_status' => 'publish',
+								'numberposts' => 1,
+							)
+						);
 						if ( $parent_posts ) {
 							$new_parent_post_id = $parent_posts[0]->ID;
-							do_action( 'synced_post_export_log', sprintf(
-								"  - parent post with ID %s found by name '%s' and type '%s'",
-								$new_parent_post_id,
-								$post_parent_info['name'],
-								$post_parent_info['type']
-							) );
+							do_action(
+								'post_export_log',
+								sprintf(
+									"  - parent post with ID %s found by name '%s' and type '%s'",
+									$new_parent_post_id,
+									$post_parent_info['name'],
+									$post_parent_info['type']
+								)
+							);
 						}
 					}
 
@@ -1718,16 +1706,15 @@ class Post_Import {
 							false
 						);
 						if ( is_wp_error( $result ) ) {
-							do_action( 'synced_post_export_log', '  - post_parent could not be updated. Error: ' . $result->get_error_message() );
+							do_action( 'post_export_log', '  - post_parent could not be updated. Error: ' . $result->get_error_message() );
 						} else {
-							do_action( 'synced_post_export_log', '  - post_parent successfully updated.' );
+							do_action( 'post_export_log', '  - post_parent successfully updated.' );
 						}
-					}
-					else {
-						do_action( 'synced_post_export_log', sprintf( "  - post_parent '%s' could not be found.", $post_parent_info['id'] ) );
+					} else {
+						do_action( 'post_export_log', sprintf( "  - post_parent '%s' could not be found.", $post_parent_info['id'] ) );
 					}
 				}
-				do_action( 'synced_post_export_log', '=> post parent set' );
+				do_action( 'post_export_log', '=> post parent set' );
 			}
 
 			// set post children
@@ -1747,25 +1734,29 @@ class Post_Import {
 					// if the child post is part of the posts that are being imported, use the new post ID
 					if ( isset( self::$posts[ $child_post_info['id'] ] ) ) {
 						$new_child_post_id = self::$posts[ $child_post_info['id'] ];
-					}
-					else {
+					} else {
 						// if the child post is not part of the posts that are being imported, try to find it by name and type
 						// we only look for posts that do not have a parent yet to not overwrite existing hierarchies.
-						$child_posts = get_posts( array(
-							'post_type' => $child_post_info['type'],
-							'name' => $child_post_info['name'],
-							'post_status' => 'publish',
-							'numberposts' => 1,
-							'post_parent' => 0 // if posts do already have a parent, they will be ignored
-						) );
+						$child_posts = get_posts(
+							array(
+								'post_type'   => $child_post_info['type'],
+								'name'        => $child_post_info['name'],
+								'post_status' => 'publish',
+								'numberposts' => 1,
+								'post_parent' => 0, // if posts do already have a parent, they will be ignored
+							)
+						);
 						if ( $child_posts ) {
 							$new_child_post_id = $child_posts[0]->ID;
-							do_action( 'synced_post_export_log', sprintf(
-								"  - child post with ID %s found by name '%s' and type '%s'",
-								$new_child_post_id,
-								$child_post_info['name'],
-								$child_post_info['type']
-							) );
+							do_action(
+								'post_export_log',
+								sprintf(
+									"  - child post with ID %s found by name '%s' and type '%s'",
+									$new_child_post_id,
+									$child_post_info['name'],
+									$child_post_info['type']
+								)
+							);
 						}
 					}
 
@@ -1779,21 +1770,20 @@ class Post_Import {
 							false
 						);
 						if ( is_wp_error( $result ) ) {
-							do_action( 'synced_post_export_log', '  - the child post could not be updated. Error: ' . $result->get_error_message() );
+							do_action( 'post_export_log', '  - the child post could not be updated. Error: ' . $result->get_error_message() );
 						} else {
-							do_action( 'synced_post_export_log', '  - the child post was successfully updated.' );
+							do_action( 'post_export_log', '  - the child post was successfully updated.' );
 						}
-					}
-					else {
-						do_action( 'synced_post_export_log', sprintf( "  - child post could not be found.", $child_post_info['id'] ) );
+					} else {
+						do_action( 'post_export_log', sprintf( '  - child post could not be found.', $child_post_info['id'] ) );
 					}
 				}
-				do_action( 'synced_post_export_log', '=> post children set' );
+				do_action( 'post_export_log', '=> post children set' );
 			}
 		}
 		// set post_parent (old way)
-		else if ( isset( $post->post_parent ) && ! empty( $post->post_parent ) ) {
-			
+		elseif ( isset( $post->post_parent ) && ! empty( $post->post_parent ) ) {
+
 			$old_parent_post_id = isset( self::$posts[ $post->post_parent ] ) ? self::$posts[ $post->post_parent ] : null;
 			if ( $old_parent_post_id ) {
 				$result = wp_update_post(
@@ -1805,14 +1795,14 @@ class Post_Import {
 					false
 				);
 				if ( is_wp_error( $result ) ) {
-					do_action( 'synced_post_export_log', '  - post_parent could not be updated.' );
+					do_action( 'post_export_log', '  - post_parent could not be updated.' );
 				} else {
-					do_action( 'synced_post_export_log', '  - post_parent successfully updated.' );
+					do_action( 'post_export_log', '  - post_parent successfully updated.' );
 				}
 			} else {
-				do_action( 'synced_post_export_log', sprintf( "  - post_parent '%s' could not be found.", $post->post_parent ) );
+				do_action( 'post_export_log', sprintf( "  - post_parent '%s' could not be found.", $post->post_parent ) );
 			}
-			do_action( 'synced_post_export_log', '=> post parent set (old way)' );
+			do_action( 'post_export_log', '=> post parent set (old way)' );
 		}
 	}
 
@@ -1848,9 +1838,9 @@ class Post_Import {
 	public static function get_zip_posts_file_contents( $filepath ) {
 
 		if ( ! file_exists( $filepath ) ) {
-			__( "The ZIP archive could not be found. It may have been moved or deleted.", 'contentsync_hub' );
+			__( 'The ZIP archive could not be found. It may have been moved or deleted.', 'contentsync_hub' );
 		} else {
-			do_action( 'synced_post_export_log', sprintf( '  - ZIP archive "%s" found.', $filepath ) );
+			do_action( 'post_export_log', sprintf( '  - ZIP archive "%s" found.', $filepath ) );
 		}
 
 		// open 'posts.json' file inside zip archive
@@ -1858,23 +1848,23 @@ class Post_Import {
 		$json_file = Helper::get_file_contents( $zip );
 
 		if ( ! $json_file ) {
-			return __( "The ZIP archive does not contain a valid \"posts.json\" file.", 'contentsync_hub' );
+			return __( 'The ZIP archive does not contain a valid "posts.json" file.', 'contentsync_hub' );
 		} else {
-			do_action( 'synced_post_export_log', sprintf( '  - file "%s" found.', 'posts.json' ) );
+			do_action( 'post_export_log', sprintf( '  - file "%s" found.', 'posts.json' ) );
 		}
 
 		// decode json data
 		$contents = json_decode( $json_file, true );
 		if ( $contents === null && json_last_error() !== JSON_ERROR_NONE ) {
-			return __( "The post.json file could not be read.", 'contentsync_hub' );
+			return __( 'The post.json file could not be read.', 'contentsync_hub' );
 		} else {
-			do_action( 'synced_post_export_log', '  - decoded json.' );
+			do_action( 'post_export_log', '  - decoded json.' );
 		}
 
 		if ( ! is_array( $contents ) ) {
-			return __( "The posts.json file does not contain any data.", 'contentsync_hub' );
+			return __( 'The posts.json file does not contain any data.', 'contentsync_hub' );
 		} else {
-			do_action( 'synced_post_export_log', '  - json contains object.' );
+			do_action( 'post_export_log', '  - json contains object.' );
 		}
 
 		// convert posts back to objects
@@ -1897,9 +1887,9 @@ class Post_Import {
 	public static function get_zip_media_file( $filepath, $medianame ) {
 
 		if ( ! file_exists( $filepath ) ) {
-			__( "The ZIP archive could not be found. It may have been moved or deleted.", 'contentsync_hub' );
+			__( 'The ZIP archive could not be found. It may have been moved or deleted.', 'contentsync_hub' );
 		} else {
-			do_action( 'synced_post_export_log', sprintf( '  - ZIP archive "%s" found.', $filepath ) );
+			do_action( 'post_export_log', sprintf( '  - ZIP archive "%s" found.', $filepath ) );
 		}
 
 		// open 'posts.json' file inside zip archive
@@ -1909,7 +1899,7 @@ class Post_Import {
 		if ( ! $media_file ) {
 			return sprintf( __( "The file '%s' could not be found in the ZIP archive.", 'contentsync_hub' ), 'media/' . $medianame );
 		} else {
-			do_action( 'synced_post_export_log', sprintf( '  - file "%s" found.', 'posts.json' ) );
+			do_action( 'post_export_log', sprintf( '  - file "%s" found.', 'posts.json' ) );
 		}
 
 		return $media_file;
@@ -1921,7 +1911,7 @@ class Post_Import {
 	 * usually called after a successfull import
 	 */
 	public static function delete_tmp_files() {
-		$path = Post_Export_Helper::get_file_path( 'tmp' );
+		$path = \Contentsync\get_export_file_path( 'tmp' );
 		$dir  = substr( $path, -1 ) === '/' ? substr( $path, 0, -1 ) : $path;
 
 		foreach ( scandir( $dir ) as $item ) {
@@ -1933,7 +1923,7 @@ class Post_Import {
 				unlink( $file );
 			}
 		}
-		do_action( 'synced_post_export_log', "\r\n" . sprintf( "All files inside folder '%s' deleted.", $dir ) );
+		do_action( 'post_export_log', "\r\n" . sprintf( "All files inside folder '%s' deleted.", $dir ) );
 	}
 
 	/**
@@ -1948,23 +1938,23 @@ class Post_Import {
 
 		$conflicts = array();
 		foreach ( $posts as $post_id => $post ) {
-			if ( $existing_post = Post_Export_Helper::get_post_by_name_and_type( $post ) ) {
+			if ( $existing_post = \Contentsync\get_post_by_name_and_type( $post ) ) {
 				$conflicts[ $post_id ] = $existing_post;
 			}
 		}
 
 		/**
 		 * Filter to modify the list of conflicting posts before returning them.
-		 * 
+		 *
 		 * This filter allows developers to customize the list of posts that conflict
 		 * with posts being imported. It's useful for adding custom conflict detection
 		 * logic or filtering out certain types of conflicts.
-		 * 
+		 *
 		 * @filter contentsync_import_post_conflicts
-		 * 
+		 *
 		 * @param array $conflicts  Array of conflicting posts, keyed by post ID.
 		 * @param array $posts      Array of posts being imported, keyed by post ID.
-		 * 
+		 *
 		 * @return array            Modified array of conflicting posts.
 		 */
 		return apply_filters( 'contentsync_import_post_conflicts', $conflicts, $posts );
@@ -1982,17 +1972,17 @@ class Post_Import {
 
 		if ( $post->post_type === 'attachment' ) {
 			$post_title = basename( get_attached_file( $post->ID ) );
-			$post_type  = __( "Image/file", 'contentsync_hub' );
+			$post_type  = __( 'Image/file', 'contentsync_hub' );
 			$post_url   = wp_get_attachment_url( $post->ID );
 		} else {
 			$post_title = $post->post_title;
 			$post_type  = get_post_type_object( $post->post_type )->labels->singular_name;
 			$post_url   = Helper::get_edit_post_link( $post );
 		}
-		$post_title = empty( $post_title ) ? '<i>' . __( "Unknown post", 'contentsync_hub' ) . '</i>' : $post_title;
-		$post_type  = empty( $post_type ) ? '<i>' . __( "Unknown post type", 'contentsync_hub' ) . '</i>' : $post_type;
+		$post_title = empty( $post_title ) ? '<i>' . __( 'Unknown post', 'contentsync_hub' ) . '</i>' : $post_title;
+		$post_type  = empty( $post_type ) ? '<i>' . __( 'Unknown post type', 'contentsync_hub' ) . '</i>' : $post_type;
 
-		return "<a href='$post_url' target='_blank' title='" . __( "Open in new tab", 'contentsync_hub' ) . "'>$post_title ($post_type)</a>";
+		return "<a href='$post_url' target='_blank' title='" . __( 'Open in new tab', 'contentsync_hub' ) . "'>$post_title ($post_type)</a>";
 	}
 
 	/**

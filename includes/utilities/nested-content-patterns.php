@@ -1,11 +1,13 @@
 <?php
-
+/**
+ * Nested content patterns helper functions.
+ *
+ * @since 2.17.0
+ */
 namespace Contentsync;
 
 /**
  * Get the patterns to replace post ids in post_content.
- *
- * @deprecated since 2.0: Post_Export::regex_nested_posts()
  *
  * @param int     $post_id      The WP_Post ID.
  * @param WP_Post $post         The WP_Post Object
@@ -32,7 +34,7 @@ function get_nested_post_patterns( $post_id = 0, $post = null ) {
 	 * and replacing nested post references in post content during export.
 	 * It's useful for supporting custom block types or content structures.
 	 *
-	 * @filter contentsync_regex_nested_posts
+	 * @filter contentsync_nested_post_patterns
 	 *
 	 * @param array   $patterns     Array of regex pattern arguments for post detection.
 	 * @param int     $post_id      The WP_Post ID being exported.
@@ -41,7 +43,7 @@ function get_nested_post_patterns( $post_id = 0, $post = null ) {
 	 * @return array                Modified array of regex patterns for post detection.
 	 */
 	return (array) apply_filters(
-		'contentsync_regex_nested_posts',
+		'contentsync_nested_post_patterns',
 		array(
 
 			/**
@@ -149,8 +151,6 @@ function get_nested_post_patterns( $post_id = 0, $post = null ) {
 /**
  * Get all the strings to replace inside post_content.
  *
- * @deprecated since 2.0: Post_Export::regex_nested_strings()
- *
  * @param string $subject   The string to query (usually post content).
  * @param int    $post_id   The post ID.
  *
@@ -188,7 +188,7 @@ function get_nested_string_patterns( $subject, $post_id ) {
 	 * be replaced with placeholders during export. It's useful for handling
 	 * site-specific URLs, paths, or other dynamic content.
 	 *
-	 * @filter contentsync_regex_nested_strings
+	 * @filter contentsync_nested_string_patterns
 	 *
 	 * @param string[]  $strings   Array of strings to be replaced, keyed by placeholder name.
 	 * @param string    $content   The post content being processed.
@@ -197,7 +197,7 @@ function get_nested_string_patterns( $subject, $post_id ) {
 	 * @return string[]            Modified array of strings to be replaced.
 	 */
 	return apply_filters(
-		'contentsync_regex_nested_strings',
+		'contentsync_nested_string_patterns',
 		array(
 			'upload_url'           => $upload_url,
 			'upload_url_enc'       => $upload_url_enc,
@@ -215,8 +215,6 @@ function get_nested_string_patterns( $subject, $post_id ) {
 /**
  * Get the patterns to replace term ids in post_content.
  *
- * @deprecated since 2.0: Post_Export::regex_nested_terms()
- *
  * @param int     $post_id      The WP_Post ID.
  * @param WP_Post $post         The WP_Post Object
  *
@@ -231,7 +229,7 @@ function get_nested_term_patterns( $post_id, $post ) {
 	 * and replacing nested taxonomy term references in post content during export.
 	 * It's useful for supporting custom term-based content structures.
 	 *
-	 * @filter contentsync_regex_nested_terms
+	 * @filter contentsync_nested_term_patterns
 	 *
 	 * @param array   $patterns     Array of regex pattern arguments for term detection.
 	 * @param int     $post_id      The WP_Post ID being exported.
@@ -240,7 +238,7 @@ function get_nested_term_patterns( $post_id, $post ) {
 	 * @return array                Modified array of regex patterns for term detection.
 	 */
 	return (array) apply_filters(
-		'contentsync_regex_nested_terms',
+		'contentsync_nested_term_patterns',
 		array(
 			/**
 			 * The taxQuery regex did not work.

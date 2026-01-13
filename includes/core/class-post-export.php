@@ -59,9 +59,9 @@ class Post_Export {
 	 */
 	public function handle_export( $data ) {
 
-		Post_Export_Helper::enable_logs();
+		\Contentsync\post_export_enable_logs();
 
-		do_action( 'synced_post_export_log', "\r\n\r\n" . 'HANDLE EXPORT' . "\r\n", $data );
+		do_action( 'post_export_log', "\r\n\r\n" . 'HANDLE EXPORT' . "\r\n", $data );
 
 		$post_id = isset( $data['post_id'] ) ? $data['post_id'] : '';
 		$args    = array(
@@ -80,17 +80,17 @@ class Post_Export {
 			 * Create the export ZIP-archive.
 			 * If posts & media are null, write_export_file() uses the class vars.
 			 */
-			$posts    = $media = ( (isset( $args['append_nested'] ) && $args['append_nested']) ? null : array());
+			$posts    = $media = ( ( isset( $args['append_nested'] ) && $args['append_nested'] ) ? null : array() );
 			$filename = self::write_filename( $post, $args );
 			$filepath = self::write_export_file( $filename, $posts, $media );
 
 			if ( ! $filepath ) {
-				Post_Export_Helper::error( __( "The export file could not be written.", 'contentsync_hub' ) );
+				\Contentsync\post_export_return_error( __( 'The export file could not be written.', 'contentsync_hub' ) );
 			}
 
-			Post_Export_Helper::success( Post_Export_Helper::convert_content_dir_to_path( $filepath ) );
+			post_export_return_success( \Contentsync\convert_wp_content_dir_to_path( $filepath ) );
 		}
-		Post_Export_Helper::error( __( "No valid post ID could found.", 'contentsync_hub' ) );
+		\Contentsync\post_export_return_error( __( 'No valid post ID could found.', 'contentsync_hub' ) );
 	}
 
 	/**
@@ -103,7 +103,7 @@ class Post_Export {
 	 */
 	public static function export_post( $post_id, $args = array() ) {
 
-		$args = Post_Export_Helper::parse_export_arguments( $args );
+		$args = \Contentsync\parse_post_export_arguments( $args );
 
 		// reset the class vars
 		self::$posts = array();
@@ -117,7 +117,7 @@ class Post_Export {
 
 	/**
 	 * Export posts with all its meta, taxonomies, media etc.
-	 * 
+	 *
 	 * @param int[] $post_ids Array of post IDs.
 	 * @param array $args       Arguments.
 	 *
@@ -125,7 +125,7 @@ class Post_Export {
 	 */
 	public static function export_posts( $post_ids, $args = array() ) {
 
-		$args = Post_Export_Helper::parse_export_arguments( $args );
+		$args = \Contentsync\parse_post_export_arguments( $args );
 
 		// reset the class vars
 		self::$posts = array();
@@ -144,15 +144,15 @@ class Post_Export {
 	 * Export posts with all its meta, taxonomies, media etc.
 	 *
 	 * @since 2.18.0
-	 * 
+	 *
 	 * @param int[]|object[] $post_ids_or_objects   Array of post IDs or post objects.
-	 * @param array $args       Arguments.
+	 * @param array          $args       Arguments.
 	 *
 	 * @return Prepared_Post[]
 	 */
 	public static function export_post_objects( $post_ids_or_objects, $args = array() ) {
 
-		$args = Post_Export_Helper::parse_export_arguments( $args );
+		$args = \Contentsync\parse_post_export_arguments( $args );
 
 		// reset the class vars
 		self::$posts = array();
@@ -178,6 +178,7 @@ class Post_Export {
 	 *
 	 * This function automatically sets the following class vars.
 	 * Use them to export all nested posts at once.
+	 *
 	 * @var array class::$posts     Array of all preparred post objects.
 	 * @var array class::$media     Array of all media files.
 	 *
@@ -185,7 +186,7 @@ class Post_Export {
 	 * @deprecated @param int $post_id WP_Post ID.
 	 *
 	 * @param int|object $post_id_or_object  Post ID or post object.
-	 * @param array $args                    Arguments.
+	 * @param array      $args                    Arguments.
 	 *
 	 * @return Prepared_Post|bool  Prepared_Post on success. False on failure.
 	 */
@@ -199,7 +200,7 @@ class Post_Export {
 
 		// return if we're already processed this post
 		if ( isset( self::$posts[ $post_id ] ) ) {
-			do_action( 'synced_post_export_log', "\r\n" . "Post '$post_id' already processed" );
+			do_action( 'post_export_log', "\r\n" . "Post '$post_id' already processed" );
 			return self::$posts[ $post_id ];
 		}
 
@@ -217,9 +218,9 @@ class Post_Export {
 		/**
 		 * Check if prepared post is valid
 		 */
-		if ( empty($post->ID) ) {
+		if ( empty( $post->ID ) ) {
 			unset( self::$posts[ $post_id ] );
-			do_action( 'synced_post_export_log', "\r\n" . "Post '$post_id' not found or invalid" );
+			do_action( 'post_export_log', "\r\n" . "Post '$post_id' not found or invalid" );
 			return false;
 		}
 
@@ -260,9 +261,9 @@ class Post_Export {
 		 */
 		if (
 			( isset( $args['translations'] ) && $args['translations'] )
-			&& isset($post->language)
-			&& isset($post->language['post_ids'])
-			&& is_countable($post->language['post_ids'])
+			&& isset( $post->language )
+			&& isset( $post->language['post_ids'] )
+			&& is_countable( $post->language['post_ids'] )
 			&& count( $post->language['post_ids'] )
 		) {
 			foreach ( $post->language['post_ids'] as $lang => $translated_post_id ) {
@@ -278,7 +279,7 @@ class Post_Export {
 	 */
 	public function add_bulk_action_callbacks() {
 		// usual posttypes
-		foreach ( Post_Export_Helper::get_supported_post_types() as $posttype ) {
+		foreach ( \Contentsync\get_export_post_types() as $posttype ) {
 			add_filter( 'bulk_actions-edit-' . $posttype, array( $this, 'add_export_bulk_action' ) );
 			add_filter( 'handle_bulk_actions-edit-' . $posttype, array( $this, 'handle_export_bulk_action' ), 10, 3 );
 		}
@@ -293,7 +294,7 @@ class Post_Export {
 	public function add_export_bulk_action( $bulk_actions ) {
 		$bulk_actions['contentsync_export'] = __( 'Export', 'contentsync_hub' );
 
-		if ( !empty( Translation_Manager::get_translation_tool() ) ) {
+		if ( ! empty( Translation_Manager::get_translation_tool() ) ) {
 			$bulk_actions['contentsync_export_multilanguage'] = __( 'Export including translations', 'contentsync_hub' );
 		}
 		return $bulk_actions;
@@ -317,8 +318,8 @@ class Post_Export {
 		}
 
 		$args = array(
-			'append_nested'  => true,
-			'translations'   => $doaction === 'contentsync_export_multilanguage'
+			'append_nested' => true,
+			'translations'  => $doaction === 'contentsync_export_multilanguage',
 		);
 
 		self::export_posts( $items, $args );
@@ -327,12 +328,12 @@ class Post_Export {
 		$filepath = self::write_export_file( $filename );
 
 		if ( $filepath ) {
-			$href = Post_Export_Helper::convert_content_dir_to_path( $filepath );
+			$href = \Contentsync\convert_wp_content_dir_to_path( $filepath );
 			// $sendback = add_query_arg( 'download', $href, $sendback );
 			$sendback = $href;
 		} else {
 			// set transient to display admin notice
-			set_transient( 'contentsync_transient_notice', 'error::' .  __( "The export file could not be written.", 'contentsync_hub' ) );
+			set_transient( 'contentsync_transient_notice', 'error::' . __( 'The export file could not be written.', 'contentsync_hub' ) );
 		}
 
 		return $sendback;
@@ -351,14 +352,14 @@ class Post_Export {
 	 */
 	public static function write_export_file( $filename, $posts = null, $media = null ) {
 
-		do_action( 'synced_post_export_log', "\r\n" . "Write export .zip archive '$filename'" );
+		do_action( 'post_export_log', "\r\n" . "Write export .zip archive '$filename'" );
 
 		$posts_data = $posts ? $posts : self::$posts;
 		$media_data = $media ? $media : self::$media;
 
 		// set monthly folder
 		$folder = date( 'y-m' );
-		$path   = Post_Export_Helper::get_file_path( $folder );
+		$path   = \Contentsync\get_export_file_path( $folder );
 
 		// write the temporary posts.json file
 		$json_name = 'posts.json';
@@ -422,12 +423,12 @@ class Post_Export {
 	 * Use Post_Export_Helper::prepare_strings() instead.
 	 */
 	public static function prepare_strings( $subject, $post_id, $log = true ) {
-		return Post_Export_Helper::replace_dynamic_strings( $subject, $post_id, $log );
+		return \Contentsync\replace_dynamic_post_strings( $subject, $post_id, $log );
 	}
 
 	/**
 	 * Get all posts from class var
-	 * 
+	 *
 	 * @return Prepared_Post[]
 	 */
 	public static function get_all_posts() {
@@ -436,7 +437,7 @@ class Post_Export {
 
 	/**
 	 * Get all posts from class var
-	 * 
+	 *
 	 * @return array[]
 	 */
 	public static function get_all_media() {
@@ -447,7 +448,7 @@ class Post_Export {
 	 * Create filename from export attributes
 	 *
 	 * @param Prepared_Post|Prepared_Post[] $posts
-	 * @param array         $args
+	 * @param array                         $args
 	 *
 	 * @return string $filename
 	 */
@@ -481,13 +482,13 @@ class Post_Export {
 
 		$post_type     = $post->post_type;
 		$default_types = array(
-			'post'             => 'post',
-			'page'             => 'page',
-			'attachment'       => 'media_file',
-			'tp_forms'         => 'form',
-			'dynamic_template' => 'template',
-			'tp_posttypes'     => 'posttype',
-			'contentsync_popup'      => 'popup',
+			'post'              => 'post',
+			'page'              => 'page',
+			'attachment'        => 'media_file',
+			'tp_forms'          => 'form',
+			'dynamic_template'  => 'template',
+			'tp_posttypes'      => 'posttype',
+			'contentsync_popup' => 'popup',
 		);
 
 		// handle default posttypes
@@ -526,18 +527,17 @@ class Post_Export {
 	 * =================================================================
 	 *                          Compatiblity functions
 	 * =================================================================
-	 * 
+	 *
 	 * @since 2.0
-	 * 
+	 *
 	 * These functions are used by external plugins:
 	 * * get_supported_post_types
 	 * * get_translation_tool
-	 * * get_languages_codes
 	 * * enable_logs
 	 * * import_posts
 	 * * import_get_conflict_posts_for_backend_form
 	 * * import_get_conflict_actions_from_backend_form
-	 * 
+	 *
 	 * They are used by the old export class and are therefore
 	 * still needed for backwards compatibility.
 	 */
@@ -545,19 +545,11 @@ class Post_Export {
 	public static $logs = false;
 
 	public static function get_supported_post_types() {
-		return Post_Export_Helper::get_supported_post_types();
-	}
-
-	public static function get_translation_tool() {
-		return Post_Export_Helper::get_translation_tool();
-	}
-
-	public static function get_languages_codes() {
-		return Post_Export_Helper::get_language_codes();
+		return \Contentsync\get_export_post_types();
 	}
 
 	public static function enable_logs() {
-		return Post_Export_Helper::enable_logs();
+		return \Contentsync\post_export_enable_logs();
 	}
 
 	public static function import_posts( $posts, $conflict_actions = array(), $zip_file = '' ) {

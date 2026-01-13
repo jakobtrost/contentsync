@@ -453,7 +453,7 @@ class Translation_Manager {
 		$export_tool  = strval( $language['tool'] );
 		$current_tool = self::get_translation_tool();
 
-		do_action( 'synced_post_export_log', "\r\n" . 'Set translations for the post:', $language );
+		do_action( 'post_export_log', "\r\n" . 'Set translations for the post:', $language );
 
 		$tool = self::get_tool_instance();
 

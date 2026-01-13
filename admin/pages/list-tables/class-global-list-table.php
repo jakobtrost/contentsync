@@ -8,7 +8,7 @@
 
 namespace Contentsync\Contents;
 
-use \Contentsync\Main_Helper;
+use Contentsync\Main_Helper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -167,6 +167,7 @@ class Global_List_Table extends \WP_List_Table {
 
 		/**
 		 * display message if translation tool is not active on the main site
+		 *
 		 * @since 2.3.0 support wpml and polylang
 		 */
 		if ( is_multisite() && is_network_admin() ) {
@@ -175,21 +176,21 @@ class Global_List_Table extends \WP_List_Table {
 				if ( isset( $post->language ) && ! empty( $post->language ) ) {
 					// get translation tool of post
 					Main_Helper::switch_to_blog( $post->blog_id );
-					$tool = Main_Helper::get_translation_tool();
+					$tool = Translation_Manager::get_translation_tool();
 					Main_Helper::restore_blog();
 					// compare to this
-					if ( Main_Helper::get_translation_tool() != $tool ) {
+					if ( Translation_Manager::get_translation_tool() != $tool ) {
 						switch ( $tool ) {
 							case 'wpml':
 								echo '<div class="notice notice-error">' .
 									'<p>' .
 										__( "We've noticed that you're using multilingual global content.", 'contentsync' ) .
 										' <strong>' .
-											__( "WPML must be active on the main page of this multisite and every other connection for this to work.", 'contentsync' ) .
+											__( 'WPML must be active on the main page of this multisite and every other connection for this to work.', 'contentsync' ) .
 										'</strong> ' .
-										__( "In addition, WPML should be active on every page with synchronized multilingual content.", 'contentsync' ) .
+										__( 'In addition, WPML should be active on every page with synchronized multilingual content.', 'contentsync' ) .
 									'</p><p>' .
-										__( "On the other hand, unexpected behavior and errors may occur when synchronizing posts and especially post types in different languages.", 'contentsync' ) .
+										__( 'On the other hand, unexpected behavior and errors may occur when synchronizing posts and especially post types in different languages.', 'contentsync' ) .
 									'</p>' .
 								'</div>';
 								break;
@@ -197,9 +198,9 @@ class Global_List_Table extends \WP_List_Table {
 								echo '<div class="notice notice-error">' .
 									'<p>' .
 										__( "We've noticed that you're using multilingual global content.", 'contentsync' ) .
-										__( "Polylang should be active on every page with synchronized multilingual content.", 'contentsync' ) .
+										__( 'Polylang should be active on every page with synchronized multilingual content.', 'contentsync' ) .
 									'</p><p>' .
-										__( "On the other hand, unexpected behavior and errors may occur when synchronizing posts and especially post types in different languages.", 'contentsync' ) .
+										__( 'On the other hand, unexpected behavior and errors may occur when synchronizing posts and especially post types in different languages.', 'contentsync' ) .
 									'</p>' .
 								'</div>';
 								break;
@@ -261,16 +262,16 @@ class Global_List_Table extends \WP_List_Table {
 		);
 
 		echo "<div id='global_tabs' class='contentsync_tabs'>";
-		echo sprintf(
+		printf(
 			"<a href='%s' class='tab %s'>%s</a>",
 			remove_query_arg( 'post_type' ),
 			empty( $current ) ? 'active' : '',
-			__( "All", 'contentsync' )
+			__( 'All', 'contentsync' )
 		);
 		foreach ( $post_types as $post_type ) {
 			$post_type_obj = get_post_type_object( $post_type );
 			if ( $post_type_obj ) {
-				echo sprintf(
+				printf(
 					"<a href='%s' class='tab %s %s'>%s</a>",
 					add_query_arg(
 						'post_type',
@@ -306,15 +307,15 @@ class Global_List_Table extends \WP_List_Table {
 		if ( is_network_admin() ) {
 			if ( $connections && count( $connections ) > 0 ) {
 				$views = array(
-					'all'  => __( "All", 'contentsync' ),
-					'here' => __( "This installation", 'contentsync' ),
+					'all'  => __( 'All', 'contentsync' ),
+					'here' => __( 'This installation', 'contentsync' ),
 				);
 			}
 		} else {
 			$views = array(
-				'all'    => __( "All", 'contentsync' ),
-				'export' => __( "Exported from here", 'contentsync' ),
-				'import' => __( "Imported here", 'contentsync' ),
+				'all'    => __( 'All', 'contentsync' ),
+				'export' => __( 'Exported from here', 'contentsync' ),
+				'import' => __( 'Imported here', 'contentsync' ),
 			);
 		}
 
@@ -326,9 +327,9 @@ class Global_List_Table extends \WP_List_Table {
 
 		if ( $rel === 'errors' ) {
 			if ( count( $this->posts['errors'] ) ) {
-				$views['errors'] = '<span class="color_red"><span class="dashicons dashicons-warning"></span>&nbsp;' . __( "Contents with errors", 'contentsync' ) . '</span>';
+				$views['errors'] = '<span class="color_red"><span class="dashicons dashicons-warning"></span>&nbsp;' . __( 'Contents with errors', 'contentsync' ) . '</span>';
 			} else {
-				$views['errors'] = __( "No errors found", 'contentsync' );
+				$views['errors'] = __( 'No errors found', 'contentsync' );
 			}
 		}
 
@@ -357,11 +358,11 @@ class Global_List_Table extends \WP_List_Table {
 				is_network_admin() ? 'network' : 'site',
 				get_current_blog_id(),
 				isset( $_GET['post_type'] ) ? $_GET['post_type'] : '',
-				__( "Search for errors...", 'contentsync' ),
-				__( "No errors found", 'contentsync' ),
+				__( 'Search for errors...', 'contentsync' ),
+				__( 'No errors found', 'contentsync' ),
 				add_query_arg( 'rel', 'errors', remove_query_arg( array( 'paged' ) ) ),
 				$rel === 'errors' ? 'current' : '',
-				__( "Contents with errors", 'contentsync' )
+				__( 'Contents with errors', 'contentsync' )
 			);
 		}
 
@@ -373,14 +374,14 @@ class Global_List_Table extends \WP_List_Table {
 	 */
 	public function no_items() {
 
-		$text = __( "No global content found.", 'contentsync' );
+		$text = __( 'No global content found.', 'contentsync' );
 		$rel  = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? sanitize_key( $_GET['rel'] ) : 'all';
 		if ( $rel === 'export' ) {
-			$text = __( "No global content exported from here was found.", 'contentsync' );
+			$text = __( 'No global content exported from here was found.', 'contentsync' );
 		} elseif ( $rel === 'import' ) {
-			$text = __( "No global content imported here was found.", 'contentsync' );
+			$text = __( 'No global content imported here was found.', 'contentsync' );
 		} elseif ( $rel === 'errors' ) {
-			$text = __( "No faulty global content found.", 'contentsync' );
+			$text = __( 'No faulty global content found.', 'contentsync' );
 		}
 
 		echo '<div style="margin: 4px 0;">' . $text . '</div>';
@@ -441,7 +442,7 @@ class Global_List_Table extends \WP_List_Table {
 		} elseif ( isset( $this->all_gids[ $gid ] ) ) {
 			$item->error = (object) array(
 				'repaired' => false,
-				'message'  => __( "There is already a post that references the same global ID.", 'contentsync' ),
+				'message'  => __( 'There is already a post that references the same global ID.', 'contentsync' ),
 				'log'      => '',
 			);
 		}
@@ -456,14 +457,14 @@ class Global_List_Table extends \WP_List_Table {
 		$item->relationship   = $this->get_contentsync_relationship( $item );
 		$item->local_post     = is_network_admin() ? false : Main_Helper::get_local_post_by_gid( $gid );
 		$item->post_type_name = post_type_exists( $item->post_type ) ? get_post_type_object( $item->post_type )->labels->singular_name : $item->post_type;
-		$item->blog_id        = ( $item->local_post || !$post->blog_id ) ? get_current_blog_id() : $post->blog_id;
+		$item->blog_id        = ( $item->local_post || ! $post->blog_id ) ? get_current_blog_id() : $post->blog_id;
 
 		// if relationship == 'unused' but local_post is set, this is an error
 		if ( $item->relationship == 'unused' && $item->local_post ) {
 			$item->relationship = 'error';
-			$error = Main_Helper::check_post_for_errors( $item );
+			$error              = Main_Helper::check_post_for_errors( $item );
 			if ( $error ) {
-				$item->error   = $error;
+				$item->error = $error;
 			}
 		}
 
@@ -471,25 +472,23 @@ class Global_List_Table extends \WP_List_Table {
 		if ( empty( $item->site_url ) ) {
 			if ( empty( $root_net_url ) ) {
 				$item->site_url = trailingslashit( get_site_url( $root_blog_id ) );
-			} else {
-				if ( isset( $this->posts[ $root_net_url ] ) ) {
+			} elseif ( isset( $this->posts[ $root_net_url ] ) ) {
 					$_post = array_filter(
 						$this->posts[ $root_net_url ],
-						function( $_post ) use ( $root_blog_id, $root_post_id ) {
+						function ( $_post ) use ( $root_blog_id, $root_post_id ) {
 							return $_post->ID === $root_post_id && $_post->blog_id === $root_blog_id;
 						}
 					);
-					if ( $_post && is_array( $_post ) && count( $_post ) > 0 ) {
-						$_post          = reset( $_post );
-						$item->site_url = trailingslashit( esc_url( $_post->site_url ) );
-					}
+				if ( $_post && is_array( $_post ) && count( $_post ) > 0 ) {
+					$_post          = reset( $_post );
+					$item->site_url = trailingslashit( esc_url( $_post->site_url ) );
+				}
+			} else {
+				$global_post = Main_Helper::get_global_post( $gid );
+				if ( $global_post && isset( $global_post->post_links ) && isset( $global_post->post_links->edit ) ) {
+					$item->site_url = trailingslashit( esc_url( $global_post->post_links->blog ) );
 				} else {
-					$global_post = Main_Helper::get_global_post( $gid );
-					if ( $global_post && isset( $global_post->post_links ) && isset( $global_post->post_links->edit ) ) {
-						$item->site_url = trailingslashit( esc_url( $global_post->post_links->blog ) );
-					} else {
-						$item->site_url = trailingslashit( esc_url( $root_net_url ) );
-					}
+					$item->site_url = trailingslashit( esc_url( $root_net_url ) );
 				}
 			}
 		} else {
@@ -507,7 +506,7 @@ class Global_List_Table extends \WP_List_Table {
 			$data['post_id'] = $item->local_post->ID;
 		}
 
-		if ( $item->post_type == "wp_template" || $item->post_type == "wp_template_part" ) {
+		if ( $item->post_type == 'wp_template' || $item->post_type == 'wp_template_part' ) {
 			// debug($item);
 			$blog_theme = isset( $item->blog_theme ) ? $item->blog_theme : 'greyd-theme';
 
@@ -523,15 +522,15 @@ class Global_List_Table extends \WP_List_Table {
 				'root' => $item->site_url . "wp-admin/site-editor.php?postType={$item->post_type}&postId={$blog_theme}//{$item->post_name}&categoryId={$root_post_id}&canvas=edit",
 				'edit' => $item->local_post ? admin_url( "site-editor.php?postType={$item->post_type}&postId={$blog_theme}//{$item->post_name}&categoryId={$item->local_post->ID}&canvas=edit" ) : '',
 			);
-		} else if ( $item->post_type == "wp_navigation") {
+		} elseif ( $item->post_type == 'wp_navigation' ) {
 			$item->post_links = array(
 				'root' => $item->site_url . "wp-admin/site-editor.php?postType={$item->post_type}&postId={$root_post_id}&canvas=edit",
 				'edit' => $item->local_post ? admin_url( "site-editor.php?postType={$item->post_type}&postId={$item->local_post->ID}&canvas=edit" ) : '',
 			);
-		} else if ( $item->post_type == "wp_global_styles" ) {
+		} elseif ( $item->post_type == 'wp_global_styles' ) {
 			$item->post_links = array(
-				'root' => $item->site_url . "wp-admin/site-editor.php?p=/styles",
-				'edit' => $item->local_post ? admin_url( "site-editor.php?p=/styles" ) : '',
+				'root' => $item->site_url . 'wp-admin/site-editor.php?p=/styles',
+				'edit' => $item->local_post ? admin_url( 'site-editor.php?p=/styles' ) : '',
 			);
 		} else {
 			$item->post_links = array(
@@ -539,32 +538,32 @@ class Global_List_Table extends \WP_List_Table {
 				'edit' => $item->local_post ? admin_url( "post.php?post={$item->local_post->ID}&action=edit" ) : '',
 			);
 		}
-	
+
 		if ( isset( $_GET['rel'] ) && $_GET['rel'] === 'errors' ) {
 			$item->post_links['edit'] = get_site_url( $item->blog_id ) . "/wp-admin/post.php?post={$post->ID}&action=edit";
 		}
 		$item->actions = array(
 			// edit the local post
-			'edit'     => $item->local_post || $item->error ? "<a href='" . $item->post_links['edit'] . "'>" . __( "Edit", 'contentsync' ) . '</a>' : '',
+			'edit'     => $item->local_post || $item->error ? "<a href='" . $item->post_links['edit'] . "'>" . __( 'Edit', 'contentsync' ) . '</a>' : '',
 			// import by gid
-			'import'   => $this->ajax_link( 'checkImport', __( "Import", 'contentsync' ), $data ),
+			'import'   => $this->ajax_link( 'checkImport', __( 'Import', 'contentsync' ), $data ),
 			// unexport if this is the root
-			'unexport' => $item->relationship == 'export' ? $this->ajax_link( 'unexportPost', __( "Unlink", 'contentsync' ), $data ) : '',
+			'unexport' => $item->relationship == 'export' ? $this->ajax_link( 'unexportPost', __( 'Unlink', 'contentsync' ), $data ) : '',
 			// unimport if local post exists
-			'unimport' => $item->local_post ? $this->ajax_link( 'unimportPost', __( "Unlink", 'contentsync' ), $data ) : '',
+			'unimport' => $item->local_post ? $this->ajax_link( 'unimportPost', __( 'Unlink', 'contentsync' ), $data ) : '',
 			// trash the local post
-			'trash'    => $item->local_post ? $this->ajax_link( 'trashPost', __( "Trash", 'contentsync' ), $data ) : '',
+			'trash'    => $item->local_post ? $this->ajax_link( 'trashPost', __( 'Trash', 'contentsync' ), $data ) : '',
 			// edit the root
-			'root'     => "<a href='" . $item->post_links['root'] . "'>" . __( "Go to the original post", 'contentsync' ) . '</a>',
+			'root'     => "<a href='" . $item->post_links['root'] . "'>" . __( 'Go to the original post', 'contentsync' ) . '</a>',
 			// repair if error
-			'repair'   => $this->ajax_link( 'repairPost', __( "Repair", 'contentsync' ), $data ),
+			'repair'   => $this->ajax_link( 'repairPost', __( 'Repair', 'contentsync' ), $data ),
 		);
 
 		if ( is_network_admin() ) {
 			// unexport by gid
-			$item->actions['unexport'] = $this->ajax_link( 'unexportPost', __( "Unlink", 'contentsync' ), $data );
+			$item->actions['unexport'] = $this->ajax_link( 'unexportPost', __( 'Unlink', 'contentsync' ), $data );
 			// delete all by gid
-			$item->actions['delete'] = $this->ajax_link( 'deletePost', __( "Delete everywhere", 'contentsync' ), $data );
+			$item->actions['delete'] = $this->ajax_link( 'deletePost', __( 'Delete everywhere', 'contentsync' ), $data );
 		}
 
 		if ( is_network_admin() ) {
@@ -613,14 +612,14 @@ class Global_List_Table extends \WP_List_Table {
 	function get_columns() {
 		$columns = array(
 			'cb'           => '<input type="checkbox" />',
-			'post_title'   => __( "Title", 'contentsync' ),
+			'post_title'   => __( 'Title', 'contentsync' ),
 			'relationship' => __( 'Status', 'contentsync' ),
-			'post_type'    => __( "Post Type", 'contentsync' ),
-			'site_url'     => __( "Source", 'contentsync' ),
-			'usage'        => __( "Usage", 'contentsync' ),
-			'language'     => __( "Language", 'contentsync' ),
-			'options'      => __( "Options", 'contentsync' ),
-			'post_date'    => __( "Date", 'contentsync' ),
+			'post_type'    => __( 'Post Type', 'contentsync' ),
+			'site_url'     => __( 'Source', 'contentsync' ),
+			'usage'        => __( 'Usage', 'contentsync' ),
+			'language'     => __( 'Language', 'contentsync' ),
+			'options'      => __( 'Options', 'contentsync' ),
+			'post_date'    => __( 'Date', 'contentsync' ),
 			'gid'          => 'GID',
 		);
 
@@ -702,7 +701,7 @@ class Global_List_Table extends \WP_List_Table {
 				$options = Main_Helper::get_contentsync_meta( $item, 'contentsync_options' );
 				if ( isset( $options['whole_posttype'] ) && $options['whole_posttype'] ) {
 					if ( $item->post_type == 'tp_posttypes' ) {
-						$title .= '<strong> — ' . __( "Dynamic Post Type incl. posts", 'contentsync' ) . '</strong>';
+						$title .= '<strong> — ' . __( 'Dynamic Post Type incl. posts', 'contentsync' ) . '</strong>';
 					} elseif ( ! isset( array_flip( array( 'page', 'post', 'attachment' ) )[ $item->post_type ] ) ) {
 						$title .= ' — ' . __( 'Dynamic Post', 'contentsync' );
 					}
@@ -723,21 +722,21 @@ class Global_List_Table extends \WP_List_Table {
 			case 'relationship':
 				if ( $item->error ) {
 					if ( Main_Helper::is_error_repaired( $item->error ) ) {
-						return Main_Helper::render_status_box( 'info', __( "Error fixed", 'contentsync' ) );
+						return Main_Helper::render_status_box( 'info', __( 'Error fixed', 'contentsync' ) );
 					} else {
-						return Main_Helper::render_status_box( 'error', __( "Error", 'contentsync' ) );
+						return Main_Helper::render_status_box( 'error', __( 'Error', 'contentsync' ) );
 					}
 				} elseif ( $item->relationship === 'unused' ) {
-					return __( "Not imported", 'contentsync' );
+					return __( 'Not imported', 'contentsync' );
 				} else {
-					$text = $item->relationship == 'export' ? __( "Exported", 'contentsync' ) : __( "Imported", 'contentsync' );
+					$text = $item->relationship == 'export' ? __( 'Exported', 'contentsync' ) : __( 'Imported', 'contentsync' );
 					return Main_Helper::render_status_box( $item->relationship, $text );
 				}
 				break;
 
 			case 'site_url':
 				if ( ! is_network_admin() && $root_blog_id == $blog_id && empty( $root_net_url ) ) {
-					return __( "This site", 'contentsync' );
+					return __( 'This site', 'contentsync' );
 				}
 				// highlight remote posts
 				$nice_url   = strpos( $item->site_url, '://' ) !== false ? explode( '://', $item->site_url )[1] : $item->site_url;
@@ -775,18 +774,18 @@ class Global_List_Table extends \WP_List_Table {
 						if ( is_numeric( $_blog_id ) ) {
 							$class   = empty( $root_net_url ) ? '' : 'remote';
 							$render .= "<a href='{$_post_con["edit"]}' class='{$class}' target='_blank'>{$_post_con["nice"]}</a><br>";
-							$count++;
+							++$count;
 						}
 						// remote posts
 						elseif ( is_array( $_post_con ) ) {
 							foreach ( $_post_con as $__blog_id => $__post_con ) {
 								$class   = $_blog_id == $this->network_url ? '' : 'remote';
 								$render .= "<a href='{$__post_con["edit"]}' class='{$class}' target='_blank'>{$__post_con["nice"]}</a><br>";
-								$count++;
+								++$count;
 							}
 						}
 					}
-					$render = '<div class="overflow-vertical"><strong>' . $count . 'x</strong> ' . ( empty( $root_net_url ) ? __( "Imported", 'contentsync' ) : __( "Imported here", 'contentsync' ) ) . ':<br>' . $render . '</div>';
+					$render = '<div class="overflow-vertical"><strong>' . $count . 'x</strong> ' . ( empty( $root_net_url ) ? __( 'Imported', 'contentsync' ) : __( 'Imported here', 'contentsync' ) ) . ':<br>' . $render . '</div>';
 				}
 
 				// render
@@ -795,7 +794,7 @@ class Global_List_Table extends \WP_List_Table {
 
 			case 'language':
 				if ( ! isset( $item->language ) ) {
-					return $this->make_info_popup( __( "The language of contents from remote sites can not be displayed in the overview.", 'contentsync' ) );
+					return $this->make_info_popup( __( 'The language of contents from remote sites can not be displayed in the overview.', 'contentsync' ) );
 				} elseif ( empty( $item->language ) ) {
 					return '--';
 				} else {
@@ -809,27 +808,27 @@ class Global_List_Table extends \WP_List_Table {
 					$option_infos = array(
 						'append_nested'  => array(
 							'icon'     => 'networking',
-							'active'   => __( "Nested content in this post will also be imported.", 'contentsync' ),
-							'inactive' => __( "Nested content in this post will NOT be imported with it.", 'contentsync' ),
+							'active'   => __( 'Nested content in this post will also be imported.', 'contentsync' ),
+							'inactive' => __( 'Nested content in this post will NOT be imported with it.', 'contentsync' ),
 						),
 						'translations'   => array(
 							'icon'     => 'translation',
-							'active'   => __( "All translations of this post will be imported.", 'contentsync' ),
-							'inactive' => __( "The translations of this post will NOT be imported.", 'contentsync' ),
+							'active'   => __( 'All translations of this post will be imported.', 'contentsync' ),
+							'inactive' => __( 'The translations of this post will NOT be imported.', 'contentsync' ),
 						),
 						'resolve_menus'  => array(
 							'icon'     => 'menu-alt',
-							'active'   => __( "Menus in the content of this post will be dissolved.", 'contentsync' ),
-							'inactive' => __( "Menus in the content of this post will NOT be dissolved.", 'contentsync' ),
+							'active'   => __( 'Menus in the content of this post will be dissolved.', 'contentsync' ),
+							'inactive' => __( 'Menus in the content of this post will NOT be dissolved.', 'contentsync' ),
 						),
 						'whole_posttype' => $item->post_type == 'tp_posttypes' ? array(
 							'icon'     => 'rss',
-							'active'   => __( "All posts of this post type are automatically displayed on the same pages as this post.", 'contentsync' ),
-							'inactive' => __( "The posts of this post type will NOT be imported.", 'contentsync' ),
+							'active'   => __( 'All posts of this post type are automatically displayed on the same pages as this post.', 'contentsync' ),
+							'inactive' => __( 'The posts of this post type will NOT be imported.', 'contentsync' ),
 						) : array(
 							'icon'     => 'rss',
-							'active'   => __( "This post was automatically made global and played on the same pages as the parent post type.", 'contentsync' ),
-							'inactive' => __( "This post was manually made global.", 'contentsync' ),
+							'active'   => __( 'This post was automatically made global and played on the same pages as the parent post type.', 'contentsync' ),
+							'inactive' => __( 'This post was manually made global.', 'contentsync' ),
 						),
 					);
 					foreach ( $option_infos as $name => $info ) {
@@ -837,7 +836,7 @@ class Global_List_Table extends \WP_List_Table {
 						$render .= $this->make_info_popup( $info[ $active ], $info['icon'], $active );
 					}
 				} else {
-					$render = $this->make_info_popup( __( "The options for content from external websites cannot be displayed in the overview.", 'contentsync' ) );
+					$render = $this->make_info_popup( __( 'The options for content from external websites cannot be displayed in the overview.', 'contentsync' ) );
 				}
 				return $render;
 				break;
@@ -877,7 +876,7 @@ class Global_List_Table extends \WP_List_Table {
 		$relationship = $blog_id == $root_blog_id && empty( $root_net_url ) ? 'export' : 'unused';
 
 		// we're only watching imported posts anyway...
-		if ( isset($_GET['rel']) && $_GET['rel'] === 'import' ) {
+		if ( isset( $_GET['rel'] ) && $_GET['rel'] === 'import' ) {
 			$relationship = 'import';
 		}
 		// root post from this network
@@ -942,11 +941,11 @@ class Global_List_Table extends \WP_List_Table {
 		// debug($post);
 		return '<input 
 				type="checkbox" 
-				name="'.$option.'" 
-				data-pt="'.$post->post_type.'" 
-				data-title="'.rawurlencode($post->post_title).'" 
-				data-rel="'.$this->get_contentsync_relationship( $post ).'" 
-				value="'.$gid.'" />';
+				name="' . $option . '" 
+				data-pt="' . $post->post_type . '" 
+				data-title="' . rawurlencode( $post->post_title ) . '" 
+				data-rel="' . $this->get_contentsync_relationship( $post ) . '" 
+				value="' . $gid . '" />';
 	}
 
 	/**
@@ -957,23 +956,23 @@ class Global_List_Table extends \WP_List_Table {
 	public function get_bulk_actions() {
 		if ( is_network_admin() ) {
 			$actions = array(
-				'unexport' => __( "Unlink", 'contentsync' ),
-				'delete'   => __( "Delete everywhere", 'contentsync' ),
+				'unexport' => __( 'Unlink', 'contentsync' ),
+				'delete'   => __( 'Delete everywhere', 'contentsync' ),
 			);
 		} else {
 			$actions = array(
-				'unlink' => __( "Unlink", 'contentsync' ),
-				'import'     => __("Import", "contentsync"),
-				'trash'  => __( "Trash", 'contentsync' ),
+				'unlink' => __( 'Unlink', 'contentsync' ),
+				'import' => __( 'Import', 'contentsync' ),
+				'trash'  => __( 'Trash', 'contentsync' ),
 			);
 
 			if ( ! is_multisite() ) {
-				$actions['delete'] = __( "Delete everywhere", 'contentsync' );
+				$actions['delete'] = __( 'Delete everywhere', 'contentsync' );
 			}
 		}
 
 		if ( isset( $_GET['rel'] ) && $_GET['rel'] === 'errors' ) {
-			$actions['repair'] = __( "Repair", 'contentsync' );
+			$actions['repair'] = __( 'Repair', 'contentsync' );
 		}
 
 		return $actions;
@@ -1081,17 +1080,17 @@ class Global_List_Table extends \WP_List_Table {
 
 				// // comes from this site
 				// if ( $root_blog_id === get_current_blog_id() && empty( $cur_net_url ) ) {
-				// 	continue;
+				// continue;
 				// }
 
 				// // already imported
 				// if ( $post = Main_Helper::get_local_post_by_gid( $gid ) ) {
-				// 	continue;
+				// continue;
 				// }
 
 				// $result = Actions::contentsync_import_post( $gid );
 				// if ( $result === true && $post = get_post( $result ) ) {
-				// 	$post_titles[] = $post->post_title;
+				// $post_titles[] = $post->post_title;
 				// }
 			}
 
@@ -1140,7 +1139,7 @@ class Global_List_Table extends \WP_List_Table {
 				echo "<input type='hidden' name='gids' value='" . json_encode( $gids ) . "'>
 					<input type='hidden' name='action' value='delete_confirmed'>
 					<button type='submit' class='button button-primary' style='margin-bottom: 1em;'>
-						" . __( "Delete post irrevocably now", 'contentsync' ) . '
+						" . __( 'Delete post irrevocably now', 'contentsync' ) . '
 					</button>
 				</form></div>';
 				$notice_content = ob_get_contents();
@@ -1168,44 +1167,42 @@ class Global_List_Table extends \WP_List_Table {
 					if ( ! is_string( $result ) ) {
 						$result = true;
 					}
-				} else {
-					if ( ! is_string( $result ) ) {
+				} elseif ( ! is_string( $result ) ) {
 						$result = Main_Helper::get_error_repaired_log( $error );
-					} else {
-						$result .= ' ' . Main_Helper::get_error_repaired_log( $error );
-					}
+				} else {
+					$result .= ' ' . Main_Helper::get_error_repaired_log( $error );
 				}
 			}
 		}
 
 		$notices = array(
 			'unlink'           => array(
-				'success' => __( "The link between the posts %s has been successfully resolved.", 'contentsync' ),
-				'fail'    => __( "There were errors in resolving the links.", 'contentsync' ),
+				'success' => __( 'The link between the posts %s has been successfully resolved.', 'contentsync' ),
+				'fail'    => __( 'There were errors in resolving the links.', 'contentsync' ),
 			),
 			'delete'           => array(
-				'success' => __( "The link between the posts %s has been successfully resolved.", 'contentsync' ),
-				'fail'    => __( "There were errors in resolving the links.", 'contentsync' ),
+				'success' => __( 'The link between the posts %s has been successfully resolved.', 'contentsync' ),
+				'fail'    => __( 'There were errors in resolving the links.', 'contentsync' ),
 			),
 			'import'           => array(
-				'success' => __( "The posts %s were successfully imported.", 'contentsync' ),
-				'fail'    => __( "There were errors when importing the posts.", 'contentsync' ),
+				'success' => __( 'The posts %s were successfully imported.', 'contentsync' ),
+				'fail'    => __( 'There were errors when importing the posts.', 'contentsync' ),
 			),
 			'trash'            => array(
-				'success' => __( "The posts %s were successfully moved to the trash.", 'contentsync' ),
-				'fail'    => __( "There were errors when moving the posts to the trash.", 'contentsync' ),
+				'success' => __( 'The posts %s were successfully moved to the trash.', 'contentsync' ),
+				'fail'    => __( 'There were errors when moving the posts to the trash.', 'contentsync' ),
 			),
 			'delete'           => array(
-				'success' => __( "Are you sure you want to delete the global content %s everywhere? This action cannot be undone.", 'contentsync' ),
-				'fail'    => __( "There were errors when deleting the content.", 'contentsync' ),
+				'success' => __( 'Are you sure you want to delete the global content %s everywhere? This action cannot be undone.', 'contentsync' ),
+				'fail'    => __( 'There were errors when deleting the content.', 'contentsync' ),
 			),
 			'delete_confirmed' => array(
-				'success' => __( "The global content %s has been permanently deleted on all sites.", 'contentsync' ),
-				'fail'    => __( "There were errors when deleting the content.", 'contentsync' ),
+				'success' => __( 'The global content %s has been permanently deleted on all sites.', 'contentsync' ),
+				'fail'    => __( 'There were errors when deleting the content.', 'contentsync' ),
 			),
 			'repair'           => array(
-				'success' => __( "The global content has been successfully repaired. In this overview, the old error messages are still displayed. When you refresh this page, you should no longer see the errors.", 'contentsync' ),
-				'fail'    => __( "Errors occurred while repairing the contents. All error messages are still displayed in this overview. If you refresh this page, you will see the bugs that have not yet been fixed.", 'contentsync' ),
+				'success' => __( 'The global content has been successfully repaired. In this overview, the old error messages are still displayed. When you refresh this page, you should no longer see the errors.', 'contentsync' ),
+				'fail'    => __( 'Errors occurred while repairing the contents. All error messages are still displayed in this overview. If you refresh this page, you will see the bugs that have not yet been fixed.', 'contentsync' ),
 			),
 		);
 
@@ -1222,7 +1219,7 @@ class Global_List_Table extends \WP_List_Table {
 			$notice_class = 'error';
 			$content      = $notices[ $bulk_action ]['fail'];
 			if ( is_string( $result ) && ! empty( $result ) ) {
-				$content .= ' ' . __( "Error message:", 'contentsync' ) . ' ' . $result;
+				$content .= ' ' . __( 'Error message:', 'contentsync' ) . ' ' . $result;
 			}
 		}
 
@@ -1236,7 +1233,6 @@ class Global_List_Table extends \WP_List_Table {
 	 *                          SORT CALLBACKS
 	 * =================================================================
 	 */
-
 	public function sort_alphabet( $a, $b ) {
 		return strcasecmp( $b, $a );
 	}

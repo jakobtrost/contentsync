@@ -18,7 +18,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 	/**
 	 * Store removed Polylang hooks to restore them later.
-	 * 
+	 *
 	 * @var array
 	 */
 	private static $removed_hooks = array();
@@ -46,11 +46,11 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 		// If Polylang is already loaded, no initialization needed
 		if ( function_exists( 'PLL' ) || function_exists( 'pll_get_post_language' ) ) {
-			do_action( 'synced_post_export_log', "  - Polylang is already loaded." );
+			do_action( 'post_export_log', '  - Polylang is already loaded.' );
 			return true;
 		}
 
-		do_action( 'synced_post_export_log', "  - Polylang is not loaded, initializing environment." );
+		do_action( 'post_export_log', '  - Polylang is not loaded, initializing environment.' );
 
 		// Register language taxonomies for database queries
 		$this->register_taxonomies();
@@ -165,7 +165,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 * Set the language for a post.
 	 *
 	 * @since 2.19.0
-	 * @param int $post_id Post ID.
+	 * @param int    $post_id Post ID.
 	 * @param string $language_code Language code.
 	 * @return bool True on success, false on failure.
 	 */
@@ -186,11 +186,10 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 			if ( $result ) {
 				$this->log( sprintf( "  - set language of post '%s' to '%s'.", $post_id, $language_code ) );
-			}
-			else {
+			} else {
 				$this->log( sprintf( "  - failed to set language of post '%s' to '%s'.", $post_id, $language_code ) );
 			}
-			
+
 			return $result;
 		}
 
@@ -201,11 +200,11 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 * Set translation relationships for a post during import.
 	 *
 	 * @since 2.19.0
-	 * @param int $post_id Current post ID.
+	 * @param int    $post_id Current post ID.
 	 * @param string $language_code Language code.
-	 * @param array $original_post_ids Original post IDs from export (lang => id).
-	 * @param array $language_args Polylang-specific arguments.
-	 * @param array $imported_post_map Map of original IDs to new IDs.
+	 * @param array  $original_post_ids Original post IDs from export (lang => id).
+	 * @param array  $language_args Polylang-specific arguments.
+	 * @param array  $imported_post_map Map of original IDs to new IDs.
 	 * @return bool
 	 */
 	public function set_translations_from_import( $post_id, $language_code, $original_post_ids, $language_args, $imported_post_map ) {
@@ -220,7 +219,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 		// Check if all translations are imported
 		// Map original post IDs to current site IDs
 		$translation_map = array();
-		$check = 0;
+		$check           = 0;
 
 		foreach ( $original_post_ids as $lang => $original_id ) {
 			// Get the new ID on this site
@@ -228,7 +227,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 			if ( ! empty( $current_id ) ) {
 				$translation_map[ $lang ] = $current_id;
-				$check++;
+				++$check;
 			}
 		}
 
@@ -238,8 +237,8 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 		// // Only proceed if all translations have been imported
 		// if ( count( $original_post_ids ) != $check ) {
-		// 	$this->log( sprintf( "  - Not all translations imported yet (%d of %d). Skipping translation setup.", $check, count( $original_post_ids ) ) );
-		// 	return false;
+		// $this->log( sprintf( "  - Not all translations imported yet (%d of %d). Skipping translation setup.", $check, count( $original_post_ids ) ) );
+		// return false;
 		// }
 
 		// Make sure the language term is set for this post
@@ -254,7 +253,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 		// Set the translations using Polylang
 		if ( function_exists( 'pll_save_post_translations' ) ) {
 			$result = pll_save_post_translations( $translation_map );
-			
+
 			if ( ! empty( $result ) ) {
 				$this->log( "\r\n" . 'Set translations:', $translation_map );
 				return true;
@@ -273,7 +272,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 *
 	 * @since 2.19.0
 	 * @param \Contentsync\Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
-	 * @param bool $include_translations Whether to include translation post IDs.
+	 * @param bool                                    $include_translations Whether to include translation post IDs.
 	 * @return array Language data structure.
 	 */
 	public function prepare_post_language_data( $post, $include_translations = false ) {
@@ -328,7 +327,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 *
 	 * @since 2.19.0
 	 * @param \Contentsync\Prepared_Post|object $post Prepared_Post object with language property.
-	 * @param array $already_imported_posts Map of original post IDs to new post IDs.
+	 * @param array                             $already_imported_posts Map of original post IDs to new post IDs.
 	 * @return array Analysis result.
 	 */
 	public function analyze_translation_import( $post, $already_imported_posts = array() ) {
@@ -433,10 +432,12 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	private function register_taxonomies() {
 		// Get Polylang options from database
 		$polylang_options     = get_option( 'polylang', array() );
-		$translated_posttypes = array_values( wp_parse_args(
-			isset( $polylang_options['post_types'] ) ? $polylang_options['post_types'] : array(),
-			array( 'post', 'page', 'wp_block' ) // Default Polylang post types
-		) );
+		$translated_posttypes = array_values(
+			wp_parse_args(
+				isset( $polylang_options['post_types'] ) ? $polylang_options['post_types'] : array(),
+				array( 'post', 'page', 'wp_block' ) // Default Polylang post types
+			)
+		);
 
 		// Register 'language' taxonomy for each translated post type
 		foreach ( $translated_posttypes as $posttype ) {
@@ -467,10 +468,10 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 	/**
 	 * Check if Polylang plugin is loaded in memory.
-	 * 
+	 *
 	 * This checks if the Polylang plugin code is loaded, which can be different
 	 * from whether it's active/configured for the current blog in multisite.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @return bool True if Polylang is loaded, false otherwise.
 	 */
@@ -480,13 +481,13 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 	/**
 	 * Temporarily disable Polylang sync hooks if it's loaded but not configured.
-	 * 
+	 *
 	 * This prevents fatal errors when Polylang is loaded globally (in a multisite)
 	 * but not configured for the current blog we switched to.
-	 * 
+	 *
 	 * Also adds a filter to clean up Polylang taxonomies that might still be
 	 * registered after a blog switch.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @return bool True if hooks were removed, false if nothing was done.
 	 */
@@ -513,7 +514,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 		$sync = isset( $polylang->sync ) ? $polylang->sync : null;
 
 		// Also get the sub-sync objects
-		$sync_tax = isset( $sync->taxonomies ) ? $sync->taxonomies : null;
+		$sync_tax        = isset( $sync->taxonomies ) ? $sync->taxonomies : null;
 		$sync_post_metas = isset( $sync->post_metas ) ? $sync->post_metas : null;
 		$sync_term_metas = isset( $sync->term_metas ) ? $sync->term_metas : null;
 
@@ -568,7 +569,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 		$removed_count = count( self::$removed_hooks );
 		// if ( $removed_count > 0 ) {
-		// 	$this->log( sprintf( 'Removed %d Polylang hooks', $removed_count ) );
+		// $this->log( sprintf( 'Removed %d Polylang hooks', $removed_count ) );
 		// }
 
 		return $removed_count > 0;
@@ -576,9 +577,9 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 	/**
 	 * Restore Polylang sync hooks that were temporarily removed.
-	 * 
+	 *
 	 * Also removes the taxonomy cleanup filter.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @return bool True if hooks were restored, false if nothing was done.
 	 */
@@ -611,11 +612,11 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 	/**
 	 * Helper method to remove a hook if it exists and store it for later restoration.
-	 * 
+	 *
 	 * @since 2.19.0
-	 * @param string $hook Hook name.
+	 * @param string   $hook Hook name.
 	 * @param callable $callback Callback function.
-	 * @param int $args Number of arguments.
+	 * @param int      $args Number of arguments.
 	 * @return bool True if hook was removed, false otherwise.
 	 */
 	private function remove_hook_if_exists( $hook, $callback, $args = 1 ) {
@@ -626,7 +627,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 		}
 
 		remove_filter( $hook, $callback, $priority );
-		
+
 		self::$removed_hooks[] = array(
 			'hook'     => $hook,
 			'callback' => $callback,
@@ -639,13 +640,13 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 	/**
 	 * Cleanup Polylang taxonomies before they are prepared for export.
-	 * 
+	 *
 	 * We need to remove the 'language' & 'post_translations' taxonomies, because in
 	 * multisite environments, they might still be registered after a blog switch
 	 * even when Polylang is not configured for the current blog.
-	 * 
+	 *
 	 * This method is used as a filter callback when Polylang is loaded but not active.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @param array $taxonomies The taxonomies to be prepared.
 	 * @return array The filtered taxonomies.
@@ -662,22 +663,22 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 /**
  * Skip Polylang taxonomies during import.
- * 
+ *
  * @since 2.19.0
  * @filter contentsync_import_skip_taxonomy
- * 
- * @param bool $skip            Whether to skip the taxonomy.
- * @param string $taxonomy      The taxonomy to skip.
- * @param array $terms          The terms to skip.
+ *
+ * @param bool          $skip            Whether to skip the taxonomy.
+ * @param string        $taxonomy      The taxonomy to skip.
+ * @param array         $terms          The terms to skip.
  * @param Prepared_Post $post  The Prepared_Post object.
- * 
+ *
  * @return bool Whether to skip the taxonomy.
  */
 function skip_post_translations_taxonomies_during_post_import( $skip, $taxonomy, $terms, $post ) {
 
 	// always skip 'post_translations' taxonomy
 	if ( $taxonomy === 'post_translations' ) {
-		do_action( 'synced_post_export_log', "  - taxonomy '{$taxonomy}' is skipped." );
+		do_action( 'post_export_log', "  - taxonomy '{$taxonomy}' is skipped." );
 		return true;
 	}
 
@@ -689,14 +690,14 @@ add_filter( 'contentsync_import_skip_taxonomy', __NAMESPACE__ . '\skip_post_tran
 
 /**
  * Skip language terms before inserting them during import.
- * 
+ *
  * @since 2.19.0
  * @filter contentsync_import_terms_before_insert
- * 
- * @param array $terms          The terms to be inserted.
- * @param string $taxonomy      The taxonomy.
+ *
+ * @param array         $terms          The terms to be inserted.
+ * @param string        $taxonomy      The taxonomy.
  * @param Prepared_Post $post  The Prepared_Post object.
- * 
+ *
  * @return array The filtered terms.
  */
 function skip_unsupported_language_terms_during_post_import( $terms, $taxonomy, $post ) {
@@ -704,7 +705,7 @@ function skip_unsupported_language_terms_during_post_import( $terms, $taxonomy, 
 	if ( $taxonomy !== 'language' ) {
 		return $terms;
 	}
-	
+
 	if ( ! function_exists( 'pll_languages_list' ) ) {
 		return $terms;
 	}
@@ -713,17 +714,20 @@ function skip_unsupported_language_terms_during_post_import( $terms, $taxonomy, 
 	$language_slugs = pll_languages_list();
 
 	// filter the terms to only include the language slugs
-	$terms = array_filter( $terms, function( $term ) use ( $language_slugs, $taxonomy ) {
-		if ( ! is_array( $term ) ) {
-			$term = (array) $term;
+	$terms = array_filter(
+		$terms,
+		function ( $term ) use ( $language_slugs, $taxonomy ) {
+			if ( ! is_array( $term ) ) {
+				$term = (array) $term;
+			}
+			if ( ! isset( $term['slug'] ) ) {
+				return false;
+			}
+			$skip = in_array( $term['slug'], $language_slugs );
+			do_action( 'post_export_log', "  - term '{$term['name']}' of taxonomy '{$taxonomy}' is skipped: " . ( $skip ? 'true' : 'false' ) );
+			return $skip;
 		}
-		if ( ! isset( $term['slug'] ) ) {
-			return false;
-		}
-		$skip = in_array( $term['slug'], $language_slugs );
-		do_action( 'synced_post_export_log', "  - term '{$term['name']}' of taxonomy '{$taxonomy}' is skipped: " . ( $skip ? 'true' : 'false' ) );
-		return $skip;
-	} );
+	);
 
 	return $terms;
 }

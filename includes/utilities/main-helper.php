@@ -1,42 +1,42 @@
 <?php
 /**
  * Helper functions for the global contents class
- * 
- * The `Main_Helper` class offers a suite of helper functions that underpin the global 
- * contents system. It encapsulates operations for retrieving global posts by their 
- * unique global ID, preparing posts for import, splitting global IDs into their 
- * component parts and aggregating posts across multisite networks or remote sites.  
- * By centralising these operations into static methods, the helper promotes reuse 
+ *
+ * The `Main_Helper` class offers a suite of helper functions that underpin the global
+ * contents system. It encapsulates operations for retrieving global posts by their
+ * unique global ID, preparing posts for import, splitting global IDs into their
+ * component parts and aggregating posts across multisite networks or remote sites.
+ * By centralising these operations into static methods, the helper promotes reuse
  * and reduces duplication throughout the distribution codebase.
- * 
- * An instance of `Main_Helper` is created when the file loads. The constructor adds 
- * a filter to merge additional meta keys into the export blacklist. Many of the 
- * methods are static and can be called without instantiating the class again. The 
- * `get_global_post` method accepts a global ID string, caches results in object and 
- * transient caches and uses `Remote_Operations` to fetch posts from remote networks 
- * when necessary. It returns a `Synced_Post` object or `null` and applies a filter to 
- * allow customisation of the result. The companion `prepare_global_post_for_import` 
- * method resolves all dependent posts for a given global ID and merges query 
- * arguments with options stored in post meta. On remote networks it delegates to 
+ *
+ * An instance of `Main_Helper` is created when the file loads. The constructor adds
+ * a filter to merge additional meta keys into the export blacklist. Many of the
+ * methods are static and can be called without instantiating the class again. The
+ * `get_global_post` method accepts a global ID string, caches results in object and
+ * transient caches and uses `Remote_Operations` to fetch posts from remote networks
+ * when necessary. It returns a `Synced_Post` object or `null` and applies a filter to
+ * allow customisation of the result. The companion `prepare_global_post_for_import`
+ * method resolves all dependent posts for a given global ID and merges query
+ * arguments with options stored in post meta. On remote networks it delegates to
  * `Remote_Operations` to fetch prepared data.
- * 
- * The helper also provides functions to derive and interpret global IDs. The 
- * `get_gid` method retrieves a global ID for a post using a filter for customisation, 
- * while `get_post_id_by_gid` finds a local post ID by global ID. The `explode_gid` 
- * method splits a global ID into blog ID, post ID and site URL components and exposes 
- * filters to adjust each part. Aggregation functions such as `get_all_global_posts` 
- * and `get_all_network_posts` return arrays of global posts from both the local 
- * multisite network and connected remote networks, using caching and remote operations 
- * to improve performance. Dozens of additional methods handle tasks like switching 
- * blogs, retrieving network URLs, collecting blog lists and creating connection maps.  
- * Because these functions interact closely with WordPress multisite APIs and remote 
- * requests, you should exercise care when using them and ensure that network 
+ *
+ * The helper also provides functions to derive and interpret global IDs. The
+ * `get_gid` method retrieves a global ID for a post using a filter for customisation,
+ * while `get_post_id_by_gid` finds a local post ID by global ID. The `explode_gid`
+ * method splits a global ID into blog ID, post ID and site URL components and exposes
+ * filters to adjust each part. Aggregation functions such as `get_all_global_posts`
+ * and `get_all_network_posts` return arrays of global posts from both the local
+ * multisite network and connected remote networks, using caching and remote operations
+ * to improve performance. Dozens of additional methods handle tasks like switching
+ * blogs, retrieving network URLs, collecting blog lists and creating connection maps.
+ * Because these functions interact closely with WordPress multisite APIs and remote
+ * requests, you should exercise care when using them and ensure that network
  * connections and caches are correctly configured.
  */
 
 namespace Contentsync;
 
-use \Contentsync\Connections\Remote_Operations;
+use Contentsync\Connections\Remote_Operations;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -49,7 +49,7 @@ class Main_Helper {
 		add_filter( 'contentsync_export_blacklisted_meta', array( $this, 'add_blacklisted_meta' ) );
 
 		// add_filter( 'wp_get_attachment_url', array( $this, '__unstable_filter_global_attachment_url' ), 10, 2 );
-		
+
 		add_filter( 'upload_dir', array( $this, 'filter_wp_upload_dir' ), 98, 1 );
 
 		// Mark Contentsync meta keys as protected to prevent syncing by translation plugins.
@@ -125,16 +125,16 @@ class Main_Helper {
 
 		/**
 		 * Filter to modify the global post object before returning.
-		 * 
+		 *
 		 * This filter allows developers to customize the global post object
 		 * that is retrieved by GID, enabling modifications to post data,
 		 * structure, or additional processing before the post is returned.
-		 * 
+		 *
 		 * @filter contentsync_get_global_post
-		 * 
+		 *
 		 * @param WP_Post|null $post The global post object or null if not found.
 		 * @param string      $gid  The global ID of the post.
-		 * 
+		 *
 		 * @return WP_Post|null The modified global post object or null.
 		 */
 		return apply_filters( 'contentsync_get_global_post', $post ?? null, $gid );
@@ -169,13 +169,13 @@ class Main_Helper {
 
 					if ( $post->post_type === 'tp_posttypes' && $args['whole_posttype'] ) {
 						$args['query_args'] = array(
-							'meta_query'  => array(
+							'meta_query' => array(
 								array(
 									'key'     => 'synced_post_status',
 									'value'   => 'root',
 									'compare' => 'LIKE',
-								)
-							)
+								),
+							),
 						);
 					}
 
@@ -211,16 +211,16 @@ class Main_Helper {
 	public static function get_gid( $post ) {
 		/**
 		 * Filter to modify the global ID before returning.
-		 * 
+		 *
 		 * This filter allows developers to customize how the global ID
 		 * is retrieved or formatted, enabling modifications to the ID
 		 * structure or additional processing before it's returned.
-		 * 
+		 *
 		 * @filter contentsync_get_gid
-		 * 
+		 *
 		 * @param string|bool $gid  The global ID or false if not found.
 		 * @param WP_Post|string $post The post object or post ID.
-		 * 
+		 *
 		 * @return string|bool The modified global ID or false.
 		 */
 		return apply_filters(
@@ -232,19 +232,21 @@ class Main_Helper {
 
 	/**
 	 * Get a WP_Post ID by global ID.
-	 * 
+	 *
 	 * @param string $gid     eg. '1-1234' or '1-1234-http://example.com'
-	 * 
+	 *
 	 * @return int            Post ID on success, 0 on failure.
 	 */
 	public static function get_post_id_by_gid( $gid ) {
-		$result = self::get_posts( array(
-			'posts_per_page' => 1,
-			'post_type'      => 'any',
-			'meta_key'       => 'synced_post_id',
-			'meta_value'     => $gid,
-			'fields'         => 'ids',
-		) );
+		$result = self::get_posts(
+			array(
+				'posts_per_page' => 1,
+				'post_type'      => 'any',
+				'meta_key'       => 'synced_post_id',
+				'meta_value'     => $gid,
+				'fields'         => 'ids',
+			)
+		);
 		return $result ? $result[0] : 0;
 	}
 
@@ -271,47 +273,47 @@ class Main_Helper {
 
 		/**
 		 * Filter to modify the blog ID component of the exploded GID.
-		 * 
+		 *
 		 * @filter contentsync_explode_gid_blog_id
-		 * 
+		 *
 		 * @param string|null $blog_id The blog ID component of the GID.
-		 * 
+		 *
 		 * @return string|null The modified blog ID component.
 		 */
 		$exploded[0] = apply_filters( 'contentsync_explode_gid_blog_id', $exploded[0] );
-		
+
 		/**
 		 * Filter to modify the post ID component of the exploded GID.
-		 * 
+		 *
 		 * @filter contentsync_explode_gid_post_id
-		 * 
+		 *
 		 * @param string|null $post_id The post ID component of the GID.
-		 * 
+		 *
 		 * @return string|null The modified post ID component.
 		 */
 		$exploded[1] = apply_filters( 'contentsync_explode_gid_post_id', $exploded[1] );
-		
+
 		/**
 		 * Filter to modify the site URL component of the exploded GID.
-		 * 
+		 *
 		 * @filter contentsync_explode_gid_site_url
-		 * 
+		 *
 		 * @param string|null $site_url The site URL component of the GID.
-		 * 
+		 *
 		 * @return string|null The modified site URL component.
 		 */
 		$exploded[2] = apply_filters( 'contentsync_explode_gid_site_url', $exploded[2] );
 
 		/**
 		 * Filter to modify the complete exploded GID array.
-		 * 
+		 *
 		 * This filter allows developers to customize the complete array
 		 * of exploded GID components after individual component filtering.
-		 * 
+		 *
 		 * @filter contentsync_explode_gid
-		 * 
+		 *
 		 * @param array $exploded Array containing [blog_id, post_id, site_url].
-		 * 
+		 *
 		 * @return array The modified exploded GID array.
 		 */
 		return apply_filters( 'contentsync_explode_gid', $exploded );
@@ -361,7 +363,7 @@ class Main_Helper {
 
 					// set persistent cache
 					set_transient( $_cache_key, $posts, HOUR_IN_SECONDS );
-					
+
 					$all_global_posts = array_merge( $all_global_posts, $posts );
 				}
 			}
@@ -369,17 +371,17 @@ class Main_Helper {
 
 		/**
 		 * Filter to modify the complete array of global posts before returning.
-		 * 
+		 *
 		 * This filter allows developers to customize the complete array of global
 		 * posts retrieved from both network and remote sources, enabling
 		 * modifications to post data, filtering, or additional processing.
-		 * 
+		 *
 		 * @filter contentsync_get_all_global_posts
-		 * 
+		 *
 		 * @param array $all_global_posts Array of all global posts.
 		 * @param string|array $query Search query or query arguments.
 		 * @param string $network_url Network URL filter.
-		 * 
+		 *
 		 * @return array Modified array of all global posts.
 		 */
 		return apply_filters( 'contentsync_get_all_global_posts', $all_global_posts, $query, $network_url );
@@ -416,16 +418,16 @@ class Main_Helper {
 
 		/**
 		 * Filter to modify the array of network posts before returning.
-		 * 
+		 *
 		 * This filter allows developers to customize the array of global
 		 * posts retrieved from the current multisite network, enabling
 		 * modifications to post data, filtering, or additional processing.
-		 * 
+		 *
 		 * @filter contentsync_get_all_network_posts
-		 * 
+		 *
 		 * @param array $all_network_posts Array of all network posts.
 		 * @param string|array $query Search query or query arguments.
-		 * 
+		 *
 		 * @return array Modified array of all network posts.
 		 */
 		return apply_filters( 'contentsync_get_all_network_posts', $all_network_posts, $query );
@@ -489,18 +491,18 @@ class Main_Helper {
 
 		/**
 		 * Filter to modify the array of blog global posts before returning.
-		 * 
+		 *
 		 * This filter allows developers to customize the array of global
 		 * posts retrieved from a specific blog, enabling modifications
 		 * to post data, filtering, or additional processing.
-		 * 
+		 *
 		 * @filter contentsync_get_blog_global_posts
-		 * 
+		 *
 		 * @param array $posts Array of global posts from the blog.
 		 * @param int $blog_id The blog ID.
 		 * @param string $filter_status The filter status used.
 		 * @param string|array $query Search query or query arguments.
-		 * 
+		 *
 		 * @return array Modified array of blog global posts.
 		 */
 		return apply_filters( 'contentsync_get_blog_global_posts', $posts, $blog_id, $filter_status, $query );
@@ -527,11 +529,11 @@ class Main_Helper {
 
 		$result = self::get_posts(
 			array(
-				'posts_per_page'   => 1,
-				'post_type'        => $post_type,
-				'meta_key'         => 'synced_post_id',
-				'meta_value'       => $gid,
-				'post_status'      => array( 'publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit' )
+				'posts_per_page' => 1,
+				'post_type'      => $post_type,
+				'meta_key'       => 'synced_post_id',
+				'meta_value'     => $gid,
+				'post_status'    => array( 'publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit' ),
 			)
 		);
 
@@ -541,17 +543,17 @@ class Main_Helper {
 
 		/**
 		 * Filter to modify the local post retrieved by GID before returning.
-		 * 
+		 *
 		 * This filter allows developers to customize the local post object
 		 * that is retrieved by global ID, enabling modifications to post
 		 * data, structure, or additional processing.
-		 * 
+		 *
 		 * @filter contentsync_get_local_post_by_gid
-		 * 
+		 *
 		 * @param WP_Post|bool $local_post The local post object or false if not found.
 		 * @param string $gid The global ID used for retrieval.
 		 * @param string $post_type The post type filter used.
-		 * 
+		 *
 		 * @return WP_Post|bool The modified local post object or false.
 		 */
 		return apply_filters( 'contentsync_get_local_post_by_gid', $local_post, $gid, $post_type );
@@ -659,9 +661,9 @@ class Main_Helper {
 
 			/**
 			 * @since 1.7.0 If the post is not linked, we don't need to do anything.
-			 * 
+			 *
 			 * @filter contentsync_get_global_permalink
-			 * 
+			 *
 			 * @param string  $permalink The new permalink.
 			 * @param WP_Post $post      Post object.
 			 * @param string  $permalink The original permalink (if any)
@@ -674,9 +676,9 @@ class Main_Helper {
 
 			/**
 			 * (1) Yoast canonical url
-			 * 
+			 *
 			 * @filter contentsync_get_global_permalink
-			 * 
+			 *
 			 * @param string  $permalink The new permalink.
 			 * @param WP_Post $post      Post object.
 			 * @param string  $original  The original permalink (if any)
@@ -689,9 +691,9 @@ class Main_Helper {
 
 			/**
 			 * (1) Rankmath canonical url
-			 * 
+			 *
 			 * @filter contentsync_get_global_permalink
-			 * 
+			 *
 			 * @param string  $permalink The new permalink.
 			 * @param WP_Post $post      Post object.
 			 * @param string  $original  The original permalink (if any)
@@ -704,9 +706,9 @@ class Main_Helper {
 
 			/**
 			 * (2) Global canonical URL
-			 * 
+			 *
 			 * @filter contentsync_get_global_permalink
-			 * 
+			 *
 			 * @param string  $permalink The new permalink.
 			 * @param WP_Post $post      Post object.
 			 * @param string  $original The original permalink (if any)
@@ -716,9 +718,9 @@ class Main_Helper {
 
 		/**
 		 * (3) The default permalink.
-		 * 
+		 *
 		 * @filter contentsync_get_global_permalink
-		 * 
+		 *
 		 * @param string  $permalink The new permalink.
 		 * @param WP_Post $post      Post object.
 		 * @param string  $permalink The original permalink (if any)
@@ -818,16 +820,12 @@ class Main_Helper {
 				}
 
 				// remove the connection
-				else {
-					if ( empty( $post_site_url ) ) {
+				elseif ( empty( $post_site_url ) ) {
 						unset( $connection_map[ $key ] );
-					} else {
-						if ( isset( $connection_map[ $post_site_url ] ) ) {
-							unset( $connection_map[ $post_site_url ][ $key ] );
-							if ( empty( $connection_map[ $post_site_url ] ) ) {
-								unset( $connection_map[ $post_site_url ] );
-							}
-						}
+				} elseif ( isset( $connection_map[ $post_site_url ] ) ) {
+						unset( $connection_map[ $post_site_url ][ $key ] );
+					if ( empty( $connection_map[ $post_site_url ] ) ) {
+						unset( $connection_map[ $post_site_url ] );
 					}
 				}
 			}
@@ -883,14 +881,13 @@ class Main_Helper {
 			if ( is_object( $post_id ) || is_array( $post_id ) ) {
 				$post = (object) $post_id;
 				if ( isset( $post->meta ) ) {
-					$post->meta = (array) $post->meta;
-					$connection_map      = isset( $post->meta[ 'contentsync_connection_map' ] ) ? $post->meta[ 'contentsync_connection_map' ] : null;
+					$post->meta     = (array) $post->meta;
+					$connection_map = isset( $post->meta['contentsync_connection_map'] ) ? $post->meta['contentsync_connection_map'] : null;
 					if ( is_array( $connection_map ) && isset( $connection_map[0] ) ) {
 						$connection_map = $connection_map[0];
 					}
 				}
-			}
-			else {
+			} else {
 				return array();
 			}
 		}
@@ -1017,10 +1014,9 @@ class Main_Helper {
 		foreach ( $connection_map as $blog_id_or_net_url => $post_array_or_blog_array ) {
 			if ( is_numeric( $blog_id_or_net_url ) ) {
 				$destination_ids[] = $blog_id_or_net_url;
-			}
-			else {
+			} else {
 				$network_url = $blog_id_or_net_url;
-				
+
 				foreach ( $post_array_or_blog_array as $blog_id => $post_array ) {
 					$destination_ids[] = $blog_id . '|' . $network_url;
 				}
@@ -1055,16 +1051,16 @@ class Main_Helper {
 
 	/**
 	 * Get edit, blog and nice url of a global post by GID.
-	 * 
+	 *
 	 * @param string $gid
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function get_post_links_by_gid( $gid ) {
 
 		$post_links = array();
 
-		$global_post = self::get_global_post($gid);
+		$global_post = self::get_global_post( $gid );
 
 		if ( ! $global_post ) {
 			return $post_links;
@@ -1074,20 +1070,17 @@ class Main_Helper {
 
 		// local network post
 		if ( empty( $root_net_url ) ) {
-			$post_links = self::get_local_post_links($root_blog_id, $root_post_id);
+			$post_links = self::get_local_post_links( $root_blog_id, $root_post_id );
 		}
 		// remote post
-		else {
-			if ( $global_post && $global_post->post_links ) {
+		elseif ( $global_post && $global_post->post_links ) {
 				$post_links = (array) $global_post->post_links;
-			}
-			else {
-				$post_links = array(
-					"edit" => $root_net_url,
-					"blog" => $root_net_url,
-					"nice" => $root_net_url,
-				);
-			}
+		} else {
+			$post_links = array(
+				'edit' => $root_net_url,
+				'blog' => $root_net_url,
+				'nice' => $root_net_url,
+			);
 		}
 		return $post_links;
 	}
@@ -1138,7 +1131,7 @@ class Main_Helper {
 		if ( $status !== 'root' ) {
 			return array(
 				'status' => 'not_root_post',
-				'text'   => __( "This is not the source post.", 'contentsync' ),
+				'text'   => __( 'This is not the source post.', 'contentsync' ),
 			);
 		}
 
@@ -1168,9 +1161,9 @@ class Main_Helper {
 		foreach ( self::get_content_connections() as $site_url => $connected_site ) {
 			$remote_connected_posts = Remote_Operations::get_all_remote_connected_posts( $connected_site, $gid );
 			if ( ! empty( $remote_connected_posts ) ) {
-				$remote_connected_posts = (array) $remote_connected_posts;
+				$remote_connected_posts                   = (array) $remote_connected_posts;
 				$updated_post_connection_map[ $site_url ] = array_map(
-					function( $item ) {
+					function ( $item ) {
 						return (array) $item;
 					},
 					$remote_connected_posts
@@ -1193,7 +1186,7 @@ class Main_Helper {
 					 */
 					if ( ! isset( $local_connected_posts[ intval( $_blog_id ) ] ) ) {
 						$return[] = sprintf(
-							__( "An orphaned post connection (%s) was deleted.", 'contentsync' ),
+							__( 'An orphaned post connection (%s) was deleted.', 'contentsync' ),
 							"$_blog_id-{$_post_con['post_id']}"
 						);
 					}
@@ -1226,7 +1219,7 @@ class Main_Helper {
 					if ( ! isset( $updated_post_connection_map[ $rem_net_url ] ) ) {
 						$updated_post_connection_map[ $rem_net_url ] = $_post_con;
 						$return[]                                    = sprintf(
-							__( "Some orphaned remote post links (website: %s) were not found because no connection were found to the site. The links were not deleted for the time being.", 'contentsync' ),
+							__( 'Some orphaned remote post links (website: %s) were not found because no connection were found to the site. The links were not deleted for the time being.', 'contentsync' ),
 							$rem_net_url
 						);
 					}
@@ -1240,9 +1233,9 @@ class Main_Helper {
 					else {
 						$rem_gid = get_current_blog_id() . '-' . $post_id . '-' . $cur_net_url;
 						foreach ( $_post_con as $rem_blog_id => $rem_post_con ) {
-							if ( ! isset( $updated_post_connection_map[ $rem_net_url ][ intval($rem_blog_id) ] ) ) {
+							if ( ! isset( $updated_post_connection_map[ $rem_net_url ][ intval( $rem_blog_id ) ] ) ) {
 								$return[] = sprintf(
-									__( "An orphaned post connection (%s) was deleted.", 'contentsync' ),
+									__( 'An orphaned post connection (%s) was deleted.', 'contentsync' ),
 									"$rem_net_url: $rem_blog_id-{$rem_post_con['post_id']}"
 								);
 							}
@@ -1284,16 +1277,16 @@ class Main_Helper {
 		if ( $connection_map != $updated_post_connection_map ) {
 			$result   = update_post_meta( $post_id, 'contentsync_connection_map', $updated_post_connection_map );
 			$return[] = $result ? sprintf(
-				__( "The post connections have been updated.", 'contentsync' )
+				__( 'The post connections have been updated.', 'contentsync' )
 			) : sprintf(
-				__( "The post connections could not be updated.", 'contentsync' )
+				__( 'The post connections could not be updated.', 'contentsync' )
 			);
 		}
 
 		// return message to AJAX
 		return empty( $return ) ? array(
 			'status' => 'ok',
-			'text'   => __( "No missing connections.", 'contentsync' ),
+			'text'   => __( 'No missing connections.', 'contentsync' ),
 		) : array(
 			'status' => 'connections_repaired',
 			'text'   => implode( ' ', $return ),
@@ -1381,7 +1374,7 @@ class Main_Helper {
 		if ( empty( $root_site_url ) ) {
 			$results = array_filter(
 				$results,
-				function( $post ) use ( $root_blog_id, $root_post_id, $root_site_url ) {
+				function ( $post ) use ( $root_blog_id, $root_post_id, $root_site_url ) {
 					return $post->blog_id !== $root_blog_id || $post->ID !== $root_post_id;
 				}
 			);
@@ -1530,12 +1523,10 @@ class Main_Helper {
 					$value = $value[0];
 				}
 			}
-		} else {
-			if ( $meta_key == 'contentsync_connection_map' ) {
+		} elseif ( $meta_key == 'contentsync_connection_map' ) {
 				$value = self::get_post_connection_map( $post_id );
-			} else {
-				$value = get_post_meta( $post_id, $meta_key, true );
-			}
+		} else {
+			$value = get_post_meta( $post_id, $meta_key, true );
 		}
 		$default = self::default_meta_values()[ $meta_key ];
 		if ( ! $value ) {
@@ -1558,15 +1549,15 @@ class Main_Helper {
 	 */
 	public static function default_meta_values() {
 		return array(
-			'synced_post_status'    => null,
-			'synced_post_id'        => null,
+			'synced_post_status'         => null,
+			'synced_post_id'             => null,
 			'contentsync_connection_map' => array(),
 			'contentsync_options'        => array(
-				'append_nested'   => true,
-				'whole_posttype'  => false,
-				'all_terms'       => false,
-				'resolve_menus'   => true,
-				'translations'    => true,
+				'append_nested'  => true,
+				'whole_posttype' => false,
+				'all_terms'      => false,
+				'resolve_menus'  => true,
+				'translations'   => true,
 			),
 		);
 	}
@@ -1576,7 +1567,7 @@ class Main_Helper {
 	 *
 	 * @return WP_Post|WP_Post[]    Depends on the input.
 	 */
-	public static function extend_post_object( $post, $current_blog=0 ) {
+	public static function extend_post_object( $post, $current_blog = 0 ) {
 		// multiple posts
 		if ( is_array( $post ) && count( $post ) > 0 ) {
 			foreach ( $post as $key => $_post ) {
@@ -1682,9 +1673,9 @@ class Main_Helper {
 	/**
 	 * Check a global post for errors.
 	 *
-	 * @param int|WP_Post  $post        Either the post_id or the preparred post object.
-	 * @param bool         $autorepair  Autorepair simple errors, such as orphaned post connections.
-	 * @param bool         $repair      Repair more complex errors, this can change meta infos or delete the post.
+	 * @param int|WP_Post                                              $post        Either the post_id or the preparred post object.
+	 * @param bool                                                     $autorepair  Autorepair simple errors, such as orphaned post connections.
+	 * @param bool                                                     $repair      Repair more complex errors, this can change meta infos or delete the post.
 	 *
 	 * @return false|object             False when no error is found, error object otherwise:
 	 *      @param string message       Description of the error.
@@ -1733,27 +1724,26 @@ class Main_Helper {
 		if ( ! empty( $root_net_url ) ) {
 
 			if ( $root_net_url == $cur_net_url ) {
-				$error->message = __( "The connection refers to this website.", 'contentsync' );
+				$error->message = __( 'The connection refers to this website.', 'contentsync' );
 
 				if ( $autorepair || $repair ) {
-					$new_gid = $root_blog_id . '-' . $root_post_id;
+					$new_gid    = $root_blog_id . '-' . $root_post_id;
 					$update_gid = true;
 				}
-			}
-			else {
-				$connection = Main_Helper::call_connections_func( 'get_connection', $root_net_url );
-	
+			} else {
+				$connection = self::call_connections_func( 'get_connection', $root_net_url );
+
 				// connection doesn't exist
 				if ( ! $connection ) {
-					$error->message = sprintf( __( "The connection to the site %s does not exist.", 'contentsync' ), $root_net_url );
-	
+					$error->message = sprintf( __( 'The connection to the site %s does not exist.', 'contentsync' ), $root_net_url );
+
 					if ( $autorepair || $repair ) {
 						$convert_to_root = true;
 					}
 				}
 				if ( ! $connection || ! isset( $connection['active'] ) || ! $connection['active'] ) {
-					$error->message = sprintf( __( "The connection to the website %s is inactive. The content cannot be synchronized.", 'contentsync' ), $root_net_url );
-	
+					$error->message = sprintf( __( 'The connection to the website %s is inactive. The content cannot be synchronized.', 'contentsync' ), $root_net_url );
+
 					if ( $repair ) {
 						$convert_to_root = true;
 					} else {
@@ -1773,7 +1763,7 @@ class Main_Helper {
 		// this is a root post
 		if ( $status == 'root' ) {
 			if ( $root_blog_id != $blog_id || ! empty( $root_net_url ) ) {
-				$error->message = __( "The post is not originally from this page.", 'contentsync' );
+				$error->message = __( 'The post is not originally from this page.', 'contentsync' );
 
 				if ( $repair ) {
 					if ( $root_post = self::get_global_post( $gid ) ) {
@@ -1784,7 +1774,7 @@ class Main_Helper {
 					}
 				}
 			} elseif ( $root_post_id != $post_id ) {
-				$error->message = __( "The global post ID is linked incorrectly.", 'contentsync' );
+				$error->message = __( 'The global post ID is linked incorrectly.', 'contentsync' );
 
 				if ( $repair ) {
 					if ( $root_post = self::get_global_post( $gid ) ) {
@@ -1830,7 +1820,7 @@ class Main_Helper {
 
 				// this should be the root
 				if ( $root_post_id === $post_id ) {
-					$error->message = __( "This should be a global source post.", 'contentsync' );
+					$error->message = __( 'This should be a global source post.', 'contentsync' );
 
 					if ( $autorepair || $repair ) {
 						$convert_to_root = true;
@@ -1842,7 +1832,7 @@ class Main_Helper {
 					if ( $root_post ) {
 
 						$error->message = sprintf(
-							__( "The source post is on the same page: %s", 'contentsync' ),
+							__( 'The source post is on the same page: %s', 'contentsync' ),
 							"<a href='" . self::get_edit_post_link( $root_post->ID ) . "' target='_blank'>{$root_post->post_title} (#{$root_post->ID})</a>"
 						);
 
@@ -1852,7 +1842,7 @@ class Main_Helper {
 					}
 					// root post not found
 					else {
-						$error->message = __( "The source post should be on the same page, but could not be found.", 'contentsync' );
+						$error->message = __( 'The source post should be on the same page, but could not be found.', 'contentsync' );
 
 						if ( $autorepair || $repair ) {
 							$convert_to_root = true;
@@ -1881,7 +1871,7 @@ class Main_Helper {
 
 					// there is no connection to this blog at all
 					if ( ! $connected_post_id_from_this_blog ) {
-						$error->message = __( "The source post had no active connection to this blog.", 'contentsync' );
+						$error->message = __( 'The source post had no active connection to this blog.', 'contentsync' );
 
 						if ( $autorepair || $repair ) {
 							$restore_connection = true;
@@ -1898,7 +1888,7 @@ class Main_Helper {
 							// add the connection if the other post is trashed
 							if ( $other_linked_post->post_status === 'trash' ) {
 								$error->message = sprintf(
-									__( "The source post was linked to a deleted post on this page: %s", 'contentsync' ),
+									__( 'The source post was linked to a deleted post on this page: %s', 'contentsync' ),
 									"<a href='" . self::get_edit_post_link( $connected_post_id_from_this_blog ) . "' target='_blank'>{$other_linked_post->post_title} (#{$other_linked_post->ID})</a>"
 								);
 
@@ -1907,7 +1897,7 @@ class Main_Helper {
 								}
 							} elseif ( $post->post_status === 'publish' && $other_linked_post->post_status !== 'publish' ) {
 								$error->message = sprintf(
-									__( "The source post is linked to another (unpublished) post on this page: %s", 'contentsync' ),
+									__( 'The source post is linked to another (unpublished) post on this page: %s', 'contentsync' ),
 									"<a href='" . self::get_edit_post_link( $connected_post_id_from_this_blog ) . "' target='_blank'>{$other_linked_post->post_title} (#{$other_linked_post->ID})</a>"
 								);
 
@@ -1917,7 +1907,7 @@ class Main_Helper {
 								}
 							} else {
 								$error->message = sprintf(
-									__( "The source post is linked to another post on this page: %s", 'contentsync' ),
+									__( 'The source post is linked to another post on this page: %s', 'contentsync' ),
 									"<a href='" . self::get_edit_post_link( $connected_post_id_from_this_blog ) . "' target='_blank'>{$other_linked_post->post_title} (#{$other_linked_post->ID})</a>"
 								);
 
@@ -1928,7 +1918,7 @@ class Main_Helper {
 						}
 						// post was not found
 						else {
-							$error->message = __( "The source post still has an incorrect connection to a post of this website, which can no longer be found.", 'contentsync' );
+							$error->message = __( 'The source post still has an incorrect connection to a post of this website, which can no longer be found.', 'contentsync' );
 
 							if ( $autorepair || $repair ) {
 								$restore_connection = true;
@@ -1939,7 +1929,7 @@ class Main_Helper {
 				// root post not found
 				else {
 
-					$error->message = __( "The original post has been deleted or moved.", 'contentsync' );
+					$error->message = __( 'The original post has been deleted or moved.', 'contentsync' );
 
 					if ( $repair ) {
 						$convert_to_root = true;
@@ -1964,9 +1954,9 @@ class Main_Helper {
 			}
 
 			if ( $success ) {
-				$error->log[] = __( "Post has been made the new source post.", 'contentsync' );
+				$error->log[] = __( 'Post has been made the new source post.', 'contentsync' );
 			} else {
-				$error->log[] = __( "Post could not be made the new source post.", 'contentsync' );
+				$error->log[] = __( 'Post could not be made the new source post.', 'contentsync' );
 			}
 		}
 
@@ -2015,9 +2005,9 @@ class Main_Helper {
 			}
 
 			if ( $success ) {
-				$error->log[] = __( "The global meta information has been deleted.", 'contentsync' );
+				$error->log[] = __( 'The global meta information has been deleted.', 'contentsync' );
 			} else {
-				$error->log[] = __( "The global meta information could not be deleted.", 'contentsync' );
+				$error->log[] = __( 'The global meta information could not be deleted.', 'contentsync' );
 			}
 		}
 
@@ -2034,9 +2024,9 @@ class Main_Helper {
 				}
 
 				if ( $success ) {
-					$error->log[] = __( "The connection has been deleted.", 'contentsync' );
+					$error->log[] = __( 'The connection has been deleted.', 'contentsync' );
 				} else {
-					$error->log[] = __( "The connection could not be deleted.", 'contentsync' );
+					$error->log[] = __( 'The connection could not be deleted.', 'contentsync' );
 				}
 			}
 		}
@@ -2057,9 +2047,9 @@ class Main_Helper {
 			}
 
 			if ( $success ) {
-				$error->log[] = __( "The connection has been restored.", 'contentsync' );
+				$error->log[] = __( 'The connection has been restored.', 'contentsync' );
 			} else {
-				$error->log[] = __( "The connection could not be restored.", 'contentsync' );
+				$error->log[] = __( 'The connection could not be restored.', 'contentsync' );
 			}
 		}
 
@@ -2076,9 +2066,9 @@ class Main_Helper {
 			}
 
 			if ( $success ) {
-				$error->log[] = __( "The other post was moved to the trash.", 'contentsync' );
+				$error->log[] = __( 'The other post was moved to the trash.', 'contentsync' );
 			} else {
-				$error->log[] = __( "The other post could not be moved to the trash.", 'contentsync' );
+				$error->log[] = __( 'The other post could not be moved to the trash.', 'contentsync' );
 			}
 		}
 
@@ -2095,9 +2085,9 @@ class Main_Helper {
 			}
 
 			if ( $success ) {
-				$error->log[] = __( "The post was moved to the trash.", 'contentsync' );
+				$error->log[] = __( 'The post was moved to the trash.', 'contentsync' );
 			} else {
-				$error->log[] = __( "The post could not be moved to the trash.", 'contentsync' );
+				$error->log[] = __( 'The post could not be moved to the trash.', 'contentsync' );
 			}
 		}
 
@@ -2139,7 +2129,7 @@ class Main_Helper {
 	 */
 	public static function get_blog_global_posts_with_errors( $blog_id = 0, $repair_posts = false, $query_args = null ) {
 
-		$error_posts  = array();
+		$error_posts = array();
 
 		self::switch_to_blog( $blog_id );
 
@@ -2190,13 +2180,13 @@ class Main_Helper {
 		$options        = array(
 			'append_nested'  => true,
 			'whole_posttype' => false,
-			'all_terms'       => true,
-			'resolve_menus'   => true,
-			'translations'    => true,
+			'all_terms'      => true,
+			'resolve_menus'  => true,
+			'translations'   => true,
 		);
 
-		if ( method_exists( '\Contentsync\Post_Export_Helper', 'enable_logs' ) ) {
-			\Contentsync\Post_Export_Helper::enable_logs( false );
+		if ( function_exists( '\Contentsync\post_export_enable_logs' ) ) {
+			\Contentsync\post_export_enable_logs( false );
 		}
 
 		if ( ! method_exists( '\Contentsync\Contents\Actions', 'make_post_global' ) ) {
@@ -2237,27 +2227,28 @@ class Main_Helper {
 
 	/**
 	 * Hold the origin site url.
-	 * 
+	 *
 	 * This is necessary to make sure the upload url is returned correctly when
 	 * switching to another blog.
-	 * 
+	 *
 	 * This is related to a core issue open since 2013:
+	 *
 	 * @see https://core.trac.wordpress.org/ticket/25650
-	 * 
+	 *
 	 * @var string|null
 	 */
 	public static $origin_site_url = null;
 
 	/**
 	 * Switch to another blog.
-	 * 
+	 *
 	 * This function unifies the switch_to_blog() function by also
 	 * registering all dynamic post types & taxonomies after the switch.
 	 * Otherwise, dynamic post types & taxonomies are not available, which
 	 * leads to various errors retrieving post, terms and more.
-	 * 
+	 *
 	 * @param int $blog_id
-	 * 
+	 *
 	 * @return bool
 	 */
 	public static function switch_to_blog( $blog_id ) {
@@ -2281,11 +2272,11 @@ class Main_Helper {
 		 * Ensures the translation environment is ready for use.
 		 * This is important because translation plugins might not be loaded
 		 * or still be loaded while not being active on the current blog.
-		 * 
+		 *
 		 * @see \Contentsync\Translation_Manager::init_translation_environment()
 		 */
 		self::call_post_export_func( 'init_translation_environment' );
-		
+
 		// remove filters from the query args within the export process
 		add_filter( 'contentsync_export_post_query_args', array( __CLASS__, 'remove_filters_from_query_args' ) );
 
@@ -2294,10 +2285,10 @@ class Main_Helper {
 
 	/**
 	 * Restore the current blog.
-	 * 
+	 *
 	 * This function unifies the restore_current_blog() function by also
 	 * making sure the origin site url is set again.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public static function restore_blog() {
@@ -2307,27 +2298,28 @@ class Main_Helper {
 		/**
 		 * Reset translation tool cache to detect the correct tool for this blog.
 		 * This also handles reloading translation tool hooks if they were unloaded.
-		 * 
+		 *
 		 * @see \Contentsync\Translation_Manager::reset_translation_tool()
 		 */
 		self::call_post_export_func( 'reset_translation_tool' );
-		
+
 		return true;
 	}
 
 	/**
 	 * Filter the wp the upload url.
+	 *
 	 * @see https://developer.wordpress.org/reference/hooks/upload_dir/
-	 * 
+	 *
 	 * This function unifies the return of the wp_upload_dir() function by
 	 * making sure the origin site url is replaced with the current site url.
-	 * 
+	 *
 	 * This is related to a core issue open since 2013 (!).
 	 * Yes. That's right. Two thousand f***ing thirteen.
 	 * @see https://core.trac.wordpress.org/ticket/25650
-	 * 
+	 *
 	 * @param array $upload_dir
-	 * 
+	 *
 	 * @return array $upload_dir
 	 */
 	public function filter_wp_upload_dir( $upload_dir ) {
@@ -2338,7 +2330,7 @@ class Main_Helper {
 
 			// if the current site url is different from the origin site url, we need to replace the url and baseurl
 			if ( $current_site_url !== self::$origin_site_url ) {
-				$upload_dir['url'] = str_replace( self::$origin_site_url, $current_site_url, $upload_dir['url'] );
+				$upload_dir['url']     = str_replace( self::$origin_site_url, $current_site_url, $upload_dir['url'] );
 				$upload_dir['baseurl'] = str_replace( self::$origin_site_url, $current_site_url, $upload_dir['baseurl'] );
 			}
 		}
@@ -2347,10 +2339,13 @@ class Main_Helper {
 	}
 
 	public static function remove_filters_from_query_args( $args ) {
-		$parsed_args = wp_parse_args( $args, array(
-			'suppress_filters' => true,
-			'lang'             => '',
-		) );
+		$parsed_args = wp_parse_args(
+			$args,
+			array(
+				'suppress_filters' => true,
+				'lang'             => '',
+			)
+		);
 
 		if (
 			isset( $parsed_args['post_type'] )
@@ -2369,13 +2364,13 @@ class Main_Helper {
 
 	/**
 	 * Get posts without filters.
-	 * 
+	 *
 	 * This function unifies the get_posts() function in order to prevent
 	 * errors with dynamic post types or filtered queries through plugins
 	 * like WPML or Polylang, whose filters are falsely applied on other blogs.
-	 * 
+	 *
 	 * @param array $args
-	 * 
+	 *
 	 * @return WP_Post[]
 	 */
 	public static function get_posts( $args ) {
@@ -2384,21 +2379,21 @@ class Main_Helper {
 
 		/**
 		 * Filter arguments for the get_post() function.
-		 * 
+		 *
 		 * @param array $args
-		 * 
+		 *
 		 * @return array $args
 		 */
 		$parsed_args = apply_filters( 'contentsync_get_posts_args', $args );
-		
+
 		$posts = get_posts( $args );
 
 		/**
 		 * Filter the posts after the get_posts() function.
-		 * 
+		 *
 		 * @param WP_Post[] $posts
 		 * @param array $args
-		 * 
+		 *
 		 * @return WP_Post[] $posts
 		 */
 		$posts = apply_filters( 'contentsync_get_posts', $posts, $args );
@@ -2443,7 +2438,7 @@ class Main_Helper {
 	 * @return string
 	 */
 	public static function get_network_url() {
-		return Main_Helper::call_connections_func( 'get_network_url' );
+		return self::call_connections_func( 'get_network_url' );
 	}
 
 	/**
@@ -2454,7 +2449,7 @@ class Main_Helper {
 	 * @return string
 	 */
 	public static function get_nice_url( $url ) {
-		return untrailingslashit( preg_replace( "/^(http|https):\/\/(www.)?/", "", strval( $url ) ) );
+		return untrailingslashit( preg_replace( '/^(http|https):\/\/(www.)?/', '', strval( $url ) ) );
 	}
 
 	/**
@@ -2463,9 +2458,9 @@ class Main_Helper {
 	public static function render_status_box( $status = 'export', $text = '' ) {
 		$status = $status === 'root' ? 'export' : ( $status === 'linked' ? 'import' : $status );
 		$titles = array(
-			'export' => __( "Root post", 'contentsync' ),
-			'import' => __( "Linked post", 'contentsync' ),
-			'error'  => __( "Error", 'contentsync' ),
+			'export' => __( 'Root post', 'contentsync' ),
+			'import' => __( 'Linked post', 'contentsync' ),
+			'error'  => __( 'Error', 'contentsync' ),
 		);
 		$title  = isset( $titles[ $status ] ) ? $titles[ $status ] : $status;
 		$color  = 'red';
@@ -2486,34 +2481,16 @@ class Main_Helper {
 	}
 
 	/**
-	 * Get the translation tool of this stage.
-	 *
-	 * @see Post_Export_Helper::get_translation_tool()
-	 */
-	public static function get_translation_tool() {
-		return self::call_post_export_func( 'get_translation_tool' );
-	}
-
-	/**
-	 * Get all language codes
-	 *
-	 * @see Post_Export_Helper::get_languages_codes()
-	 */
-	public static function get_languages_codes() {
-		return self::call_post_export_func( 'get_languages_codes' ) ?? array();
-	}
-
-	/**
 	 * Get language code of a post.
-	 * 
-	 * @see Post_Export_Helper::get_post_language_info( $post )
+	 *
+	 * @see Translation_Manager::get_post_language_info( $post )
 	 *
 	 * @param WP_Post $post
 	 * @return string Empty string if no language was found.
 	 */
 	public static function get_post_language_code( $post ) {
-		$language_details = self::call_post_export_func( 'get_post_language_info', $post );
-		if ( is_array( $language_details) && isset( $language_details['language_code']) ) {
+		$language_details = Translation_Manager::get_post_language_info( $post );
+		if ( is_array( $language_details ) && isset( $language_details['language_code'] ) ) {
 			return $language_details['language_code'];
 		}
 		return '';
@@ -2521,35 +2498,34 @@ class Main_Helper {
 
 	/**
 	 * Function to check if current user is allowed to edit global contents.
-	 * Permission is based on 'edit_posts' capability and can be overridden 
+	 * Permission is based on 'edit_posts' capability and can be overridden
 	 * with the filter 'contentsync_user_can_edit'.
-	 * 
+	 *
 	 * @param string $status 'root' or 'linked'
-	 * 
+	 *
 	 * @return bool
 	 */
 	public static function current_user_can_edit_global_posts( $status = '' ) {
 
-		$can_edit = function_exists( 'current_user_can' ) ? current_user_can('edit_posts') : true;
+		$can_edit = function_exists( 'current_user_can' ) ? current_user_can( 'edit_posts' ) : true;
 
 		if ( $status === 'root' ) {
 
 			/**
 			 * Filter to allow editing of root posts.
-			 * 
+			 *
 			 * @param bool $can_edit
-			 * 
+			 *
 			 * @return bool
 			 */
 			$can_edit = apply_filters( 'contentsync_user_can_edit_root_posts', $can_edit );
-		}
-		else if ( $status === 'linked' ) {
+		} elseif ( $status === 'linked' ) {
 
 			/**
 			 * Filter to allow editing of linked posts.
-			 * 
+			 *
 			 * @param bool $can_edit
-			 * 
+			 *
 			 * @return bool
 			 */
 			$can_edit = apply_filters( 'contentsync_user_can_edit_linked_posts', $can_edit );
@@ -2557,9 +2533,9 @@ class Main_Helper {
 
 		/**
 		 * Filter to allow editing of all global posts, no matter the status.
-		 * 
+		 *
 		 * @param bool $can_edit
-		 * 
+		 *
 		 * @return bool
 		 */
 		return apply_filters( 'contentsync_user_can_edit_global_posts', $can_edit, $status );
@@ -2577,20 +2553,20 @@ class Main_Helper {
 	 * @return array $connection_map   All saved connections.
 	 */
 	public static function get_connections() {
-		return Main_Helper::call_connections_func( 'get_connections' );
+		return self::call_connections_func( 'get_connections' );
 	}
 
 	/**
 	 * Get all connections for global contents
 	 */
 	public static function get_content_connections() {
-		$connections = Main_Helper::call_connections_func( 'get_connections' );
+		$connections = self::call_connections_func( 'get_connections' );
 		if ( ! $connections ) {
 			return array();
 		}
 		return array_filter(
 			$connections,
-			function( $connection ) {
+			function ( $connection ) {
 				return ! isset( $connection['contents'] ) || $connection['contents'] === true;
 			}
 		);
@@ -2601,8 +2577,8 @@ class Main_Helper {
 	 */
 	public static function get_search_connections() {
 		return array_filter(
-			Main_Helper::call_connections_func( 'get_connections' ),
-			function( $connection ) {
+			self::call_connections_func( 'get_connections' ),
+			function ( $connection ) {
 				return ! isset( $connection['search'] ) || $connection['search'] === true;
 			}
 		);
@@ -2637,19 +2613,22 @@ class Main_Helper {
 		$args = func_get_args();
 		array_shift( $args );
 
+		// Check for standalone functions first (new in refactored version)
+		$function = '\Contentsync\\' . $function_name;
+		if ( function_exists( $function ) ) {
+			return count( $args ) === 0
+				? call_user_func( $function )
+				: call_user_func_array( $function, $args );
+		}
+
 		$method = '';
 
-		// Check Translation_Manager first (new in 2.19.0)
+		// Check Translation_Manager (new in 2.19.0)
 		if ( class_exists( '\Contentsync\Translation_Manager' ) && method_exists( '\Contentsync\Translation_Manager', $function_name ) ) {
 			$method = '\Contentsync\Translation_Manager';
-		}
-		else if ( method_exists( '\Contentsync\Post_Export_Helper', $function_name ) ) {
-			$method = '\Contentsync\Post_Export_Helper';
-		}
-		else if ( method_exists( '\Contentsync\Post_Export', $function_name ) ) {
+		} elseif ( method_exists( '\Contentsync\Post_Export', $function_name ) ) {
 			$method = '\Contentsync\Post_Export';
-		}
-		else if ( method_exists( '\Contentsync\Post_Import', $function_name ) ) {
+		} elseif ( method_exists( '\Contentsync\Post_Import', $function_name ) ) {
 			$method = '\Contentsync\Post_Import';
 		}
 
@@ -2664,11 +2643,12 @@ class Main_Helper {
 
 	/**
 	 * Export posts with backward compatiblity and additional actions.
+	 *
 	 * @see \Contentsync\Post_Export::export_post()
-	 * 
+	 *
 	 * @param int   $post_id          Post ID to export.
 	 * @param array $args             Array of arguments to export post.
-	 * 
+	 *
 	 * @return mixed                  Exported post.
 	 */
 	public static function export_post( $post_id, $args = array() ) {
@@ -2692,11 +2672,12 @@ class Main_Helper {
 
 	/**
 	 * Export posts with backward compatiblity and additional actions.
+	 *
 	 * @see \Contentsync\Post_Export::export_posts()
-	 * 
+	 *
 	 * @param array $post_ids_or_objects Array of post IDs or post objects to export.
 	 * @param array $args                Array of arguments to export posts.
-	 * 
+	 *
 	 * @return mixed                     Array of exported posts.
 	 */
 	public static function export_posts( $post_ids_or_objects, $args = array() ) {
@@ -2709,14 +2690,14 @@ class Main_Helper {
 
 		/**
 		 * Use the new export_post_objects method if available.
-		 * 
+		 *
 		 * @see \Contentsync\Post_Export::export_post_objects()
-		 * 
+		 *
 		 * @since 2.18.0
-		 * 
+		 *
 		 * @param array $post_ids_or_objects Array of post IDs or post objects to export.
 		 * @param array $args                Array of arguments to export posts.
-		 * 
+		 *
 		 * @return mixed                     Array of exported posts.
 		 */
 		if ( method_exists( '\Contentsync\Post_Export', 'export_post_objects' ) ) {
@@ -2750,14 +2731,15 @@ class Main_Helper {
 
 	/**
 	 * Import posts with backward compatiblity and additional actions.
+	 *
 	 * @see \Contentsync\Post_Import::import_posts()
-	 * 
+	 *
 	 * @param array $posts             Array of posts to import.
 	 * @param array $conflict_actions  Array of conflict actions.
-	 * 
+	 *
 	 * @return mixed                  True on success. WP_Error on failure.
 	 */
-	public static function import_posts( $posts, $conflict_actions=array() ) {
+	public static function import_posts( $posts, $conflict_actions = array() ) {
 
 		/**
 		 * @action contentsync_before_import_global_posts
@@ -2795,7 +2777,7 @@ class Main_Helper {
 
 		if ( method_exists( '\Greyd\Connections\Connections_Helper', $function_name ) ) {
 			$method = '\Greyd\Connections\Connections_Helper';
-		} else if ( method_exists( '\Greyd\Hub\Admin', $function_name ) ) {
+		} elseif ( method_exists( '\Greyd\Hub\Admin', $function_name ) ) {
 			$method = '\Greyd\Hub\Admin';
 		}
 
@@ -2817,22 +2799,21 @@ class Main_Helper {
 
 	/**
 	 * Retrieves the edit post link for post.
-	 * 
+	 *
 	 * @see wp-includes/link-template.php
-	 * 
+	 *
 	 * @param int|WP_Post $post Post ID or post object.
-	 * 
+	 *
 	 * @return string The edit post link URL for the given post.
 	 */
 	public static function get_edit_post_link( $post ) {
 
-		if ( !is_object($post) ) {
-			$post = get_post($post);
+		if ( ! is_object( $post ) ) {
+			$post = get_post( $post );
 		}
 
 		switch ( $post->post_type ) {
 			case 'wp_global_styles':
-
 				// do not allow editing of global styles and font families from other themes
 				if ( self::get_wp_template_theme( $post ) != get_option( 'stylesheet' ) ) {
 					return null;
@@ -2863,11 +2844,11 @@ class Main_Helper {
 				// wp-admin/site-editor.php?postType=wp_template_part&postId=greyd-theme//footer&categoryId=footer&categoryType=wp_template_part&canvas=edit
 				return add_query_arg(
 					array(
-						'postType'      => $post->post_type,
-						'postId'        => self::get_wp_template_theme( $post ) . '//' . $post->post_name,
-						'categoryId'    => $post->ID,
-						'categoryType'  => $post->post_type,
-						'canvas'        => 'edit',
+						'postType'     => $post->post_type,
+						'postId'       => self::get_wp_template_theme( $post ) . '//' . $post->post_name,
+						'categoryId'   => $post->ID,
+						'categoryType' => $post->post_type,
+						'canvas'       => 'edit',
 					),
 					admin_url( 'site-editor.php' )
 				);
@@ -2887,8 +2868,8 @@ class Main_Helper {
 				// wp-admin/edit.php?post_type=wp_block
 				return add_query_arg(
 					array(
-						'post'      => $post->ID,
-						'action'    => 'edit',
+						'post'   => $post->ID,
+						'action' => 'edit',
 					),
 					admin_url( 'post.php' )
 				);
@@ -2907,11 +2888,11 @@ class Main_Helper {
 			default:
 				return html_entity_decode( get_edit_post_link( $post ) );
 				// return add_query_arg(
-				// 	array(
-				// 		'post'      => $post->ID,
-				// 		'action'    => 'edit',
-				// 	),
-				// 	admin_url( 'post.php' )
+				// array(
+				// 'post'      => $post->ID,
+				// 'action'    => 'edit',
+				// ),
+				// admin_url( 'post.php' )
 				// );
 				break;
 		}
@@ -2920,14 +2901,14 @@ class Main_Helper {
 
 	/**
 	 * Retrieves the theme slug for a wp_template post.
-	 * 
+	 *
 	 * @param WP_Post $post Post object.
-	 * 
+	 *
 	 * @return string The theme slug for the given template.
 	 */
 	public static function get_wp_template_theme( $post ) {
 		$theme = wp_get_post_terms( $post->ID, 'wp_theme' );
-		if ( $theme && is_array($theme) && isset($theme[0]) ) {
+		if ( $theme && is_array( $theme ) && isset( $theme[0] ) ) {
 			return $theme[0]->name;
 		}
 		return '';
@@ -2992,13 +2973,13 @@ class Main_Helper {
 	 * Usually we would use the core function get_the_terms(). However it sometimes returns
 	 * terms of completely different taxonomies - without returning an error. To retrieve the
 	 * terms directly from the database seems to work more consistent in those cases.
-	 * 
+	 *
 	 * @see get_the_terms()
 	 * @see https://developer.wordpress.org/reference/functions/get_the_terms/
 	 * @see this function was copied from contentsync_tp_management/inc/post_export.php
 	 *
-	 * @param int       $post_id    Post ID.
-	 * @param string    $taxonomy   Taxonomy name.
+	 * @param int    $post_id    Post ID.
+	 * @param string $taxonomy   Taxonomy name.
 	 * @return WP_Term[]|null       Array of WP_Term objects on success, null if there are no terms
 	 *                              or the post does not exist.
 	 */
@@ -3022,7 +3003,7 @@ class Main_Helper {
 		);
 		if ( $results && is_array( $results ) && count( $results ) ) {
 			return array_map(
-				function( $term ) {
+				function ( $term ) {
 					return new \WP_Term( $term );
 				},
 				$results
@@ -3034,16 +3015,17 @@ class Main_Helper {
 	/**
 	 * Get all active Plugins from Option.
 	 * Including all active sitewide Plugins.
+	 *
 	 * @param string $mode  all|site|global (default: all)
 	 */
-	public static function active_plugins($mode = 'all') {
+	public static function active_plugins( $mode = 'all' ) {
 
 		$plugins = array();
 
 		// get all active plugins
 		if ( $mode == 'all' || $mode == 'site' ) {
-			$plugins = get_option('active_plugins');
-			if ( !is_array($plugins) ) {
+			$plugins = get_option( 'active_plugins' );
+			if ( ! is_array( $plugins ) ) {
 				$plugins = array();
 			}
 		}
@@ -3053,13 +3035,13 @@ class Main_Helper {
 			is_multisite()
 			&& ( $mode == 'all' || $mode == 'global' )
 		) {
-			$plugins_multi = get_site_option('active_sitewide_plugins');
-			if ( is_array($plugins_multi) && !empty($plugins_multi) ) {
-				foreach ($plugins_multi as $key => $value) {
+			$plugins_multi = get_site_option( 'active_sitewide_plugins' );
+			if ( is_array( $plugins_multi ) && ! empty( $plugins_multi ) ) {
+				foreach ( $plugins_multi as $key => $value ) {
 					$plugins[] = $key;
 				}
-				$plugins = array_unique($plugins);
-				sort($plugins);
+				$plugins = array_unique( $plugins );
+				sort( $plugins );
 			}
 		}
 
@@ -3069,105 +3051,136 @@ class Main_Helper {
 	/**
 	 * Check if single Plugin is active.
 	 */
-	public static function is_active_plugin($file) {
+	public static function is_active_plugin( $file ) {
 		// check for active plugins
 		$plugins = self::active_plugins();
-		$active = false;
-		if (in_array($file, $plugins)) $active = true;
+		$active  = false;
+		if ( in_array( $file, $plugins ) ) {
+			$active = true;
+		}
 		return $active;
 	}
 
 	/**
 	 * Render a frontend message box.
+	 *
 	 * @param string $msg   The message to show.
 	 * @param string $mode  Style of the notice (error, warning, success, info).
 	 */
-	public static function show_frontend_message($msg, $mode="info") {
-		if ($mode != "info" && $mode != "success" && $mode != "danger") $mode = "info";
+	public static function show_frontend_message( $msg, $mode = 'info' ) {
+		if ( $mode != 'info' && $mode != 'success' && $mode != 'danger' ) {
+			$mode = 'info';
+		}
 		return "<div class='message {$mode}'>{$msg}</div>";
 	}
 
 	/**
-	 * Show wordpress style notice in top of page.
+	 * Show WordPress style notice in top of page.
+	 *
 	 * @param string $msg   The message to show.
 	 * @param string $mode  Style of the notice (error, warning, success, info).
-	 * @param bool $list    Add to hub msg list (default: false).
+	 * @param bool   $list    Add to hub msg list (default: false).
 	 */
-	public static function show_message($msg, $mode='info', $list=false) {
-		if (empty($msg)) return;
-		if ($list) echo "<p class='hub_msg msg_list {$mode}'>{$msg}</p>";
-		else echo "<div class='notice notice-{$mode} is-dismissible'><p>{$msg}</p></div>";
+	public static function show_message( $msg, $mode = 'info', $list = false ) {
+		if ( empty( $msg ) ) {
+			return;
+		}
+		if ( $list ) {
+			echo "<p class='hub_msg msg_list {$mode}'>{$msg}</p>";
+		} else {
+			echo "<div class='notice notice-{$mode} is-dismissible'><p>{$msg}</p></div>";
+		}
 	}
 
 	/**
 	 * Render Infobox in Backend.
+	 *
 	 * @param array $atts
 	 *      @property string above      Bold Headline.
 	 *      @property string text       Infotext.
 	 *      @property string class      Extra class(es)).
 	 *      @property string style      Style of the notice (success, warning, alert, new).
 	 *      @property string styling    Color Style of the notice (green, orange, red).
-	 * @param bool $echo    Directly output the Content, or return contents (default: false).
+	 * @param bool  $echo    Directly output the Content, or return contents (default: false).
 	 */
-	public static function render_info_box($atts=[], $echo=false) {
+	public static function render_info_box( $atts = array(), $echo = false ) {
 
-		$above      = isset($atts['above']) ? '<b>'.esc_attr($atts['above']).'</b>' : '';
-		$text       = isset($atts['text']) ? '<span>'.html_entity_decode(esc_attr($atts['text'])).'</span>' : '';
-		$class      = isset($atts['class']) ? esc_attr($atts['class']) : '';
+		$above = isset( $atts['above'] ) ? '<b>' . esc_attr( $atts['above'] ) . '</b>' : '';
+		$text  = isset( $atts['text'] ) ? '<span>' . html_entity_decode( esc_attr( $atts['text'] ) ) . '</span>' : '';
+		$class = isset( $atts['class'] ) ? esc_attr( $atts['class'] ) : '';
 
-		$styling    = isset($atts['style']) ? esc_attr($atts['style']) : ( isset($atts['styling']) ? esc_attr($atts['styling']) : '' );
-		if ($styling == 'success' || $styling == 'green') $info_icon = 'dashicons-yes';
-		else if ($styling == 'warning' || $styling == 'orange') $info_icon = 'dashicons-warning';
-		else if ($styling == 'alert' || $styling == 'red' || $styling == 'danger' || $styling == 'error') $info_icon = 'dashicons-warning';
-		else if ($styling == 'new') $info_icon = 'dashicons-megaphone';
-		else $info_icon = 'dashicons-info';
+		$styling = isset( $atts['style'] ) ? esc_attr( $atts['style'] ) : ( isset( $atts['styling'] ) ? esc_attr( $atts['styling'] ) : '' );
+		if ( $styling == 'success' || $styling == 'green' ) {
+			$info_icon = 'dashicons-yes';
+		} elseif ( $styling == 'warning' || $styling == 'orange' ) {
+			$info_icon = 'dashicons-warning';
+		} elseif ( $styling == 'alert' || $styling == 'red' || $styling == 'danger' || $styling == 'error' ) {
+			$info_icon = 'dashicons-warning';
+		} elseif ( $styling == 'new' ) {
+			$info_icon = 'dashicons-megaphone';
+		} else {
+			$info_icon = 'dashicons-info';
+		}
 
 		$return = "<div class='contentsync_info_box {$styling} {$class}'><span class='dashicons {$info_icon}'></span><div>{$above}{$text}</div></div>";
-		if ($echo) echo $return;
+		if ( $echo ) {
+			echo $return;
+		}
 		return $return;
 	}
 
 	/**
 	 * Render small Infopopup with toggle in Backend.
+	 *
 	 * @param string $content   Infotext.
 	 * @param string $className Extra class names.
-	 * @param bool $echo        Directly output the Content, or return contents (default: false).
+	 * @param bool   $echo        Directly output the Content, or return contents (default: false).
 	 */
-	public static function render_info_popup($content="", $className="", $echo=false) {
-		if ( empty($content) ) return false;
-		$return = "<span class='contentsync_popup_wrapper'>".
-			"<span class='toggle dashicons dashicons-info'></span>".
-			"<span class='popup {$className}'>{$content}</span>".
-		"</span>";
-		if ($echo) echo $return;
+	public static function render_info_popup( $content = '', $className = '', $echo = false ) {
+		if ( empty( $content ) ) {
+			return false;
+		}
+		$return = "<span class='contentsync_popup_wrapper'>" .
+			"<span class='toggle dashicons dashicons-info'></span>" .
+			"<span class='popup {$className}'>{$content}</span>" .
+		'</span>';
+		if ( $echo ) {
+			echo $return;
+		}
 		return $return;
 	}
 
 	/**
 	 * Similar to render_info_popup but bigger.
+	 *
 	 * @param string $content   Infotext.
 	 * @param string $className Extra class names.
-	 * @param bool $echo        Directly output the Content, or return contents (default: false).
+	 * @param bool   $echo        Directly output the Content, or return contents (default: false).
 	 */
-	public static function render_info_dialog($content="", $className="", $echo=false) {
-		$return = "<span class='contentsync_popup_wrapper'>".
-			"<span class='toggle dashicons dashicons-info'></span>".
-			"<dialog class='{$className}'>{$content}</dialog>".
-		"</span>";
-		if ($echo) echo $return;
+	public static function render_info_dialog( $content = '', $className = '', $echo = false ) {
+		$return = "<span class='contentsync_popup_wrapper'>" .
+			"<span class='toggle dashicons dashicons-info'></span>" .
+			"<dialog class='{$className}'>{$content}</dialog>" .
+		'</span>';
+		if ( $echo ) {
+			echo $return;
+		}
 		return $return;
 	}
 
 	/**
 	 * Render a Dashicon.
 	 * https://developer.wordpress.org/resource/dashicons
+	 *
 	 * @param string $icon  Dashicon slug.
-	 * @param bool $echo    Directly output the Content, or return contents (default: false).
+	 * @param bool   $echo    Directly output the Content, or return contents (default: false).
 	 */
-	public static function render_dashicon($icon, $echo=false) {
-		$icon = str_replace( "dashicons-", "", $icon );
+	public static function render_dashicon( $icon, $echo = false ) {
+		$icon   = str_replace( 'dashicons-', '', $icon );
 		$return = "<span class='dashicons dashicons-$icon'></span>";
-		if ($echo) echo $return;
+		if ( $echo ) {
+			echo $return;
+		}
 		return $return;
 	}
 }

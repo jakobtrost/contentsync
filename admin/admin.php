@@ -1676,7 +1676,7 @@ class Admin {
 			 * add option to include translations when translation tool is active
 			 * @since 2.3.0 support wpml and polylang
 			 */
-			if ( !empty(Main_Helper::get_translation_tool()) ) {
+			if ( !empty(Translation_Manager::get_translation_tool()) ) {
 				$contentsync_options['translations'] = array(
 					'name'      => 'translations',
 					'title'     => __("Include translations", 'contentsync'),

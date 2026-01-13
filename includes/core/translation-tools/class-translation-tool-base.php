@@ -26,10 +26,10 @@ abstract class Translation_Tool_Base {
 
 	/**
 	 * Check if the plugin is loaded in memory.
-	 * 
+	 *
 	 * This checks if the plugin code is loaded, which can be different from
 	 * whether it's active/configured for the current blog in multisite.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @return bool True if the plugin is loaded, false otherwise.
 	 */
@@ -76,7 +76,7 @@ abstract class Translation_Tool_Base {
 	 * Set the language for a post.
 	 *
 	 * @since 2.19.0
-	 * @param int $post_id Post ID.
+	 * @param int    $post_id Post ID.
 	 * @param string $language_code Language code.
 	 * @return bool True on success, false on failure.
 	 */
@@ -86,11 +86,11 @@ abstract class Translation_Tool_Base {
 	 * Set translation relationships for a post during import.
 	 *
 	 * @since 2.19.0
-	 * @param int $post_id Current post ID on this site.
+	 * @param int    $post_id Current post ID on this site.
 	 * @param string $language_code Language code for this post.
-	 * @param array $original_post_ids Original post IDs from export (lang => id).
-	 * @param array $language_args Tool-specific arguments.
-	 * @param array $imported_post_map Map of original IDs to new IDs.
+	 * @param array  $original_post_ids Original post IDs from export (lang => id).
+	 * @param array  $language_args Tool-specific arguments.
+	 * @param array  $imported_post_map Map of original IDs to new IDs.
 	 * @return bool True on success, false on failure.
 	 */
 	abstract public function set_translations_from_import( $post_id, $language_code, $original_post_ids, $language_args, $imported_post_map );
@@ -100,7 +100,7 @@ abstract class Translation_Tool_Base {
 	 *
 	 * @since 2.19.0
 	 * @param \Contentsync\Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
-	 * @param bool $include_translations Whether to include translation post IDs.
+	 * @param bool                                    $include_translations Whether to include translation post IDs.
 	 * @return array Language data structure.
 	 */
 	abstract public function prepare_post_language_data( $post, $include_translations = false );
@@ -110,7 +110,7 @@ abstract class Translation_Tool_Base {
 	 *
 	 * @since 2.19.0
 	 * @param \Contentsync\Prepared_Post|object $post Prepared_Post object with language property.
-	 * @param array $already_imported_posts Map of original post IDs to new post IDs.
+	 * @param array                             $already_imported_posts Map of original post IDs to new post IDs.
 	 * @return array Analysis result.
 	 */
 	abstract public function analyze_translation_import( $post, $already_imported_posts = array() );
@@ -152,14 +152,14 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Log a message.
 	 *
-	 * Convenience wrapper for the synced_post_export_log action.
+	 * Convenience wrapper for the post_export_log action.
 	 *
 	 * @since 2.19.0
 	 * @param string $message Message to log.
-	 * @param mixed $data Optional data to log.
+	 * @param mixed  $data Optional data to log.
 	 */
 	protected function log( $message, $data = 'do_not_log' ) {
-		do_action( 'synced_post_export_log', $message, $data );
+		do_action( 'post_export_log', $message, $data );
 	}
 
 	/**
@@ -193,10 +193,10 @@ abstract class Translation_Tool_Base {
 
 	/**
 	 * Unload translation tool hooks if the tool is loaded but not configured.
-	 * 
+	 *
 	 * This is optional - tools can override this if they need to handle
 	 * scenarios where the plugin is loaded but not active on the current blog.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @return bool True if hooks were unloaded, false otherwise.
 	 */
@@ -207,9 +207,9 @@ abstract class Translation_Tool_Base {
 
 	/**
 	 * Reload translation tool hooks that were previously unloaded.
-	 * 
+	 *
 	 * This is optional - tools can override this if they implement unload_hooks().
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @return bool True if hooks were reloaded, false otherwise.
 	 */
@@ -218,4 +218,3 @@ abstract class Translation_Tool_Base {
 		return false;
 	}
 }
-

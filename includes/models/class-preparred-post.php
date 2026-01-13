@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class used to implement the Prepared_Post object.
- * 
+ *
  * @since 2.17.0
  *
  * This class attaches all post meta options, taxonomy terms and
@@ -72,21 +72,21 @@ class Prepared_Post {
 
 	/**
 	 * Post meta info of the post.
-	 * 
+	 *
 	 * @var array
 	 */
 	public $meta = array();
 
 	/**
 	 * Assigned terms of the post.
-	 * 
+	 *
 	 * @var array
 	 */
 	public $terms = array();
 
 	/**
 	 * Nested posts, keyed by ID.
-	 * 
+	 *
 	 * @var array[]
 	 * Nested post arrays keyed by post_id:
 	 *   {{post_id}} => array(
@@ -101,14 +101,14 @@ class Prepared_Post {
 
 	/**
 	 * Nested terms of the post.
-	 * 
+	 *
 	 * @var array
 	 */
 	public $nested_terms = array();
 
 	/**
 	 * Attached media file (only when the post is an attachment).
-	 * 
+	 *
 	 * @var array
 	 *     @property string name           Post name (slug) of the media file (eg. 'my-image.jpg')
 	 *     @property string path           DIR path of the media file (eg. '/htdocs/www/public/wp-content/uploads/sites/9/2025/10/my-image.jpg').
@@ -119,7 +119,7 @@ class Prepared_Post {
 
 	/**
 	 * Language information of the post.
-	 * 
+	 *
 	 * @var array
 	 *     @property string code       The post's language code (eg. 'en')
 	 *     @property string tool       The plugin used to setup the translation.
@@ -130,11 +130,12 @@ class Prepared_Post {
 
 	/**
 	 * The arguments used to export the post.
+	 *
 	 * @since new
-	 * 
+	 *
 	 * This takes precedence over the default arguments, passed to
 	 * the Class __construct() function: @param $export_arguments.
-	 * 
+	 *
 	 * @var array
 	 *    @property bool  append_nested   Append nested posts to the export.
 	 *    @property bool  whole_posttype  Export the whole post type.
@@ -147,22 +148,23 @@ class Prepared_Post {
 
 	/**
 	 * Conflict action: What to do if a conflicting post already exists.
+	 *
 	 * @since new
-	 * 
+	 *
 	 * A conflicting post is a post with the same post_name and post_type.
-	 * 
+	 *
 	 * @var string 'keep|replace|skip'
 	 *    @default 'keep'    Keep the existing post and insert the new one with a new ID.
 	 *    @value   'replace' Replace the existing post with the new one.
 	 *    @value   'skip'    Skip the post if a conflicting post already exists.
-	 * 
 	 */
 	public $conflict_action = 'keep';
 
 	/**
 	 * Import action: What to do with the post on/after import.
+	 *
 	 * @since new
-	 * 
+	 *
 	 * @var string 'insert|draft|trash|delete'
 	 *    @default 'update'  Insert or update the post if it already exists.
 	 *    @value   'draft'   Set the post to draft.
@@ -173,8 +175,9 @@ class Prepared_Post {
 
 	/**
 	 * Post hierarchy: The hierarchy of the post.
+	 *
 	 * @since 2.18.0
-	 * 
+	 *
 	 * @var array
 	 *    @property array $parent      Information about the parent post.
 	 *        @property int $id        The parent post ID.
@@ -198,7 +201,7 @@ class Prepared_Post {
 	 * Constructor.
 	 *
 	 * @param WP_Post|object|array|int $post  Post object or Post ID.
-	 * @param array $export_arguments  Additional arguments.
+	 * @param array                    $export_arguments  Additional arguments.
 	 */
 	public function __construct( $post, $export_arguments = array() ) {
 
@@ -217,7 +220,7 @@ class Prepared_Post {
 			return;
 		}
 
-		do_action( 'synced_post_export_log', "\r\n\r\n|\r\n|  PREPARE POST {$post->ID} '{$post->post_title}'\r\n|" );
+		do_action( 'post_export_log', "\r\n\r\n|\r\n|  PREPARE POST {$post->ID} '{$post->post_title}'\r\n|" );
 
 		// set base object vars from WP_Post
 		foreach ( get_object_vars( $post ) as $key => $value ) {
@@ -228,6 +231,7 @@ class Prepared_Post {
 		 * Parse arguments.
 		 * The export_arguments defined within the post take precedence
 		 * over the default arguments passed to the constructor.
+		 *
 		 * @property array $export_arguments
 		 */
 		$this->export_arguments = wp_parse_args( $this->export_arguments, $export_arguments );
@@ -251,12 +255,12 @@ class Prepared_Post {
 	 */
 	public function prepare_nested_posts() {
 
-		do_action( 'synced_post_export_log', "\r\n" . 'Prepare nested posts.' );
+		do_action( 'post_export_log', "\r\n" . 'Prepare nested posts.' );
 
-		$nested_posts  = array();
+		$nested_posts = array();
 
 		if ( empty( $this->post_content ) ) {
-			do_action( 'synced_post_export_log', '=> post content is empty' );
+			do_action( 'post_export_log', '=> post content is empty' );
 			return;
 		}
 
@@ -278,18 +282,18 @@ class Prepared_Post {
 
 			$match_regex = '/' . implode( '([\da-z\-\_]+?)', $pattern['search'] ) . '/';
 			$regex_group = isset( $pattern['group'] ) ? (int) $pattern['group'] : 2;
-			// do_action( "synced_post_export_log", "  - test regex: ".esc_attr($match_regex) );
+			// do_action( "post_export_log", "  - test regex: ".esc_attr($match_regex) );
 
 			// search for all occurrences
 			preg_match_all( $match_regex, $this->post_content, $matches );
 			$found_posts = isset( $matches[ $regex_group ] ) ? $matches[ $regex_group ] : null;
 			if ( ! empty( $found_posts ) ) {
 
-				do_action( 'synced_post_export_log', "\r\n" . "  Replace '" . $key . "':" );
+				do_action( 'post_export_log', "\r\n" . "  Replace '" . $key . "':" );
 				foreach ( $found_posts as $name_or_id ) {
 
 					$nested_post = null;
-					$nested_id = $name_or_id;
+					$nested_id   = $name_or_id;
 
 					// WP_Post->ID
 					if ( is_numeric( $name_or_id ) ) {
@@ -306,14 +310,14 @@ class Prepared_Post {
 							$args = $name_or_id;
 						}
 						// get post
-						$nested_post = Post_Export_Helper::get_post_by_name_and_type( $args );
+						$nested_post = \Contentsync\get_post_by_name_and_type( $args );
 						if ( $nested_post ) {
 							$nested_id = $nested_post->ID;
 						}
 					}
 
 					if ( ! $nested_post ) {
-						do_action( 'synced_post_export_log', "  - post with id or name '$name_or_id' could not be found." );
+						do_action( 'post_export_log', "  - post with id or name '$name_or_id' could not be found." );
 						continue;
 					}
 
@@ -324,35 +328,36 @@ class Prepared_Post {
 					$this->post_content = preg_replace( $search_regex, $replace_string, $this->post_content );
 
 					// collect in $nested_posts
-					$nested_posts[$nested_id] = $nested_post;
+					$nested_posts[ $nested_id ] = $nested_post;
 				}
 			}
 		}
 
 		/**
 		 * advancedFilter
+		 *
 		 * @since 2.8.0
 		 */
 		preg_match_all( '/\"advancedFilter\":(\[.*\])/', $this->post_content, $matches );
 		if ( $matches ) {
 			// debug("advancedFilter");
 			foreach ( $matches[1] as $match ) {
-				$res = json_decode($match);
+				$res = json_decode( $match );
 				if ( $res ) {
 					$changed = false;
 					foreach ( $res as $i => $filter ) {
-						if ( $filter->name == "include" && !empty($filter->include) ) {
+						if ( $filter->name == 'include' && ! empty( $filter->include ) ) {
 							foreach ( $filter->include as $j => $post_id ) {
-								if ( is_numeric($post_id) ) {
-									$res[$i]->include[$j] = '{{'.$post_id.'}}';
-									$nested_posts[$post_id] = get_post( $post_id );
-									$changed = true;
+								if ( is_numeric( $post_id ) ) {
+									$res[ $i ]->include[ $j ] = '{{' . $post_id . '}}';
+									$nested_posts[ $post_id ] = get_post( $post_id );
+									$changed                  = true;
 								}
 							}
 						}
 					}
-					if ( $changed) {
-						$encoded = str_replace( array( '"{{', '}}"' ), array( '{{', '}}' ), json_encode($res) );
+					if ( $changed ) {
+						$encoded            = str_replace( array( '"{{', '}}"' ), array( '{{', '}}' ), json_encode( $res ) );
 						$this->post_content = str_replace( $match, $encoded, $this->post_content );
 					}
 				}
@@ -365,7 +370,7 @@ class Prepared_Post {
 			if ( isset( $this->nested[ $nested_id ] ) ) {
 				continue;
 			}
-			
+
 			if ( ! $nested_post ) {
 				$this->nested[ $nested_id ] = null;
 			}
@@ -379,8 +384,8 @@ class Prepared_Post {
 			if ( $nested_post->post_type === 'attachment' ) {
 				// $this->nested[ $nested_id ]['file_path'] = get_attached_file( $nested_post->ID );
 				// remove '-scaled' suffix (https://wp-kama.com/2284/the-scaled-suffix-for-images)
-				$file_url = str_replace( '-scaled.', '.', wp_get_attachment_url( $nested_id ) );
-				$file_path = str_replace( '-scaled.', '.', get_attached_file( $nested_id ) );
+				$file_url                   = str_replace( '-scaled.', '.', wp_get_attachment_url( $nested_id ) );
+				$file_path                  = str_replace( '-scaled.', '.', get_attached_file( $nested_id ) );
 				$this->nested[ $nested_id ] = array(
 					'ID'        => $nested_id,
 					'post_name' => $nested_post->post_name,
@@ -396,13 +401,13 @@ class Prepared_Post {
 					'post_type' => $nested_post->post_type,
 					'front_url' => get_permalink( $nested_id ),
 				);
-			
+
 				// also replace the front url inside the post content
 				$this->post_content = str_replace( $this->nested[ $nested_id ]['front_url'], '{{' . $nested_id . '-front-url}}', $this->post_content );
 			}
 
 			do_action(
-				'synced_post_export_log',
+				'post_export_log',
 				sprintf(
 					"  - nested post '%s' attached for export.\r\n     * ID: %s\r\n     * TYPE: %s\r\n     * URL: %s",
 					$nested_post->post_name,
@@ -413,19 +418,19 @@ class Prepared_Post {
 			);
 		}
 
-		do_action( 'synced_post_export_log', '=> nested elements were preparred' );
+		do_action( 'post_export_log', '=> nested elements were preparred' );
 	}
 
 	/**
 	 * Prepare nested terms inside the post content.
 	 */
 	public function prepare_nested_terms() {
-		do_action( 'synced_post_export_log', "\r\n" . 'Prepare nested terms.' );
+		do_action( 'post_export_log', "\r\n" . 'Prepare nested terms.' );
 
 		$nested_term_ids = array();
 
 		if ( empty( $this->post_content ) ) {
-			do_action( 'synced_post_export_log', '=> post content is empty' );
+			do_action( 'post_export_log', '=> post content is empty' );
 			return;
 		}
 
@@ -447,14 +452,14 @@ class Prepared_Post {
 
 			$match_regex = '/' . implode( '([\da-z\-\_]+?)', $pattern['search'] ) . '/';
 			$regex_group = isset( $pattern['group'] ) ? (int) $pattern['group'] : 2;
-			// do_action( "synced_post_export_log", "  - test regex: ".esc_attr($match_regex) );
+			// do_action( "post_export_log", "  - test regex: ".esc_attr($match_regex) );
 
 			// search for all occurrences
 			preg_match_all( $match_regex, $this->post_content, $matches );
 			$found_terms = isset( $matches[ $regex_group ] ) ? $matches[ $regex_group ] : null;
 			if ( ! empty( $found_terms ) ) {
 
-				do_action( 'synced_post_export_log', '  - replace ' . $key . ':' );
+				do_action( 'post_export_log', '  - replace ' . $key . ':' );
 				foreach ( $found_terms as $term_id ) {
 
 					// default value for term_ids
@@ -476,24 +481,25 @@ class Prepared_Post {
 
 		/**
 		 * taxQuery and advancedFilter
+		 *
 		 * @since 2.8.0
 		 */
 		preg_match_all( '/\"taxQuery\":(\{.*?\})/', $this->post_content, $matches );
 		if ( $matches ) {
 			// debug("taxQuery");
 			foreach ( $matches[1] as $match ) {
-				$res = json_decode($match);
+				$res = json_decode( $match );
 				if ( $res ) {
 					$changed = false;
 					foreach ( $res as $tax => $terms ) {
 						foreach ( $terms as $i => $term_id ) {
-							$res->{$tax}[$i] = '{{t_'.$term_id.'}}';
+							$res->{$tax}[ $i ] = '{{t_' . $term_id . '}}';
 							$nested_term_ids[] = $term_id;
-							$changed = true;
+							$changed           = true;
 						}
 					}
-					if ( $changed) {
-						$encoded = str_replace( array( '"{{', '}}"' ), array( '{{', '}}' ), json_encode($res) );
+					if ( $changed ) {
+						$encoded            = str_replace( array( '"{{', '}}"' ), array( '{{', '}}' ), json_encode( $res ) );
 						$this->post_content = str_replace( $match, $encoded, $this->post_content );
 					}
 				}
@@ -503,22 +509,22 @@ class Prepared_Post {
 		if ( $matches ) {
 			// debug("advancedFilter");
 			foreach ( $matches[1] as $match ) {
-				$res = json_decode($match);
+				$res = json_decode( $match );
 				if ( $res ) {
 					$changed = false;
 					foreach ( $res as $i => $filter ) {
-						if ( $filter->name == "taxonomy" && !empty($filter->terms) ) {
+						if ( $filter->name == 'taxonomy' && ! empty( $filter->terms ) ) {
 							foreach ( $filter->terms as $j => $term_id ) {
-								if ( intval($term_id) == $term_id ) {
-									$res[$i]->terms[$j] = '{{t_'.$term_id.'}}';
-									$nested_term_ids[] = $term_id;
-									$changed = true;
+								if ( intval( $term_id ) == $term_id ) {
+									$res[ $i ]->terms[ $j ] = '{{t_' . $term_id . '}}';
+									$nested_term_ids[]      = $term_id;
+									$changed                = true;
 								}
 							}
 						}
 					}
-					if ( $changed) {
-						$encoded = str_replace( array( '"{{', '}}"' ), array( '{{', '}}' ), json_encode($res) );
+					if ( $changed ) {
+						$encoded            = str_replace( array( '"{{', '}}"' ), array( '{{', '}}' ), json_encode( $res ) );
 						$this->post_content = str_replace( $match, $encoded, $this->post_content );
 					}
 				}
@@ -533,29 +539,29 @@ class Prepared_Post {
 
 			$term_object = get_term( $term_id );
 			if ( ! $term_object || is_wp_error( $term_object ) ) {
-				do_action( 'synced_post_export_log', "  - term with id '$term_id' could not be found." );
+				do_action( 'post_export_log', "  - term with id '$term_id' could not be found." );
 				$this->nested_terms[ $term_id ] = null;
 			} else {
-				do_action( 'synced_post_export_log', "  - term with id '$term_id' found.", $term_object );
+				do_action( 'post_export_log', "  - term with id '$term_id' found.", $term_object );
 				$this->nested_terms[ $term_id ] = $term_object;
 			}
 		}
 
-		do_action( 'synced_post_export_log', '=> nested terms were preparred' );
+		do_action( 'post_export_log', '=> nested terms were preparred' );
 	}
 
 	/**
 	 * Replace strings for export
 	 */
 	public function prepare_strings() {
-		$this->post_content = Post_Export_Helper::replace_dynamic_strings( $this->post_content, $this->ID );
+		$this->post_content = \Contentsync\replace_dynamic_post_strings( $this->post_content, $this->ID );
 	}
 
 	/**
 	 * Prepare meta for consumption
 	 */
 	public function prepare_meta() {
-		do_action( 'synced_post_export_log', "\r\n" . 'Prepare post meta.' );
+		do_action( 'post_export_log', "\r\n" . 'Prepare post meta.' );
 
 		$meta = get_post_meta( $this->ID );
 
@@ -564,11 +570,11 @@ class Prepared_Post {
 			foreach ( $meta_array as $meta_value ) {
 
 				// don't prepare blacklisted meta
-				if ( in_array( $meta_key, Post_Export_Helper::blacklisted_meta( 'export', $this->ID ), true ) ) {
+				if ( in_array( $meta_key, \Contentsync\get_blacklisted_meta_for_export( 'export', $this->ID ), true ) ) {
 					continue;
 				}
 				// skip certain meta keys
-				elseif ( Post_Export_Helper::maybe_skip_meta_option( $meta_key, $meta_value, 'export', $this->ID ) ) {
+				elseif ( \Contentsync\maybe_skip_meta_option( $meta_key, $meta_value, 'export', $this->ID ) ) {
 					continue;
 				}
 
@@ -576,17 +582,17 @@ class Prepared_Post {
 
 				/**
 				 * Filter to modify specific post meta values before export.
-				 * 
+				 *
 				 * This filter allows developers to customize individual post meta values
 				 * during export. The filter name is dynamic based on the meta key,
 				 * allowing for targeted modifications of specific meta fields.
-				 * 
+				 *
 				 * @filter contentsync_export_post_meta-{{meta_key}}
-				 * 
+				 *
 				 * @param mixed $meta_value      The meta value to be exported.
 				 * @param int   $post_id        The ID of the post being exported.
 				 * @param array $export_arguments The export arguments passed to the constructor.
-				 * 
+				 *
 				 * @return mixed                The modified meta value for export.
 				 */
 				$meta_value = apply_filters( 'contentsync_export_post_meta-' . $meta_key, $meta_value, $this->ID, $this->export_arguments );
@@ -595,34 +601,36 @@ class Prepared_Post {
 			}
 		}
 
-		do_action( 'synced_post_export_log', '=> post meta prepared' );
+		do_action( 'post_export_log', '=> post meta prepared' );
 	}
 
 	/**
 	 * Prepare terms associated with the post.
 	 */
 	public function prepare_terms() {
-		
-		do_action( 'synced_post_export_log', "\r\n" . 'Prepare taxonomy terms.' );
+
+		do_action( 'post_export_log', "\r\n" . 'Prepare taxonomy terms.' );
 
 		$posttype_meta = (array) get_post_meta( $this->ID, 'posttype_settings', true );
-		$is_taxonomy   = $posttype_meta && isset($posttype_meta['is_taxonomy']) && $posttype_meta['is_taxonomy'];
-		$tax_slug      = $posttype_meta && isset($posttype_meta['slug']) ? $posttype_meta['slug'] : '';
+		$is_taxonomy   = $posttype_meta && isset( $posttype_meta['is_taxonomy'] ) && $posttype_meta['is_taxonomy'];
+		$tax_slug      = $posttype_meta && isset( $posttype_meta['slug'] ) ? $posttype_meta['slug'] : '';
 
 		/**
 		 * If the post is a dynamic taxonomy, only prepare the associated terms.
 		 */
 		if ( $is_taxonomy ) {
-			
+
 			// get all terms of the taxonomy
-			$terms = get_terms( array(
-				'taxonomy' => $tax_slug,
-				'hide_empty' => false,
-			) );
+			$terms = get_terms(
+				array(
+					'taxonomy'   => $tax_slug,
+					'hide_empty' => false,
+				)
+			);
 
 			foreach ( $terms as $term ) {
-				if (isset($term->term_id)) {
-					$this->terms[$term->term_id] = $term;
+				if ( isset( $term->term_id ) ) {
+					$this->terms[ $term->term_id ] = $term;
 				}
 			}
 
@@ -637,19 +645,19 @@ class Prepared_Post {
 		$taxonomies = get_object_taxonomies( $this );
 
 		if ( empty( $taxonomies ) ) {
-			do_action( 'synced_post_export_log', '=> no taxonomy terms found' );
+			do_action( 'post_export_log', '=> no taxonomy terms found' );
 			return array();
 		}
 
 		/**
 		 * Apply filters to the taxonomies.
-		 * 
+		 *
 		 * @filter synced_post_export_taxonomies_before_prepare
-		 * 
+		 *
 		 * @param array $taxonomies The taxonomies to be exported.
 		 * @param int   $post_id    The ID of the post being exported.
 		 * @param object $post     The Prepared_Post object.
-		 * 
+		 *
 		 * @return array The filtered taxonomies.
 		 */
 		$taxonomies = apply_filters( 'synced_post_export_taxonomies_before_prepare', $taxonomies, $this->ID, $this );
@@ -671,16 +679,15 @@ class Prepared_Post {
 
 			if ( empty( $terms ) ) {
 				$prepared_terms[ $taxonomy ] = array();
-				do_action( 'synced_post_export_log', "  - no terms found for taxonomy '$taxonomy'." );
-			}
-			else {
+				do_action( 'post_export_log', "  - no terms found for taxonomy '$taxonomy'." );
+			} else {
 				$count = count( $terms );
 				do_action(
-					'synced_post_export_log',
+					'post_export_log',
 					"  - {$count} " . ( $count > 1 ? 'terms' : 'term' ) . " of taxonomy '$taxonomy' prepared:\r\n    - " . implode(
 						"\r\n    - ",
 						array_map(
-							function( $term ) {
+							function ( $term ) {
 								return "{$term->name} (#{$term->term_id})";
 							},
 							$terms
@@ -689,47 +696,57 @@ class Prepared_Post {
 				);
 				/**
 				 * Nest parent terms.
+				 *
 				 * @since 1.2.8
 				 */
-				$ids = array_map( function( $term ) { return $term->term_id; }, $terms );
+				$ids = array_map(
+					function ( $term ) {
+						return $term->term_id;
+					},
+					$terms
+				);
 				foreach ( $terms as $i => $term ) {
-					if ( $term->name == get_stylesheet() ) $term->name = '{{theme}}';
-					if ( $term->slug == get_stylesheet() ) $term->slug = '{{theme}}';
-					$prepared_terms[ $taxonomy ][$i] = $this->get_term_parents( $term, $ids );
+					if ( $term->name == get_stylesheet() ) {
+						$term->name = '{{theme}}';
+					}
+					if ( $term->slug == get_stylesheet() ) {
+						$term->slug = '{{theme}}';
+					}
+					$prepared_terms[ $taxonomy ][ $i ] = $this->get_term_parents( $term, $ids );
 				}
 			}
 		}
 
 		/**
 		 * Filter to modify the terms after they have been prepared.
-		 * 
+		 *
 		 * @filter synced_post_export_terms_after_prepare
-		 * 
+		 *
 		 * @param array $terms The terms to be exported.
 		 * @param int   $post_id The ID of the post being exported.
 		 * @param object $post The Prepared_Post object.
-		 * 
+		 *
 		 * @return array The filtered terms.
 		 */
 		$this->terms = apply_filters( 'synced_post_export_terms_after_prepare', $prepared_terms, $this->ID, $this );
 
-		do_action( 'synced_post_export_log', '=> all taxonomy terms prepared' );
+		do_action( 'post_export_log', '=> all taxonomy terms prepared' );
 	}
 
 	/**
 	 * Get all parent terms by replacing the ID with the actual term object recursively.
-	 * 
+	 *
 	 * @param WP_Term $term     The term object.
-	 * @param array $prepared   All already prepared term IDs.
-	 * 
+	 * @param array   $prepared   All already prepared term IDs.
+	 *
 	 * @return WP_Term $term    The term object with nested parent term object(s)
 	 */
 	public function get_term_parents( $term, $prepared ) {
 
-		if ( $term->parent != 0 && !in_array( $term->parent, $prepared ) ) {
-			do_action( 'synced_post_export_log', "    - parent of '".$term->term_id."' found: '".$term->parent."'" );
+		if ( $term->parent != 0 && ! in_array( $term->parent, $prepared ) ) {
+			do_action( 'post_export_log', "    - parent of '" . $term->term_id . "' found: '" . $term->parent . "'" );
 			$parent = get_term( $term->parent );
-			// do_action( 'synced_post_export_log', json_encode( $parent ) );
+			// do_action( 'post_export_log', json_encode( $parent ) );
 			$term->parent = $this->get_term_parents( $parent, $prepared );
 		}
 
@@ -740,7 +757,7 @@ class Prepared_Post {
 	 * Format media items for export
 	 */
 	public function prepare_media() {
-		
+
 		if ( $file_path = get_attached_file( $this->ID ) ) {
 
 			$file_path = str_replace( '-scaled.', '.', $file_path );
@@ -751,7 +768,7 @@ class Prepared_Post {
 			 * @since 2.18.0 Get the relative path to the uploads basedir.
 			 * - default: /2025/10/my-image.jpg
 			 * - option 'uploads_use_yearmonth_folders' set to false: /my-image.jpg
-			 * 
+			 *
 			 * We need to export this information to later replace the relative part of the url with the new
 			 * relative path of the uploaded file on the destination site, as the upload directory and the option
 			 * 'uploads_use_yearmonth_folders' might be different.
@@ -766,7 +783,7 @@ class Prepared_Post {
 				'relative_path' => $relative_path, // /2025/10/my-image.jpg
 			);
 
-			do_action( 'synced_post_export_log', "\r\n" . sprintf( "The file '%s' was added to the post.", $file_name ) );
+			do_action( 'post_export_log', "\r\n" . sprintf( "The file '%s' was added to the post.", $file_name ) );
 		}
 	}
 
@@ -777,7 +794,7 @@ class Prepared_Post {
 	 */
 	public function prepare_language() {
 
-		do_action( 'synced_post_export_log', "\r\n" . 'Prepare post language info.' );
+		do_action( 'post_export_log', "\r\n" . 'Prepare post language info.' );
 
 		// Use Translation_Manager to prepare all language data in one call
 		$this->language = Translation_Manager::prepare_post_language_data(
@@ -785,22 +802,22 @@ class Prepared_Post {
 			$this->export_arguments['translations']
 		);
 
-		do_action( 'synced_post_export_log', '=> post language info prepared', $this->language );
+		do_action( 'post_export_log', '=> post language info prepared', $this->language );
 	}
 
 
 	/**
 	 * Prepare menus by converting navigation blocks into custom links:
-	 * 
+	 *
 	 * Converts navigation blocks with post-type references to custom links:
 	 * - wp:navigation-link
-	 * - wp:navigation-submenu  
+	 * - wp:navigation-submenu
 	 * - And any other wp:navigation-* blocks
-	 * 
+	 *
 	 * From:
 	 * <!-- wp:navigation-link {"label":"Sticky Navbar","type":"page","id":548,"url":"{{site_url}}/sticky-navbar/","kind":"post-type"} /-->
 	 * <!-- wp:navigation-submenu {"label":"External Links","type":"page","id":3876,"url":"https://google.com/","kind":"post-type","className":""} -->
-	 * 
+	 *
 	 * To:
 	 * <!-- wp:navigation-link {"label":"Sticky Navbar","url":"{{site_url}}/sticky-navbar/","kind":"custom"} /-->
 	 * <!-- wp:navigation-submenu {"label":"External Links","url":"https://google.com/","kind":"custom","className":""} -->
@@ -814,58 +831,61 @@ class Prepared_Post {
 			return;
 		}
 
-		do_action( 'synced_post_export_log', "\r\n" . 'Prepare nested menus.' );
+		do_action( 'post_export_log', "\r\n" . 'Prepare nested menus.' );
 
 		$subject = $this->post_content;
 
 		// return if subject doesn't contain any navigation blocks
 		if ( strpos( $subject, 'wp:navigation-' ) === false ) {
-			do_action( 'synced_post_export_log', '=> no navigation blocks found' );
+			do_action( 'post_export_log', '=> no navigation blocks found' );
 			return $subject;
 		}
-		
+
 		// loop through all navigation blocks (self-closing and opening tags)
-		$subject = preg_replace_callback( '/<!-- wp:(navigation-[a-zA-Z-]+) (.*?) (\/-->|-->)/', function( $matches ) {
+		$subject = preg_replace_callback(
+			'/<!-- wp:(navigation-[a-zA-Z-]+) (.*?) (\/-->|-->)/',
+			function ( $matches ) {
 
-			$block_name = $matches[1]; // e.g., "navigation-link", "navigation-submenu", "navigation-mega-menu"
-			$attributes_json = $matches[2];
-			$closing = $matches[3]; // "/-->" for self-closing, "-->" for opening tag
+				$block_name      = $matches[1]; // e.g., "navigation-link", "navigation-submenu", "navigation-mega-menu"
+				$attributes_json = $matches[2];
+				$closing         = $matches[3]; // "/-->" for self-closing, "-->" for opening tag
 
-			// get the navigation block attributes
-			$attributes = json_decode( $attributes_json, true );
+				// get the navigation block attributes
+				$attributes = json_decode( $attributes_json, true );
 
-			// if json decode failed or already a custom link, return the original string
-			if ( ! is_array( $attributes ) || ! isset( $attributes['kind'] ) || $attributes['kind'] === 'custom' ) {
-				return $matches[0];
-			}
+				// if json decode failed or already a custom link, return the original string
+				if ( ! is_array( $attributes ) || ! isset( $attributes['kind'] ) || $attributes['kind'] === 'custom' ) {
+					return $matches[0];
+				}
 
-			// change kind into custom
-			$attributes['kind'] = 'custom';
+				// change kind into custom
+				$attributes['kind'] = 'custom';
 
-			// remove type & id
-			unset( $attributes['type'] );
-			unset( $attributes['id'] );
+				// remove type & id
+				unset( $attributes['type'] );
+				unset( $attributes['id'] );
 
-			// return the updated navigation block
-			return '<!-- wp:' . $block_name . ' ' . json_encode( $attributes ) . ' ' . $closing;
+				// return the updated navigation block
+				return '<!-- wp:' . $block_name . ' ' . json_encode( $attributes ) . ' ' . $closing;
+			},
+			$subject
+		);
 
-		}, $subject );
-
-		do_action( 'synced_post_export_log', '=> nested menus were resolved' );
+		do_action( 'post_export_log', '=> nested menus were resolved' );
 
 		/**
 		 * Filter to modify the post content after resolving navigation menus.
-		 * 
+		 *
 		 * This filter allows developers to customize post content after navigation
 		 * links have been converted to static links during export. It's useful for
 		 * applying additional content modifications or custom formatting.
-		 * 
+		 *
 		 * @filter synced_post_export_resolve_menus
-		 * 
+		 *
 		 * @param string $subject  The post content after menu resolution.
 		 * @param int    $post_id  The ID of the post being exported.
 		 * @param object $post     The Prepared_Post object.
-		 * 
+		 *
 		 * @return string          The modified post content for export.
 		 */
 		$this->post_content = apply_filters( 'synced_post_export_resolve_menus', $subject, $this->ID, $this );
@@ -873,15 +893,15 @@ class Prepared_Post {
 
 	/**
 	 * Prepare the post hierarchy.
-	 * 
+	 *
 	 * @since 2.18.0
-	 * 
+	 *
 	 * We collect the post hierarchy information in the Prepared_Post object. This contains
 	 * information about the parent post (if any) and all child posts (if any are found).
 	 * This information is used during the import process to try to restore the same hierarchy
 	 * based on the posts provided on the destination site.
 	 * @see \Contentsync\Post_Import::set_post_hierarchy()
-	 * 
+	 *
 	 * @var array $this->post_hierarchy Information about the post hierarchy.
 	 *    @property array $parent       Information about the parent post.
 	 *        @property int $id         The parent post ID.
@@ -891,17 +911,17 @@ class Prepared_Post {
 	 *        @property int $id         The child post ID.
 	 *        @property string $name    The child post name (slug).
 	 *        @property string $type    The child post type.
-	 * 
+	 *
 	 * @return array|null $this->post_hierarchy Information about the post hierarchy.
 	 */
 	public function prepare_post_hierarchy() {
-		
+
 		if ( ! isset( $this->export_arguments['append_nested'] ) || ! $this->export_arguments['append_nested'] ) {
 			return null;
 		}
 
 		$this->post_hierarchy = array(
-			'parent' => array(),
+			'parent'   => array(),
 			'children' => array(),
 		);
 
@@ -917,12 +937,14 @@ class Prepared_Post {
 		}
 
 		// check if there are any child posts
-		$child_posts = get_posts( array(
-			'post_parent' => $this->ID,
-			'post_type'   => $this->post_type,
-			'post_status' => 'publish',
-			'numberposts' => -1,
-		) );
+		$child_posts = get_posts(
+			array(
+				'post_parent' => $this->ID,
+				'post_type'   => $this->post_type,
+				'post_status' => 'publish',
+				'numberposts' => -1,
+			)
+		);
 		if ( $child_posts ) {
 			foreach ( $child_posts as $child_post ) {
 				$this->post_hierarchy['children'][] = array(
