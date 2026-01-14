@@ -2,7 +2,7 @@
 /**
  * Global post review object
  *
- * This file defines the `Synced_Post_Review` class, which models a review
+ * This file defines the `Post_Review` class, which models a review
  * for a global post as part of the cluster review workflow. A post
  * review records the IDs of the blog, post and editor involved, the
  * time of the review, the review state (e.g. new, in_review, denied,
@@ -15,13 +15,13 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Reviews;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-final class Synced_Post_Review {
+final class Post_Review {
 
 
 	/**
@@ -93,7 +93,7 @@ final class Synced_Post_Review {
 			return false;
 		}
 
-		return new Synced_Post_Review( $_post_review );
+		return new Post_Review( $_post_review );
 	}
 
 	/**
@@ -101,7 +101,7 @@ final class Synced_Post_Review {
 	 *
 	 * @since 3.5.0
 	 *
-	 * @param Synced_Post_Review|object $post_review Post Review object.
+	 * @param Post_Review|object $post_review Post Review object.
 	 */
 	public function __construct( $post_review ) {
 		foreach ( get_object_vars( $post_review ) as $key => $value ) {
@@ -141,7 +141,7 @@ final class Synced_Post_Review {
 			$review_id = $this->ID;
 			$messages  = array_map(
 				function ( $message ) use ( $review_id ) {
-					return new Synced_Post_Review_Message( $review_id, $message );
+					return new Post_Review_Message( $review_id, $message );
 				},
 				$messages
 			);

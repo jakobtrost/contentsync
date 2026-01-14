@@ -13,14 +13,14 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync\Cluster;
+namespace Contentsync\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 use Contentsync\Main_Helper;
 use Contentsync\Contents\Actions;
-use Contentsync\Distribution\Distributor;
+use Contentsync\Distributor;
 
 new Cluster_Admin();
 
@@ -392,7 +392,7 @@ class Cluster_Admin {
 
 			if ( $result ) {
 
-				// \Contentsync\Distribution\Logger::clear_log_file();
+				// \Contentsync\Logger::clear_log_file();
 
 				// if destination_ids are set or changed, distribute posts
 				if (
@@ -402,7 +402,7 @@ class Cluster_Admin {
 
 					// distribute posts
 					$distribute_result = Distributor::distribute_contentsync_cluster_posts(
-						new \Cluster( (object) $cluster ),
+						new \Contentsync\Cluster( (object) $cluster ),
 						array(
 							'posts'           => $cluster_posts_before,
 							'destination_ids' => $destination_ids_before,

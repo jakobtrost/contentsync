@@ -13,7 +13,7 @@
  * @since 2.17.0
  */
 
-namespace Contentsync;
+namespace Contentsync\DB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

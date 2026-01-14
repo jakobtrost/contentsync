@@ -14,7 +14,7 @@ namespace Contentsync\Mails;
  *
  * @return string The complete HTML email template.
  */
-function get_email_template( $title, $body, $footer ) {
+function get_mail_template( $title, $body, $footer ) {
 	return '<!doctype html>
 		<html>
 			<head>

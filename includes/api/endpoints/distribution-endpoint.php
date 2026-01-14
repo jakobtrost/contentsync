@@ -35,11 +35,9 @@
 namespace Contentsync\Api;
 
 use Contentsync\Main_Helper;
-use Contentsync\Distribution\Distributor;
-use Contentsync\Distribution\Logger;
-use Contentsync\Distribution\Blog_Destination;
-use Contentsync\Distribution\Remote_Destination;
-use Contentsync\Distribution\Distribution_Item;
+use Contentsync\Distributor;
+use Contentsync\Logger;
+use Contentsync\Distribution_Item;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -151,7 +149,7 @@ class Distribution_Endpoint extends Endpoint {
 		}
 
 		$blogs                = isset( $item->destination->blogs ) ? $item->destination->blogs : array();
-		$preparred_posts      = $item->posts;
+		$prepared_posts       = $item->posts;
 		$distribution_item_id = $item->ID;
 
 		if ( empty( $blogs ) || ! is_array( $blogs ) ) {
@@ -161,7 +159,7 @@ class Distribution_Endpoint extends Endpoint {
 		foreach ( $blogs as $key => $blog_destination ) {
 
 			$distribution_item_properties = array(
-				'posts'       => $preparred_posts,
+				'posts'       => $prepared_posts,
 				'destination' => $blog_destination,
 				'origin'      => $origin,
 				'origin_id'   => $distribution_item_id,
@@ -300,7 +298,7 @@ class Distribution_Endpoint extends Endpoint {
 	 *
 	 * @param array|object $destination  The remote destination object from the request, usually an array.
 	 *
-	 * @return Remote_Destination|bool   The sanitized remote destination object or false.
+	 * @return Contentsync\Destinations\Remote_Destination|bool   The sanitized remote destination object or false.
 	 */
 	public function sanitize_remote_destination( $destination ) {
 
@@ -315,7 +313,7 @@ class Distribution_Endpoint extends Endpoint {
 		$blogs = isset( $destination['blogs'] ) ? $destination['blogs'] : array();
 		unset( $destination['blogs'] );
 
-		$remote_destination = new Remote_Destination( $destination );
+		$remote_destination = new \Contentsync\Destinations\Remote_Destination( $destination );
 
 		if ( empty( $blogs ) ) {
 			Logger::add( 'sanitize_remote_destination', 'The destination has no blogs.' );
@@ -523,13 +521,13 @@ class Distribution_Endpoint extends Endpoint {
 			return $this->respond( $response, 'The request arguments were set incorrectly (status, distribution_item_id, destination).' );
 		}
 
-		$remote_blog_destination = isset( $destination['ID'] ) ? new Blog_Destination( $destination['ID'], $destination ) : false;
+		$remote_blog_destination = isset( $destination['ID'] ) ? new \Contentsync\Destinations\Blog_Destination( $destination['ID'], $destination ) : false;
 
 		if ( ! $remote_blog_destination ) {
 			return $this->respond( $response, 'The remote blog destination does not have an ID.' );
 		}
 
-		$distribution_item = \Contentsync\Distribution\get_distribution_item( $distribution_item_id );
+		$distribution_item = \Contentsync\get_distribution_item( $distribution_item_id );
 
 		if ( ! $distribution_item ) {
 			return $this->respond( $response, 'The distribution item could not be found.' );

@@ -134,7 +134,7 @@ class Translation_Manager {
 	 * - WPML: ['language_code' => 'en', 'element_id' => 123, 'trid' => 456, 'source_language_code' => null]
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
+	 * @param Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array|null Language info array or null if not found.
 	 */
 	public static function get_post_language_info( $post ) {
@@ -172,7 +172,7 @@ class Translation_Manager {
 	 * Example: ['en' => 123, 'de' => 456, 'fr' => 789]
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
+	 * @param Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array Associative array of translations (language_code => post_id).
 	 */
 	public static function get_post_translations( $post ) {
@@ -215,8 +215,8 @@ class Translation_Manager {
 	 * - 'log_message': Optional log message (or empty string)
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post $post The Prepared_Post instance.
-	 * @param bool                       $include_translations Whether to include translation post IDs.
+	 * @param Prepared_Post $post The Prepared_Post instance.
+	 * @param bool          $include_translations Whether to include translation post IDs.
 	 * @return array Array with language data.
 	 *     @property string code       The post's language code (eg. 'en')
 	 *     @property string tool       The plugin used to setup the translation.
@@ -313,8 +313,8 @@ class Translation_Manager {
 	 * - 'import_fallback': No better option exists, import as fallback
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post|object $post Prepared_Post object with language property.
-	 * @param array                             $already_imported_posts Map of original post IDs to new post IDs.
+	 * @param Prepared_Post|object $post Prepared_Post object with language property.
+	 * @param array                $already_imported_posts Map of original post IDs to new post IDs.
 	 * @return array Analysis result array.
 	 */
 	public static function analyze_translation_import( $post, $already_imported_posts = array() ) {
@@ -336,8 +336,8 @@ class Translation_Manager {
 	 * the target site.
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post|object $post Prepared_Post object with language property.
-	 * @param array                             $already_imported_posts Map of original post IDs to new post IDs.
+	 * @param Prepared_Post|object $post Prepared_Post object with language property.
+	 * @param array                $already_imported_posts Map of original post IDs to new post IDs.
 	 * @return array Analysis result.
 	 */
 	private static function analyze_translation_import_without_tool( $post, $already_imported_posts = array() ) {
@@ -471,7 +471,7 @@ class Translation_Manager {
 	 * match the post's language. This is useful during import operations.
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post|object $post Prepared_Post object with language property.
+	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @return mixed null if no language info, false if language not supported, true if switched.
 	 */
 	public static function switch_to_language_context( $post ) {

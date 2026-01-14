@@ -2,7 +2,7 @@
 /**
  * Global post review message object
  *
- * This file defines the `Synced_Post_Review_Message` class, representing
+ * This file defines the `Post_Review_Message` class, representing
  * a single message associated with a post review. Each message records
  * a timestamp, the reviewer’s user ID, the content of the message,
  * the action taken (e.g. comment, decision) and the related post
@@ -12,13 +12,13 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Reviews;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-final class Synced_Post_Review_Message {
+final class Post_Review_Message {
 
 
 	/**

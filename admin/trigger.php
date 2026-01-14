@@ -18,8 +18,8 @@ namespace Contentsync\Contents;
 
 use Contentsync\Main_Helper;
 use Contentsync\Post_Export;
-use Contentsync\Distribution\Distributor;
-use Contentsync\Distribution\Logger;
+use Contentsync\Distributor;
+use Contentsync\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

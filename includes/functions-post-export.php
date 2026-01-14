@@ -340,7 +340,7 @@ function replace_dynamic_post_strings( $subject, $post_id, $log = true ) {
 
 		if ( $log ) {
 			if ( strpos( $subject, $string ) !== false ) {
-				do_action( 'post_export_log', sprintf( "  - '%s' was preparred for export (%s → {{%s}}).", $name, $string, $name ) );
+				do_action( 'post_export_log', sprintf( "  - '%s' was prepared for export (%s → {{%s}}).", $name, $string, $name ) );
 			} else {
 				do_action( 'post_export_log', sprintf( "  - '%s' was not found in the subject (%s).", $name, $string ) );
 			}

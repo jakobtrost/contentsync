@@ -418,7 +418,7 @@ class Prepared_Post {
 			);
 		}
 
-		do_action( 'post_export_log', '=> nested elements were preparred' );
+		do_action( 'post_export_log', '=> nested elements were prepared' );
 	}
 
 	/**
@@ -547,7 +547,7 @@ class Prepared_Post {
 			}
 		}
 
-		do_action( 'post_export_log', '=> nested terms were preparred' );
+		do_action( 'post_export_log', '=> nested terms were prepared' );
 	}
 
 	/**

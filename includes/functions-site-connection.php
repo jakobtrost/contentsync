@@ -60,10 +60,10 @@ function get_site_connections() {
 function get_site_connection( $site_url ) {
 
 	$site_url = apply_filters( 'contentsync_connection_key', Main_Helper::get_nice_url( $site_url ) );
-	\Contentsync\Logger::add( 'get_site_connection', $site_url );
+	Logger::add( 'get_site_connection', $site_url );
 
 	$connections = get_site_connections();
-	\Contentsync\Logger::add( 'get_site_connections', $connections );
+	Logger::add( 'get_site_connections', $connections );
 	if ( isset( $connections[ $site_url ] ) ) {
 		$connection = $connections[ $site_url ];
 	} else {

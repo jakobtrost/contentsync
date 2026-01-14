@@ -51,20 +51,15 @@ class Connections_Page {
 			return;
 		}
 
-		/**
-		 * If the 'Content Sync' plugin is active, we add a submenu
-		 */
-		if ( class_exists( '\Synced_Post' ) ) {
-			$page_slug = add_submenu_page(
-				'global_contents', // Admin::$args['slug'], // parent slug
-				__( 'Connections', 'contentsync_hub' ),  // page title
-				__( 'Connections', 'contentsync_hub' ), // menu title
-				'manage_options', // capability
-				'gc_connections', // slug
-				array( $this, 'render_admin_page' ), // function
-				60 // position
-			);
-		}
+		$page_slug = add_submenu_page(
+			'global_contents', // Admin::$args['slug'], // parent slug
+			__( 'Connections', 'contentsync_hub' ),  // page title
+			__( 'Connections', 'contentsync_hub' ), // menu title
+			'manage_options', // capability
+			'gc_connections', // slug
+			array( $this, 'render_admin_page' ), // function
+			60 // position
+		);
 	}
 
 	/**

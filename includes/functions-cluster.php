@@ -14,10 +14,6 @@
  */
 namespace Contentsync;
 
-use Contentsync\Distribution\Distributor;
-use Contentsync\Distribution\Logger;
-use Contentsync\Main_Helper;
-
 /**
  * Global Cluster Functions
  */
@@ -31,10 +27,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @param int $cluster_id
  *
- * @return Contentsync_Cluster|false
+ * @return Cluster|false
  */
 function get_cluster_by_id( $cluster_id ) {
-	return Contentsync_Cluster::get_instance( $cluster_id );
+	return Cluster::get_instance( $cluster_id );
 }
 
 /**
@@ -56,7 +52,7 @@ function get_clusters() {
 
 	$cluster_objects = array();
 	foreach ( $clusters as $cluster ) {
-		$cluster_objects[] = new Contentsync_Cluster( $cluster );
+		$cluster_objects[] = new Cluster( $cluster );
 	}
 
 	return $cluster_objects;
@@ -82,7 +78,7 @@ function get_clusters_by_destination_id( $blog_id ) {
 
 	$cluster_objects = array();
 	foreach ( $clusters as $cluster ) {
-		$cluster_objects[] = new Contentsync_Cluster( $cluster );
+		$cluster_objects[] = new Cluster( $cluster );
 	}
 
 	return $cluster_objects;
@@ -181,14 +177,14 @@ function delete_cluster( $cluster_id ) {
 /**
  * Check if a post is in a cluster.
  *
- * @param int|WP_Post             $post_or_post_id
- * @param int|Contentsync_Cluster $cluster_or_cluster_id
+ * @param int|WP_Post $post_or_post_id
+ * @param int|Cluster $cluster_or_cluster_id
  *
  * @return bool
  */
 function is_post_in_cluster( $post_or_post_id, $cluster_or_cluster_id ) {
 
-	if ( ! $cluster_or_cluster_id instanceof Contentsync_Cluster ) {
+	if ( ! $cluster_or_cluster_id instanceof Cluster ) {
 		$cluster = get_cluster_by_id( $cluster_or_cluster_id );
 		if ( ! $cluster ) {
 			return false;
@@ -232,7 +228,7 @@ function is_post_in_cluster( $post_or_post_id, $cluster_or_cluster_id ) {
 /**
  * Get all clusters that have contents with date conditions.
  *
- * @return Contentsync_Cluster[]  All clusters containing contents with date conditions.
+ * @return Cluster[]  All clusters containing contents with date conditions.
  */
 function get_clusters_with_date_mode_condition() {
 
@@ -268,7 +264,7 @@ function get_clusters_with_date_mode_condition() {
  * @param int|WP_Post $post         The post object or ID.
  * @param string      $with_filter  Filter the clusters by a specific filter, either 'count' or 'date_mode'
  *
- * @return Contentsync_Cluster[]             All clusters containing the post, keyed by cluster ID.
+ * @return Cluster[]             All clusters containing the post, keyed by cluster ID.
  */
 function get_clusters_including_post( $post, $with_filter = null ) {
 
@@ -314,7 +310,7 @@ function get_clusters_including_post( $post, $with_filter = null ) {
  *
  * @param mixed $post_or_posttype  The post object, post ID or post type.
  *
- * @return Contentsync_Cluster[]             All clusters containing the post type, keyed by cluster ID.
+ * @return Cluster[]             All clusters containing the post type, keyed by cluster ID.
  */
 function get_clusters_including_posttype( $post_or_posttype ) {
 
@@ -363,7 +359,7 @@ function get_clusters_including_posttype( $post_or_posttype ) {
 /**
  * Get all posts inside a cluster.
  *
- * @param int|Contentsync_Cluster $cluster_or_cluster_id
+ * @param int|Cluster $cluster_or_cluster_id
  *
  * @return array        All WP_Post objects (+ @property int blog_id) keyed by blog_id.
  * @example
@@ -381,9 +377,9 @@ function get_cluster_posts_per_blog( $cluster_or_cluster_id ) {
 
 	Logger::add( 'get_cluster_posts_per_blog' );
 
-	if ( ! $cluster_or_cluster_id instanceof Contentsync_Cluster ) {
+	if ( ! $cluster_or_cluster_id instanceof Cluster ) {
 		if ( is_array( $cluster_or_cluster_id ) ) {
-			$cluster = new Contentsync_Cluster( (object) $cluster_or_cluster_id );
+			$cluster = new Cluster( (object) $cluster_or_cluster_id );
 		} else {
 			$cluster = get_cluster_by_id( $cluster_or_cluster_id );
 		}

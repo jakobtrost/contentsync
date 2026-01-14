@@ -1195,7 +1195,7 @@ class Post_Import {
 	 *
 	 * @param int           $post_id      Post ID.
 	 * @param array         $meta         Array of meta as key => value.
-	 * @param Prepared_Post $post  The preparred post object (optional).
+	 * @param Prepared_Post $post  The prepared post object (optional).
 	 */
 	public static function set_meta( $post_id, $meta, $post = null ) {
 		do_action( 'post_export_log', "\r\n" . 'Set post meta.' );
@@ -1625,7 +1625,7 @@ class Post_Import {
 	 * information about the parent post (if any) and all child posts (if any are found).
 	 * This information is used now to try to restore the same hierarchy based on the posts
 	 * that exist on the destination site or are part of the posts that are being imported.
-	 * @see \Contentsync\Prepared_Post::prepare_post_hierarchy()
+	 * @see Prepared_Post::prepare_post_hierarchy()
 	 *
 	 * @param int           $post_id      Post ID on this stage.
 	 * @param Prepared_Post $post  Old Prepared_Post object (Post ID might differ).
@@ -1637,7 +1637,7 @@ class Post_Import {
 
 		/**
 		 * @since 2.18.0 Post hierarchy information.
-		 * @see \Contentsync\Prepared_Post->post_hierarchy property.
+		 * @see Prepared_Post->post_hierarchy property.
 		 *
 		 * @var array $post->post_hierarchy Information about the post hierarchy.
 		 *    @property array $parent       Information about the parent post.

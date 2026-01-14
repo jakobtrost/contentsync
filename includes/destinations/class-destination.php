@@ -25,7 +25,7 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Destinations;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

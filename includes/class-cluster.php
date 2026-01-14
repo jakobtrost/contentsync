@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Global Contentsync_Cluster object
+ * Global Cluster object
  *
- * This file declares the `Contentsync_Cluster` class, which models a cluster of
+ * This file declares the `Cluster` class, which models a cluster of
  * destinations within the Content Sync system. A cluster defines a
  * collection of blogs or sites to which content should be distributed,
  * as well as review and content condition settings. The class stores
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-final class Contentsync_Cluster {
+final class Cluster {
 
 	/**
 	 * Cluster ID.
@@ -80,13 +80,13 @@ final class Contentsync_Cluster {
 			return false;
 		}
 
-		return new Contentsync_Cluster( $_cluster );
+		return new Cluster( $_cluster );
 	}
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Contentsync_Cluster|object $cluster Contentsync_Cluster object.
+	 * @param Cluster|object $cluster Cluster object.
 	 */
 	public function __construct( $cluster ) {
 		foreach ( get_object_vars( $cluster ) as $key => $value ) {

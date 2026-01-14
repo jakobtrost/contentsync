@@ -113,7 +113,7 @@ class Connections_List_Table extends \WP_List_Table {
 			'user_login' => __( 'User', 'contentsync_hub' ),
 			'active'     => __( 'State', 'contentsync_hub' ),
 			// 'password'       => __( "Password", 'contentsync_hub' ),
-			'options'    => __( 'Settings', 'contentsync_hub' ),
+			// 'options'    => __( 'Settings', 'contentsync_hub' ),
 			// 'debug'          => 'Debug',
 		);
 
@@ -170,34 +170,6 @@ class Connections_List_Table extends \WP_List_Table {
 							'text'  => $active ? __( 'Connection active', 'contentsync_hub' ) : __( 'Connection inactive', 'contentsync_hub' ),
 						)
 					);
-				}
-				break;
-
-			case 'options':
-				$site_url         = isset( $item['site_url'] ) ? Main_Helper::get_nice_url( $item['site_url'] ) : null;
-				$contents_checked = ! isset( $item['contents'] ) || $item['contents'] ? 'checked' : '';
-				$search_checked   = ! isset( $item['search'] ) || $item['search'] ? 'checked' : '';
-
-				if ( class_exists( 'Synced_Post' ) ) {
-					return "<div class='gc_connection_options' data-site_url='$site_url'>
-						<label>
-							<input type='checkbox' name='contents' value='contents' $contents_checked>
-							" . __( 'Use for Content Sync', 'contentsync_hub' ) . "
-						</label>
-						<label>
-							<input type='checkbox' name='search' value='search' $search_checked>
-							" . __( 'Use for Global Search', 'contentsync_hub' ) . "
-						</label>
-						<span
-							class='button small save_connection_options hidden'
-							data-text='" . __( 'Save', 'contentsync_hub' ) . "'
-							data-text_loading='" . __( 'Saving...', 'contentsync_hub' ) . "'
-							data-text_success='" . __( '✓ Saved', 'contentsync_hub' ) . "'
-							data-text_fail='" . __( 'Not saved', 'contentsync_hub' ) . "'
-						></span>
-					</div>";
-				} else {
-					return '';
 				}
 				break;
 

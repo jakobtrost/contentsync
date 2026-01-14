@@ -192,10 +192,10 @@ function distribute_item_to_remote_site( $connection_or_site_url, $remote_distri
  *
  * This function calles the endpoint 'distribution/update-item' on the origin site.
  *
- * @param array|string       $connection_or_site_url  The connection or site URL.
- * @param int                $distribution_item_id    The Distribution_Item ID.
- * @param string             $status                  The status of the distribution.
- * @param Remote_Destination $destination             The destination object.
+ * @param array|string                                 $connection_or_site_url  The connection or site URL.
+ * @param int                                          $distribution_item_id    The Distribution_Item ID.
+ * @param string                                       $status                  The status of the distribution.
+ * @param \Contentsync\Destinations\Remote_Destination $destination             The destination object.
  */
 function update_distribution_item( $connection_or_site_url, $distribution_item_id, $status, $destination ) {
 	return send_request(

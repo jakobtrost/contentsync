@@ -179,7 +179,7 @@ class Post_Export {
 	 * This function automatically sets the following class vars.
 	 * Use them to export all nested posts at once.
 	 *
-	 * @var array class::$posts     Array of all preparred post objects.
+	 * @var array class::$posts     Array of all prepared post objects.
 	 * @var array class::$media     Array of all media files.
 	 *
 	 * @since 2.18.0 (plugin version) the method does support a post objects as first argument.

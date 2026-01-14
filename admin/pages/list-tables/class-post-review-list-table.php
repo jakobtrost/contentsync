@@ -3,7 +3,7 @@
  * Displays all cluster post reviews in a table.
  *
  * @extends WP_List_Table ( wp-admin/includes/class-wp-list-table.php )
- * 
+ *
  * @since 2.17.0
  */
 
@@ -11,11 +11,13 @@ namespace Contentsync\Cluster;
 
 use Contentsync\Main_Helper;
 
-if ( !defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 // include the parent class
-if ( !class_exists( 'WP_List_Table' ) ) {
-	require_once ABSPATH.'wp-admin/includes/class-wp-list-table.php';
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
 class Post_Review_List_Table extends \WP_List_Table {
@@ -56,14 +58,14 @@ class Post_Review_List_Table extends \WP_List_Table {
 		$sortable              = $this->get_sortable_columns();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$rel   = isset( $_GET['rel'] ) && !empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'open';
+		$rel   = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'open';
 		$items = get_synced_post_reviews( $rel == 'open' ? null : $rel );
 		// debug($items);
 
 		// sort
 		$orderby  = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'post_date';
 		$order    = isset( $_GET['order'] ) ? $_GET['order'] : 'desc';
-		$callback = method_exists( __CLASS__, 'sortby_'.$orderby.'_'.$order ) ? array( __CLASS__, 'sortby_'.$orderby.'_'.$order ) : array( __CLASS__, 'sortby_date_desc' );
+		$callback = method_exists( __CLASS__, 'sortby_' . $orderby . '_' . $order ) ? array( __CLASS__, 'sortby_' . $orderby . '_' . $order ) : array( __CLASS__, 'sortby_date_desc' );
 		usort( $items, $callback );
 
 		// pagination
@@ -89,7 +91,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 */
 	public function render() {
 		echo '<div class="wrap">';
-		echo '<h1>'.esc_html( get_admin_page_title() ).'</h1>';
+		echo '<h1>' . esc_html( get_admin_page_title() ) . '</h1>';
 		// echo sprintf(
 		// '<a href="%s" class="page-title-action">%s</a>',
 		// admin_url( 'site-editor.php' ),
@@ -97,7 +99,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		// );
 		echo '<hr class="wp-header-end">';
 
-		echo '<p>'.__( 'Here you can manage all pending post reviews.', 'contentsync' ).'</p>';
+		echo '<p>' . __( 'Here you can manage all pending post reviews.', 'contentsync' ) . '</p>';
 
 		$this->views();
 
@@ -123,7 +125,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 
 		$views  = array();
 		$return = array();
-		$rel    = isset( $_GET['rel'] ) && !empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'open';
+		$rel    = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'open';
 
 		$views = array(
 			'open'     => __( 'Open', 'contentsync' ),
@@ -140,8 +142,10 @@ class Post_Review_List_Table extends \WP_List_Table {
 				foreach ( array( 'new', 'in_review', 'denied' ) as $state ) {
 					$items_count += count( get_synced_post_reviews( $state ) );
 				}
-			} else $items_count = count( get_synced_post_reviews( $type ) );
-			$query              = remove_query_arg( array( 'rel', 'paged', 'action', 'post', '_wpnonce' ) );
+			} else {
+				$items_count = count( get_synced_post_reviews( $type ) );
+			}
+			$query = remove_query_arg( array( 'rel', 'paged', 'action', 'post', '_wpnonce' ) );
 
 			$return[ $type ] = sprintf(
 				'<a href="%s" class="%s">%s <span class="count">(%s)</span></a>',
@@ -163,7 +167,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 */
 	protected function display_tablenav( $which ) {
 		if ( 'top' === $which ) {
-			wp_nonce_field( 'bulk-'.$this->_args['plural'] );
+			wp_nonce_field( 'bulk-' . $this->_args['plural'] );
 			// $this->search_box( __( 'Search' ), 'search-box-id' );
 		}
 		?>
@@ -214,7 +218,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 
 		$text = __( 'No reviews active.', 'contentsync' );
 
-		echo '<div style="margin: 4px 0;">'.$text.'</div>';
+		echo '<div style="margin: 4px 0;">' . $text . '</div>';
 	}
 
 
@@ -227,12 +231,12 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the post title & actions column output.
 	 *
-	 * @param Synced_Post_Review $post The current Synced_Post_Review object.
+	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
 	 */
 	public function column_post_title( $post ) {
 
 		$root_post = is_multisite() ? get_blog_post( $post->blog_id, $post->post_id ) : get_post( $post->post_id );
-		if ( !$root_post ) {
+		if ( ! $root_post ) {
 			$root_post = $post->previous_post;
 		}
 		$title       = $root_post ? $root_post->post_title : __( 'N/A', 'contentsync' );
@@ -243,7 +247,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 				$_REQUEST['page'],
 				$action,
 				$post->ID,
-				wp_create_nonce( $action.'_review' )
+				wp_create_nonce( $action . '_review' )
 			);
 		};
 
@@ -252,7 +256,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 
 		$row_actions = array();
 
-		if ( !empty( $edit_link ) ) {
+		if ( ! empty( $edit_link ) ) {
 			$row_actions['edit'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
 				$edit_link,
@@ -282,7 +286,6 @@ class Post_Review_List_Table extends \WP_List_Table {
 			);
 		}
 
-
 		if ( $post->state == 'approved' || $post->state == 'denied' ) {
 			$row_actions['revert-review'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
@@ -302,7 +305,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		);
 
 		// render the post title
-		if ( !empty( $edit_link ) && $root_post->post_status != 'trash' ) {
+		if ( ! empty( $edit_link ) && $root_post->post_status != 'trash' ) {
 			$content = sprintf(
 				'<strong><a class="row-title" href="%s">%s</a></strong>',
 				$edit_link,
@@ -331,7 +334,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the editor column output.
 	 *
-	 * @param Synced_Post_Review $post The current Synced_Post_Review object.
+	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
 	 */
 	public function column_editor( $post ) {
 		return $post->get_editor();
@@ -340,7 +343,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the reviewer column output.
 	 *
-	 * @param Synced_Post_Review $post The current Synced_Post_Review object.
+	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
 	 */
 	public function column_reviewer( $post ) {
 		if ( in_array( $post->state, array( 'approved', 'denied', 'reverted' ) ) ) {
@@ -353,17 +356,17 @@ class Post_Review_List_Table extends \WP_List_Table {
 					$reviewer_message_content = $reviewer_message->get_content( true );
 					if ( empty( $reviewer_message_content ) ) {
 						$info .= Main_Helper::render_info_popup(
-							"<div class='log_title'>".sprintf( __( 'The reviewer (%s) left no message.', 'contentsync' ), $reviewer ).'</div>'
+							"<div class='log_title'>" . sprintf( __( 'The reviewer (%s) left no message.', 'contentsync' ), $reviewer ) . '</div>'
 						);
 					} else {
 						$info .= Main_Helper::render_info_popup(
-							"<div class='log_title'>".sprintf( __( 'The reviewer (%s) left the following message:', 'contentsync' ), $reviewer ).'</div>'.
-							"<div class='log_items'><b>".$reviewer_message_content.'</b></div>'
+							"<div class='log_title'>" . sprintf( __( 'The reviewer (%s) left the following message:', 'contentsync' ), $reviewer ) . '</div>' .
+							"<div class='log_items'><b>" . $reviewer_message_content . '</b></div>'
 						);
 					}
 				}
 			}
-			return $reviewer.$info;
+			return $reviewer . $info;
 		}
 		return '';
 	}
@@ -371,7 +374,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the post date column output.
 	 *
-	 * @param Synced_Post_Review $post The current Synced_Post_Review object.
+	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
 	 */
 	public function column_date( $post ) {
 
@@ -390,12 +393,12 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the state column output.
 	 *
-	 * @param Synced_Post_Review $post The current Synced_Post_Review object.
+	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
 	 */
 	public function column_state( $post ) {
 		// return $post->state;
 
-		$color = 'blue';
+		$color  = 'blue';
 		$action = $post->state; // new, in_review, denied, approved, reverted
 		if ( $action === 'new' ) {
 			$text = __( 'New', 'contentsync' );
@@ -403,13 +406,13 @@ class Post_Review_List_Table extends \WP_List_Table {
 			$text = __( 'In Review', 'contentsync' );
 		} elseif ( $action === 'denied' ) {
 			$color = 'red';
-			$text = __( 'Denied', 'contentsync' );
+			$text  = __( 'Denied', 'contentsync' );
 		} elseif ( $action === 'approved' ) {
 			$color = 'green';
-			$text = __( 'Approved', 'contentsync' );
+			$text  = __( 'Approved', 'contentsync' );
 		} elseif ( $action === 'reverted' ) {
 			$color = 'red';
-			$text = __( 'Reverted', 'contentsync' );
+			$text  = __( 'Reverted', 'contentsync' );
 		}
 		return $this->render_status_box( $text, $color );
 	}
@@ -443,7 +446,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the root_stage column output.
 	 *
-	 * @param Synced_Post_Review $post The current Synced_Post_Review object.
+	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
 	 */
 	public function column_root_stage( $post ) {
 		return $this->get_root_blog_url( $post->blog_id );
@@ -452,7 +455,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the destinations column output.
 	 *
-	 * @param Synced_Post_Review $post The current Synced_Post_Review object.
+	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
 	 */
 	public function column_destinations( $post ) {
 		return '';
@@ -493,11 +496,11 @@ class Post_Review_List_Table extends \WP_List_Table {
 	public function process_bulk_action() {
 
 		// verify the nonce and action
-		if ( !isset( $_REQUEST['_wpnonce'] ) ||
-			!isset( $_REQUEST['action'] ) || empty( $_REQUEST['action'] ) ||
-			!in_array( $_REQUEST['action'], array( 'approve', 'deny', 'revert', 'delete' ) ) ||
-			!(
-				wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-'.$this->_args['plural'] ) ||
+		if ( ! isset( $_REQUEST['_wpnonce'] ) ||
+			! isset( $_REQUEST['action'] ) || empty( $_REQUEST['action'] ) ||
+			! in_array( $_REQUEST['action'], array( 'approve', 'deny', 'revert', 'delete' ) ) ||
+			! (
+				wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-' . $this->_args['plural'] ) ||
 				( wp_verify_nonce( $_REQUEST['_wpnonce'], 'approve_review' ) && $_REQUEST['action'] == 'approve' ) ||
 				( wp_verify_nonce( $_REQUEST['_wpnonce'], 'revert_review' ) && $_REQUEST['action'] == 'revert' ) ||
 				( wp_verify_nonce( $_REQUEST['_wpnonce'], 'delete_review' ) && $_REQUEST['action'] == 'delete' )
@@ -519,12 +522,12 @@ class Post_Review_List_Table extends \WP_List_Table {
 		}
 		// but if the user confirmed the action (eg. on 'delete'),
 		// the values are set as an encoded string
-		else if ( is_string( $post_ids ) ) {
+		elseif ( is_string( $post_ids ) ) {
 			$post_ids = esc_sql( json_decode( stripslashes( $post_ids ), true ) );
 		}
 
 		// single action
-		if ( !is_array( $post_ids ) && intval( $post_ids ) == $post_ids ) {
+		if ( ! is_array( $post_ids ) && intval( $post_ids ) == $post_ids ) {
 			// debug($post_ids);
 			$post_ids = array( $post_ids );
 		}
@@ -541,29 +544,29 @@ class Post_Review_List_Table extends \WP_List_Table {
 				if ( $post ) {
 					// get root post
 					$root_post = is_multisite() ? get_blog_post( $post->blog_id, $post->post_id ) : get_post( $post->post_id );
-					if ( !$root_post ) {
+					if ( ! $root_post ) {
 						$root_post = $post->previous_post;
 					}
 					// perform the action...
 					$result = false;
 					switch ( $bulk_action ) {
 						case 'approve':
-							Main_Helper::switch_to_blog($post->blog_id);
-							$result = (bool)\Contentsync\Contents\Actions::approve_post_review( $post_id );
+							Main_Helper::switch_to_blog( $post->blog_id );
+							$result = (bool) \Contentsync\Contents\Actions::approve_post_review( $post_id );
 							Main_Helper::restore_blog();
 							break;
 						case 'deny':
-							Main_Helper::switch_to_blog($post->blog_id);
-							$result = (bool)\Contentsync\Contents\Actions::deny_post_review( $post_id );
+							Main_Helper::switch_to_blog( $post->blog_id );
+							$result = (bool) \Contentsync\Contents\Actions::deny_post_review( $post_id );
 							Main_Helper::restore_blog();
 							break;
 						case 'revert':
-							Main_Helper::switch_to_blog($post->blog_id);
-							$result = (bool)\Contentsync\Contents\Actions::revert_post_review( $post_id, $root_post->ID );
+							Main_Helper::switch_to_blog( $post->blog_id );
+							$result = (bool) \Contentsync\Contents\Actions::revert_post_review( $post_id, $root_post->ID );
 							Main_Helper::restore_blog();
 							break;
 						case 'delete':
-							$result = (bool)delete_synced_post_review( $post_id );
+							$result = (bool) delete_synced_post_review( $post_id );
 							break;
 						default:
 							break;
@@ -600,7 +603,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		if ( $result === true ) {
 			if ( count( $post_titles ) > 1 ) {
 				$last        = array_pop( $post_titles );
-				$post_titles = implode( ', ', $post_titles ).' & '.$last;
+				$post_titles = implode( ', ', $post_titles ) . ' & ' . $last;
 			} else {
 				$post_titles = implode( ', ', $post_titles );
 			}
@@ -609,8 +612,8 @@ class Post_Review_List_Table extends \WP_List_Table {
 			$notice_class = 'error';
 			$error        = count( $post_ids ) == 0 ? 'no_posts' : 'fail';
 			$content      = $notices[ $bulk_action ][ $error ];
-			if ( is_string( $result ) && !empty( $result ) ) {
-				$content .= ' '.__( 'Error message:', 'contentsync' ).' '.$result;
+			if ( is_string( $result ) && ! empty( $result ) ) {
+				$content .= ' ' . __( 'Error message:', 'contentsync' ) . ' ' . $result;
 			}
 		}
 
@@ -618,13 +621,13 @@ class Post_Review_List_Table extends \WP_List_Table {
 		if ( isset( $_GET['_wpnonce'] ) ) {
 			$notice_content .= "<script>    
 				if ( typeof window.history.pushState == 'function' ) {
-					window.history.pushState({}, 'Hide', '".$_SERVER['HTTP_REFERER']."');
+					window.history.pushState({}, 'Hide', '" . $_SERVER['HTTP_REFERER'] . "');
 				}
 			</script>";
 		}
 
 		// display the admin notice
-		$this->show_message( $content.$notice_content, $notice_class );
+		$this->show_message( $content . $notice_content, $notice_class );
 	}
 
 	/**
@@ -666,9 +669,14 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 * @param bool   $list    Add to hub msg list (default: false).
 	 */
 	public static function show_message( $msg, $mode = 'info', $list = false ) {
-		if ( empty( $msg ) ) return;
-		if ( $list ) echo "<p class='hub_msg msg_list {$mode}'>{$msg}</p>";
-		else echo "<div class='notice notice-{$mode} is-dismissible'><p>{$msg}</p></div>";
+		if ( empty( $msg ) ) {
+			return;
+		}
+		if ( $list ) {
+			echo "<p class='hub_msg msg_list {$mode}'>{$msg}</p>";
+		} else {
+			echo "<div class='notice notice-{$mode} is-dismissible'><p>{$msg}</p></div>";
+		}
 	}
 
 

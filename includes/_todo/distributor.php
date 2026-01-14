@@ -19,7 +19,7 @@ namespace Contentsync\Distribution;
 
 use Contentsync\Main_Helper;
 use Contentsync\Contents\Actions;
-use Contentsync\Connections\Remote_Operations;
+use Remote_Operations;
 use WP_Error;
 
 new Distributor();
@@ -77,17 +77,17 @@ class Distributor {
 		$destinations = self::get_destinations( $destination_ids_or_arrays, $root_post_id );
 
 		// Prepare posts for distribution.
-		$preparred_posts = self::prepare_posts_for_distribution(
+		$prepared_posts = self::prepare_posts_for_distribution(
 			$post_ids,
 			! empty( $export_args ) ? $export_args : Main_Helper::get_contentsync_meta( $root_post, 'contentsync_options' ),
 			$root_post_id
 		);
 
-		if ( is_wp_error( $preparred_posts ) ) {
-			return $preparred_posts;
+		if ( is_wp_error( $prepared_posts ) ) {
+			return $prepared_posts;
 		}
 
-		return self::schedule_post_distribution( $preparred_posts, $destinations );
+		return self::schedule_post_distribution( $prepared_posts, $destinations );
 	}
 
 	/**
@@ -142,16 +142,16 @@ class Distributor {
 		$destinations = self::get_destinations( $destination_ids_or_arrays );
 
 		// Prepare posts for distribution.
-		$preparred_posts = self::prepare_posts_for_distribution(
+		$prepared_posts = self::prepare_posts_for_distribution(
 			$post_ids_or_objects,
 			! empty( $export_args ) ? $export_args : array()
 		);
 
-		if ( is_wp_error( $preparred_posts ) ) {
-			return $preparred_posts;
+		if ( is_wp_error( $prepared_posts ) ) {
+			return $prepared_posts;
 		}
 
-		return self::schedule_post_distribution( $preparred_posts, $destinations );
+		return self::schedule_post_distribution( $prepared_posts, $destinations );
 	}
 
 	/**
@@ -199,8 +199,8 @@ class Distributor {
 	/**
 	 * Distribute cluster posts to all destinations.
 	 *
-	 * @param Contentsync_Cluster|int $cluster_or_cluster_id
-	 * @param array                   $before
+	 * @param Cluster|int $cluster_or_cluster_id
+	 * @param array       $before
 	 *   @property array posts              Posts before the distribution, per blog_id.
 	 *   @property array destination_ids    Destination IDs before the distribution.
 	 *
@@ -212,7 +212,7 @@ class Distributor {
 		// Logger::add( "Cluster or ID:", $cluster_or_cluster_id );
 		// Logger::add( "Before:", $before );
 
-		if ( ! $cluster_or_cluster_id instanceof \Contentsync_Cluster ) {
+		if ( ! $cluster_or_cluster_id instanceof \Contentsync\Cluster ) {
 			$cluster = get_cluster_by_id( $cluster_or_cluster_id );
 			if ( ! $cluster ) {
 				return false;
@@ -300,7 +300,7 @@ class Distributor {
 
 		Logger::add( 'distribute_cluster_content_condition_posts' );
 
-		if ( ! $condition_or_condition_id instanceof \Cluster_Content_Condition ) {
+		if ( ! $condition_or_condition_id instanceof \Contentsync\Cluster_Content_Condition ) {
 			$condition = get_cluster_content_condition_by_id( $condition_or_condition_id );
 			if ( ! $condition ) {
 				return false;
@@ -370,7 +370,7 @@ class Distributor {
 	 *                                          the distribution. We use this to make sure this post will be updated and not
 	 *                                          skipped, as it probably has been changed.
 	 *
-	 * @return Destination[] Array of Blog_Destination and Remote_Destination objects.
+	 * @return \Contentsync\Destinations\Destination[] Array of Blog_Destination and Remote_Destination objects.
 	 */
 	public static function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 
@@ -432,7 +432,7 @@ class Distributor {
 				$remote_network_url = Main_Helper::get_nice_url( $remote_network_url );
 
 				if ( ! isset( $destinations[ $remote_network_url ] ) ) {
-					$destinations[ $remote_network_url ] = new Remote_Destination( $remote_network_url );
+					$destinations[ $remote_network_url ] = new \Contentsync\Destinations\Remote_Destination( $remote_network_url );
 				}
 
 				$blog = $destinations[ $remote_network_url ]->set_blog( $remote_blog_id );
@@ -454,7 +454,7 @@ class Distributor {
 				}
 
 				if ( ! isset( $destinations[ $blog_id ] ) ) {
-					$destinations[ $blog_id ] = new Blog_Destination(
+					$destinations[ $blog_id ] = new \Contentsync\Destinations\Blog_Destination(
 						$blog_id,
 						array(
 							'url' => get_home_url( $blog_id ),
@@ -505,7 +505,7 @@ class Distributor {
 					$post_connection = $post_connection_or_blogs;
 
 					if ( ! isset( $destinations[ $blod_id ] ) ) {
-						$destinations[ $blod_id ] = new Blog_Destination(
+						$destinations[ $blod_id ] = new \Contentsync\Destinations\Blog_Destination(
 							$blod_id,
 							array(
 								'url' => get_home_url( $blod_id ),
@@ -529,7 +529,7 @@ class Distributor {
 					$blogs              = $post_connection_or_blogs;
 
 					if ( ! isset( $destinations[ $remote_network_url ] ) ) {
-						$destinations[ $remote_network_url ] = new Remote_Destination( $remote_network_url );
+						$destinations[ $remote_network_url ] = new \Contentsync\Destinations\Remote_Destination( $remote_network_url );
 					}
 
 					foreach ( $blogs as $blog_id => $post_connection ) {
@@ -555,7 +555,7 @@ class Distributor {
 	 *
 	 * @param array $post_ids_or_objects Array of post IDs or post objects.
 	 *                                   If post objects are provided, they must have the property 'ID'.
-	 *                                   Also if set, the following properties are inherited to the preparred post:
+	 *                                   Also if set, the following properties are inherited to the prepared post:
 	 *                                       * 'import_action'
 	 *                                       * 'conflict_action'
 	 *                                       * 'export_arguments'
@@ -576,7 +576,7 @@ class Distributor {
 			return new WP_Error( 'invalid_post_ids', __( 'Invalid post IDs.', 'global-contents' ) );
 		}
 
-		$preparred_posts = Main_Helper::export_posts( $post_ids_or_objects, $export_args );
+		$prepared_posts = Main_Helper::export_posts( $post_ids_or_objects, $export_args );
 
 		$inherit_properties = array(
 			'import_action',
@@ -588,7 +588,7 @@ class Distributor {
 		/**
 		 * Make sure all posts are global posts.
 		 */
-		foreach ( $preparred_posts as $post_id => $post ) {
+		foreach ( $prepared_posts as $post_id => $post ) {
 			$gid = isset( $post->meta['synced_post_id'] ) ? $post->meta['synced_post_id'][0] : '';
 
 			/**
@@ -607,8 +607,8 @@ class Distributor {
 				 * If a post already exists on a blog (= the gid exists), it is skipped anyway
 				 * and this change has no effect for that specific post.
 				 */
-				$preparred_posts[ $post_id ]->meta = array_merge(
-					$preparred_posts[ $post_id ]->meta,
+				$prepared_posts[ $post_id ]->meta = array_merge(
+					$prepared_posts[ $post_id ]->meta,
 					array(
 						'synced_post_id'     => array( $gid ),
 						'synced_post_status' => array( 'linked' ),
@@ -620,7 +620,7 @@ class Distributor {
 			 * Set fallback conflict action to 'replace', so that a conflicting post is
 			 * always updated on the destination sites.
 			 */
-			$preparred_posts[ $post_id ]->conflict_action = 'replace';
+			$prepared_posts[ $post_id ]->conflict_action = 'replace';
 
 			/**
 			 * Set custom property to mark the root post.
@@ -629,7 +629,7 @@ class Distributor {
 			 */
 			if ( $root_post_id && $root_post_id == $post_id ) {
 				Logger::add( 'is_contentsync_root_post = true' );
-				$preparred_posts[ $post_id ]->is_contentsync_root_post = true;
+				$prepared_posts[ $post_id ]->is_contentsync_root_post = true;
 			}
 
 			/**
@@ -638,7 +638,7 @@ class Distributor {
 			if ( isset( $post_objects[ $post_id ] ) ) {
 				foreach ( $inherit_properties as $property ) {
 					if ( isset( $post_objects[ $post_id ]->$property ) && ! empty( $post_objects[ $post_id ]->$property ) ) {
-						$preparred_posts[ $post_id ]->$property = $post_objects[ $post_id ]->$property;
+						$prepared_posts[ $post_id ]->$property = $post_objects[ $post_id ]->$property;
 						// Logger::add( 'inherit property from post_objects: '.$property.' = ', $post_objects[ $post_id ]->$property );
 					}
 				}
@@ -658,31 +658,31 @@ class Distributor {
 		 *
 		 * @filter contentsync_prepared_posts_for_distribution
 		 *
-		 * @param Prepared_Post[] $preparred_posts Array of prepared posts for distribution.
+		 * @param Prepared_Post[] $prepared_posts Array of prepared posts for distribution.
 		 * @param int[]           $post_ids        Array of post IDs being distributed.
 		 * @param array           $export_args     Export arguments and configuration.
 		 *
 		 * @return Prepared_Post[] Modified array of prepared posts for distribution.
 		 */
-		return apply_filters( 'contentsync_prepared_posts_for_distribution', $preparred_posts, $post_ids_or_objects, $export_args );
+		return apply_filters( 'contentsync_prepared_posts_for_distribution', $prepared_posts, $post_ids_or_objects, $export_args );
 	}
 
 	/**
 	 * Schedule post distribution.
 	 *
-	 * @param Prepared_Post[] $preparred_posts  Array of preparred posts.
-	 * @param Destination[]   $destinations        Array of Blog_Destination and Remote_Destination objects.
+	 * @param Prepared_Post[]                         $prepared_posts  Array of prepared posts.
+	 * @param \Contentsync\Destinations\Destination[] $destinations        Array of Blog_Destination and Remote_Destination objects.
 	 *
 	 * @return WP_Error|true  WP_Error on failure, true on success.
 	 */
-	public static function schedule_post_distribution( $preparred_posts, $destinations ) {
+	public static function schedule_post_distribution( $prepared_posts, $destinations ) {
 
 		Logger::add( 'schedule_post_distribution' );
-		// Logger::add( 'preparred_posts', $preparred_posts );
+		// Logger::add( 'prepared_posts', $prepared_posts );
 		// Logger::add( 'destinations', $destinations );
 
-		if ( empty( $preparred_posts ) || ! is_array( $preparred_posts ) ) {
-			return new WP_Error( 'invalid_preparred_posts', __( 'Invalid preparred posts.', 'global-contents' ) );
+		if ( empty( $prepared_posts ) || ! is_array( $prepared_posts ) ) {
+			return new WP_Error( 'invalid_prepared_posts', __( 'Invalid prepared posts.', 'global-contents' ) );
 		}
 
 		if ( empty( $destinations ) || ! is_array( $destinations ) ) {
@@ -694,7 +694,7 @@ class Distributor {
 		foreach ( $destinations as $destination ) {
 
 			$distribution_item_properties = array(
-				'posts'       => $preparred_posts,
+				'posts'       => $prepared_posts,
 				'destination' => $destination,
 			);
 
@@ -724,8 +724,8 @@ class Distributor {
 	 * Schedule a distribution item.
 	 *
 	 * @param array $distribution_item_properties  The distribution item properties.
-	 *   @property Prepared_Post[] $posts       Array of preparred posts.
-	 *   @property Destination      $destination The destination object
+	 *   @property Prepared_Post[] $posts       Array of prepared posts.
+	 *   @property \Contentsync\Destinations\Destination      $destination The destination object
 	 *
 	 * @return WP_Error|int  WP_Error on failure, the action ID on success.
 	 */
@@ -794,7 +794,7 @@ class Distributor {
 		// get the distribution item from the database
 		$distribution_item = get_distribution_item( $distribution_item_id );
 
-		if ( ! is_a( $distribution_item, 'Contentsync\Distribution\Distribution_Item' ) ) {
+		if ( ! is_a( $distribution_item, 'Contentsync\Distribution_Item' ) ) {
 			return new WP_Error( 'invalid_distribution_item', __( 'Invalid distribution item.', 'global-contents' ) );
 		}
 
@@ -859,7 +859,7 @@ class Distributor {
 
 		$item = get_distribution_item( $item_id );
 
-		if ( ! is_a( $item, 'Contentsync\Distribution\Distribution_Item' ) ) {
+		if ( ! is_a( $item, 'Contentsync\Distribution_Item' ) ) {
 			return false;
 		}
 
@@ -872,7 +872,7 @@ class Distributor {
 		);
 
 		// Distribute to local blog.
-		if ( is_a( $item->destination, 'Contentsync\Distribution\Blog_Destination' ) ) {
+		if ( is_a( $item->destination, 'Contentsync\Destinations\Blog_Destination' ) ) {
 
 			$result = self::distribute_to_blog( $item );
 
@@ -884,7 +884,7 @@ class Distributor {
 		}
 
 		// Distribute to remote site.
-		if ( is_a( $item->destination, 'Contentsync\Distribution\Remote_Destination' ) ) {
+		if ( is_a( $item->destination, 'Contentsync\Destinations\Remote_Destination' ) ) {
 
 			$result = self::distribute_to_remote_site( $item );
 
@@ -935,7 +935,7 @@ class Distributor {
 		// // inherit properties from the destination
 		// foreach( $inherit_properties as $property ) {
 		// if ( isset($item->destination->$property) && ! empty($item->destination->$property) ) {
-		// foreach ( $item->posts as $post_id => $preparred_post ) {
+		// foreach ( $item->posts as $post_id => $prepared_post ) {
 		// Logger::add( 'inherit property from destination: ' . $property . ' = ' . $item->destination->$property );
 		// $item->posts[ $post_id ]->$property = $item->destination->$property;
 		// }
@@ -949,7 +949,7 @@ class Distributor {
 
 			if ( isset( $item->destination->import_action ) && $item->destination->import_action != 'insert' ) {
 				// map the import action to each post
-				foreach ( $item->posts as $post_id => $preparred_post ) {
+				foreach ( $item->posts as $post_id => $prepared_post ) {
 					$item->posts[ $post_id ]->import_action = $item->destination->import_action;
 				}
 			}
@@ -974,7 +974,7 @@ class Distributor {
 
 		// if debug mode is enabled, add the log action
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			add_action( 'post_export_log', array( '\Contentsync\Distribution\Logger', 'add' ), 10, 2 );
+			add_action( 'post_export_log', array( '\Contentsync\Logger', 'add' ), 10, 2 );
 		}
 
 		// import the posts
@@ -1026,11 +1026,11 @@ class Distributor {
 
 		$errors = array();
 
-		foreach ( $item->posts as $post_id => $preparred_post ) {
-			$gid = isset( $preparred_post->meta['synced_post_id'] ) ? $preparred_post->meta['synced_post_id'][0] : false;
+		foreach ( $item->posts as $post_id => $prepared_post ) {
+			$gid = isset( $prepared_post->meta['synced_post_id'] ) ? $prepared_post->meta['synced_post_id'][0] : false;
 			// Logger::add( 'Deleting post with gid: ' . $gid );
 			if ( $gid ) {
-				$posttype   = $preparred_post->post_type;
+				$posttype   = $prepared_post->post_type;
 				$local_post = Main_Helper::get_local_post_by_gid( $gid, $posttype );
 				if ( $local_post ) {
 					// Logger::add( 'Deleting local post with id: ' . $local_post->ID );
@@ -1066,7 +1066,7 @@ class Distributor {
 	public static function distribute_to_remote_site( &$item ) {
 		Logger::add( 'Distributing to remote site:', $item->destination->ID );
 
-		$result = \Contentsync\Connections\Remote_Operations::distribute_item_to_remote_site( $item->destination->ID, $item );
+		$result = \Contentsync\Api\distribute_item_to_remote_site( $item->destination->ID, $item );
 
 		Logger::add( 'Result: ', $result );
 
@@ -1089,7 +1089,7 @@ class Distributor {
 		}
 
 		if ( ! $result ) {
-			Logger::add( 'Not identified error distributing to remote site. The method "\Contentsync\Connections\Remote_Operations::distribute_item_to_remote_site" returned NULL. This could be a timeout or a network error, or the connection feature or license is not enabled an the remote site.' );
+			Logger::add( 'Not identified error distributing to remote site. The method "\Contentsync\Api\distribute_item_to_remote_site" returned NULL. This could be a timeout or a network error, or the connection feature or license is not enabled an the remote site.' );
 			$item->destination->error = new \WP_Error( 'distribute_to_remote_site', __( 'Unknown error', 'global-contents' ) );
 			return false;
 		}

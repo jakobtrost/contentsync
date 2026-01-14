@@ -34,7 +34,7 @@ class Global_List_Table extends \WP_List_Table {
 	public $posts_per_page = 20;
 
 	/**
-	 * Hold the preparred post items
+	 * Hold the prepared post items
 	 */
 	private $posts = array();
 
@@ -858,7 +858,7 @@ class Global_List_Table extends \WP_List_Table {
 	/**
 	 * Get the realtionship of a ppst to the current site
 	 *
-	 * @param Synced_Post $post
+	 * @param Contentsync\Synced_Post $post
 	 *
 	 * @return string
 	 */

@@ -18,8 +18,8 @@
 namespace Contentsync\Contents;
 
 use Contentsync\Main_Helper;
-use Contentsync\Distribution\Distributor;
-use Contentsync\Connections\Remote_Operations;
+use Contentsync\Distributor;
+use Remote_Operations;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -312,7 +312,7 @@ class Actions {
 			return false;
 		}
 
-		$new_message = new \Synced_Post_Review_Message(
+		$new_message = new \Contentsync\Reviews\Post_Review_Message(
 			$review_id,
 			array(
 				'content'   => '',
@@ -359,7 +359,7 @@ class Actions {
 			'reviewer'  => get_current_user_id(), // $post_review->editor
 		);
 
-		$new_message = new \Synced_Post_Review_Message( $review_id, $new_message_args );
+		$new_message = new \Contentsync\Reviews\Post_Review_Message( $review_id, $new_message_args );
 		$new_message->save();
 
 		$result = set_synced_post_review_state( $review_id, 'denied' );
@@ -396,7 +396,7 @@ class Actions {
 			'reviewer'  => get_current_user_id(), // $post_review->editor
 		);
 
-		$new_message = new \Synced_Post_Review_Message( $review_id, $new_message_args );
+		$new_message = new \Contentsync\Reviews\Post_Review_Message( $review_id, $new_message_args );
 		$new_message->save();
 
 		$previous_post = $post_review->previous_post;
@@ -474,7 +474,7 @@ class Actions {
 	 * @filter 'contentsync_import_conflicts'
 	 *
 	 * @param array[WP_Post] $conflicts     WP_Post objects in conflict with importing posts.
-	 * @param array[WP_Post] $all_posts     All preparred WP_Post objects.
+	 * @param array[WP_Post] $all_posts     All prepared WP_Post objects.
 	 */
 	public function remove_conflict_when_same_gid( $conflicts, $all_posts ) {
 
@@ -617,7 +617,7 @@ class Actions {
 
 				$action = isset( $post->is_contentsync_root_post ) && $post->is_contentsync_root_post ? 'replace' : 'skip';
 				// if ( isset( $post->is_contentsync_root_post ) && $post->is_contentsync_root_post ) {
-				// \Contentsync\Distribution\Logger::log( 'Post is contentsync_root_post: ' . $post->is_contentsync_root_post );
+				// \Contentsync\Logger::log( 'Post is contentsync_root_post: ' . $post->is_contentsync_root_post );
 				// }
 
 				$conflict_actions[ $post->ID ] = array(
@@ -637,7 +637,7 @@ class Actions {
 	 * Update contentsync meta after post was imported.
 	 *
 	 * @param int    $post_id  The new post ID.
-	 * @param object $post  The preparred WP_Post object.
+	 * @param object $post  The prepared WP_Post object.
 	 */
 	public function update_contentsync_meta_after_insert_post( $post_id, $post ) {
 
@@ -767,11 +767,11 @@ class Actions {
 		if ( ! $connection_map ) {
 			$connection_map = Main_Helper::get_post_connection_map( $post_id );
 		}
-		\Contentsync\Distribution\Logger::add( 'trash_connected_posts', $post_id );
-		\Contentsync\Distribution\Logger::add( 'connection_map', $connection_map );
+		\Contentsync\Logger::add( 'trash_connected_posts', $post_id );
+		\Contentsync\Logger::add( 'connection_map', $connection_map );
 
 		$destination_ids = Main_Helper::convert_connection_map_to_destination_ids( $connection_map );
-		\Contentsync\Distribution\Logger::add( 'destination_ids', $destination_ids );
+		\Contentsync\Logger::add( 'destination_ids', $destination_ids );
 
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
@@ -779,7 +779,7 @@ class Actions {
 				'import_action' => 'trash',
 			);
 		}
-		\Contentsync\Distribution\Logger::add( 'destination_arrays', $destination_arrays );
+		\Contentsync\Logger::add( 'destination_arrays', $destination_arrays );
 
 		if ( is_object( $post_id ) && is_a( $post_id, 'Contentsync\Prepared_Post' ) ) {
 			$post_id->import_action = 'trash';
@@ -804,7 +804,7 @@ class Actions {
 		// else {
 		// $remote_network_url = $blog_id;
 		// $remote_gid         = $root_blog_id . '-' . $root_post_id . '-' . Main_Helper::get_network_url();
-		// $response           = Remote_Operations::delete_all_remote_connected_posts( $remote_network_url, $remote_gid, $post_connection );
+		// $response           = \Contentsync\Api\delete_all_remote_connected_posts( $remote_network_url, $remote_gid, $post_connection );
 		// }
 		// }
 		// }
@@ -882,11 +882,11 @@ class Actions {
 		if ( ! $connection_map ) {
 			$connection_map = Main_Helper::get_post_connection_map( $post_id );
 		}
-		\Contentsync\Distribution\Logger::log( 'delete_connected_posts', $post_id );
-		\Contentsync\Distribution\Logger::log( 'connection_map', $connection_map );
+		\Contentsync\Logger::log( 'delete_connected_posts', $post_id );
+		\Contentsync\Logger::log( 'connection_map', $connection_map );
 
 		$destination_ids = Main_Helper::convert_connection_map_to_destination_ids( $connection_map );
-		\Contentsync\Distribution\Logger::log( 'destination_ids', $destination_ids );
+		\Contentsync\Logger::log( 'destination_ids', $destination_ids );
 
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
@@ -894,7 +894,7 @@ class Actions {
 				'import_action' => 'delete',
 			);
 		}
-		\Contentsync\Distribution\Logger::log( 'destination_arrays', $destination_arrays );
+		\Contentsync\Logger::log( 'destination_arrays', $destination_arrays );
 
 		$result = Distributor::distribute_single_post( $post_id, $destination_arrays );
 
@@ -909,7 +909,7 @@ class Actions {
 		// if ( strpos($blog_id, '|') !== false) {
 		// list ($blog_id, $remote_network_url) = explode('|', $blog_id);
 		// $root_gid = Main_Helper::get_contentsync_meta( $post_id, 'synced_post_id' );
-		// $result = Remote_Operations::delete_all_remote_connected_posts( $remote_network_url, $root_gid, $post_connection );
+		// $result = \Contentsync\Api\delete_all_remote_connected_posts( $remote_network_url, $root_gid, $post_connection );
 		// }
 		// }
 
@@ -957,11 +957,11 @@ class Actions {
 		if ( ! $connection_map ) {
 			$connection_map = Main_Helper::get_post_connection_map( $post );
 		}
-		\Contentsync\Distribution\Logger::log( 'delete_unlinked_posts', $post );
-		\Contentsync\Distribution\Logger::log( 'connection_map', $connection_map );
+		\Contentsync\Logger::log( 'delete_unlinked_posts', $post );
+		\Contentsync\Logger::log( 'connection_map', $connection_map );
 
 		$destination_ids = Main_Helper::convert_connection_map_to_destination_ids( $connection_map );
-		\Contentsync\Distribution\Logger::log( 'destination_ids', $destination_ids );
+		\Contentsync\Logger::log( 'destination_ids', $destination_ids );
 
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
@@ -969,7 +969,7 @@ class Actions {
 				'import_action' => 'delete',
 			);
 		}
-		\Contentsync\Distribution\Logger::log( 'destination_arrays', $destination_arrays );
+		\Contentsync\Logger::log( 'destination_arrays', $destination_arrays );
 
 		$result = Distributor::distribute_single_post( $post, $destination_arrays );
 
@@ -1010,11 +1010,11 @@ class Actions {
 
 		// delete imported posts
 		$connection_map = Main_Helper::get_post_connection_map( $global_post->ID );
-		\Contentsync\Distribution\Logger::log( 'delete_global_post', $global_post->ID );
-		\Contentsync\Distribution\Logger::log( 'connection_map', $connection_map );
+		\Contentsync\Logger::log( 'delete_global_post', $global_post->ID );
+		\Contentsync\Logger::log( 'connection_map', $connection_map );
 
 		$destination_ids = Main_Helper::convert_connection_map_to_destination_ids( $connection_map );
-		\Contentsync\Distribution\Logger::log( 'destination_ids', $destination_ids );
+		\Contentsync\Logger::log( 'destination_ids', $destination_ids );
 
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
@@ -1022,7 +1022,7 @@ class Actions {
 				'import_action' => 'delete',
 			);
 		}
-		\Contentsync\Distribution\Logger::log( 'destination_arrays', $destination_arrays );
+		\Contentsync\Logger::log( 'destination_arrays', $destination_arrays );
 
 		$result = Distributor::distribute_single_post( $post, $destination_arrays );
 

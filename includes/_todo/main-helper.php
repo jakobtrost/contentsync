@@ -36,7 +36,7 @@
 
 namespace Contentsync;
 
-use Contentsync\Connections\Remote_Operations;
+use Remote_Operations;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -72,7 +72,7 @@ class Main_Helper {
 	 *
 	 * @param string $gid
 	 *
-	 * @return \Synced_Post|null
+	 * @return Synced_Post|null
 	 */
 	public static function get_global_post( $gid ) {
 
@@ -112,7 +112,7 @@ class Main_Helper {
 		}
 		// remote post
 		else {
-			$response = Remote_Operations::get_remote_global_post( $site_url, $gid );
+			$response = \Contentsync\Api\get_remote_global_post( $site_url, $gid );
 			if ( $response ) {
 				$post = new_synced_post( $response );
 
@@ -188,7 +188,7 @@ class Main_Helper {
 		}
 		// remote post
 		else {
-			$posts = Remote_Operations::prepare_remote_global_post( $site_url, $gid );
+			$posts = \Contentsync\Api\prepare_remote_global_post( $site_url, $gid );
 		}
 
 		return $posts ? (array) $posts : null;
@@ -358,7 +358,7 @@ class Main_Helper {
 			}
 			// load new
 			else {
-				$posts = Remote_Operations::get_remote_global_posts( $connection, $query );
+				$posts = \Contentsync\Api\get_remote_global_posts( $connection, $query );
 				if ( is_array( $posts ) && count( $posts ) ) {
 
 					// set persistent cache
@@ -841,7 +841,7 @@ class Main_Helper {
 		else {
 			// the network url is the current network, as we just imported a post here
 			$post_site_url = self::get_network_url();
-			$result        = Remote_Operations::update_remote_post_connection( $site_url, $gid, $args, $add, $post_site_url );
+			$result        = \Contentsync\Api\update_remote_post_connection( $site_url, $gid, $args, $add, $post_site_url );
 		}
 
 		return (bool) $result;
@@ -1159,7 +1159,7 @@ class Main_Helper {
 		 */
 		$remote_connected_posts = array();
 		foreach ( \Contentsync\get_site_connections() as $site_url => $connected_site ) {
-			$remote_connected_posts = Remote_Operations::get_all_remote_connected_posts( $connected_site, $gid );
+			$remote_connected_posts = \Contentsync\Api\get_all_remote_connected_posts( $connected_site, $gid );
 			if ( ! empty( $remote_connected_posts ) ) {
 				$remote_connected_posts                   = (array) $remote_connected_posts;
 				$updated_post_connection_map[ $site_url ] = array_map(
@@ -1627,7 +1627,7 @@ class Main_Helper {
 	/**
 	 * Check if a global post has an error
 	 *
-	 * @param int|WP_Post $post     Either the post_id or the preparred post object.
+	 * @param int|WP_Post $post     Either the post_id or the prepared post object.
 	 *
 	 * @return false|object         False if no error found, error object if found.
 	 */
@@ -1673,7 +1673,7 @@ class Main_Helper {
 	/**
 	 * Check a global post for errors.
 	 *
-	 * @param int|WP_Post                                              $post        Either the post_id or the preparred post object.
+	 * @param int|WP_Post                                              $post        Either the post_id or the prepared post object.
 	 * @param bool                                                     $autorepair  Autorepair simple errors, such as orphaned post connections.
 	 * @param bool                                                     $repair      Repair more complex errors, this can change meta infos or delete the post.
 	 *
