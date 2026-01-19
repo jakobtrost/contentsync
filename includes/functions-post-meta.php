@@ -74,7 +74,7 @@ function get_contentsync_meta_values( $post_id, $meta_key ) {
 			}
 		}
 	} elseif ( $meta_key == 'contentsync_connection_map' ) {
-		$value = Main_Helper::get_post_connection_map( $post_id );
+		$value = get_post_connection_map( $post_id );
 	} else {
 		$value = get_post_meta( $post_id, $meta_key, true );
 	}
@@ -219,7 +219,7 @@ function adjust_synced_post_status_after_import( $post_id, $post ) {
 	elseif ( $root_blog_id != get_current_blog_id() || ! empty( $root_net_url ) ) {
 		Logger::add( sprintf( 'The gid values do not match (%s) - this is a linked post!', $gid ) );
 		$new_status = 'linked';
-		Main_Helper::add_post_connection_to_connection_map( $gid, get_current_blog_id(), $post_id );
+		add_post_connection_to_connection_map( $gid, get_current_blog_id(), $post_id );
 	}
 
 	// update the status if changed

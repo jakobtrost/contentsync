@@ -367,7 +367,7 @@ class Ajax {
 				$this->fail( 'post_id is not defined.' );
 			}
 
-			$result = Main_Helper::check_connection_map( $post_id );
+			$result = \Contentsync\check_connection_map( $post_id );
 
 			// failure
 			if ( ! $result ) {

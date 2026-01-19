@@ -630,7 +630,7 @@ class Trigger {
 
 		if ( $status === 'linked' ) {
 			// remove connection from root post
-			Main_Helper::remove_post_connection_from_connection_map( $gid, get_current_blog_id(), $post_id );
+			\Contentsync\remove_post_connection_from_connection_map( $gid, get_current_blog_id(), $post_id );
 		} elseif ( $status === 'root' ) {
 			if ( self::post_needs_review( $post_id ) ) {
 				$post_before              = $post;
@@ -652,7 +652,7 @@ class Trigger {
 		$status = get_post_meta( $post_id, 'synced_post_status', true );
 		if ( $status === 'linked' ) {
 			$gid = get_post_meta( $post_id, 'synced_post_id', true );
-			Main_Helper::add_post_connection_to_connection_map( $gid, get_current_blog_id(), $post_id );
+			\Contentsync\add_post_connection_to_connection_map( $gid, get_current_blog_id(), $post_id );
 		} elseif ( $status === 'root' ) {
 			if ( self::post_needs_review( $post_id ) ) {
 				$post_before              = get_post( $post_id );
@@ -724,7 +724,7 @@ class Trigger {
 		}
 
 		// display admin notice when root post is trashed and there is still a connection
-		$connection_map = Main_Helper::get_post_connection_map( $post_id );
+		$connection_map = \Contentsync\get_post_connection_map( $post_id );
 		if ( $connection_map && is_array( $connection_map ) && count( $connection_map ) ) {
 			set_transient(
 				'contentsync_transient_notice',
@@ -787,7 +787,7 @@ class Trigger {
 		if ( $delete_global_post_setting == 'delete' ) {
 
 			// get connection_map from review
-			$connection_map = isset( $post->meta['contentsync_connection_map'] ) ? $post->meta['contentsync_connection_map'] : Main_Helper::get_post_connection_map( $post->ID );
+			$connection_map = isset( $post->meta['contentsync_connection_map'] ) ? $post->meta['contentsync_connection_map'] : \Contentsync\get_post_connection_map( $post->ID );
 			$result         = \Contentsync\delete_connected_posts( $post->ID, $connection_map );
 
 			if ( $trash_global_post_setting == 'trash' ) {

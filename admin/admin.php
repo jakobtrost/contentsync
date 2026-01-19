@@ -316,7 +316,7 @@ class Admin {
 
 			if ( $status === 'linked' ) {
 
-				$post_links = Main_Helper::get_post_links_by_gid( $gid );
+				$post_links = \Contentsync\get_post_links_by_gid( $gid );
 
 				$text = sprintf(
 					__( 'This post is synced from the site %s', 'contentsync' ),
@@ -339,7 +339,7 @@ class Admin {
 				}
 			} elseif ( $status === 'root' ) {
 
-				$connection_map = Main_Helper::get_post_connection_map( $post_id );
+				$connection_map = \Contentsync\get_post_connection_map( $post_id );
 
 				/**
 				 * Review Status
@@ -756,7 +756,7 @@ class Admin {
 			 */
 			elseif ( $status === 'root' ) {
 
-				$connection_map = Main_Helper::get_post_connection_map( $post_id );
+				$connection_map = \Contentsync\get_post_connection_map( $post_id );
 				// debug( $connection_map, true );
 
 				// render status
@@ -945,7 +945,7 @@ class Admin {
 			 */
 			elseif ( $status === 'linked' ) {
 
-				$post_links = Main_Helper::get_post_links_by_gid( $gid );
+				$post_links = \Contentsync\get_post_links_by_gid( $gid );
 
 				// status
 				$return .= Main_Helper::render_status_box( $status, __( 'Linked post', 'contentsync' ) );
@@ -1280,7 +1280,7 @@ class Admin {
 		/**
 		 * Get connected posts
 		 */
-		$connection_map = Main_Helper::get_post_connection_map( $post_id );
+		$connection_map = \Contentsync\get_post_connection_map( $post_id );
 		$post_list      = '';
 
 		if ( is_array( $connection_map ) && count( $connection_map ) > 0 ) {

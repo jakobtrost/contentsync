@@ -121,7 +121,7 @@ class Connected_Posts extends Endpoint {
 
 		$message = 'Try to get all connected posts of the gid <b>' . $remote_gid . '</b> on all connected blogs of the network <u>' . network_site_url() . '</u>';
 
-		$connected_posts = Main_Helper::get_all_local_post_connections( $remote_gid );
+		$connected_posts = \Contentsync\get_all_local_post_connections( $remote_gid );
 
 		return $this->respond( $connected_posts, $message, is_array( $connected_posts ) );
 	}

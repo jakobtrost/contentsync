@@ -128,7 +128,7 @@ class Posts extends Endpoint {
 			if ( $post ) {
 				$message = "Global post '$gid' found on this site ($net_url).";
 				// append urls
-				$post->post_links = Main_Helper::get_local_post_links( $blog_id, $post_id );
+				$post->post_links = \Contentsync\get_local_post_links( $blog_id, $post_id );
 			} else {
 				$message = "Global post '$gid' could not be found [$net_url]";
 			}

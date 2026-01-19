@@ -40,7 +40,7 @@ function create_post_review( $post_id, $post_before = null ) {
 	$send_mail = true;
 
 	// check if the post has been distributed yet
-	$post_connection_map = Main_Helper::get_post_connection_map( $post_id );
+	$post_connection_map = get_post_connection_map( $post_id );
 	$state               = empty( $post_connection_map ) ? 'new' : 'in_review';
 
 	// is there an active review?

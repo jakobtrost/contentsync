@@ -142,7 +142,7 @@ function get_all_remote_connected_posts( $connection_or_site_url, $gid ) {
  *
  * @param array|string $connection_or_site_url
  * @param string       $gid               Global ID of the root post with an appended network_url.
- * @param array        $connected_posts    Connections from this network, usually created by Main_Helper::create_post_connection_map_array()
+ * @param array        $connected_posts    Connections from this network, usually created by get_post_connection_map()
  */
 function delete_all_remote_connected_posts( $connection_or_site_url, $gid, $connected_posts ) {
 	return send_request(

@@ -59,7 +59,7 @@ function make_post_global( $post_id, $args ) {
 		update_post_meta( $_post_id, 'contentsync_export_options', (array) $args );
 
 		// if there already were connections, we don't want to loose these
-		$connection_map = Main_Helper::get_post_connection_map( $_post_id ) ?? array();
+		$connection_map = get_post_connection_map( $_post_id ) ?? array();
 		update_post_meta( $_post_id, 'contentsync_connection_map', $connection_map );
 
 		/**
@@ -73,7 +73,7 @@ function make_post_global( $post_id, $args ) {
 	update_post_meta( $post_id, 'contentsync_export_options', (array) $args );
 
 	// if there already were connections, we don't want to loose these
-	$connection_map = Main_Helper::get_post_connection_map( $post_id ) ?? array();
+	$connection_map = get_post_connection_map( $post_id ) ?? array();
 	update_post_meta( $post_id, 'contentsync_connection_map', $connection_map );
 
 	/**
@@ -261,7 +261,7 @@ function unlink_synced_root_post( $gid ) {
 
 	Main_Helper::switch_to_blog( $blog_id );
 
-	$connection_map = Main_Helper::get_post_connection_map( $post_id );
+	$connection_map = get_post_connection_map( $post_id );
 
 	// delete meta of imported posts
 	if ( is_array( $connection_map ) && count( $connection_map ) > 0 ) {
@@ -298,7 +298,7 @@ function unlink_synced_root_post( $gid ) {
 function unlink_synced_post( $post_id ) {
 
 	$gid    = get_post_meta( $post_id, 'synced_post_id', true );
-	$result = Main_Helper::remove_post_connection_from_connection_map( $gid, get_current_blog_id(), $post_id );
+	$result = remove_post_connection_from_connection_map( $gid, get_current_blog_id(), $post_id );
 
 	delete_contentsync_meta_values( $post_id );
 
@@ -324,12 +324,12 @@ function trash_connected_posts( $post_id, $connection_map = null ) {
 	$result = true;
 
 	if ( ! $connection_map ) {
-		$connection_map = Main_Helper::get_post_connection_map( $post_id );
+		$connection_map = get_post_connection_map( $post_id );
 	}
 	\Contentsync\Logger::add( 'trash_connected_posts', $post_id );
 	\Contentsync\Logger::add( 'connection_map', $connection_map );
 
-	$destination_ids = Main_Helper::convert_connection_map_to_destination_ids( $connection_map );
+	$destination_ids = convert_connection_map_to_destination_ids( $connection_map );
 	\Contentsync\Logger::add( 'destination_ids', $destination_ids );
 
 	$destination_arrays = array();
@@ -429,12 +429,12 @@ function untrash_connected_posts( $post_id, $delete = false ) {
 function delete_connected_posts( $post_id, $connection_map = null ) {
 
 	if ( ! $connection_map ) {
-		$connection_map = Main_Helper::get_post_connection_map( $post_id );
+		$connection_map = get_post_connection_map( $post_id );
 	}
 	\Contentsync\Logger::log( 'delete_connected_posts', $post_id );
 	\Contentsync\Logger::log( 'connection_map', $connection_map );
 
-	$destination_ids = Main_Helper::convert_connection_map_to_destination_ids( $connection_map );
+	$destination_ids = convert_connection_map_to_destination_ids( $connection_map );
 	\Contentsync\Logger::log( 'destination_ids', $destination_ids );
 
 	$destination_arrays = array();
@@ -473,7 +473,7 @@ function unlink_connected_posts( $post_id ) {
 		if ( empty( $destination_id ) ) {
 			continue;
 		}
-		$result = Main_Helper::remove_post_connection_from_connection_map( $root_gid, $destination_id, $post_id );
+		$result = remove_post_connection_from_connection_map( $root_gid, $destination_id, $post_id );
 	}
 
 	return $result;
@@ -489,12 +489,12 @@ function unlink_connected_posts( $post_id ) {
 function delete_unlinked_posts( $post ) {
 
 	if ( ! $connection_map ) {
-		$connection_map = Main_Helper::get_post_connection_map( $post );
+		$connection_map = get_post_connection_map( $post );
 	}
 	\Contentsync\Logger::log( 'delete_unlinked_posts', $post );
 	\Contentsync\Logger::log( 'connection_map', $connection_map );
 
-	$destination_ids = Main_Helper::convert_connection_map_to_destination_ids( $connection_map );
+	$destination_ids = convert_connection_map_to_destination_ids( $connection_map );
 	\Contentsync\Logger::log( 'destination_ids', $destination_ids );
 
 	$destination_arrays = array();
@@ -540,11 +540,11 @@ function delete_global_post( $gid, $keep_root_post = false ) {
 	Main_Helper::switch_to_blog( $root_blog_id );
 
 	// delete imported posts
-	$connection_map = Main_Helper::get_post_connection_map( $global_post->ID );
+	$connection_map = get_post_connection_map( $global_post->ID );
 	\Contentsync\Logger::log( 'delete_global_post', $global_post->ID );
 	\Contentsync\Logger::log( 'connection_map', $connection_map );
 
-	$destination_ids = Main_Helper::convert_connection_map_to_destination_ids( $connection_map );
+	$destination_ids = convert_connection_map_to_destination_ids( $connection_map );
 	\Contentsync\Logger::log( 'destination_ids', $destination_ids );
 
 	$destination_arrays = array();

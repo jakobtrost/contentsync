@@ -117,7 +117,7 @@ class Site_Editor {
 			$post_id        = self::get_numeric_post_id( $postReference );
 			$status         = get_post_meta( $post_id, 'synced_post_status', true );
 			$gid            = get_post_meta( $post_id, 'synced_post_id', true );
-			$connection_map = Main_Helper::get_post_connection_map( $post_id );
+			$connection_map = \Contentsync\get_post_connection_map( $post_id );
 
 			// Get Contentsync options and canonical URL
 			$contentsync_export_options = get_post_meta( $post_id, 'contentsync_export_options', true );
@@ -190,7 +190,7 @@ class Site_Editor {
 					) : array() ),
 					// linked posts
 					( $status === 'linked' ? array(
-						'links'     => Main_Helper::get_post_links_by_gid( $gid ),
+						'links'     => \Contentsync\get_post_links_by_gid( $gid ),
 						'canonical' => esc_attr( get_post_meta( $post_id, 'contentsync_canonical_url', true ) ),
 						'error'     => Main_Helper::get_post_error( $post_id ),
 					) : array() ),

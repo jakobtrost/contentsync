@@ -762,7 +762,7 @@ class Global_List_Table extends \WP_List_Table {
 				if ( empty( $root_net_url ) ) {
 					$connections = \Contentsync\get_contentsync_meta_values( $item, 'contentsync_connection_map' );
 				} else {
-					$connections = Main_Helper::get_network_remote_connection_map_by_gid( $gid );
+					$connections = \Contentsync\get_network_remote_connection_map_by_gid( $gid );
 				}
 
 				// loop through connections
@@ -894,7 +894,7 @@ class Global_List_Table extends \WP_List_Table {
 			if ( $local_post ) {
 				$relationship = 'import';
 			} else {
-				$result = Main_Helper::remove_post_connection_from_connection_map( $gid, $blog_id, $local_post_id );
+				$result = \Contentsync\remove_post_connection_from_connection_map( $gid, $blog_id, $local_post_id );
 				if ( $result ) {
 					$relationship = 'unused';
 				} else {

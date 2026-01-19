@@ -83,7 +83,7 @@ class Posts_Connections extends Endpoint {
 		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
 			Main_Helper::switch_to_blog( $blog_id );
-			$connection_map = Main_Helper::get_post_connection_map( $post_id );
+			$connection_map = \Contentsync\get_post_connection_map( $post_id );
 			Main_Helper::restore_blog();
 
 			if ( $connection_map ) {
@@ -114,7 +114,7 @@ class Posts_Connections extends Endpoint {
 				return $this->respond( false, "Could not add post connection. Request arguments 'site_url' or 'args' were empty [$net_url]" );
 			}
 
-			$result = Main_Helper::add_or_remove_post_connection_from_connection_map( $gid, $args, true, $site_url );
+			$result = \Contentsync\add_or_remove_post_connection_from_connection_map( $gid, $args, true, $site_url );
 			if ( $result ) {
 				$message = "Post connection for the post '$gid' to the domain '$site_url' was set successfully [$net_url]";
 			} else {
@@ -143,7 +143,7 @@ class Posts_Connections extends Endpoint {
 				return $this->respond( false, "Could not remove post connection. Request arguments 'site_url' or 'args' were empty [$net_url]" );
 			}
 
-			$result = Main_Helper::add_or_remove_post_connection_from_connection_map( $gid, $args, false, $site_url );
+			$result = \Contentsync\add_or_remove_post_connection_from_connection_map( $gid, $args, false, $site_url );
 			if ( $result ) {
 				$message = "Post connection for the post '$gid' to the domain '$site_url' was removed successfully [$net_url]";
 			} else {

@@ -327,7 +327,7 @@ class Synced_Post {
 					$net_url                            = \Contentsync\Main_Helper::get_network_url();
 					$meta['contentsync_connection_map'] = array(
 						$net_url => array(
-							$blog_id => \Contentsync\Main_Helper::create_post_connection_map_array( $blog_id, $imported_post->ID ),
+							$blog_id => \Contentsync\get_post_connection_map( $blog_id, $imported_post->ID ),
 						),
 					);
 				}

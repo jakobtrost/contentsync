@@ -456,7 +456,7 @@ function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 	}
 
 	if ( $root_post_id ) {
-		$connection_map = Main_Helper::get_post_connection_map( $root_post_id );
+		$connection_map = get_post_connection_map( $root_post_id );
 
 		// Logger::add( 'root post connection_map', $connection_map );
 		// Logger::add( 'destinations so far:', $destinations );
