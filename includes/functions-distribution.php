@@ -157,7 +157,7 @@ function distribute_posts_per_blog( $posts_keyed_by_blog, $destination_ids_or_ar
 
 	foreach ( $posts_keyed_by_blog as $blog_id => $posts ) {
 
-		Main_Helper::switch_to_blog( $blog_id );
+		switch_blog( $blog_id );
 
 		$result = distribute_posts( $posts, $destination_ids_or_arrays, $export_args );
 
@@ -415,7 +415,7 @@ function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 		if ( strpos( $destination_id, '|' ) !== false ) {
 			list( $remote_blog_id, $remote_network_url ) = explode( '|', $destination_id );
 
-			$remote_network_url = Main_Helper::get_nice_url( $remote_network_url );
+			$remote_network_url = \Contentsync\Utils\get_nice_url( $remote_network_url );
 
 			if ( ! isset( $destinations[ $remote_network_url ] ) ) {
 				$destinations[ $remote_network_url ] = new \Contentsync\Destinations\Remote_Destination( $remote_network_url );
@@ -912,7 +912,7 @@ function distribute_to_blog( $item ) {
 
 	Logger::add( 'Distributing to blog: ' . $item->destination->ID . ' - ' . $item->destination->url );
 
-	Main_Helper::switch_to_blog( $item->destination->ID );
+	switch_blog( $item->destination->ID );
 
 	/**
 	 * This should be working, but it somehow influences the posts in
@@ -950,7 +950,7 @@ function distribute_to_blog( $item ) {
 		$result = import_posts_to_blog( $item );
 	}
 
-	Main_Helper::restore_blog();
+	restore_blog();
 
 	return $result;
 }
@@ -988,7 +988,7 @@ function import_posts_to_blog( &$item ) {
 				$imported_post_id,
 				array(
 					'status' => 'success',
-					'url'    => Main_Helper::get_edit_post_link( $imported_post_id ),
+					'url'    => \Contentsync\get_edit_post_link( $imported_post_id ),
 				)
 			);
 		}
@@ -1095,8 +1095,8 @@ function distribute_to_remote_site( &$item ) {
  *                          SANITIZATION
  * =================================================================
  */
-add_action( 'contentsync_before_import_global_posts', __NAMESPACE__ . '\\before_import_global_posts', 10, 2 );
-add_action( 'contentsync_after_import_global_posts', __NAMESPACE__ . '\\after_import_global_posts', 10, 2 );
+add_action( 'contentsync_before_import_synced_posts', __NAMESPACE__ . '\\before_import_synced_posts', 10, 2 );
+add_action( 'contentsync_after_import_synced_posts', __NAMESPACE__ . '\\after_import_synced_posts', 10, 2 );
 
 /**
  * Before import synced posts: Filter the HTML tags that are allowed for a given context.
@@ -1106,7 +1106,7 @@ add_action( 'contentsync_after_import_global_posts', __NAMESPACE__ . '\\after_im
  *
  * @return void
  */
-function before_import_global_posts( $posts, $conflict_actions ) {
+function before_import_synced_posts( $posts, $conflict_actions ) {
 	add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\\filter_allowed_html_tags_during_distribution', 98, 2 );
 }
 
@@ -1118,7 +1118,7 @@ function before_import_global_posts( $posts, $conflict_actions ) {
  *
  * @return void
  */
-function after_import_global_posts( $posts, $conflict_actions ) {
+function after_import_synced_posts( $posts, $conflict_actions ) {
 	remove_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\\filter_allowed_html_tags_during_distribution', 98 );
 }
 

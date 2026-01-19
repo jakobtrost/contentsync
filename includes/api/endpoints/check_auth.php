@@ -30,7 +30,7 @@ class Check_Auth extends Endpoint {
 	 */
 	public function callback( $request ) {
 		$request_url = $request->get_header( 'Origin' );
-		$current_url = \Contentsync\Main_Helper::get_network_url();
+		$current_url = \Contentsync\Utils\get_network_url();
 		return $this->respond( 'true', "The connection from $request_url (current site) to $current_url (remote site) is active." );
 	}
 

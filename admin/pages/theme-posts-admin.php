@@ -163,7 +163,7 @@ class Theme_Posts_Admin {
 					__( 'This will assign the styles from the theme %s to your current theme. Be careful, this could lead to errors, because the styles might not be compatible with your theme.', 'contentsync_hub' ),
 					'<strong class="replace"></strong>'
 				),
-				'content' => Helper::render_info_box(
+				'content' => \Contentsync\Utils\make_admin_info_box(
 					array(
 						'text'  => __( 'You are overwriting the global styles of your current theme. This cannot be made undone. Make sure to make a backup of the current styles beforehand.', 'contentsync_hub' ),
 						'style' => 'warning',

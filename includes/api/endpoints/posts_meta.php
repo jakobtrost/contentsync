@@ -82,7 +82,7 @@ class Posts_Meta extends Endpoint {
 
 			$meta_key = isset( $request['meta_key'] ) ? esc_attr( urldecode( $request['meta_key'] ) ) : null;
 
-			Main_Helper::switch_to_blog( $blog_id );
+			\Contentsync\switch_blog( $blog_id );
 			// if no meta key set, we get all contentsync_meta
 			if ( empty( $meta_key ) ) {
 				$post_meta = array();
@@ -93,7 +93,7 @@ class Posts_Meta extends Endpoint {
 			} else {
 				$post_meta = \Contentsync\get_contentsync_meta_values( $post_id, $meta_key );
 			}
-			Main_Helper::restore_blog();
+			\Contentsync\restore_blog();
 
 			if ( ! empty( $post_meta ) ) {
 				$result  = $post_meta;
@@ -122,9 +122,9 @@ class Posts_Meta extends Endpoint {
 		$blog_id = explode( '-', $gid )[0];
 		$post_id = explode( '-', $gid )[1];
 
-		Main_Helper::switch_to_blog( $blog_id );
+		\Contentsync\switch_blog( $blog_id );
 		update_post_meta( $post_id, $meta_key, $meta_val );
-		Main_Helper::restore_blog();
+		\Contentsync\restore_blog();
 
 		return $this->respond( $meta_val );
 	}
@@ -139,7 +139,7 @@ class Posts_Meta extends Endpoint {
 		$post_id  = explode( '-', $gid )[1];
 		$meta_key = isset( $request['meta_key'] ) ? esc_attr( urldecode( $request['meta_key'] ) ) : null;
 
-		Main_Helper::switch_to_blog( $blog_id );
+		\Contentsync\switch_blog( $blog_id );
 
 		// if no meta key set, we delete all contentsync_meta
 		if ( empty( $meta_key ) ) {
@@ -148,7 +148,7 @@ class Posts_Meta extends Endpoint {
 			delete_post_meta( $post_id, $meta_key );
 		}
 
-		Main_Helper::restore_blog();
+		\Contentsync\restore_blog();
 
 		return $this->respond( true );
 	}

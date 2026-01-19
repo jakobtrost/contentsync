@@ -53,7 +53,7 @@ function get_site_name( $connection_or_site_url ) {
  *
  * @return mixed
  */
-function get_remote_global_posts( $connection_or_site_url, $query_args = null ) {
+function get_remote_synced_posts( $connection_or_site_url, $query_args = null ) {
 	return send_request(
 		$connection_or_site_url,
 		'posts',
@@ -70,7 +70,7 @@ function get_remote_global_posts( $connection_or_site_url, $query_args = null ) 
  *
  * @return mixed
  */
-function get_remote_global_post( $connection_or_site_url, $gid ) {
+function get_remote_synced_post( $connection_or_site_url, $gid ) {
 	return send_request(
 		$connection_or_site_url,
 		'posts/' . prepare_gid_for_url( $gid )
@@ -84,7 +84,7 @@ function get_remote_global_post( $connection_or_site_url, $gid ) {
  *
  * @return mixed
  */
-function prepare_remote_global_post( $connection_or_site_url, $gid ) {
+function prepare_remote_synced_post( $connection_or_site_url, $gid ) {
 	return send_request(
 		$connection_or_site_url,
 		'posts/' . prepare_gid_for_url( $gid ) . '/prepare'
@@ -138,7 +138,7 @@ function get_all_remote_connected_posts( $connection_or_site_url, $gid ) {
 /**
  * Delete all connected posts of a synced post from a certain connection
  *
- * @see \Contentsync\delete_global_post()
+ * @see \Contentsync\delete_synced_post()
  *
  * @param array|string $connection_or_site_url
  * @param string       $gid               Global ID of the root post with an appended network_url.
@@ -172,7 +172,7 @@ function distribute_item_to_remote_site( $connection_or_site_url, $remote_distri
 		'distribution/distribute-item',
 		array(
 			'distribution_item' => json_encode( $remote_distribution_item ),
-			'origin'            => \Contentsync\Main_Helper::get_network_url(),
+			'origin'            => \Contentsync\Utils\get_network_url(),
 		),
 		'POST',
 		array(
@@ -245,14 +245,14 @@ function send_request( $connection_or_site_url, $rest_base, $body = array(), $me
 		$request_url = untrailingslashit( esc_url( $connection['site_url'] ) );
 		$headers     = array(
 			'Authorization' => 'Basic ' . base64_encode( $connection['user_login'] . ':' . str_rot13( $connection['password'] ) ),
-			'Origin'        => \Contentsync\Main_Helper::get_network_url(),
+			'Origin'        => \Contentsync\Utils\get_network_url(),
 		);
 	}
 	// try to get data from public endpoint
 	else {
 		$request_url = untrailingslashit( esc_url( $connection_or_site_url ) );
 		$headers     = array(
-			'Origin' => \Contentsync\Main_Helper::get_network_url(),
+			'Origin' => \Contentsync\Utils\get_network_url(),
 		);
 	}
 

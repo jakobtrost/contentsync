@@ -144,7 +144,7 @@ class Site_Editor {
 						'title'          => get_the_title( $post_id ),
 						'gid'            => $gid,
 						'status'         => $status,
-						'currentUserCan' => Main_Helper::current_user_can_edit_global_posts( $status ),
+						'currentUserCan' => Main_Helper::current_user_can_edit_synced_posts( $status ),
 					),
 					// root posts
 					( $status === 'root' ? array(
@@ -186,13 +186,13 @@ class Site_Editor {
 							},
 							get_clusters_including_post( $post_id )
 						),
-						'error'            => Main_Helper::get_post_error( $post_id ),
+						'error'            => \Contentsync\get_post_error( $post_id ),
 					) : array() ),
 					// linked posts
 					( $status === 'linked' ? array(
 						'links'     => \Contentsync\get_post_links_by_gid( $gid ),
 						'canonical' => esc_attr( get_post_meta( $post_id, 'contentsync_canonical_url', true ) ),
-						'error'     => Main_Helper::get_post_error( $post_id ),
+						'error'     => \Contentsync\get_post_error( $post_id ),
 					) : array() ),
 				),
 				'notice' => Admin::get_global_notice_content( $post_id, 'site_editor' ),
@@ -240,7 +240,7 @@ class Site_Editor {
 			}
 
 			// Check if user can edit this post
-			if ( ! Main_Helper::current_user_can_edit_global_posts( 'root' ) ) {
+			if ( ! Main_Helper::current_user_can_edit_synced_posts( 'root' ) ) {
 				return json_encode(
 					array(
 						'status'  => 403,
@@ -295,7 +295,7 @@ class Site_Editor {
 		$parts = explode( '//', $site_editor_post_id );
 		if ( count( $parts ) === 2 ) {
 
-			$posts = Main_Helper::get_posts(
+			$posts = \Contentsync\get_unfiltered_posts(
 				array(
 					'name'        => $parts[1],
 					'post_type'   => array( 'wp_template', 'wp_template_part' ),
@@ -342,7 +342,7 @@ class Site_Editor {
 			case 'wp_template':
 			case 'wp_template_part':
 				// greyd-theme//footer, greyd-theme//404 ...
-				return Main_Helper::get_wp_template_theme( $post ) . '//' . $post->post_name;
+				return \Contentsync\get_wp_template_theme( $post ) . '//' . $post->post_name;
 
 			case 'wp_navigation':
 			case 'wp_block':

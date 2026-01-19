@@ -130,7 +130,7 @@ class Trigger {
 
 		// abort if the current user is not allowed to edit synced posts
 		if ( ! empty( $contentsync_status ) ) {
-			$current_user_can_edit = Main_Helper::current_user_can_edit_global_posts( $contentsync_status );
+			$current_user_can_edit = Main_Helper::current_user_can_edit_synced_posts( $contentsync_status );
 			if ( ! $current_user_can_edit ) {
 				wp_die(
 					__( 'You are not allowed to edit synced posts.', 'global-contents' ),
@@ -183,7 +183,7 @@ class Trigger {
 		if ( empty( $contentsync_status ) ) {
 			self::after_update_local_post( $post_id, $post, $post_before );
 		} elseif ( $contentsync_status === 'root' ) {
-			self::after_update_global_post( $post_id, $post, $post_before );
+			self::after_update_synced_post( $post_id, $post, $post_before );
 		} elseif ( $contentsync_status === 'linked' ) {
 
 			/**
@@ -452,7 +452,7 @@ class Trigger {
 	 * @param WP_Post $post
 	 * @param WP_Post $post_before
 	 */
-	public function after_update_global_post( $post_id, $post, $post_before = null ) {
+	public function after_update_synced_post( $post_id, $post, $post_before = null ) {
 
 		$post_needs_review = false;
 		$destination_ids   = array();
@@ -555,7 +555,7 @@ class Trigger {
 	 */
 	public function after_attachment_updated( $post_id, $post_after, $post_before ) {
 		if ( 'root' === get_post_meta( $post_id, 'synced_post_status', true ) ) {
-			self::after_update_global_post( $post_id, $post_after );
+			self::after_update_synced_post( $post_id, $post_after );
 		}
 	}
 
@@ -574,7 +574,7 @@ class Trigger {
 	 */
 	public function after_media_replaced( $target_url, $source_url, $post_id ) {
 		if ( 'root' === get_post_meta( $post_id, 'synced_post_status', true ) ) {
-			self::after_update_global_post( $post_id, get_post( $post_id ) );
+			self::after_update_synced_post( $post_id, get_post( $post_id ) );
 		}
 	}
 
@@ -619,7 +619,7 @@ class Trigger {
 			/**
 			 * Check if the current user can trash synced posts.
 			 */
-			$current_user_can_trash = Main_Helper::current_user_can_edit_global_posts( $status );
+			$current_user_can_trash = Main_Helper::current_user_can_edit_synced_posts( $status );
 			if ( ! $current_user_can_trash ) {
 				wp_die(
 					__( 'You are not allowed to trash synced posts.', 'global-contents' ),
@@ -638,7 +638,7 @@ class Trigger {
 				create_post_review( $post_id, $post_before );
 				return;
 			}
-			self::on_trash_global_post( $post_id );
+			self::on_trash_synced_post( $post_id );
 		}
 	}
 
@@ -660,7 +660,7 @@ class Trigger {
 				create_post_review( $post_id, $post_before );
 				return;
 			}
-			self::on_untrash_global_post( $post_id );
+			self::on_untrash_synced_post( $post_id );
 		}
 	}
 
@@ -681,9 +681,9 @@ class Trigger {
 					/**
 					 * @todo REWORK delete post from destinations
 					 */
-					Main_Helper::switch_to_blog( $blog_id );
+					\Contentsync\switch_blog( $blog_id );
 					\Contentsync\unlink_synced_post( $post_id );
-					Main_Helper::restore_blog();
+					\Contentsync\restore_blog();
 				}
 			}
 		} elseif ( $status === 'root' ) {
@@ -691,11 +691,11 @@ class Trigger {
 				create_post_review( $post_id, $post );
 				return;
 			}
-			self::on_delete_global_post( $post );
+			self::on_delete_synced_post( $post );
 		}
 	}
 
-	public static function on_trash_global_post( $post_id ) {
+	public static function on_trash_synced_post( $post_id ) {
 
 		// get setting
 		$setting = 'trash'; // TODO: get setting from database
@@ -738,7 +738,7 @@ class Trigger {
 		return $result;
 	}
 
-	public static function on_untrash_global_post( $post_id ) {
+	public static function on_untrash_synced_post( $post_id ) {
 
 		// get setting
 		$setting = 'trash'; // TODO: get setting from database
@@ -773,29 +773,29 @@ class Trigger {
 	 *
 	 * @todo REWORK with new distributor
 	 */
-	public static function on_delete_global_post( $post ) {
+	public static function on_delete_synced_post( $post ) {
 
 		// get settings
-		$delete_global_post_setting = 'delete'; // TODO: get setting from database
-		$trash_global_post_setting  = 'trash'; // TODO: get setting from database
+		$delete_synced_post_setting = 'delete'; // TODO: get setting from database
+		$trash_synced_post_setting  = 'trash'; // TODO: get setting from database
 
 		$result = true;
 
 		/**
 		 * delete everywhere
 		 */
-		if ( $delete_global_post_setting == 'delete' ) {
+		if ( $delete_synced_post_setting == 'delete' ) {
 
 			// get connection_map from review
 			$connection_map = isset( $post->meta['contentsync_connection_map'] ) ? $post->meta['contentsync_connection_map'] : \Contentsync\get_post_connection_map( $post->ID );
 			$result         = \Contentsync\delete_connected_posts( $post->ID, $connection_map );
 
-			if ( $trash_global_post_setting == 'trash' ) {
+			if ( $trash_synced_post_setting == 'trash' ) {
 				// search for trashed posts and delete them
 				\Contentsync\untrash_connected_posts( $post->ID, true );
-			} elseif ( $trash_global_post_setting == 'delete' ) {
+			} elseif ( $trash_synced_post_setting == 'delete' ) {
 				// do nothing, linked posts are already deleted
-			} elseif ( $trash_global_post_setting == 'localize' ) {
+			} elseif ( $trash_synced_post_setting == 'localize' ) {
 				// search for localized (unlinked) posts and delete them
 				\Contentsync\delete_unlinked_posts( $post );
 			}
@@ -804,15 +804,15 @@ class Trigger {
 		/**
 		 * make local everywhere
 		 */
-		if ( $delete_global_post_setting == 'localize' ) {
+		if ( $delete_synced_post_setting == 'localize' ) {
 			$result = \Contentsync\unlink_connected_posts( $post->ID );
 
-			if ( $trash_global_post_setting == 'trash' ) {
+			if ( $trash_synced_post_setting == 'trash' ) {
 				// search for trashed posts and untrash them
 				\Contentsync\untrash_connected_posts( $post->ID );
-			} elseif ( $trash_global_post_setting == 'delete' ) {
+			} elseif ( $trash_synced_post_setting == 'delete' ) {
 				// do nothing, linked posts are gone
-			} elseif ( $trash_global_post_setting == 'localize' ) {
+			} elseif ( $trash_synced_post_setting == 'localize' ) {
 				// do nothing, posts are already unlinked
 			}
 		}
@@ -820,7 +820,7 @@ class Trigger {
 		/**
 		 * do nothing (default)
 		 */
-		if ( $delete_global_post_setting == 'nothing' ) {
+		if ( $delete_synced_post_setting == 'nothing' ) {
 			// do nothing
 		}
 

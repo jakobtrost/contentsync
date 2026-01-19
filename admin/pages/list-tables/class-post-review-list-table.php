@@ -321,7 +321,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 			$content = sprintf(
 				'<strong><span class="row-title">%s</span> %s</strong>',
 				$title,
-				Main_Helper::render_info_popup( $msg, 'right' )
+				\Contentsync\Utils\make_admin_info_popup( $msg, 'right' )
 			);
 		}
 
@@ -355,11 +355,11 @@ class Post_Review_List_Table extends \WP_List_Table {
 				if ( $post->state != 'approved' ) {
 					$reviewer_message_content = $reviewer_message->get_content( true );
 					if ( empty( $reviewer_message_content ) ) {
-						$info .= Main_Helper::render_info_popup(
+						$info .= \Contentsync\Utils\make_admin_info_popup(
 							"<div class='log_title'>" . sprintf( __( 'The reviewer (%s) left no message.', 'contentsync' ), $reviewer ) . '</div>'
 						);
 					} else {
-						$info .= Main_Helper::render_info_popup(
+						$info .= \Contentsync\Utils\make_admin_info_popup(
 							"<div class='log_title'>" . sprintf( __( 'The reviewer (%s) left the following message:', 'contentsync' ), $reviewer ) . '</div>' .
 							"<div class='log_items'><b>" . $reviewer_message_content . '</b></div>'
 						);
@@ -401,7 +401,8 @@ class Post_Review_List_Table extends \WP_List_Table {
 		$color  = 'blue';
 		$action = $post->state; // new, in_review, denied, approved, reverted
 		if ( $action === 'new' ) {
-			$text = __( 'New', 'contentsync' );
+			$color = 'blue';
+			$text  = __( 'New', 'contentsync' );
 		} elseif ( $action === 'in_review' ) {
 			$text = __( 'In Review', 'contentsync' );
 		} elseif ( $action === 'denied' ) {
@@ -414,33 +415,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 			$color = 'red';
 			$text  = __( 'Reverted', 'contentsync' );
 		}
-		return $this->render_status_box( $text, $color );
-	}
-
-	public function render_status_box( $status = '', $color = '' ) {
-		if ( $status === 'failed' ) {
-			$color = 'red';
-		} elseif ( $status === 'success' ) {
-			$color = 'green';
-		} elseif ( $status === 'started' ) {
-			$color = 'blue';
-		}
-		$text = $status;
-		if ( $status === 'failed' ) {
-			$text = __( 'Failed', 'contentsync' );
-		} elseif ( $status === 'success' ) {
-			$text = __( 'Completed', 'contentsync' );
-		} elseif ( $status === 'started' ) {
-			$text = __( 'Started', 'contentsync' );
-		} elseif ( $status === 'init' ) {
-			$text = __( 'Scheduled', 'contentsync' );
-		}
-		return sprintf(
-			'<span data-title="%1$s" class="contentsync_info_box %2$s contentsync_status">%3$s</span>',
-			/* title    */ preg_replace( '/\s{1}/', '&nbsp;', $status ),
-			/* color    */ $color,
-			/* text     */ ! empty( $text ) ? '<span>' . $text . '</span>' : ''
-		);
+		return \Contentsync\Utils\make_admin_icon_status_box( $color, $text, false );
 	}
 
 	/**
@@ -551,19 +526,19 @@ class Post_Review_List_Table extends \WP_List_Table {
 					$result = false;
 					switch ( $bulk_action ) {
 						case 'approve':
-							Main_Helper::switch_to_blog( $post->blog_id );
+							\Contentsync\switch_blog( $post->blog_id );
 							$result = (bool) \Contentsync\approve_post_review( $post_id );
-							Main_Helper::restore_blog();
+							\Contentsync\restore_blog();
 							break;
 						case 'deny':
-							Main_Helper::switch_to_blog( $post->blog_id );
+							\Contentsync\switch_blog( $post->blog_id );
 							$result = (bool) \Contentsync\deny_post_review( $post_id );
-							Main_Helper::restore_blog();
+							\Contentsync\restore_blog();
 							break;
 						case 'revert':
-							Main_Helper::switch_to_blog( $post->blog_id );
+							\Contentsync\switch_blog( $post->blog_id );
 							$result = (bool) \Contentsync\revert_post_review( $post_id, $root_post->ID );
-							Main_Helper::restore_blog();
+							\Contentsync\restore_blog();
 							break;
 						case 'delete':
 							$result = (bool) delete_post_review( $post_id );
@@ -627,7 +602,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		}
 
 		// display the admin notice
-		$this->show_message( $content . $notice_content, $notice_class );
+		$this->render_admin_notice( $content . $notice_content, $notice_class );
 	}
 
 	/**
@@ -643,9 +618,9 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 * @param int $post_id The post id.
 	 */
 	public function get_root_post_edit_link( $blog_id, $post_id ) {
-		Main_Helper::switch_to_blog( $blog_id );
-		$edit_post_link = Main_Helper::get_edit_post_link( $post_id );
-		Main_Helper::restore_blog();
+		\Contentsync\switch_blog( $blog_id );
+		$edit_post_link = \Contentsync\get_edit_post_link( $post_id );
+		\Contentsync\restore_blog();
 		return $edit_post_link;
 	}
 
@@ -655,9 +630,9 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 * @param int $blog_id The blog id.
 	 */
 	public function get_root_blog_url( $blog_id ) {
-		Main_Helper::switch_to_blog( $blog_id );
+		\Contentsync\switch_blog( $blog_id );
 		$root_post_url = get_bloginfo( 'url' );
-		Main_Helper::restore_blog();
+		\Contentsync\restore_blog();
 		return $root_post_url;
 	}
 
@@ -668,7 +643,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 * @param string $mode  Style of the notice (error, warning, success, info).
 	 * @param bool   $list    Add to hub msg list (default: false).
 	 */
-	public static function show_message( $msg, $mode = 'info', $list = false ) {
+	public static function render_admin_notice( $msg, $mode = 'info', $list = false ) {
 		if ( empty( $msg ) ) {
 			return;
 		}

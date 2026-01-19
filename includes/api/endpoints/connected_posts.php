@@ -156,7 +156,7 @@ class Connected_Posts extends Endpoint {
 		foreach ( $connected_posts as $blog_id => $post_con ) {
 			if ( is_numeric( $blog_id ) ) {
 
-				Main_Helper::switch_to_blog( $blog_id );
+				\Contentsync\switch_blog( $blog_id );
 
 				$post_id  = $post_con['post_id'];
 				$message .= " - check post #$post_id on blog <u>" . get_site_url( $blog_id ) . " (ID: $blog_id)</u>";
@@ -189,7 +189,7 @@ class Connected_Posts extends Endpoint {
 				} else {
 					$message .= ' - this is not a linked post';
 				}
-				Main_Helper::restore_blog();
+				\Contentsync\restore_blog();
 			}
 			$response = true;
 		}
@@ -226,7 +226,7 @@ class Connected_Posts extends Endpoint {
 		foreach ( $connected_posts as $blog_id => $post_con ) {
 			if ( is_numeric( $blog_id ) ) {
 
-				Main_Helper::switch_to_blog( $blog_id );
+				\Contentsync\switch_blog( $blog_id );
 
 				$result = \Contentsync\import_synced_post( $remote_gid );
 
@@ -235,7 +235,7 @@ class Connected_Posts extends Endpoint {
 				} else {
 					$message .= ' - post could not be imported';
 				}
-				Main_Helper::restore_blog();
+				\Contentsync\restore_blog();
 			}
 			$response = true;
 		}
@@ -262,7 +262,7 @@ class Connected_Posts extends Endpoint {
 
 		$message = "Try to import post $remote_gid on connected blogs with id $blog_id: ";
 
-		Main_Helper::switch_to_blog( $blog_id );
+		\Contentsync\switch_blog( $blog_id );
 
 		/**
 		 * @todo if $request['posts'] isset, use this array to import the post,
@@ -275,7 +275,7 @@ class Connected_Posts extends Endpoint {
 		} else {
 			$message .= ' - post could not be imported';
 		}
-		Main_Helper::restore_blog();
+		\Contentsync\restore_blog();
 
 		$response = true;
 
@@ -303,14 +303,14 @@ class Connected_Posts extends Endpoint {
 				foreach ( $connected_posts as $blog_id => $post_con ) {
 
 					if ( is_numeric( $blog_id ) && get_blog_details( $blog_id, false ) ) {
-						Main_Helper::switch_to_blog( $blog_id );
+						\Contentsync\switch_blog( $blog_id );
 						$result = wp_delete_post( $post_con['post_id'], true );
 						if ( $result ) {
 							$message .= ' - Post #' . $post_con['post_id'] . " was deleted from the blog $blog_id";
 						} else {
 							$message .= ' - Post #' . $post_con['post_id'] . " could not be deleted from the blog $blog_id";
 						}
-						Main_Helper::restore_blog();
+						\Contentsync\restore_blog();
 					}
 				}
 				$response = true;
@@ -342,7 +342,7 @@ class Connected_Posts extends Endpoint {
 		// echo "\r\n".sprintf( "Match gid before import: %s", $gid );
 
 		$origin  = $this->origin;
-		$current = \Contentsync\Main_Helper::get_network_url();
+		$current = \Contentsync\Utils\get_network_url();
 
 		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $gid );
 		if ( ! empty( $post_id ) && ! empty( $origin ) ) {
@@ -411,7 +411,7 @@ class Connected_Posts extends Endpoint {
 	public function allow_request_from_same_origin( $request ) {
 
 		$origin  = $request->get_header( 'Origin' );
-		$current = \Contentsync\Main_Helper::get_network_url();
+		$current = \Contentsync\Utils\get_network_url();
 
 		if ( $current == $origin ) {
 			return true;

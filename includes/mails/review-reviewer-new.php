@@ -27,7 +27,7 @@ function get_mail_content_for_reviews_reviewer_new( $review, $post ) {
 
 	$mail_note = sprintf( __( 'Please review the %s and make the necessary changes.', 'contentsync' ) . '<br><br>', $post->post_type );
 
-	$links  = "<a href='" . \Contentsync\Main_Helper::get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
+	$links  = "<a href='" . \Contentsync\get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
 	$links .= " | <a href='" . network_admin_url( 'admin.php?page=contentsync-post-reviews' ) . "'>" . __( 'View all reviews', 'contentsync' ) . '</a>';
 
 	$message = $mail_title . $mail_note . $links;

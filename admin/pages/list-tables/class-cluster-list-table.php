@@ -230,7 +230,7 @@ class Cluster_List_Table extends \WP_List_Table {
 				'<strong><span class="row-title">%s</span>%s&nbsp;%s</strong>',
 				$post->title,
 				$post_status,
-				Main_Helper::render_info_popup( $error, 'right' )
+				\Contentsync\Utils\make_admin_info_popup( $error, 'right' )
 			);
 		}
 
@@ -294,7 +294,7 @@ class Cluster_List_Table extends \WP_List_Table {
 	public function column_reviews( $post ) {
 
 		if ( ! $post->enable_reviews ) {
-			return $this->render_status_box( __( 'No reviews', 'contentsync' ) );
+			return \Contentsync\Utils\make_admin_icon_status_box( 'info', __( 'No reviews', 'contentsync' ), false );
 		}
 
 		foreach ( $post->reviewer_ids as $reviewer_id ) {
@@ -304,7 +304,7 @@ class Cluster_List_Table extends \WP_List_Table {
 			}
 		}
 
-		return $this->render_status_box( __( 'Reviews active', 'contentsync' ), 'blue' );
+		return \Contentsync\Utils\make_admin_icon_status_box( 'info', __( 'Reviews active', 'contentsync' ), false );
 	}
 
 	/**
@@ -542,16 +542,7 @@ class Cluster_List_Table extends \WP_List_Table {
 		}
 
 		// display the admin notice
-		$this->show_message( $content . $notice_content, $notice_class );
-	}
-
-	public function render_status_box( $text = '', $color = '' ) {
-		return sprintf(
-			'<span data-title="%1$s" class="contentsync_info_box %2$s contentsync_status">%3$s</span>',
-			/* title    */ preg_replace( '/\s{1}/', '&nbsp;', $text ),
-			/* color    */ $color,
-			/* text     */ ! empty( $text ) ? '<span>' . $text . '</span>' : ''
-		);
+		$this->render_admin_notice( $content . $notice_content, $notice_class );
 	}
 
 	/**
@@ -561,7 +552,7 @@ class Cluster_List_Table extends \WP_List_Table {
 	 * @param string $mode  Style of the notice (error, warning, success, info).
 	 * @param bool   $list    Add to hub msg list (default: false).
 	 */
-	public static function show_message( $msg, $mode = 'info', $list = false ) {
+	public static function render_admin_notice( $msg, $mode = 'info', $list = false ) {
 		if ( empty( $msg ) ) {
 			return;
 		}

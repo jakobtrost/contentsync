@@ -10,7 +10,7 @@
 
 namespace Contentsync\Translation_Tools;
 
-use Contentsync\Main_Helper as Main_Helper;
+use Contentsync\Main_Helper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -106,14 +106,12 @@ class Translation_Tool_Factory {
 	private static function detect_tool() {
 		$tool = null;
 
-		$plugins = Main_Helper::active_plugins();
+		$plugins = self::get_active_plugins();
 		if ( in_array( 'sitepress-multilingual-cms/sitepress.php', $plugins ) ) {
 			$tool = 'wpml';
-		}
-		else if ( in_array( 'polylang/polylang.php', $plugins ) ) {
+		} elseif ( in_array( 'polylang/polylang.php', $plugins ) ) {
 			$tool = 'polylang';
-		}
-		else if ( in_array( 'polylang-pro/polylang.php', $plugins ) ) {
+		} elseif ( in_array( 'polylang-pro/polylang.php', $plugins ) ) {
 			$tool = 'polylang';
 		}
 
@@ -121,11 +119,47 @@ class Translation_Tool_Factory {
 	}
 
 	/**
+	 * Get all active Plugins from Option.
+	 * Including all active sitewide Plugins.
+	 *
+	 * @param string $mode  all|site|global (default: all)
+	 */
+	public static function get_active_plugins( $mode = 'all' ) {
+
+		$plugins = array();
+
+		// get all active plugins
+		if ( $mode == 'all' || $mode == 'site' ) {
+			$plugins = get_option( 'active_plugins' );
+			if ( ! is_array( $plugins ) ) {
+				$plugins = array();
+			}
+		}
+
+		// on multisite, get all active sitewide plugins as well
+		if (
+			is_multisite()
+			&& ( $mode == 'all' || $mode == 'global' )
+		) {
+			$plugins_multi = get_site_option( 'active_sitewide_plugins' );
+			if ( is_array( $plugins_multi ) && ! empty( $plugins_multi ) ) {
+				foreach ( $plugins_multi as $key => $value ) {
+					$plugins[] = $key;
+				}
+				$plugins = array_unique( $plugins );
+				sort( $plugins );
+			}
+		}
+
+		return $plugins;
+	}
+
+	/**
 	 * Check if a specific translation tool plugin is loaded in memory.
-	 * 
+	 *
 	 * This checks if the plugin code is loaded, which can be different from
 	 * whether it's active/configured for the current blog in multisite.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @param string|null $tool_name Tool name ('wpml', 'polylang') or null to detect automatically.
 	 * @return bool True if the plugin is loaded, false otherwise.
@@ -140,7 +174,7 @@ class Translation_Tool_Factory {
 		}
 
 		$instance = self::create_instance_by_name( $tool_name );
-		
+
 		if ( ! $instance ) {
 			return false;
 		}
@@ -150,11 +184,11 @@ class Translation_Tool_Factory {
 
 	/**
 	 * Detect which translation tool is loaded in memory (if any).
-	 * 
+	 *
 	 * This is different from detect_tool() which checks if a tool is active
 	 * for the current blog. This method checks all known tools to see if
 	 * any of them are loaded in memory.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @return string|null Tool name if loaded, null if none found.
 	 */
@@ -172,17 +206,17 @@ class Translation_Tool_Factory {
 
 	/**
 	 * Unload hooks from a translation tool that's loaded but not active.
-	 * 
+	 *
 	 * This is a generic method that detects if any translation plugin is loaded
 	 * but not active for the current blog, then unloads its hooks.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @return bool True if hooks were unloaded, false otherwise.
 	 */
 	public static function unload_inactive_tool_hooks() {
 		// Check which tool is active for this blog
 		$active_tool = self::get_tool_name();
-		
+
 		// Check which tool is loaded in memory
 		$loaded_tool = self::get_loaded_tool_name();
 
@@ -193,7 +227,7 @@ class Translation_Tool_Factory {
 
 		// Tool is loaded but shouldn't be active - create instance and unload its hooks
 		$instance = self::create_instance_by_name( $loaded_tool );
-		
+
 		if ( ! $instance ) {
 			return false;
 		}
@@ -203,10 +237,10 @@ class Translation_Tool_Factory {
 
 	/**
 	 * Reload hooks for the active translation tool.
-	 * 
+	 *
 	 * This should be called after switching back to a blog where the translation
 	 * tool should be active.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @return bool True if hooks were reloaded, false otherwise.
 	 */
@@ -222,7 +256,7 @@ class Translation_Tool_Factory {
 
 	/**
 	 * Create a translation tool instance by name.
-	 * 
+	 *
 	 * @since 2.19.0
 	 * @param string $tool_name Tool name ('wpml', 'polylang').
 	 * @return Translation_Tool_Base|null
@@ -240,6 +274,3 @@ class Translation_Tool_Factory {
 		}
 	}
 }
-
-
-

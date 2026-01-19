@@ -95,8 +95,8 @@ class Posts extends Endpoint {
 
 		$args = isset( $request['args'] ) ? $request['args'] : null;
 
-		$posts = $this->get_global_posts_for_endpoint( $args );
-		// $posts = Main_Helper::get_all_network_posts();
+		$posts = $this->get_synced_posts_for_endpoint( $args );
+		// $posts = Main_Helper::get_all_synced_posts_from_current_network();
 
 		$message = 'No synced posts found on this stage';
 		if ( $posts ) {
@@ -123,7 +123,7 @@ class Posts extends Endpoint {
 		if ( $post_id !== null ) {
 
 			$gid  = $blog_id . '-' . $post_id;
-			$post = Main_Helper::get_global_post( $gid );
+			$post = Main_Helper::get_synced_post( $gid );
 
 			if ( $post ) {
 				$message = "Synced post '$gid' found on this site ($net_url).";
@@ -159,7 +159,7 @@ class Posts extends Endpoint {
 			add_filter( 'contentsync_export_post_meta-synced_post_id', array( $this, 'maybe_append_network_url_to_gid_on_export' ), 10, 2 );
 
 			$gid  = $blog_id . '-' . $post_id;
-			$post = Main_Helper::prepare_global_post_for_import( $gid );
+			$post = Main_Helper::prepare_synced_post_for_import( $gid );
 
 			// remove filter
 			remove_filter( 'contentsync_export_post_meta-synced_post_id', array( $this, 'maybe_append_network_url_to_gid_on_export' ) );
@@ -190,7 +190,7 @@ class Posts extends Endpoint {
 			return $gid;
 		}
 
-		$gid = $_blog_id . '-' . $_post_id . '-' . Main_Helper::get_network_url();
+		$gid = $_blog_id . '-' . $_post_id . '-' . \Contentsync\Utils\get_network_url();
 
 		return $gid;
 	}
@@ -210,7 +210,7 @@ class Posts extends Endpoint {
 	 *
 	 * @return array of all synced posts
 	 */
-	public function get_global_posts_for_endpoint( $query_args = null ) {
+	public function get_synced_posts_for_endpoint( $query_args = null ) {
 
 		global $wpdb;
 		$all_posts             = $query_parts = $removed_posts = array();
@@ -244,11 +244,11 @@ class Posts extends Endpoint {
 			}
 		}
 
-		$network_url = Main_Helper::get_network_url();
+		$network_url = \Contentsync\Utils\get_network_url();
 
 		// build sql query
 		$results = array();
-		foreach ( Main_Helper::get_all_blogs() as $blog_id => $blog_args ) {
+		foreach ( \Contentsync\get_all_blogs() as $blog_id => $blog_args ) {
 			$prefix   = $blog_args['prefix'];
 			$site_url = $blog_args['site_url'];
 			$query    = "

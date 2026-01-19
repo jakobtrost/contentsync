@@ -49,7 +49,7 @@ function get_mail_content_for_reviews_editor_reverted( $review, $post ) {
 		}
 	}
 
-	$links = "<a href='" . \Contentsync\Main_Helper::get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
+	$links = "<a href='" . \Contentsync\get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
 
 	$message = $mail_title . $mail_note . $links;
 

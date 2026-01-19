@@ -100,29 +100,29 @@ class Global_List_Table extends \WP_List_Table {
 		$connections = is_network_admin() || ! is_multisite() ? \Contentsync\get_site_connections() : false;
 		$rel         = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'all';
 
-		$this->posts['all'] = Main_Helper::get_all_global_posts( $query_args );
+		$this->posts['all'] = Main_Helper::get_all_synced_posts( $query_args );
 
 		// get posts in relation to this blog
 		if ( ! is_network_admin() ) {
-			$this->posts['export'] = Main_Helper::get_blog_global_posts( $blog_id, 'root', $query_args );
-			$this->posts['import'] = Main_Helper::get_blog_global_posts( $blog_id, 'linked', $query_args );
+			$this->posts['export'] = Main_Helper::get_synced_posts_of_blog( $blog_id, 'root', $query_args );
+			$this->posts['import'] = Main_Helper::get_synced_posts_of_blog( $blog_id, 'linked', $query_args );
 		}
 
 		if ( $connections && count( $connections ) > 0 ) {
 			if ( is_network_admin() ) {
-				$this->posts['here'] = Main_Helper::get_all_global_posts( $query_args, 'here' );
+				$this->posts['here'] = Main_Helper::get_all_synced_posts( $query_args, 'here' );
 			}
 			foreach ( $connections as $key => $connection ) {
-				$this->posts[ $key ] = Main_Helper::get_all_global_posts( $query_args, $key );
+				$this->posts[ $key ] = Main_Helper::get_all_synced_posts( $query_args, $key );
 			}
 		}
 
 		// post error view
 		if ( $rel === 'errors' ) {
 			if ( is_network_admin() ) {
-				$this->posts['errors'] = Main_Helper::get_network_global_posts_with_errors( false, $query_args );
+				$this->posts['errors'] = \Contentsync\get_network_synced_posts_with_errors( false, $query_args );
 			} else {
-				$this->posts['errors'] = Main_Helper::get_blog_global_posts_with_errors( $blog_id, false, $query_args );
+				$this->posts['errors'] = \Contentsync\get_synced_posts_of_blog_with_errors( $blog_id, false, $query_args );
 			}
 		}
 
@@ -163,7 +163,7 @@ class Global_List_Table extends \WP_List_Table {
 		);
 
 		// set class vars
-		$this->network_url = Main_Helper::get_network_url();
+		$this->network_url = \Contentsync\Utils\get_network_url();
 
 		/**
 		 * display message if translation tool is not active on the main site
@@ -171,13 +171,13 @@ class Global_List_Table extends \WP_List_Table {
 		 * @since 2.3.0 support wpml and polylang
 		 */
 		if ( is_multisite() && is_network_admin() ) {
-			Main_Helper::switch_to_blog( get_main_site_id() );
+			\Contentsync\switch_blog( get_main_site_id() );
 			foreach ( $items as $post ) {
 				if ( isset( $post->language ) && ! empty( $post->language ) ) {
 					// get translation tool of post
-					Main_Helper::switch_to_blog( $post->blog_id );
+					\Contentsync\switch_blog( $post->blog_id );
 					$tool = Translation_Manager::get_translation_tool();
-					Main_Helper::restore_blog();
+					\Contentsync\restore_blog();
 					// compare to this
 					if ( Translation_Manager::get_translation_tool() != $tool ) {
 						switch ( $tool ) {
@@ -209,7 +209,7 @@ class Global_List_Table extends \WP_List_Table {
 				}
 				break;
 			}
-			Main_Helper::restore_blog();
+			\Contentsync\restore_blog();
 		}
 	}
 
@@ -462,7 +462,7 @@ class Global_List_Table extends \WP_List_Table {
 		// if relationship == 'unused' but local_post is set, this is an error
 		if ( $item->relationship == 'unused' && $item->local_post ) {
 			$item->relationship = 'error';
-			$error              = Main_Helper::check_post_for_errors( $item );
+			$error              = \Contentsync\check_post_for_errors( $item );
 			if ( $error ) {
 				$item->error = $error;
 			}
@@ -484,9 +484,9 @@ class Global_List_Table extends \WP_List_Table {
 					$item->site_url = trailingslashit( esc_url( $_post->site_url ) );
 				}
 			} else {
-				$global_post = Main_Helper::get_global_post( $gid );
-				if ( $global_post && isset( $global_post->post_links ) && isset( $global_post->post_links->edit ) ) {
-					$item->site_url = trailingslashit( esc_url( $global_post->post_links->blog ) );
+				$synced_post = Main_Helper::get_synced_post( $gid );
+				if ( $synced_post && isset( $synced_post->post_links ) && isset( $synced_post->post_links->edit ) ) {
+					$item->site_url = trailingslashit( esc_url( $synced_post->post_links->blog ) );
 				} else {
 					$item->site_url = trailingslashit( esc_url( $root_net_url ) );
 				}
@@ -515,7 +515,7 @@ class Global_List_Table extends \WP_List_Table {
 			// because the theme will automatically be switched to the theme of the destination blog
 			// during import.
 			if ( $item->local_post ) {
-				$blog_theme = Main_Helper::get_wp_template_theme( $item->local_post );
+				$blog_theme = \Contentsync\get_wp_template_theme( $item->local_post );
 			}
 			// debug( $item, true );
 			$item->post_links = array(
@@ -709,8 +709,8 @@ class Global_List_Table extends \WP_List_Table {
 
 				if ( $item->error ) {
 					$actions = array( 'edit', 'root' );
-					$title  .= "<br><span class='color_red'>" . Main_Helper::get_error_message( $item->error ) . '</span>';
-					if ( ! Main_Helper::is_error_repaired( $item->error ) ) {
+					$title  .= "<br><span class='color_red'>" . \Contentsync\get_error_message( $item->error ) . '</span>';
+					if ( ! \Contentsync\is_error_repaired( $item->error ) ) {
 						$actions[] = 'repair';
 						$actions[] = 'trash';
 					}
@@ -721,16 +721,16 @@ class Global_List_Table extends \WP_List_Table {
 
 			case 'relationship':
 				if ( $item->error ) {
-					if ( Main_Helper::is_error_repaired( $item->error ) ) {
-						return Main_Helper::render_status_box( 'info', __( 'Error fixed', 'contentsync' ) );
+					if ( \Contentsync\is_error_repaired( $item->error ) ) {
+						return \Contentsync\Utils\make_admin_icon_status_box( 'info', __( 'Error fixed', 'contentsync' ) );
 					} else {
-						return Main_Helper::render_status_box( 'error', __( 'Error', 'contentsync' ) );
+						return \Contentsync\Utils\make_admin_icon_status_box( 'error', __( 'Error', 'contentsync' ) );
 					}
 				} elseif ( $item->relationship === 'unused' ) {
 					return __( 'Not imported', 'contentsync' );
 				} else {
 					$text = $item->relationship == 'export' ? __( 'Exported', 'contentsync' ) : __( 'Imported', 'contentsync' );
-					return Main_Helper::render_status_box( $item->relationship, $text );
+					return \Contentsync\Utils\make_admin_icon_status_box( $item->relationship, $text );
 				}
 				break;
 
@@ -1099,14 +1099,14 @@ class Global_List_Table extends \WP_List_Table {
 
 				if ( $gids_are_post_ids ) {
 					if ( is_network_admin() && $root_blog_id ) {
-						Main_Helper::switch_to_blog( $root_blog_id );
+						\Contentsync\switch_blog( $root_blog_id );
 					}
 					$result = (bool) wp_trash_post( $root_post_id );
 					if ( $result ) {
 						$post_titles[] = get_post( $root_post_id )->post_title;
 					}
 					if ( is_network_admin() && $root_blog_id ) {
-						Main_Helper::restore_blog();
+						\Contentsync\restore_blog();
 					}
 				} else {
 					$post = Main_Helper::get_local_post_by_gid( $gid );
@@ -1127,7 +1127,7 @@ class Global_List_Table extends \WP_List_Table {
 					continue;
 				}
 
-				$post = Main_Helper::get_global_post( $gid );
+				$post = Main_Helper::get_synced_post( $gid );
 				if ( $post ) {
 					$post_titles[] = $post->post_title;
 				}
@@ -1149,10 +1149,10 @@ class Global_List_Table extends \WP_List_Table {
 			// delete confirmed
 			elseif ( $bulk_action === 'delete_confirmed' ) {
 
-				$post = Main_Helper::get_global_post( $gid );
+				$post = Main_Helper::get_synced_post( $gid );
 				if ( $post ) {
 					$post_title = $post->post_title;
-					$result     = (bool) \Contentsync\delete_global_post( $gid );
+					$result     = (bool) \Contentsync\delete_synced_post( $gid );
 					if ( $result ) {
 						$post_titles[] = $post_title;
 					}
@@ -1162,15 +1162,15 @@ class Global_List_Table extends \WP_List_Table {
 			// repair
 			elseif ( $bulk_action === 'repair' ) {
 
-				$error = Main_Helper::repair_post( $root_post_id, $root_blog_id, true );
-				if ( Main_Helper::is_error_repaired( $error ) ) {
+				$error = \Contentsync\repair_post( $root_post_id, $root_blog_id, true );
+				if ( \Contentsync\is_error_repaired( $error ) ) {
 					if ( ! is_string( $result ) ) {
 						$result = true;
 					}
 				} elseif ( ! is_string( $result ) ) {
-						$result = Main_Helper::get_error_repaired_log( $error );
+						$result = \Contentsync\get_error_repaired_log( $error );
 				} else {
-					$result .= ' ' . Main_Helper::get_error_repaired_log( $error );
+					$result .= ' ' . \Contentsync\get_error_repaired_log( $error );
 				}
 			}
 		}
@@ -1224,7 +1224,7 @@ class Global_List_Table extends \WP_List_Table {
 		}
 
 		// display the admin notice
-		Main_Helper::show_message( $content . $notice_content, $notice_class );
+		\Contentsync\Utils\render_admin_notice( $content . $notice_content, $notice_class );
 	}
 
 

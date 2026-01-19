@@ -132,11 +132,11 @@ function approve_post_review( $review_id, $post_id = null ) {
 	set_post_review_state( $review_id, 'approved' );
 
 	if ( ! $post ) {
-		$result = Trigger::on_delete_global_post( $post_review->previous_post );
+		$result = Trigger::on_delete_synced_post( $post_review->previous_post );
 	} elseif ( $post->post_status == 'trash' ) {
-		$result = Trigger::on_trash_global_post( $post_review->previous_post );
+		$result = Trigger::on_trash_synced_post( $post_review->previous_post );
 	} elseif ( $post_review->previous_post->post_status == 'trash' ) {
-		$result = Trigger::on_untrash_global_post( $post_id );
+		$result = Trigger::on_untrash_synced_post( $post_id );
 	} else {
 		$destination_ids = array();
 		foreach ( get_clusters_including_post( $post ) as $cluster ) {

@@ -214,7 +214,7 @@ class Synced_Post {
 
 		// set language
 		if ( $this->language === null && ! $this->network_url ) {
-			$this->language = \Contentsync\Main_Helper::get_post_language_code( $post );
+			$this->language = get_post_language_code( $post );
 		}
 	}
 
@@ -301,7 +301,7 @@ class Synced_Post {
 			 *
 			 * We use them to calculate some required meta infos, like the global ID.
 			 *
-			 * @see \Contentsync\Api\Posts->get_global_posts_for_endpoint() for details
+			 * @see \Contentsync\Api\Posts->get_synced_posts_for_endpoint() for details
 			 */
 
 			// synced_post_status
@@ -312,7 +312,7 @@ class Synced_Post {
 				$gid = $this->blog_id . '-' . $this->ID;
 
 				if ( ! empty( $this->network_url ) ) {
-					$gid .= '-' . \Contentsync\Main_Helper::get_nice_url( $this->network_url );
+					$gid .= '-' . \Contentsync\\Contentsync\Utils\get_nice_url( $this->network_url );
 				}
 
 				$meta['synced_post_id'] = $gid;
@@ -324,7 +324,7 @@ class Synced_Post {
 				$imported_post = \Contentsync\Main_Helper::get_local_post_by_gid( $gid );
 				if ( $imported_post && isset( $imported_post->ID ) ) {
 					$blog_id                            = get_current_blog_id();
-					$net_url                            = \Contentsync\Main_Helper::get_network_url();
+					$net_url                            = \Contentsync\Utils\get_network_url();
 					$meta['contentsync_connection_map'] = array(
 						$net_url => array(
 							$blog_id => \Contentsync\get_post_connection_map( $blog_id, $imported_post->ID ),

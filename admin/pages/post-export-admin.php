@@ -152,7 +152,7 @@ class Post_Export_Admin {
 
 		// add notices
 		if ( $screen->id === 'edit-page' ) {
-			$export_form .= Helper::render_info_box(
+			$export_form .= \Contentsync\Utils\make_admin_info_box(
 				array(
 					'text'  => __( 'Posts in query loops are not included in the import. Posts and Post Types must be exported separately.', 'contentsync_hub' ),
 					'style' => 'info',
@@ -289,7 +289,7 @@ class Post_Export_Admin {
 			$mode      = $transient[0];
 			$msg       = $transient[1];
 			// this is my last resort
-			Helper::show_message( $msg, $mode );
+			\Contentsync\Utils\render_admin_notice( $msg, $mode );
 
 			// delete transient
 			delete_transient( 'contentsync_transient_notice' );
@@ -353,7 +353,7 @@ class Post_Export_Admin {
 			echo "<hr>\r\n\r\n=== R E S P O N S E ===\r\n\r\n";
 			var_dump( $response, true );
 		} else {
-			$posts = \Content_Sync\Main_Helper::prepare_global_post_for_import( strval( $_GET['contentsync_export_debug'] ) );
+			$posts = \Content_Sync\Main_Helper::prepare_synced_post_for_import( strval( $_GET['contentsync_export_debug'] ) );
 			debug( $posts );
 		}
 

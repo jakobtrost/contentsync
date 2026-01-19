@@ -51,7 +51,7 @@ class Add_Connection extends Endpoint {
 	public function add_site_connection( $request ) {
 
 		$request_url    = $request->get_header( 'Origin' );
-		$current_url    = \Contentsync\Main_Helper::get_network_url();
+		$current_url    = \Contentsync\Utils\get_network_url();
 		$new_connection = $request->get_param( 'connection' );
 
 		if ( ! $new_connection ) {

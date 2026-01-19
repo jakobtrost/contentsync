@@ -50,6 +50,21 @@ function get_theme_posts( $args ) {
 }
 
 /**
+ * Retrieves the theme slug for a wp_template post.
+ *
+ * @param WP_Post $post Post object.
+ *
+ * @return string The theme slug for the given template.
+ */
+function get_wp_template_theme( $post ) {
+	$theme = wp_get_post_terms( $post->ID, 'wp_theme' );
+	if ( $theme && is_array( $theme ) && isset( $theme[0] ) ) {
+		return $theme[0]->name;
+	}
+	return '';
+}
+
+/**
  * Assign a template to the current theme.
  *
  * @param WP_Post $post Post object.
@@ -63,7 +78,7 @@ function set_wp_template_theme( $post, $switch_references_in_content = false ) {
 
 	$old_theme = null;
 	if ( $switch_references_in_content ) {
-		$old_theme = Main_Helper::get_wp_template_theme( $post );
+		$old_theme = get_wp_template_theme( $post );
 	}
 
 	// set the terms

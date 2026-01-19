@@ -223,7 +223,7 @@ function get_posts_by_cluster_content_condition( $condition ) {
 
 	$blog_id = get_current_blog_id();
 	if ( $blog_id != $condition->blog_id ) {
-		Main_Helper::switch_to_blog( $condition->blog_id );
+		switch_blog( $condition->blog_id );
 	}
 
 	// export arguments
@@ -241,7 +241,7 @@ function get_posts_by_cluster_content_condition( $condition ) {
 	$query_args = get_query_args_for_cluster_content_condition( $condition );
 	// Logger::add( "Query args:", $query_args );
 
-	$posts = Main_Helper::get_posts( $query_args );
+	$posts = get_unfiltered_posts( $query_args );
 	// Logger::add( "Posts:", $posts );
 
 	$cluster_posts = array();
@@ -254,7 +254,7 @@ function get_posts_by_cluster_content_condition( $condition ) {
 	}
 
 	if ( $blog_id != $condition->blog_id ) {
-		Main_Helper::restore_blog();
+		restore_blog();
 	}
 
 	return $cluster_posts;
@@ -305,7 +305,7 @@ function post_meets_cluster_content_condition( $post_or_post_id, $condition_or_c
 		$query_args['post__in'] = array( $post_id );
 	}
 
-	$posts = \Contentsync\Main_Helper::get_posts( $query_args );
+	$posts = \Contentsync\get_unfiltered_posts( $query_args );
 
 	// ... so we have to check manually
 	if ( ! isset( $query_args['post__in'] ) ) {

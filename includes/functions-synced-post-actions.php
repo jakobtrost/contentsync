@@ -100,7 +100,7 @@ function make_post_global( $post_id, $args ) {
  */
 function check_synced_post_import( $gid ) {
 
-	$posts = Main_Helper::prepare_global_post_for_import( $gid );
+	$posts = Main_Helper::prepare_synced_post_for_import( $gid );
 	if ( ! $posts ) {
 		return false;
 	}
@@ -134,7 +134,7 @@ function remove_conflict_when_same_gid( $conflicts, $all_posts ) {
 		$import_gid  = Main_Helper::get_gid( $all_posts[ $post_id ] );
 
 		// remove the conflict if it is the same synced post
-		if ( Main_Helper::get_global_post( $current_gid ) && $current_gid === $import_gid ) {
+		if ( Main_Helper::get_synced_post( $current_gid ) && $current_gid === $import_gid ) {
 			unset( $conflicts[ $post_id ] );
 		}
 	}
@@ -156,7 +156,7 @@ add_filter( 'import_synced_post_conflicts', __NAMESPACE__ . '\remove_conflict_wh
  */
 function import_synced_post( $gid, $conflict_actions = array() ) {
 
-	$posts = Main_Helper::prepare_global_post_for_import( $gid );
+	$posts = Main_Helper::prepare_synced_post_for_import( $gid );
 	if ( ! $posts ) {
 		return false;
 	}
@@ -259,7 +259,7 @@ function unlink_synced_root_post( $gid ) {
 		return false;
 	}
 
-	Main_Helper::switch_to_blog( $blog_id );
+	switch_blog( $blog_id );
 
 	$connection_map = get_post_connection_map( $post_id );
 
@@ -267,9 +267,9 @@ function unlink_synced_root_post( $gid ) {
 	if ( is_array( $connection_map ) && count( $connection_map ) > 0 ) {
 		foreach ( $connection_map as $_blog_id => $post_connection ) {
 			if ( is_numeric( $_blog_id ) ) {
-				Main_Helper::switch_to_blog( $_blog_id );
+				switch_blog( $_blog_id );
 				delete_contentsync_meta_values( $post_connection['post_id'] );
-				Main_Helper::restore_blog();
+				restore_blog();
 			} else {
 				/**
 				 * @todo handle remote connections
@@ -283,7 +283,7 @@ function unlink_synced_root_post( $gid ) {
 	// delete meta of exported post
 	delete_contentsync_meta_values( $post_id );
 
-	Main_Helper::restore_blog();
+	restore_blog();
 
 	return true;
 }
@@ -378,8 +378,8 @@ function untrash_connected_posts( $post_id, $delete = false ) {
 			continue;
 		}
 
-		Main_Helper::switch_to_blog( $destination_id );
-		$trashed = Main_Helper::get_posts(
+		switch_blog( $destination_id );
+		$trashed = get_unfiltered_posts(
 			array(
 				'numberposts' => -1,
 				'post_status' => 'trash',
@@ -412,7 +412,7 @@ function untrash_connected_posts( $post_id, $delete = false ) {
 			}
 		}
 
-		Main_Helper::restore_blog();
+		restore_blog();
 	}
 
 	return $result;
@@ -520,7 +520,7 @@ function delete_unlinked_posts( $post ) {
  *
  * @return WP_Post|false|null Post data on success, false or null on failure.
  */
-function delete_global_post( $gid, $keep_root_post = false ) {
+function delete_synced_post( $gid, $keep_root_post = false ) {
 
 	Logger::add( sprintf( "DELETE synced post with gid '%s'", $gid ) );
 
@@ -531,17 +531,17 @@ function delete_global_post( $gid, $keep_root_post = false ) {
 	}
 
 	// needs to be the root post
-	$global_post = Main_Helper::get_global_post( $gid );
-	if ( ! $global_post || $global_post->meta['synced_post_status'] !== 'root' ) {
+	$synced_post = Main_Helper::get_synced_post( $gid );
+	if ( ! $synced_post || $synced_post->meta['synced_post_status'] !== 'root' ) {
 		return false;
 	}
 
 	$result = true;
-	Main_Helper::switch_to_blog( $root_blog_id );
+	switch_blog( $root_blog_id );
 
 	// delete imported posts
-	$connection_map = get_post_connection_map( $global_post->ID );
-	\Contentsync\Logger::log( 'delete_global_post', $global_post->ID );
+	$connection_map = get_post_connection_map( $synced_post->ID );
+	\Contentsync\Logger::log( 'delete_synced_post', $synced_post->ID );
 	\Contentsync\Logger::log( 'connection_map', $connection_map );
 
 	$destination_ids = convert_connection_map_to_destination_ids( $connection_map );
@@ -563,7 +563,7 @@ function delete_global_post( $gid, $keep_root_post = false ) {
 	}
 
 	// restore blog
-	Main_Helper::restore_blog();
+	restore_blog();
 
 	return $result;
 }

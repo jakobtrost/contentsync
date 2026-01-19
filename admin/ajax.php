@@ -244,9 +244,9 @@ class Ajax {
 			}
 
 			$current_posts = array();
-			$global_post   = Main_Helper::get_global_post( $gid );
-			if ( $global_post ) {
-				$current_posts[ $global_post->ID ] = array(
+			$synced_post   = Main_Helper::get_synced_post( $gid );
+			if ( $synced_post ) {
+				$current_posts[ $synced_post->ID ] = array(
 					'post_id' => $post_id,
 					'action'  => 'replace',
 				);
@@ -278,7 +278,7 @@ class Ajax {
 				$this->fail( 'post_id is not defined.' );
 			}
 
-			$error = Main_Helper::repair_post( $post_id, $blog_id, true );
+			$error = \Contentsync\repair_post( $post_id, $blog_id, true );
 
 			// no error
 			if ( ! $error ) {
@@ -286,10 +286,10 @@ class Ajax {
 			}
 			// error found
 			else {
-				echo Main_Helper::get_error_repaired_log( $error );
+				echo \Contentsync\get_error_repaired_log( $error );
 
 				// success
-				if ( Main_Helper::is_error_repaired( $error ) ) {
+				if ( \Contentsync\is_error_repaired( $error ) ) {
 					$this->success( 'post was successfully repaired' );
 				} else {
 					$this->fail( $error->message );
@@ -312,11 +312,11 @@ class Ajax {
 			}
 
 			if ( $blog_id ) {
-				Main_Helper::switch_to_blog( $blog_id );
+				\Contentsync\switch_blog( $blog_id );
 			}
 			$result = wp_trash_post( $post_id );
 			if ( $blog_id ) {
-				Main_Helper::restore_blog();
+				\Contentsync\restore_blog();
 			}
 
 			// failure
@@ -342,7 +342,7 @@ class Ajax {
 				$this->fail( 'global ID is not defined.' );
 			}
 
-			$result = \Contentsync\delete_global_post( $gid );
+			$result = \Contentsync\delete_synced_post( $gid );
 
 			// failure
 			if ( ! $result ) {
@@ -393,7 +393,7 @@ class Ajax {
 			}
 
 			if ( $post = get_post( $post_id ) ) {
-				if ( $similar_posts = Main_Helper::get_similar_global_posts( $post ) ) {
+				if ( $similar_posts = Main_Helper::get_similar_synced_posts( $post ) ) {
 					$this->success( json_encode( $similar_posts ) );
 				} else {
 					$this->fail( 'No similar posts found.' );
@@ -443,16 +443,16 @@ class Ajax {
 			$post_type = isset( $data['post_type'] ) ? intval( $data['post_type'] ) : null;
 
 			if ( $mode === 'network' ) {
-				$posts = Main_Helper::get_network_global_posts_with_errors( false, array( 'post_type' => $post_type ) );
+				$posts = \Contentsync\get_network_synced_posts_with_errors( false, array( 'post_type' => $post_type ) );
 			} else {
-				$posts = Main_Helper::get_blog_global_posts_with_errors( $blog_id, false, array( 'post_type' => $post_type ) );
+				$posts = \Contentsync\get_synced_posts_of_blog_with_errors( $blog_id, false, array( 'post_type' => $post_type ) );
 			}
 
 			if ( count( $posts ) ) {
 				$return = array_filter(
 					$posts,
 					function ( $post ) {
-						return isset( $post->error ) && ! Main_Helper::is_error_repaired( $post->error );
+						return isset( $post->error ) && ! \Contentsync\is_error_repaired( $post->error );
 					}
 				);
 				$this->success( json_encode( array_values( $return ) ) );

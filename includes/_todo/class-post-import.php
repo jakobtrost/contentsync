@@ -1977,7 +1977,7 @@ class Post_Import {
 		} else {
 			$post_title = $post->post_title;
 			$post_type  = get_post_type_object( $post->post_type )->labels->singular_name;
-			$post_url   = Helper::get_edit_post_link( $post );
+			$post_url   = \Contentsync\get_edit_post_link( $post );
 		}
 		$post_title = empty( $post_title ) ? '<i>' . __( 'Unknown post', 'contentsync_hub' ) . '</i>' : $post_title;
 		$post_type  = empty( $post_type ) ? '<i>' . __( 'Unknown post type', 'contentsync_hub' ) . '</i>' : $post_type;

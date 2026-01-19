@@ -40,7 +40,7 @@ function get_mail_content_for_reviews_editor_denied( $review, $post ) {
 
 	$mail_note .= __( 'Please review the requested modifications and make the necessary changes.', 'contentsync' ) . '<br><br>';
 
-	$links = "<a href='" . \Contentsync\Main_Helper::get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
+	$links = "<a href='" . \Contentsync\get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
 
 	$message = $mail_title . $mail_note . $links;
 

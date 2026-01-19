@@ -42,7 +42,7 @@ function get_mail_content_for_reviews_editor_approved( $review, $post ) {
 
 	$mail_note = __( 'No further action is needed.', 'contentsync' ) . '<br><br>';
 
-	$links = "<a href='" . \Contentsync\Main_Helper::get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
+	$links = "<a href='" . \Contentsync\get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
 
 	$message = $mail_title . $mail_note . $links;
 

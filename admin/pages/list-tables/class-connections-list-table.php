@@ -139,7 +139,7 @@ class Connections_List_Table extends \WP_List_Table {
 				if ( ! $site_name ) {
 					$site_name = \Contentsync\Api\get_site_name( $site_url ) ?? $site_url;
 				}
-				$network_url = Main_Helper::get_nice_url( $site_url );
+				$network_url = \Contentsync\Utils\get_nice_url( $site_url );
 				$delete_url  = remove_query_arg( array( 'user_login', 'password', 'site_url', 'success' ), add_query_arg( 'delete', $network_url ) );
 				$actions     = array(
 					'view'   => "<a href='$site_url' target='_blank'>" . __( 'View website', 'contentsync_hub' ) . '</a>',
@@ -156,7 +156,7 @@ class Connections_List_Table extends \WP_List_Table {
 			case 'active':
 				$unused = isset( $item['contents'] ) && $item['contents'] === false && isset( $item['search'] ) && $item['search'] === false;
 				if ( $unused ) {
-					return Main_Helper::render_info_box(
+					return \Contentsync\Utils\make_admin_info_box(
 						array(
 							'style' => '',
 							'text'  => __( 'Connection not used', 'contentsync_hub' ),
@@ -164,7 +164,7 @@ class Connections_List_Table extends \WP_List_Table {
 					);
 				} else {
 					$active = isset( $item['active'] ) ? (bool) $item['active'] : false;
-					return Main_Helper::render_info_box(
+					return \Contentsync\Utils\make_admin_info_box(
 						array(
 							'style' => $active ? 'green' : 'red',
 							'text'  => $active ? __( 'Connection active', 'contentsync_hub' ) : __( 'Connection inactive', 'contentsync_hub' ),
@@ -230,7 +230,7 @@ class Connections_List_Table extends \WP_List_Table {
 			$deleted         = \Contentsync\Site_Connections\delete_connection( $delete_site_url );
 			// successfull
 			if ( $deleted ) {
-				Main_Helper::show_message(
+				\Contentsync\Utils\render_admin_notice(
 					sprintf(
 						__( 'The connection to the %s page was successfully deleted.', 'contentsync_hub' ),
 						'<strong>' . $delete_site_url . '</strong>'
@@ -240,7 +240,7 @@ class Connections_List_Table extends \WP_List_Table {
 			}
 			// failed
 			elseif ( $deleted === false ) {
-				Main_Helper::show_message(
+				\Contentsync\Utils\render_admin_notice(
 					sprintf(
 						__( "Errors occurred while deleting the connection to the '%s' page.", 'contentsync_hub' ),
 						'<strong>' . $delete_site_url . '</strong>'

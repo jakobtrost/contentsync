@@ -379,7 +379,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	 */
 	public function column_title( $post ) {
 
-		$edit_post_link  = Main_Helper::get_edit_post_link( $post );
+		$edit_post_link  = \Contentsync\get_edit_post_link( $post );
 		$trash_post_link = \Contentsync\get_delete_post_link( $post );
 
 		$is_trash    = ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' );
@@ -446,7 +446,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		$error       = '';
 		$post_status = '';
 
-		$template_theme = Main_Helper::get_wp_template_theme( $post );
+		$template_theme = \Contentsync\get_wp_template_theme( $post );
 		if ( $template_theme ) {
 
 			$template_theme_name = '';
@@ -501,7 +501,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				'<strong><span class="row-title">%s</span>%s&nbsp;%s</strong>',
 				$post->post_title,
 				$post_status,
-				Main_Helper::render_info_popup( $error, 'right' )
+				\Contentsync\Utils\make_admin_info_popup( $error, 'right' )
 			);
 		}
 
@@ -672,12 +672,12 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				if ( $post ) {
 					$result = wp_delete_post( $post_id, true );
 					if ( $result ) {
-						Main_Helper::show_message(
+						\Contentsync\Utils\render_admin_notice(
 							sprintf( __( 'The post "%s" has been permanently deleted.', 'contentsync_hub' ), $post->post_title ),
 							'success'
 						);
 					} else {
-						Main_Helper::show_message( __( 'Error occurred when deleting the post permanently.', 'contentsync_hub' ), 'error' );
+						\Contentsync\Utils\render_admin_notice( __( 'Error occurred when deleting the post permanently.', 'contentsync_hub' ), 'error' );
 					}
 				}
 				return;
@@ -856,7 +856,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		}
 
 		// display the admin notice
-		Main_Helper::show_message( $content . $notice_content, $notice_class );
+		\Contentsync\Utils\render_admin_notice( $content . $notice_content, $notice_class );
 	}
 
 

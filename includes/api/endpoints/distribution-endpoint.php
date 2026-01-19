@@ -433,7 +433,7 @@ class Distribution_Endpoint extends Endpoint {
 	public function match_gid_before_import( $gid ) {
 
 		$origin  = $this->origin;
-		$current = Main_Helper::get_network_url();
+		$current = \Contentsync\Utils\get_network_url();
 
 		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $gid );
 

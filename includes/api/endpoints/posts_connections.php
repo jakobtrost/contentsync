@@ -82,9 +82,9 @@ class Posts_Connections extends Endpoint {
 
 		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
-			Main_Helper::switch_to_blog( $blog_id );
+			\Contentsync\switch_blog( $blog_id );
 			$connection_map = \Contentsync\get_post_connection_map( $post_id );
-			Main_Helper::restore_blog();
+			\Contentsync\restore_blog();
 
 			if ( $connection_map ) {
 				$message = "Post connections for post '$gid' found [$net_url]";

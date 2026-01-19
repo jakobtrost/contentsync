@@ -70,7 +70,7 @@ function add_or_remove_post_connection_from_connection_map( $gid, $args, $add = 
 
 	// network post
 	if ( ! $site_url ) {
-		Main_Helper::switch_to_blog( $blog_id );
+		switch_blog( $blog_id );
 		$connection_map = $old_connection = get_post_connection_map( $post_id );
 		if ( ! is_array( $connection_map ) ) {
 			$connection_map = array();
@@ -106,12 +106,12 @@ function add_or_remove_post_connection_from_connection_map( $gid, $args, $add = 
 		} else {
 			$result = update_post_meta( $post_id, 'contentsync_connection_map', $connection_map );
 		}
-		Main_Helper::restore_blog();
+		restore_blog();
 	}
 	// remote post
 	else {
 		// the network url is the current network, as we just imported a post here
-		$post_site_url = Main_Helper::get_network_url();
+		$post_site_url = \Contentsync\Utils\get_network_url();
 		$result        = \Contentsync\Api\update_remote_post_connection( $site_url, $gid, $args, $add, $post_site_url );
 	}
 
@@ -307,9 +307,9 @@ function convert_connection_map_to_destination_ids( $connection_map ) {
  */
 function get_local_post_links( $blog_id, $post_id ) {
 
-	Main_Helper::switch_to_blog( $blog_id );
-	$edit_url = Main_Helper::get_edit_post_link( $post_id );
-	Main_Helper::restore_blog();
+	switch_blog( $blog_id );
+	$edit_url = \Contentsync\get_edit_post_link( $post_id );
+	restore_blog();
 
 	$blog_url = get_site_url( $blog_id );
 	$nice_url = strpos( $blog_url, '://' ) !== false ? explode( '://', $blog_url )[1] : $blog_url;
@@ -331,9 +331,9 @@ function get_post_links_by_gid( $gid ) {
 
 	$post_links = array();
 
-	$global_post = Main_Helper::get_global_post( $gid );
+	$synced_post = Main_Helper::get_synced_post( $gid );
 
-	if ( ! $global_post ) {
+	if ( ! $synced_post ) {
 		return $post_links;
 	}
 
@@ -344,8 +344,8 @@ function get_post_links_by_gid( $gid ) {
 		$post_links = get_local_post_links( $root_blog_id, $root_post_id );
 	}
 	// remote post
-	elseif ( $global_post && $global_post->post_links ) {
-			$post_links = (array) $global_post->post_links;
+	elseif ( $synced_post && $synced_post->post_links ) {
+			$post_links = (array) $synced_post->post_links;
 	} else {
 		$post_links = array(
 			'edit' => $root_net_url,
@@ -367,18 +367,18 @@ function get_network_remote_connection_map_by_gid( $gid ) {
 
 	// loop through all blogs and get the posts
 	$connection_map = array();
-	foreach ( Main_Helper::get_all_blogs() as $blog_id => $blog_args ) {
+	foreach ( get_all_blogs() as $blog_id => $blog_args ) {
 
-		Main_Helper::switch_to_blog( $blog_id );
+		switch_blog( $blog_id );
 		$post = Main_Helper::get_local_post_by_gid( $gid );
 		if ( $post ) {
 			$connection_map[ $blog_id ] = create_post_connection_map_array( $blog_id, $post->ID );
 		}
-		Main_Helper::restore_blog();
+		restore_blog();
 	}
 
 	return array(
-		Main_Helper::get_network_url() => $connection_map,
+		\Contentsync\Utils\get_network_url() => $connection_map,
 	);
 }
 
@@ -408,7 +408,7 @@ function check_connection_map( $post_id ) {
 
 	$gid            = Main_Helper::get_gid( $post_id );
 	$connection_map = get_post_connection_map( $post_id );
-	$cur_net_url    = Main_Helper::get_network_url();
+	$cur_net_url    = \Contentsync\Utils\get_network_url();
 	$return         = array();
 
 	$updated_post_connection_map = array();
@@ -474,7 +474,7 @@ function check_connection_map( $post_id ) {
 				// "$_blog_id-$_post_id"
 				// );
 				// }
-				// Main_Helper::restore_blog();
+				// restore_blog();
 			} else {
 
 				$rem_net_url = $_blog_id;
@@ -521,7 +521,7 @@ function check_connection_map( $post_id ) {
 	 */
 	// // check other blogs for orphaned connected posts
 	// $other_blogs = array_diff(
-	// array_keys( Main_Helper::get_all_blogs() ),
+	// array_keys( get_all_blogs() ),
 	// is_array( $connection_map ) ? array_keys( $connection_map ) : array(),
 	// array( get_current_blog_id() )
 	// );
@@ -540,7 +540,7 @@ function check_connection_map( $post_id ) {
 	// );
 	// }
 	// }
-	// Main_Helper::restore_blog();
+	// restore_blog();
 	// }
 	// }
 
@@ -614,11 +614,11 @@ function get_all_local_linked_posts( $gid ) {
 
 	list( $root_blog_id, $root_post_id, $root_site_url ) = explode_gid( $gid );
 
-	$network_url = Main_Helper::get_network_url();
+	$network_url = \Contentsync\Utils\get_network_url();
 
 	// build sql query
 	$results = array();
-	foreach ( Main_Helper::get_all_blogs() as $blog_id => $blog_args ) {
+	foreach ( get_all_blogs() as $blog_id => $blog_args ) {
 		$prefix   = $blog_args['prefix'];
 		$site_url = $blog_args['site_url'];
 		$query    = "

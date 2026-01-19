@@ -442,7 +442,7 @@ class Queue_List_Table extends \WP_List_Table {
 		switch ( $column_name ) {
 
 			case 'status':
-				echo $this->render_status_box( $item->status );
+				echo \Contentsync\Utils\make_admin_icon_status_box( $item->status );
 
 				if ( $item->status === 'failed' ) {
 
@@ -464,7 +464,7 @@ class Queue_List_Table extends \WP_List_Table {
 							$message = $error;
 						}
 						if ( ! empty( $message ) ) {
-							echo '&nbsp;' . Main_Helper::render_info_popup( $message );
+							echo '&nbsp;' . \Contentsync\Utils\make_admin_info_popup( $message );
 						}
 					}
 				}
@@ -488,7 +488,7 @@ class Queue_List_Table extends \WP_List_Table {
 					$color = 'red';
 					$text  = __( 'Delete', 'contentsync' );
 				}
-				echo $this->render_status_box( $text, $color );
+				echo \Contentsync\Utils\make_admin_icon_status_box( $color, $text, false );
 				break;
 
 			case 'references':
@@ -509,7 +509,7 @@ class Queue_List_Table extends \WP_List_Table {
 						$post_with_escaped_content->posts[ $idx ]->post_content = esc_html( $post->post_content );
 					}
 				}
-				echo Main_Helper::render_info_dialog( '<pre>' . print_r( $post_with_escaped_content, true ) . '</pre>' );
+				echo \Contentsync\Utils\make_admin_info_dialog( '<pre>' . print_r( $post_with_escaped_content, true ) . '</pre>' );
 				break;
 
 			case 'time':
@@ -524,32 +524,6 @@ class Queue_List_Table extends \WP_List_Table {
 		}
 	}
 
-	public function render_status_box( $status = '', $color = '' ) {
-		if ( $status === 'failed' ) {
-			$color = 'red';
-		} elseif ( $status === 'success' ) {
-			$color = 'green';
-		} elseif ( $status === 'started' ) {
-			$color = 'blue';
-		}
-		$text = $status;
-		if ( $status === 'failed' ) {
-			$text = __( 'Failed', 'contentsync' );
-		} elseif ( $status === 'success' ) {
-			$text = __( 'Completed', 'contentsync' );
-		} elseif ( $status === 'started' ) {
-			$text = __( 'Started', 'contentsync' );
-		} elseif ( $status === 'init' ) {
-			$text = __( 'Scheduled', 'contentsync' );
-		}
-		return sprintf(
-			'<span data-title="%1$s" class="contentsync_info_box %2$s contentsync_status">%3$s</span>',
-			/* title    */ preg_replace( '/\s{1}/', '&nbsp;', $status ),
-			/* color    */ $color,
-			/* text     */ ! empty( $text ) ? '<span>' . $text . '</span>' : ''
-		);
-	}
-
 	/**
 	 * Process row actions
 	 */
@@ -559,9 +533,9 @@ class Queue_List_Table extends \WP_List_Table {
 			$item_id = intval( $_GET['run_now'] );
 			$result  = \Contentsync\distribute_item( $item_id );
 			if ( $result !== false ) {
-				$this->show_message( __( 'Distribution started successfully.', 'contentsync' ), 'success' );
+				$this->render_admin_notice( __( 'Distribution started successfully.', 'contentsync' ), 'success' );
 			} else {
-				$this->show_message( __( 'Failed to start distribution.', 'contentsync' ), 'error' );
+				$this->render_admin_notice( __( 'Failed to start distribution.', 'contentsync' ), 'error' );
 			}
 		}
 
@@ -570,9 +544,9 @@ class Queue_List_Table extends \WP_List_Table {
 			$item_id = intval( $_GET['reschedule'] );
 			$result  = \Contentsync\schedule_distribution_item_by_id( $item_id );
 			if ( ! is_wp_error( $result ) ) {
-				$this->show_message( __( 'Distribution rescheduled successfully.', 'contentsync' ), 'success' );
+				$this->render_admin_notice( __( 'Distribution rescheduled successfully.', 'contentsync' ), 'success' );
 			} else {
-				$this->show_message( sprintf( __( 'Failed to reschedule distribution: %s', 'contentsync' ), $result->get_error_message() ), 'error' );
+				$this->render_admin_notice( sprintf( __( 'Failed to reschedule distribution: %s', 'contentsync' ), $result->get_error_message() ), 'error' );
 			}
 		}
 
@@ -581,9 +555,9 @@ class Queue_List_Table extends \WP_List_Table {
 			$item_id = intval( $_GET['delete_queue'] );
 			$item    = get_distribution_item( $item_id );
 			if ( $item && $item->delete() ) {
-				$this->show_message( __( 'Distribution deleted successfully.', 'contentsync' ), 'success' );
+				$this->render_admin_notice( __( 'Distribution deleted successfully.', 'contentsync' ), 'success' );
 			} else {
-				$this->show_message( __( 'Failed to delete distribution.', 'contentsync' ), 'error' );
+				$this->render_admin_notice( __( 'Failed to delete distribution.', 'contentsync' ), 'error' );
 			}
 		}
 
@@ -609,7 +583,7 @@ class Queue_List_Table extends \WP_List_Table {
 				$message      = sprintf( __( 'Deleted %1$d queue items. Failed to delete %2$d items.', 'contentsync' ), $deleted_count, $failed_count );
 				$message_type = 'warning';
 			}
-			$this->show_message( $message, $message_type );
+			$this->render_admin_notice( $message, $message_type );
 
 		}
 	}
@@ -784,7 +758,7 @@ class Queue_List_Table extends \WP_List_Table {
 		}
 
 		// display the admin notice
-		$this->show_message( $content . $notice_content, $notice_class );
+		$this->render_admin_notice( $content . $notice_content, $notice_class );
 	}
 
 	/**
@@ -794,7 +768,7 @@ class Queue_List_Table extends \WP_List_Table {
 	 * @param string $mode  Style of the notice (error, warning, success, info).
 	 * @param bool   $list    Add to hub msg list (default: false).
 	 */
-	public static function show_message( $msg, $mode = 'info', $list = false ) {
+	public static function render_admin_notice( $msg, $mode = 'info', $list = false ) {
 		if ( empty( $msg ) ) {
 			return;
 		}

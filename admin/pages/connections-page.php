@@ -72,7 +72,7 @@ class Connections_Page {
 
 		// connection declined -> add error
 		if ( isset( $_GET['success'] ) && $_GET['success'] === 'false' ) {
-			Main_Helper::show_message( __( 'The connection was not approved.', 'contentsync_hub' ), 'error' );
+			\Contentsync\Utils\render_admin_notice( __( 'The connection was not approved.', 'contentsync_hub' ), 'error' );
 		}
 
 		// display the table
@@ -84,7 +84,7 @@ class Connections_Page {
 		<form method='post' class='add_site_connection'>
 			<input type='hidden' name='_nonce' value='" . wp_create_nonce( \Contentsync\get_site_connections_option_name() ) . "' />
 
-			" . ( is_ssl() ? '' : Main_Helper::render_info_box(
+			" . ( is_ssl() ? '' : \Contentsync\Utils\make_admin_info_box(
 				array(
 					'style' => 'warning',
 					'above' => __( 'Missing SSL certificate', 'contentsync_hub' ),
@@ -101,7 +101,7 @@ class Connections_Page {
 			<p>' . __( 'In addition, a valid SSL certificate should be available on both sides and the Content Sync Plugin should be active and up-to-date.', 'contentsync_hub' ) . '</p>
 			<p>' . sprintf(
 				__( 'To add a connection to this page on another page, enter the URL %s.', 'contentsync_hub' ),
-				'<code>' . Main_Helper::get_network_url() . '</code>'
+				'<code>' . \Contentsync\Utils\get_network_url() . '</code>'
 			) . '</p>
 		</form>';
 
@@ -153,7 +153,7 @@ class Connections_Page {
 		$success_path   = $_GET['page'] === 'gc_connections' ? 'admin.php?page=gc_connections' : 'admin.php?page=contentsync_hub&tab=connections';
 		$success_url    = is_network_admin() ? network_admin_url( $success_path ) : admin_url( $success_path );
 
-		$app_name   = urlencode( sprintf( __( 'Connection for %s', 'contentsync_hub' ), Main_Helper::get_network_url() ) );
+		$app_name   = urlencode( sprintf( __( 'Connection for %s', 'contentsync_hub' ), \Contentsync\Utils\get_network_url() ) );
 		$query_args = array(
 			'app_name'    => $app_name,
 			'app_id'      => urlencode( wp_generate_uuid4() ),
@@ -176,7 +176,7 @@ class Connections_Page {
 		}
 
 		$site_url   = esc_attr( $_GET['site_url'] );
-		$nice_url   = Main_Helper::get_nice_url( $site_url );
+		$nice_url   = \Contentsync\Utils\get_nice_url( $site_url );
 		$connection = array(
 			'site_name'  => \Contentsync\Api\get_site_name( $site_url ),
 			'user_login' => esc_attr( $_GET['user_login'] ),
@@ -199,7 +199,7 @@ class Connections_Page {
 				sprintf(
 					__( 'To do this, go to the admin or network admin area of the page %1$s and enter the URL %2$s at "Add Connection".', 'contentsync_hub' ),
 					"<a href='" . esc_url( $site_url ) . "' target='_blank'>$nice_url</a>",
-					'<strong>' . Main_Helper::get_network_url() . '</strong>'
+					'<strong>' . \Contentsync\Utils\get_network_url() . '</strong>'
 				)
 			);
 		}
@@ -366,7 +366,7 @@ class Connections_Page {
 	public function display_errors() {
 		if ( count( self::get_errors() ) ) {
 			foreach ( self::get_errors() as $error ) {
-				Main_Helper::show_message( $error, 'error' );
+				\Contentsync\Utils\render_admin_notice( $error, 'error' );
 			}
 		}
 	}

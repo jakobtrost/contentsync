@@ -675,7 +675,7 @@ class Prepared_Post {
 			 *
 			 * @deprecated since 1.2.7: $terms = wp_get_object_terms( $this->ID, $taxonomy );
 			 */
-			$terms = Main_Helper::get_post_taxonomy_terms( $this->ID, $taxonomy );
+			$terms = get_post_taxonomy_terms( $this->ID, $taxonomy );
 
 			if ( empty( $terms ) ) {
 				$prepared_terms[ $taxonomy ] = array();
