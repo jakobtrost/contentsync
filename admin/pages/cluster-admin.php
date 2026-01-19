@@ -20,7 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 use Contentsync\Main_Helper;
 use Contentsync\Contents\Actions;
-use Contentsync\Distributor;
 
 new Cluster_Admin();
 
@@ -401,7 +400,7 @@ class Cluster_Admin {
 				) {
 
 					// distribute posts
-					$distribute_result = Distributor::distribute_contentsync_cluster_posts(
+					$distribute_result = \Contentsync\distribute_cluster_posts(
 						new \Contentsync\Cluster( (object) $cluster ),
 						array(
 							'posts'           => $cluster_posts_before,
@@ -1191,7 +1190,7 @@ class Cluster_Admin {
 				/**
 				 * Distribute posts to all destinations, step by step per blog.
 				 */
-				$result = Distributor::distribute_posts_per_blog( $cluster_posts, $destination_arrays );
+				$result = \Contentsync\distribute_posts_per_blog( $cluster_posts, $destination_arrays );
 
 				// delete all conditions
 				foreach ( $cluster->content_conditions as $condition ) {

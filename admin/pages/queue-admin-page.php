@@ -16,13 +16,15 @@
 
 namespace Contentsync\Distribution;
 
-use \Contentsync\Main_Helper;
+use Contentsync\Main_Helper;
 
-if( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 new Admin();
 class Admin {
-	
+
 	/**
 	 * holds the posttype args
 	 *
@@ -46,7 +48,7 @@ class Admin {
 
 		// add the menu items & pages
 		add_action( $admin_menu_hook, array( $this, 'add_admin_page' ), 9 );
-		add_filter( 'set-screen-option', array($this, 'queue_save_screen_options'), 10, 3);
+		add_filter( 'set-screen-option', array( $this, 'queue_save_screen_options' ), 10, 3 );
 
 		// Enqueue scripts for the queue page
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), 98 );
@@ -88,8 +90,8 @@ class Admin {
 
 		add_screen_option( 'per_page', $args );
 
-		if ( !class_exists( 'Queue_List_Table' ) ) {
-			require_once __DIR__.'/class-queue-list-table.php';
+		if ( ! class_exists( 'Queue_List_Table' ) ) {
+			require_once __DIR__ . '/class-queue-list-table.php';
 		}
 
 		$this->Queue_List_Table = new Queue_List_Table();
@@ -100,7 +102,9 @@ class Admin {
 	 */
 	public function queue_save_screen_options( $status, $option, $value ) {
 
-		if ( 'queue_per_page' == $option ) return $value;
+		if ( 'queue_per_page' == $option ) {
+			return $value;
+		}
 
 		return $status;
 	}
@@ -110,11 +114,11 @@ class Admin {
 	 */
 	function render_queue_admin_page() {
 
-		if ( !class_exists( 'Queue_List_Table' ) ) {
-			require_once __DIR__.'/queue-list-table.php';
+		if ( ! class_exists( 'Queue_List_Table' ) ) {
+			require_once __DIR__ . '/queue-list-table.php';
 		}
 
-		if ( !$this->List_Table ) {
+		if ( ! $this->List_Table ) {
 			$this->List_Table = new Queue_List_Table();
 		}
 
@@ -142,8 +146,8 @@ class Admin {
 
 		wp_enqueue_script(
 			'greyd-admin-distribution',
-			plugins_url('assets/js/admin-distribution.js', __FILE__),
-			array('jquery'), // or your dependencies
+			plugins_url( 'assets/js/admin-distribution.js', __FILE__ ),
+			array( 'jquery' ), // or your dependencies
 			CONTENTSYNC_VERSION,
 			true
 		);
@@ -153,44 +157,47 @@ class Admin {
 			$stuck_items = $this->get_stuck_items();
 
 			$stuck_items_data = array(
-				'count' => count($stuck_items),
-				'items' => array()
+				'count' => count( $stuck_items ),
+				'items' => array(),
 			);
-			foreach ($stuck_items as $item) {
+			foreach ( $stuck_items as $item ) {
 				$stuck_items_data['items'][] = array(
-					'id' => $item->ID,
+					'id'   => $item->ID,
 					'time' => $item->time,
 				);
 			}
-		}
-		else {
+		} else {
 			$stuck_items_data = array(
 				'count' => 0,
-				'items' => array()
+				'items' => array(),
 			);
 		}
 
-		wp_localize_script('greyd-admin-distribution', 'distributionData', array(
-			'ajax_url'                => admin_url('admin-ajax.php'),
-			'nonce'                   => wp_create_nonce('contentsync_run_all_stuck'),
-			'stuck_items'             => $stuck_items_data,
-			'i18n'                    => array(
-				'progressLabel'           => __('Processed %s out of %s items', 'contentsync' ),
-				'resume'                  => __('Resume', 'contentsync' ),
-				'pause'                   => __('Pause', 'contentsync' ),
-				'summaryAllSuccess'       => __('All %s items were processed successfully.', 'contentsync' ),
-				'summarySomeFailed'       => __('%s of %s items were processed successfully. %s items failed.', 'contentsync' ),
-				'failedToProcess'         => __('Failed to process', 'contentsync' ),
-				'errorProcessingItem'     => __('Error processing item', 'contentsync' ),
-				'completed'               => __('Completed', 'contentsync' ),
-				'failed'                  => __('Failed', 'contentsync' ),
-			),
-		));
+		wp_localize_script(
+			'greyd-admin-distribution',
+			'distributionData',
+			array(
+				'ajax_url'    => admin_url( 'admin-ajax.php' ),
+				'nonce'       => wp_create_nonce( 'contentsync_run_all_stuck' ),
+				'stuck_items' => $stuck_items_data,
+				'i18n'        => array(
+					'progressLabel'       => __( 'Processed %1$s out of %2$s items', 'contentsync' ),
+					'resume'              => __( 'Resume', 'contentsync' ),
+					'pause'               => __( 'Pause', 'contentsync' ),
+					'summaryAllSuccess'   => __( 'All %s items were processed successfully.', 'contentsync' ),
+					'summarySomeFailed'   => __( '%1$s of %2$s items were processed successfully. %3$s items failed.', 'contentsync' ),
+					'failedToProcess'     => __( 'Failed to process', 'contentsync' ),
+					'errorProcessingItem' => __( 'Error processing item', 'contentsync' ),
+					'completed'           => __( 'Completed', 'contentsync' ),
+					'failed'              => __( 'Failed', 'contentsync' ),
+				),
+			)
+		);
 	}
 
 	/**
 	 * Check if there are stuck items (not completed and older than 5 minutes).
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function has_stuck_items() {
@@ -199,7 +206,7 @@ class Admin {
 
 	/**
 	 * Get all stuck items (not completed and older than 5 minutes).
-	 * 
+	 *
 	 * @return array
 	 */
 	public function get_stuck_items() {
@@ -211,14 +218,17 @@ class Admin {
 		}
 
 		// get items that are not completed and older than 5 minutes
-		$stuck_items = get_distribution_items(array(
-			'status' => array( 'init', 'started' ),
-			'time' => array(
-				'before' => current_time( 'timestamp' ) - 5 * MINUTE_IN_SECONDS,
+		$stuck_items = get_distribution_items(
+			array(
+				'status'  => array( 'init', 'started' ),
+				'time'    => array(
+					'before' => current_time( 'timestamp' ) - 5 * MINUTE_IN_SECONDS,
+				),
+				'orderby' => 'time',
+				'order'   => 'DESC',
 			),
-			'orderby' => 'time',
-			'order' => 'DESC',
-		), 'ID, status, time' );
+			'ID, status, time'
+		);
 
 		// set transient
 		wp_cache_set( 'contentsync_stuck_items', $stuck_items, 'greyd' );
@@ -242,11 +252,11 @@ class Admin {
 		if ( $this->has_stuck_items() ) {
 
 			// If we're on the queue page, show the button
-			if ( isset($_GET['page']) && $_GET['page'] === 'contentsync_queue' ) {
+			if ( isset( $_GET['page'] ) && $_GET['page'] === 'contentsync_queue' ) {
 
-				$stuck_items = $this->get_stuck_items();
+				$stuck_items       = $this->get_stuck_items();
 				$stuck_items_count = count( $stuck_items );
-	
+
 				$message = sprintf(
 					'<div class="contentsync-distribution-notice">
 						<p>%s</p>
@@ -298,7 +308,7 @@ class Admin {
 						'Some posts were scheduled to be distributed across your network using Content Sync but have not been processed. You can manually process these updates from the %s.',
 						'contentsync'
 					),
-					'<a href="' . esc_url(admin_url('admin.php?page=contentsync_queue')) . '">' . __('Content Sync Queue', 'contentsync' ) . '</a>'
+					'<a href="' . esc_url( admin_url( 'admin.php?page=contentsync_queue' ) ) . '">' . __( 'Content Sync Queue', 'contentsync' ) . '</a>'
 				) . '</p>';
 				echo '</div>';
 			}
@@ -310,40 +320,44 @@ class Admin {
 	 */
 	public function ajax_run_distribution_item() {
 		// Verify nonce
-		if ( !isset($_POST['_ajax_nonce']) || !wp_verify_nonce($_POST['_ajax_nonce'], 'contentsync_run_all_stuck') ) {
-			wp_send_json_error(array('message' => __('Invalid nonce', 'contentsync' )));
+		if ( ! isset( $_POST['_ajax_nonce'] ) || ! wp_verify_nonce( $_POST['_ajax_nonce'], 'contentsync_run_all_stuck' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid nonce', 'contentsync' ) ) );
 		}
 
 		// Check permissions
-		if ( !current_user_can('manage_options') ) {
-			wp_send_json_error(array('message' => __('Insufficient permissions', 'contentsync' )));
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'contentsync' ) ) );
 		}
 
 		// Get and validate item ID
-		$item_id = isset($_POST['item_id']) ? intval($_POST['item_id']) : 0;
-		if ( !$item_id ) {
-			wp_send_json_error(array('message' => __('Invalid item ID', 'contentsync' )));
+		$item_id = isset( $_POST['item_id'] ) ? intval( $_POST['item_id'] ) : 0;
+		if ( ! $item_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid item ID', 'contentsync' ) ) );
 		}
 
 		// Get the distribution item
-		$item = get_distribution_item($item_id);
-		if ( !$item ) {
-			wp_send_json_error(array('message' => __('Distribution item not found', 'contentsync' )));
+		$item = get_distribution_item( $item_id );
+		if ( ! $item ) {
+			wp_send_json_error( array( 'message' => __( 'Distribution item not found', 'contentsync' ) ) );
 		}
 
 		// Run the distribution
-		$result = Distributor::distribute_item($item_id);
-		
+		$result = \Contentsync\distribute_item( $item_id );
+
 		if ( $result !== false ) {
-			wp_send_json_success(array(
-				'message' => __('Item distributed successfully', 'contentsync' ),
-				'item_id' => $item_id
-			));
+			wp_send_json_success(
+				array(
+					'message' => __( 'Item distributed successfully', 'contentsync' ),
+					'item_id' => $item_id,
+				)
+			);
 		} else {
-			wp_send_json_error(array(
-				'message' => __('Failed to distribute item', 'contentsync' ),
-				'item_id' => $item_id
-			));
+			wp_send_json_error(
+				array(
+					'message' => __( 'Failed to distribute item', 'contentsync' ),
+					'item_id' => $item_id,
+				)
+			);
 		}
 	}
 }

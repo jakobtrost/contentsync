@@ -18,7 +18,6 @@
 namespace Contentsync\Contents;
 
 use Contentsync\Main_Helper;
-use Contentsync\Distributor;
 use Remote_Operations;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -139,36 +138,26 @@ class Actions {
 		 */
 		if ( isset( $request_post_data['editable_contentsync_options'] ) && is_array( $request_post_data['editable_contentsync_options'] ) ) {
 
-			if ( self::$logs ) {
-				echo "\r\n\r\n" . "Update 'contentsync_options'.";
-			}
+			Logger::add( 'Update "contentsync_options".' );
 
 			$meta_updated        = false;
 			$contentsync_options = $old_contentsync_options = Main_Helper::get_contentsync_meta( $post_id, 'contentsync_options' );
 			foreach ( $request_post_data['editable_contentsync_options'] as $option_name => $raw_value ) {
 				$contentsync_options[ $option_name ] = $raw_value === 'on';
-				if ( self::$logs ) {
-					echo "\r\n  - $option_name = $raw_value";
-				}
+				Logger::add( "  - $option_name = $raw_value" );
 			}
 			if ( $old_contentsync_options !== $contentsync_options ) {
 				$meta_updated = update_post_meta( $post_id, 'contentsync_options', $contentsync_options );
 			}
-			if ( self::$logs ) {
-				echo "\r\n" . '→ ' . ( $meta_updated ? 'options have been updated.' : 'options are unchanged' );
-			}
+			Logger::add( '→ ' . ( $meta_updated ? 'options have been updated.' : 'options are unchanged' ) );
 		}
 		if ( isset( $request_post_data['contentsync_canonical_url'] ) ) {
 
-			if ( self::$logs ) {
-				echo "\r\n\r\n" . "Update 'contentsync_canonical_url'.";
-			}
+			Logger::add( "Update 'contentsync_canonical_url'." );
 
 			$contentsync_canonical_url = esc_url( trim( strval( $request_post_data['contentsync_canonical_url'] ) ) );
 			$meta_updated              = update_post_meta( $post_id, 'contentsync_canonical_url', $contentsync_canonical_url );
-			if ( self::$logs ) {
-				echo "\r\n" . '→ ' . ( $meta_updated ? 'contentsync_canonical_url has been updated.' : 'contentsync_canonical_url could not be updated' );
-			}
+			Logger::add( '→ ' . ( $meta_updated ? 'contentsync_canonical_url has been updated.' : 'contentsync_canonical_url could not be updated' ) );
 
 			// error_log( 'contentsync_canonical_url: ' . $contentsync_canonical_url );
 		}
@@ -303,7 +292,7 @@ class Actions {
 			}
 
 			// distribute the post
-			$result = Distributor::distribute_single_post( $post_id, $destination_ids );
+			$result = \Contentsync\distribute_single_post( $post_id, $destination_ids );
 		}
 
 		if ( ! $result ) {
@@ -425,7 +414,7 @@ class Actions {
 			);
 
 			// distribute the post
-			$result = Distributor::distribute_single_post( $post_id, $destination_ids );
+			$result = \Contentsync\distribute_single_post( $post_id, $destination_ids );
 		}
 
 		\contentsync\mails\send_review_mail( $review_id, 'reverted', 'editor' );
@@ -624,9 +613,7 @@ class Actions {
 					'post_id' => $existing_post->ID,
 					'action'  => $action,
 				);
-				if ( self::$logs ) {
-					echo "\r\n" . sprintf( "Matching local post found with GID '%s' and post-type '%s'.", $gid, $post->post_type );
-				}
+				Logger::add( sprintf( "Matching local post found with GID '%s' and post-type '%s'.", $gid, $post->post_type ) );
 			}
 		}
 
@@ -656,23 +643,17 @@ class Actions {
 
 		// if gid values match, this is the root post
 		if ( $root_blog_id == get_current_blog_id() && $post_id == $root_post_id && empty( $root_net_url ) ) {
-			if ( self::$logs ) {
-				echo "\r\n" . sprintf( "New contentsync post status is 'root' because gid values match: %s", $gid );
-			}
+			Logger::add( sprintf( "New contentsync post status is 'root' because gid values match: %s", $gid ) );
 			$new_status = 'root';
 		}
 		// blog doesn't exist in this multisite network
 		elseif ( empty( $root_net_url ) && function_exists( 'get_blog_details' ) && get_blog_details( $root_blog_id, false ) === false ) {
-			if ( self::$logs ) {
-				echo "\r\n" . sprintf( "Blog doesn't exist in the current network: %s", $gid );
-			}
+			Logger::add( sprintf( "Blog doesn't exist in the current network: %s", $gid ) );
 			Main_Helper::delete_contentsync_meta( $post_id );
 		}
 		// this is a linked post
 		elseif ( $root_blog_id != get_current_blog_id() || ! empty( $root_net_url ) ) {
-			if ( self::$logs ) {
-				echo "\r\n" . sprintf( 'The gid values do not match (%s) - this is a linked post!', $gid );
-			}
+			Logger::add( sprintf( 'The gid values do not match (%s) - this is a linked post!', $gid ) );
 			$new_status = 'linked';
 			Main_Helper::add_post_connection_to_connection_map( $gid, get_current_blog_id(), $post_id );
 		}
@@ -785,29 +766,7 @@ class Actions {
 			$post_id->import_action = 'trash';
 		}
 
-		$result = Distributor::distribute_single_post( $post_id, $destination_arrays );
-
-		// if ( $connection_map && !empty($connection_map) ) {
-		// foreach ( $connection_map as $blog_id => $post_connection ) {
-		// if ( is_numeric( $blog_id ) ) {
-		// Main_Helper::switch_to_blog( $blog_id );
-		// $result = wp_trash_post( $post_connection['post_id'], true );
-		// if ( self::$logs ) {
-		// if ( $result ) {
-		// echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} trashed.";
-		// } else {
-		// echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} could NOT be trashed.";
-		// }
-		// }
-		// Main_Helper::restore_blog();
-		// }
-		// else {
-		// $remote_network_url = $blog_id;
-		// $remote_gid         = $root_blog_id . '-' . $root_post_id . '-' . Main_Helper::get_network_url();
-		// $response           = \Contentsync\Api\delete_all_remote_connected_posts( $remote_network_url, $remote_gid, $post_connection );
-		// }
-		// }
-		// }
+		$result = \Contentsync\distribute_single_post( $post_id, $destination_arrays );
 
 		return $result;
 	}
@@ -848,21 +807,17 @@ class Actions {
 						// debug($trash);
 						if ( ! $delete ) {
 							$result = wp_untrash_post( $trash->ID, true );
-							if ( self::$logs ) {
-								if ( $result ) {
-									echo "\r\n" . "post {$trash->ID} on blog {$destination_id} untrashed.";
-								} else {
-									echo "\r\n" . "post {$trash->ID} on blog {$destination_id} could NOT be untrashed.";
-								}
+							if ( $result ) {
+								Logger::add( "post {$trash->ID} on blog {$destination_id} untrashed." );
+							} else {
+								Logger::add( "post {$trash->ID} on blog {$destination_id} could NOT be untrashed." );
 							}
 						} else {
 							$result = wp_delete_post( $trash->ID, true );
-							if ( self::$logs ) {
-								if ( $result ) {
-									echo "\r\n" . "post {$trash->ID} on blog {$destination_id} deleted.";
-								} else {
-									echo "\r\n" . "post {$trash->ID} on blog {$destination_id} could NOT be deleted.";
-								}
+							if ( $result ) {
+								Logger::add( "post {$trash->ID} on blog {$destination_id} deleted." );
+							} else {
+								Logger::add( "post {$trash->ID} on blog {$destination_id} could NOT be deleted." );
 							}
 						}
 					}
@@ -896,32 +851,7 @@ class Actions {
 		}
 		\Contentsync\Logger::log( 'destination_arrays', $destination_arrays );
 
-		$result = Distributor::distribute_single_post( $post_id, $destination_arrays );
-
-		// if ( $connection_map && !empty($connection_map) ) {
-		// foreach ( $connection_map as $blog_id => $post_connection ) {
-		// if ( is_numeric( $blog_id ) ) {
-		// Main_Helper::switch_to_blog( $blog_id );
-		// $result = wp_delete_post( $post_connection['post_id'], true );
-		// Main_Helper::restore_blog();
-		// }
-		// else {
-		// if ( strpos($blog_id, '|') !== false) {
-		// list ($blog_id, $remote_network_url) = explode('|', $blog_id);
-		// $root_gid = Main_Helper::get_contentsync_meta( $post_id, 'synced_post_id' );
-		// $result = \Contentsync\Api\delete_all_remote_connected_posts( $remote_network_url, $root_gid, $post_connection );
-		// }
-		// }
-
-		// if ( self::$logs ) {
-		// if ( $result ) {
-		// echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} deleted.";
-		// } else {
-		// echo "\r\n" . "post {$post_connection['post_id']} on blog {$blog_id} could NOT be deleted.";
-		// }
-		// }
-		// }
-		// }
+		$result = \Contentsync\distribute_single_post( $post_id, $destination_arrays );
 
 		return true;
 	}
@@ -971,7 +901,7 @@ class Actions {
 		}
 		\Contentsync\Logger::log( 'destination_arrays', $destination_arrays );
 
-		$result = Distributor::distribute_single_post( $post, $destination_arrays );
+		$result = \Contentsync\distribute_single_post( $post, $destination_arrays );
 
 		return $result;
 	}
@@ -988,10 +918,7 @@ class Actions {
 	 */
 	public static function delete_global_post( $gid, $keep_root_post = false ) {
 
-		if ( self::$logs ) {
-			echo "\r\n" . sprintf( "DELETE global post with gid '%s'", $gid ) . "\r\n";
-			Main_Helper::call_connections_func( 'enable_logs' );
-		}
+		Logger::add( sprintf( "DELETE global post with gid '%s'", $gid ) );
 
 		// needs to be from this site
 		list( $root_blog_id, $root_post_id, $root_net_url ) = Main_Helper::explode_gid( $gid );
@@ -1024,7 +951,7 @@ class Actions {
 		}
 		\Contentsync\Logger::log( 'destination_arrays', $destination_arrays );
 
-		$result = Distributor::distribute_single_post( $post, $destination_arrays );
+		$result = \Contentsync\distribute_single_post( $post, $destination_arrays );
 
 		// delete the root post
 		if ( ! $keep_root_post ) {

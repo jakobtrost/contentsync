@@ -303,7 +303,7 @@ function get_latest_message_by_synced_post_review_id( $post_review_id ) {
  * Before we distribute posts, we need to replace all posts that have not
  * been reviewed yet with the previous version.
  *
- * @see Distributor::prepare_posts_for_distribution()
+ * @see \Contentsync\prepare_posts_for_distribution()
  * @filter contentsync_prepared_posts_for_distribution
  *
  * @param Prepared_Post[] $prepared_posts  Array of prepared posts.

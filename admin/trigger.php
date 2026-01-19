@@ -18,7 +18,6 @@ namespace Contentsync\Contents;
 
 use Contentsync\Main_Helper;
 use Contentsync\Post_Export;
-use Contentsync\Distributor;
 use Contentsync\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -328,7 +327,7 @@ class Trigger {
 			// included yet.
 			if ( $condition_has_count_filter ) {
 				// Logger::add( 'distributing condition (removed post id: '.$post_id.'): ', $condition );
-				Distributor::distribute_cluster_content_condition_posts( $condition, $posts_before );
+				\Contentsync\distribute_cluster_content_condition_posts( $condition, $posts_before );
 			}
 		}
 
@@ -371,7 +370,7 @@ class Trigger {
 			// included before, but now needs to be removed from the condition.
 			if ( $condition_has_count_filter ) {
 				// Logger::add( 'distributing condition (added post id: '.$post_id.'): ', $condition );
-				Distributor::distribute_cluster_content_condition_posts( $condition, $posts_before );
+				\Contentsync\distribute_cluster_content_condition_posts( $condition, $posts_before );
 			}
 		}
 	}
@@ -432,7 +431,7 @@ class Trigger {
 		 * Distribute the post to all connections
 		 */
 		else {
-			Distributor::distribute_single_post( $post_id, $destination_ids );
+			\Contentsync\distribute_single_post( $post_id, $destination_ids );
 		}
 	}
 
@@ -532,7 +531,7 @@ class Trigger {
 				}
 			}
 
-			$result = Distributor::distribute_single_post( $post_id, $destination_ids );
+			$result = \Contentsync\distribute_single_post( $post_id, $destination_ids );
 		}
 	}
 

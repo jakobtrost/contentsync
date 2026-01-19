@@ -35,7 +35,6 @@
 namespace Contentsync\Api;
 
 use Contentsync\Main_Helper;
-use Contentsync\Distributor;
 use Contentsync\Logger;
 use Contentsync\Distribution_Item;
 
@@ -165,7 +164,7 @@ class Distribution_Endpoint extends Endpoint {
 				'origin_id'   => $distribution_item_id,
 			);
 
-			$distribution_item = Distributor::schedule_distribution_item( $distribution_item_properties );
+			$distribution_item = \Contentsync\schedule_distribution_item( $distribution_item_properties );
 
 			Logger::add( 'Distribution to destination scheduled: ' . $distribution_item->destination->ID );
 		}
