@@ -5,7 +5,7 @@
  *
  * This file provides functions for interacting with remote networks and
  * sites connected to the Content Sync system. It provides functions
- * to query global posts across all blogs, build SQL queries for remote
+ * to query synced posts across all blogs, build SQL queries for remote
  * searches, fetch posts and metadata from remote networks, and register
  * endpoints used by other parts of the plugin. By centralising remote
  * data access here, the rest of the plugin can work with consistent
@@ -47,7 +47,7 @@ function get_site_name( $connection_or_site_url ) {
 }
 
 /**
- * Get all remote global posts
+ * Get all remote synced posts
  *
  * @param array|string $connection_or_site_url
  *
@@ -64,7 +64,7 @@ function get_remote_global_posts( $connection_or_site_url, $query_args = null ) 
 }
 
 /**
- * Get a remote global post
+ * Get a remote synced post
  *
  * @param array|string $connection_or_site_url
  *
@@ -78,7 +78,7 @@ function get_remote_global_post( $connection_or_site_url, $gid ) {
 }
 
 /**
- * Prepare a remote global post for import
+ * Prepare a remote synced post for import
  *
  * @param array|string $connection_or_site_url
  *
@@ -136,7 +136,7 @@ function get_all_remote_connected_posts( $connection_or_site_url, $gid ) {
 }
 
 /**
- * Delete all connected posts of a global post from a certain connection
+ * Delete all connected posts of a synced post from a certain connection
  *
  * @see \Contentsync\delete_global_post()
  *

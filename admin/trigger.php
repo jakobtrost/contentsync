@@ -128,12 +128,12 @@ class Trigger {
 
 		$contentsync_status = get_post_meta( $post_id, 'synced_post_status', true );
 
-		// abort if the current user is not allowed to edit global posts
+		// abort if the current user is not allowed to edit synced posts
 		if ( ! empty( $contentsync_status ) ) {
 			$current_user_can_edit = Main_Helper::current_user_can_edit_global_posts( $contentsync_status );
 			if ( ! $current_user_can_edit ) {
 				wp_die(
-					__( 'You are not allowed to edit global posts.', 'global-contents' ),
+					__( 'You are not allowed to edit synced posts.', 'global-contents' ),
 					405
 				);
 			}
@@ -208,7 +208,7 @@ class Trigger {
 
 				// prevent updating linked posts
 				wp_die(
-					__( 'This post is linked to a global post and cannot be updated locally.', 'global-contents' ),
+					__( 'This post is linked to a synced post and cannot be updated locally.', 'global-contents' ),
 					405
 				);
 			}
@@ -547,7 +547,7 @@ class Trigger {
 	 *
 	 * The default action 'wp_after_insert_post' is not called only for attachments.
 	 * Also, attachments are not made global on initial upload, only when they are
-	 * included in a global post as nested content.
+	 * included in a synced post as nested content.
 	 *
 	 * @param int     $post_id      Post ID.
 	 * @param WP_Post $post_after   Post object following the update.
@@ -617,12 +617,12 @@ class Trigger {
 
 		if ( ! empty( $status ) ) {
 			/**
-			 * Check if the current user can trash global posts.
+			 * Check if the current user can trash synced posts.
 			 */
 			$current_user_can_trash = Main_Helper::current_user_can_edit_global_posts( $status );
 			if ( ! $current_user_can_trash ) {
 				wp_die(
-					__( 'You are not allowed to trash global posts.', 'global-contents' ),
+					__( 'You are not allowed to trash synced posts.', 'global-contents' ),
 					405
 				);
 			}

@@ -572,14 +572,14 @@ function prepare_posts_for_distribution( $post_ids_or_objects, $export_args = ar
 	);
 
 	/**
-	 * Make sure all posts are global posts.
+	 * Make sure all posts are synced posts.
 	 */
 	foreach ( $prepared_posts as $post_id => $post ) {
 		$gid = isset( $post->meta['synced_post_id'] ) ? $post->meta['synced_post_id'][0] : '';
 
 		/**
-		 * If this is not a global post yet, it has not been part of the
-		 * export of the root post yet. So we need to make it a global post.
+		 * If this is not a synced post yet, it has not been part of the
+		 * export of the root post yet. So we need to make it a synced post.
 		 */
 		if ( empty( $gid ) ) {
 			$gid = \Contentsync\make_post_global( $post_id, $export_args );
@@ -1099,7 +1099,7 @@ add_action( 'contentsync_before_import_global_posts', __NAMESPACE__ . '\\before_
 add_action( 'contentsync_after_import_global_posts', __NAMESPACE__ . '\\after_import_global_posts', 10, 2 );
 
 /**
- * Before import global posts: Filter the HTML tags that are allowed for a given context.
+ * Before import synced posts: Filter the HTML tags that are allowed for a given context.
  *
  * @param array $posts  The posts to import.
  * @param array $conflict_actions  The conflict actions.
@@ -1111,7 +1111,7 @@ function before_import_global_posts( $posts, $conflict_actions ) {
 }
 
 /**
- * After import global posts: Remove the filter for the HTML tags that are allowed for a given context.
+ * After import synced posts: Remove the filter for the HTML tags that are allowed for a given context.
  *
  * @param array $posts  The posts to import.
  * @param array $conflict_actions  The conflict actions.

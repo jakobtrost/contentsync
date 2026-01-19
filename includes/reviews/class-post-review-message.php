@@ -1,6 +1,6 @@
 <?php
 /**
- * Global post review message object
+ * Synced post review message object
  *
  * This file defines the `Post_Review_Message` class, representing
  * a single message associated with a post review. Each message records

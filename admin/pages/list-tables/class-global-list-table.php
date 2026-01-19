@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Displays all global posts as default WP admin list table
+ * Displays all synced posts as default WP admin list table
  *
  * @extends WP_List_Table ( wp-admin/includes/class-wp-list-table.php )
  */
@@ -429,7 +429,7 @@ class Global_List_Table extends \WP_List_Table {
 		$item = new_synced_post( $post );
 		$gid  = \Contentsync\get_contentsync_meta_values( $item, 'synced_post_id' );
 
-		// return if not global post
+		// return if not synced post
 		if ( ! isset( $item->meta ) || empty( $gid ) ) {
 			// debug($item);
 			return;

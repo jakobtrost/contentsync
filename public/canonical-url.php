@@ -4,9 +4,9 @@
  * Content Sync functions for the frontend
  *
  * This file hooks into front‑end rendering to adjust permalinks and canonical URLs
- * for global posts. It integrates with core WordPress functions and third‑party
+ * for synced posts. It integrates with core WordPress functions and third‑party
  * plugins such as Yoast SEO to ensure that the correct canonical URL is output
- * for a global post and optionally uses that canonical URL as the actual permalink.
+ * for a synced post and optionally uses that canonical URL as the actual permalink.
  * It also marks posts as duplicates when appropriate.
  */
 

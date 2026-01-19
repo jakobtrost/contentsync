@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Displays all global posts as default WP admin list table
+ * Displays all synced posts as default WP admin list table
  *
  * @extends WP_List_Table ( wp-admin/includes/class-wp-list-table.php )
  */

@@ -8,8 +8,8 @@
  * registers and enqueues editor‑specific scripts and styles so that
  * blocks can display global content indicators and controls. It also
  * exposes a REST API endpoint used by the editor to fetch information
- * about global posts. Modify this class if you want to add new
- * block‑editor features or customise the integration of global posts
+ * about synced posts. Modify this class if you want to add new
+ * block‑editor features or customise the integration of synced posts
  * into the Site Editor.
  */
 

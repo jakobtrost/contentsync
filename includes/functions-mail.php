@@ -73,7 +73,7 @@ function send_review_mail( $review_id, $status, $recipient ) {
 	}
 
 	$content = array(
-		'subject' => 'Global Post Review Notification',
+		'subject' => 'Synced Post Review Notification',
 		'message' => '',
 	);
 

@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Global Post Object
+ * Synced Post Object
  *
  * The `Synced_Post` class wraps the native WordPress `WP_Post` object and augments it
  * with additional metadata for the global content system. It enables you to access
  * both standard post properties and custom global properties in a unified way. The
- * class ensures that only valid global posts are instantiated and throws exceptions
+ * class ensures that only valid synced posts are instantiated and throws exceptions
  * when a post cannot be found, when it is in the trash or when it lacks the required
  * global metadata.
  *
@@ -14,7 +14,7 @@
  * post object. The constructor converts an ID into a post object using `get_post`,
  * checks for existence and throws if the post is missing or trashed. It then copies
  * all properties from the underlying post into the new object and loads the meta
- * information via `get_meta`. If the meta data does not indicate a global post the
+ * information via `get_meta`. If the meta data does not indicate a synced post the
  * constructor throws an exception. For local posts the constructor sets the language
  * if it is not provided; for remote posts the language is resolved differently.
  *
@@ -28,7 +28,7 @@
  * retrieve a `Synced_Post` instance by ID, the static `get_instance` method returns a
  * new object or `false` if the post does not exist. The `new_synced_post` function
  * wraps the class construction in a try/catch block and returns `false` on failure.
- * Together these utilities provide a reliable interface for working with global posts.
+ * Together these utilities provide a reliable interface for working with synced posts.
  *
  * @since 2.17.0
  */
@@ -207,9 +207,9 @@ class Synced_Post {
 		// set the meta infos
 		$this->meta = $this->get_meta();
 
-		// not a global post
+		// not a synced post
 		if ( empty( $this->meta['synced_post_status'] ) || empty( $this->meta['synced_post_id'] ) ) {
-			throw new Exception( 'Post is not a global post.' );
+			throw new Exception( 'Post is not a synced post.' );
 		}
 
 		// set language
@@ -392,7 +392,7 @@ class Synced_Post {
  * This convenience function instantiates the `Synced_Post` class using
  * either a `WP_Post` object or a post ID. Any exceptions thrown
  * during instantiation (for example if the post does not exist or
- * does not qualify as a global post) are caught and the function
+ * does not qualify as a synced post) are caught and the function
  * returns `false`. On success the new `Synced_Post` instance is
  * returned to the caller.
  *

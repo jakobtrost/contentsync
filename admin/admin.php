@@ -7,7 +7,7 @@
  * functionality into the WordPress admin UI. It registers admin and
  * network admin menu pages, modifies the post edit and list screens to
  * surface global status and actions, adds meta boxes and overlay
- * interfaces for managing global posts, and handles screen options and
+ * interfaces for managing synced posts, and handles screen options and
  * admin bar entries. When extending this class, you can add new UI
  * components or adjust existing ones to suit custom workflows.
  */
@@ -101,7 +101,7 @@ class Admin {
 		self::$args = array(
 			'slug'           => 'global_contents',
 			'title'          => __( 'Content Sync', 'contentsync' ),
-			'singular'       => __( 'Global Post', 'contentsync' ),
+			'singular'       => __( 'Synced Post', 'contentsync' ),
 			'plural'         => __( 'Content Sync', 'contentsync' ),
 			'admin_url'      => admin_url( 'admin.php?page=global_contents' ),
 			'network_url'    => network_admin_url( 'admin.php?page=global_contents' ),
@@ -500,7 +500,7 @@ class Admin {
 				$text  .= '<p>' . $status_text . '</p>';
 
 				if ( ! Main_Helper::current_user_can_edit_global_posts( $status ) ) {
-					$text .= '<p>' . __( 'You are not allowed to edit this global post.', 'contentsync' ) . '</p>';
+					$text .= '<p>' . __( 'You are not allowed to edit this synced post.', 'contentsync' ) . '</p>';
 				}
 
 				if (
@@ -551,17 +551,17 @@ class Admin {
 									" . implode(
     ', ',
     array_map(
-                    function ( $button ) {
-                            return '{
-                                                                                                                                                                                                ' . ( isset( $button['label'] ) ? "label: '{$button['label']}'," : '' ) . '
-                                                                                                                                                                                                ' . ( isset( $button['url'] ) ? "url: '{$button['url']}'," : '' ) . '
-                                                                                                                                                                                                ' . ( isset( $button['onClick'] ) ? "onClick: () => {{$button['onClick']}}," : '' ) . '
-                                                                                                                                                                                                ' . ( isset( $button['variant'] ) ? "variant: '{$button['variant']}'," : '' ) . '
-                                                                                                                                                                                                ' . ( isset( $button['className'] ) ? "className: '{$button['className']} contentsync-notice__action'" : "className: 'contentsync-notice__action'" ) . ',
-                                                                                                                                                                                            }';
-                    },
+					function ( $button ) {
+							return '{
+                                                                                                                                                                                                                                                ' . ( isset( $button['label'] ) ? "label: '{$button['label']}'," : '' ) . '
+                                                                                                                                                                                                                                                ' . ( isset( $button['url'] ) ? "url: '{$button['url']}'," : '' ) . '
+                                                                                                                                                                                                                                                ' . ( isset( $button['onClick'] ) ? "onClick: () => {{$button['onClick']}}," : '' ) . '
+                                                                                                                                                                                                                                                ' . ( isset( $button['variant'] ) ? "variant: '{$button['variant']}'," : '' ) . '
+                                                                                                                                                                                                                                                ' . ( isset( $button['className'] ) ? "className: '{$button['className']} contentsync-notice__action'" : "className: 'contentsync-notice__action'" ) . ',
+                                                                                                                                                                                                                                            }';
+					},
 				$buttons
-	)
+                )
 ) . '
 								],
 							}
@@ -717,7 +717,7 @@ class Admin {
 			self::$overlay_contents[] = 'contentsync_overwrite';
 		}
 
-		// global post
+		// synced post
 		else {
 
 			list( $root_blog_id, $root_post_id, $root_net_url ) = Main_Helper::explode_gid( $gid );
@@ -1025,7 +1025,7 @@ class Admin {
 		if ( $status === 'linked' ) {
 			$classes .= ' contentsync-locked';
 		}
-		// add locked class if user cannot edit global posts
+		// add locked class if user cannot edit synced posts
 		elseif ( ! empty( $status ) && ! Main_Helper::current_user_can_edit_global_posts( $status ) ) {
 			$classes .= ' contentsync-locked';
 		}
@@ -1073,7 +1073,7 @@ class Admin {
 	 */
 
 	/**
-	 * Filter row actions for global posts:
+	 * Filter row actions for synced posts:
 	 * - Remove quick edit for linked posts
 	 * - Remove trash for non-editors
 	 *
@@ -1175,7 +1175,7 @@ class Admin {
 				// $status = Main_Helper::get_post_error( $post_id ) ? 'error' : $status;
 				echo Main_Helper::render_status_box( $status );
 			} elseif ( Main_Helper::current_user_can_edit_global_posts( 'root' ) ) {
-				// if the status is empty, the post is not a global post and therefore we will render a button to make it global
+				// if the status is empty, the post is not a synced post and therefore we will render a button to make it global
 
 				self::$overlay_contents = array_merge(
 					self::$overlay_contents,
@@ -1486,7 +1486,7 @@ class Admin {
 			'contentsync_overwrite'      => array(
 				'confirm' => array(
 					'title'  => __( 'Overwrite this post', 'contentsync' ),
-					'descr'  => sprintf( __( 'This post will be overwritten with the global content "%s".<br><br>The current post will be replaced with the global post’s content, metadata, and taxonomy. The post will become a Linked Post (synced) and the editor will reload.', 'contentsync' ), '<strong class="replace"></strong>' ),
+					'descr'  => sprintf( __( 'This post will be overwritten with the global content "%s".<br><br>The current post will be replaced with the synced post’s content, metadata, and taxonomy. The post will become a Linked Post (synced) and the editor will reload.', 'contentsync' ), '<strong class="replace"></strong>' ),
 					'button' => __( 'Overwrite now', 'contentsync' ),
 				),
 				'loading' => array(

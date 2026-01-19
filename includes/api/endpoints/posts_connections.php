@@ -4,7 +4,7 @@
  * Endpoint 'posts/connections'
  *
  * This class handles the post meta 'contentsync_connection_map' of a
- * global post where the root post is usually on this site.
+ * synced post where the root post is usually on this site.
  *
  * @link {{your-domain}}/wp-json/contentsync/v1/posts
  *
@@ -73,7 +73,7 @@ class Posts_Connections extends Endpoint {
 	 */
 
 	/**
-	 * Get connections of a global post
+	 * Get connections of a synced post
 	 */
 	public function get_post_connection_map( $request ) {
 
@@ -97,7 +97,7 @@ class Posts_Connections extends Endpoint {
 	}
 
 	/**
-	 * Add connection to a global post
+	 * Add connection to a synced post
 	 */
 	public function add_post_connection_to_connection_map( $request ) {
 
@@ -126,7 +126,7 @@ class Posts_Connections extends Endpoint {
 	}
 
 	/**
-	 * Remove connection from a global post
+	 * Remove connection from a synced post
 	 */
 	public function remove_post_connection_from_connection_map( $request ) {
 

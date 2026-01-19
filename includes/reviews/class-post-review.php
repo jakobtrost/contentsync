@@ -1,9 +1,9 @@
 <?php
 /**
- * Global post review object
+ * Synced post review object
  *
  * This file defines the `Post_Review` class, which models a review
- * for a global post as part of the cluster review workflow. A post
+ * for a synced post as part of the cluster review workflow. A post
  * review records the IDs of the blog, post and editor involved, the
  * time of the review, the review state (e.g. new, in_review, denied,
  * approved, reverted) and a snapshot of the previous post state. The

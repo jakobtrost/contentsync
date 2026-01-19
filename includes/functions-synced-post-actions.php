@@ -5,7 +5,7 @@
  * Handles all post actions, like import, export, update, delete, etc.
  *
  * This file exposes a collection of utility functions that implement
- * import, export and update operations for global posts. It hooks into
+ * import, export and update operations for synced posts. It hooks into
  * filters and actions to manage conflict resolution, update post
  * metadata, and queue exports via the distribution system.
  */
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @formerly contentsync_export_post
  *
- * This sets the default post meta for global posts
+ * This sets the default post meta for synced posts
  *
  * @param int   $post_id    Post ID.
  * @param array $args       Export arguments.
@@ -92,7 +92,7 @@ function make_post_global( $post_id, $args ) {
  */
 
 /**
- * Check global posts for conflicts on this page
+ * Check synced posts for conflicts on this page
  *
  * @param string $gid   Global ID.
  *
@@ -119,7 +119,7 @@ function check_synced_post_import( $gid ) {
 
 /**
  * Remove conflicts when same global ID is set. This means the posts
- * both depend on the same global post.
+ * both depend on the same synced post.
  *
  * @filter 'contentsync_import_conflicts'
  *
@@ -133,7 +133,7 @@ function remove_conflict_when_same_gid( $conflicts, $all_posts ) {
 		$current_gid = Main_Helper::get_gid( $post->ID );
 		$import_gid  = Main_Helper::get_gid( $all_posts[ $post_id ] );
 
-		// remove the conflict if it is the same global post
+		// remove the conflict if it is the same synced post
 		if ( Main_Helper::get_global_post( $current_gid ) && $current_gid === $import_gid ) {
 			unset( $conflicts[ $post_id ] );
 		}
@@ -144,7 +144,7 @@ function remove_conflict_when_same_gid( $conflicts, $all_posts ) {
 add_filter( 'import_synced_post_conflicts', __NAMESPACE__ . '\remove_conflict_when_same_gid', 10, 2 );
 
 /**
- * Import a global post to the current blog
+ * Import a synced post to the current blog
  *
  * @param string $gid               The global ID. Format {{blog_id}}-{{post_id}}
  * @param array  $conflict_actions   Array of posts that already exist on the current blog.
@@ -204,7 +204,7 @@ function match_synced_posts_before_import( $conflict_actions, $all_posts ) {
 		 * Filter to modify the GID (Global ID) used for conflict resolution during import.
 		 *
 		 * This filter allows developers to customize how the GID is generated or retrieved
-		 * when checking for conflicts between global posts during import operations.
+		 * when checking for conflicts between synced posts during import operations.
 		 *
 		 * @filter filter_gid_for_conflict_action
 		 *
@@ -244,7 +244,7 @@ add_filter( 'contentsync_import_conflict_actions', __NAMESPACE__ . '\match_synce
  */
 
 /**
- * Convert global post to static one
+ * Convert synced post to static one
  *
  * @param int $gid
  *
@@ -289,7 +289,7 @@ function unlink_synced_root_post( $gid ) {
 }
 
 /**
- * Unlink imported post from the global post
+ * Unlink imported post from the synced post
  *
  * @param int $post_id  The ID of the imported post.
  *
@@ -511,7 +511,7 @@ function delete_unlinked_posts( $post ) {
 }
 
 /**
- * Permanently delete a global post and all it's linked posts.
+ * Permanently delete a synced post and all it's linked posts.
  * The root post needs to be on the current network. This can not be undone.
  *
  * @todo REWORK with new distributor (test)
@@ -522,7 +522,7 @@ function delete_unlinked_posts( $post ) {
  */
 function delete_global_post( $gid, $keep_root_post = false ) {
 
-	Logger::add( sprintf( "DELETE global post with gid '%s'", $gid ) );
+	Logger::add( sprintf( "DELETE synced post with gid '%s'", $gid ) );
 
 	// needs to be from this site
 	list( $root_blog_id, $root_post_id, $root_net_url ) = Main_Helper::explode_gid( $gid );

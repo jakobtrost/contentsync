@@ -70,7 +70,7 @@ class Posts_Meta extends Endpoint {
 	 */
 
 	/**
-	 * Get contentsync_meta of a global post
+	 * Get contentsync_meta of a synced post
 	 */
 	public function get_post_meta( $request ) {
 
@@ -107,7 +107,7 @@ class Posts_Meta extends Endpoint {
 	}
 
 	/**
-	 * Update certain contentsync_meta of a global post
+	 * Update certain contentsync_meta of a synced post
 	 */
 	public function update_post_meta( $request ) {
 
@@ -130,7 +130,7 @@ class Posts_Meta extends Endpoint {
 	}
 
 	/**
-	 * Delete contentsync_meta of a global post
+	 * Delete contentsync_meta of a synced post
 	 */
 	public function delete_post_meta( $request ) {
 

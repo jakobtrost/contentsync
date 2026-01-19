@@ -99,7 +99,7 @@ var contentsync = new function () {
 	};
 
 	/**
-	 * Export post as global post
+	 * Export post as synced post
 	 */
 	this.exportPost = function ( elem, postId, postTitle ) {
 
@@ -590,7 +590,7 @@ var contentsync = new function () {
 	};
 
 	/**
-	 * Overwrite local post with global post
+	 * Overwrite local post with synced post
 	 */
 	this.overwritePost = function ( elem, postId ) {
 
@@ -634,7 +634,7 @@ var contentsync = new function () {
 	};
 
 	/**
-	 * Delete global posts
+	 * Delete synced posts
 	 */
 	this.deletePost = function ( elem ) {
 

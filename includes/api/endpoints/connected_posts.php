@@ -266,7 +266,7 @@ class Connected_Posts extends Endpoint {
 
 		/**
 		 * @todo if $request['posts'] isset, use this array to import the post,
-		 * otherwise use the global post.
+		 * otherwise use the synced post.
 		 */
 		$result = \Contentsync\import_synced_post( $remote_gid );
 

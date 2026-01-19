@@ -89,7 +89,7 @@ class Posts extends Endpoint {
 	 */
 
 	/**
-	 * Get all global posts
+	 * Get all synced posts
 	 */
 	public function get_all_posts( $request ) {
 
@@ -98,13 +98,13 @@ class Posts extends Endpoint {
 		$posts = $this->get_global_posts_for_endpoint( $args );
 		// $posts = Main_Helper::get_all_network_posts();
 
-		$message = 'No global posts found on this stage';
+		$message = 'No synced posts found on this stage';
 		if ( $posts ) {
 			$count = count( $posts );
 			if ( $count === 1 ) {
-				$message = '1 global post found on this stage.';
+				$message = '1 synced post found on this stage.';
 			} elseif ( $count > 1 ) {
-				$message = $count . ' global posts found on this stage.';
+				$message = $count . ' synced posts found on this stage.';
 			}
 		}
 
@@ -112,7 +112,7 @@ class Posts extends Endpoint {
 	}
 
 	/**
-	 * Get single global post by gid
+	 * Get single synced post by gid
 	 */
 	public function get_post( $request ) {
 
@@ -126,11 +126,11 @@ class Posts extends Endpoint {
 			$post = Main_Helper::get_global_post( $gid );
 
 			if ( $post ) {
-				$message = "Global post '$gid' found on this site ($net_url).";
+				$message = "Synced post '$gid' found on this site ($net_url).";
 				// append urls
 				$post->post_links = \Contentsync\get_local_post_links( $blog_id, $post_id );
 			} else {
-				$message = "Global post '$gid' could not be found [$net_url]";
+				$message = "Synced post '$gid' could not be found [$net_url]";
 			}
 		}
 
@@ -145,7 +145,7 @@ class Posts extends Endpoint {
 	 */
 
 	/**
-	 * Prepare global post for import
+	 * Prepare synced post for import
 	 */
 	public function prepare_post( $request ) {
 
@@ -165,9 +165,9 @@ class Posts extends Endpoint {
 			remove_filter( 'contentsync_export_post_meta-synced_post_id', array( $this, 'maybe_append_network_url_to_gid_on_export' ) );
 
 			if ( $post ) {
-				$message = "Global post '$gid' found and prepared for import [$net_url]";
+				$message = "Synced post '$gid' found and prepared for import [$net_url]";
 			} else {
-				$message = "Global post '$gid' could not be found and prepared for import [$net_url]";
+				$message = "Synced post '$gid' could not be found and prepared for import [$net_url]";
 			}
 		}
 
@@ -178,7 +178,7 @@ class Posts extends Endpoint {
 	 * Maybe append the network url to all global IDs before export.
 	 * The current network url is appended to every global ID that doesn't have one yet.
 	 *
-	 * @param string $gid    Current global post ID.
+	 * @param string $gid    Current synced post ID.
 	 * @param int    $post_id   WP_Post ID.
 	 *
 	 * @return string $gid
@@ -203,12 +203,12 @@ class Posts extends Endpoint {
 	 */
 
 	/**
-	 * Get all global posts of this installation.
+	 * Get all synced posts of this installation.
 	 * This function is usually called via a REST API call.
 	 *
 	 * @param string|array $query   Search query term or array of query args.
 	 *
-	 * @return array of all global posts
+	 * @return array of all synced posts
 	 */
 	public function get_global_posts_for_endpoint( $query_args = null ) {
 

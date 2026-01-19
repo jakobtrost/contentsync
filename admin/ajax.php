@@ -114,7 +114,7 @@ class Ajax {
 			}
 			// success
 			else {
-				$this->success( 'post was unlinked and the global post was removed' );
+				$this->success( 'post was unlinked and the synced post was removed' );
 			}
 		}
 
@@ -216,7 +216,7 @@ class Ajax {
 				$this->fail( 'post_id is not defined.' );
 			}
 
-			// get global post
+			// get synced post
 			$result = \Contentsync\unlink_synced_post( $post_id );
 
 			// failure
@@ -333,7 +333,7 @@ class Ajax {
 		elseif ( $action === 'contentsync_delete' ) {
 
 			if ( self::DEBUG ) {
-				echo "\r\n" . '* try to delete global post...';
+				echo "\r\n" . '* try to delete synced post...';
 			}
 
 			$gid = isset( $data['gid'] ) ? strval( $data['gid'] ) : null;

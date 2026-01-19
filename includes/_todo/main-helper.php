@@ -3,7 +3,7 @@
  * Helper functions for the global contents class
  *
  * The `Main_Helper` class offers a suite of helper functions that underpin the global
- * contents system. It encapsulates operations for retrieving global posts by their
+ * contents system. It encapsulates operations for retrieving synced posts by their
  * unique global ID, preparing posts for import, splitting global IDs into their
  * component parts and aggregating posts across multisite networks or remote sites.
  * By centralising these operations into static methods, the helper promotes reuse
@@ -25,7 +25,7 @@
  * while `get_post_id_by_gid` finds a local post ID by global ID. The `explode_gid`
  * method splits a global ID into blog ID, post ID and site URL components and exposes
  * filters to adjust each part. Aggregation functions such as `get_all_global_posts`
- * and `get_all_network_posts` return arrays of global posts from both the local
+ * and `get_all_network_posts` return arrays of synced posts from both the local
  * multisite network and connected remote networks, using caching and remote operations
  * to improve performance. Dozens of additional methods handle tasks like switching
  * blogs, retrieving network URLs, collecting blog lists and creating connection maps.
@@ -112,24 +112,24 @@ class Main_Helper {
 		}
 
 		/**
-		 * Filter to modify the global post object before returning.
+		 * Filter to modify the synced post object before returning.
 		 *
-		 * This filter allows developers to customize the global post object
+		 * This filter allows developers to customize the synced post object
 		 * that is retrieved by GID, enabling modifications to post data,
 		 * structure, or additional processing before the post is returned.
 		 *
 		 * @filter contentsync_get_global_post
 		 *
-		 * @param WP_Post|null $post The global post object or null if not found.
+		 * @param WP_Post|null $post The synced post object or null if not found.
 		 * @param string      $gid  The global ID of the post.
 		 *
-		 * @return WP_Post|null The modified global post object or null.
+		 * @return WP_Post|null The modified synced post object or null.
 		 */
 		return apply_filters( 'contentsync_get_global_post', $post ?? null, $gid );
 	}
 
 	/**
-	 * Get a global post with all it's dependant posts.
+	 * Get a synced post with all it's dependant posts.
 	 *
 	 * @param string $gid
 	 *
@@ -308,12 +308,12 @@ class Main_Helper {
 	}
 
 	/**
-	 * Get all global posts for this multisite including connections
+	 * Get all synced posts for this multisite including connections
 	 *
 	 * @param string|array $query   Search query term or array of query args.
 	 * @param string       $network_url   Filter by network url ('here' only retrieves posts from this network)
 	 *
-	 * @return array of all global posts
+	 * @return array of all synced posts
 	 */
 	public static function get_all_global_posts( $query = null, $network_url = null ) {
 
@@ -358,7 +358,7 @@ class Main_Helper {
 		}
 
 		/**
-		 * Filter to modify the complete array of global posts before returning.
+		 * Filter to modify the complete array of synced posts before returning.
 		 *
 		 * This filter allows developers to customize the complete array of global
 		 * posts retrieved from both network and remote sources, enabling
@@ -366,17 +366,17 @@ class Main_Helper {
 		 *
 		 * @filter contentsync_get_all_global_posts
 		 *
-		 * @param array $all_global_posts Array of all global posts.
+		 * @param array $all_global_posts Array of all synced posts.
 		 * @param string|array $query Search query or query arguments.
 		 * @param string $network_url Network URL filter.
 		 *
-		 * @return array Modified array of all global posts.
+		 * @return array Modified array of all synced posts.
 		 */
 		return apply_filters( 'contentsync_get_all_global_posts', $all_global_posts, $query, $network_url );
 	}
 
 	/**
-	 * Get all global posts of this multisite
+	 * Get all synced posts of this multisite
 	 *
 	 * @param string|array $query   Search query term or array of query args.
 	 *
@@ -422,7 +422,7 @@ class Main_Helper {
 	}
 
 	/**
-	 * Get all global posts of a certain blog
+	 * Get all synced posts of a certain blog
 	 *
 	 * @param int          $blog_id       ID of the blog, defaults to the current blog.
 	 * @param string       $filter_status Filter 'synced_post_status' meta. Leave empty for no filtering.
@@ -478,7 +478,7 @@ class Main_Helper {
 		self::restore_blog();
 
 		/**
-		 * Filter to modify the array of blog global posts before returning.
+		 * Filter to modify the array of blog synced posts before returning.
 		 *
 		 * This filter allows developers to customize the array of global
 		 * posts retrieved from a specific blog, enabling modifications
@@ -486,12 +486,12 @@ class Main_Helper {
 		 *
 		 * @filter contentsync_get_blog_global_posts
 		 *
-		 * @param array $posts Array of global posts from the blog.
+		 * @param array $posts Array of synced posts from the blog.
 		 * @param int $blog_id The blog ID.
 		 * @param string $filter_status The filter status used.
 		 * @param string|array $query Search query or query arguments.
 		 *
-		 * @return array Modified array of blog global posts.
+		 * @return array Modified array of blog synced posts.
 		 */
 		return apply_filters( 'contentsync_get_blog_global_posts', $posts, $blog_id, $filter_status, $query );
 	}
@@ -588,7 +588,7 @@ class Main_Helper {
 	}
 
 	/**
-	 * Find similar global posts.
+	 * Find similar synced posts.
 	 *
 	 * Criteria:
 	 * * not from current blog
@@ -764,7 +764,7 @@ class Main_Helper {
 	 */
 
 	/**
-	 * Check if a global post has an error
+	 * Check if a synced post has an error
 	 *
 	 * @param int|WP_Post $post     Either the post_id or the prepared post object.
 	 *
@@ -810,7 +810,7 @@ class Main_Helper {
 	}
 
 	/**
-	 * Check a global post for errors.
+	 * Check a synced post for errors.
 	 *
 	 * @param int|WP_Post                                              $post        Either the post_id or the prepared post object.
 	 * @param bool                                                     $autorepair  Autorepair simple errors, such as orphaned post connections.
@@ -913,7 +913,7 @@ class Main_Helper {
 					}
 				}
 			} elseif ( $root_post_id != $post_id ) {
-				$error->message = __( 'The global post ID is linked incorrectly.', 'contentsync' );
+				$error->message = __( 'The synced post ID is linked incorrectly.', 'contentsync' );
 
 				if ( $repair ) {
 					if ( $root_post = self::get_global_post( $gid ) ) {
@@ -1259,7 +1259,7 @@ class Main_Helper {
 	}
 
 	/**
-	 * Get all global posts with errors of a certain blog.
+	 * Get all synced posts with errors of a certain blog.
 	 *
 	 * @param int  $blog_id  ID of the blog, defaults to the current blog.
 	 * @param bool $repair  Repair errors, this can change meta infos or delete posts.
@@ -1288,7 +1288,7 @@ class Main_Helper {
 	}
 
 	/**
-	 * Get all global posts with errors of the whole network.
+	 * Get all synced posts with errors of the whole network.
 	 *
 	 * @param bool $repair  Repair errors, this can change meta infos or delete posts.
 	 *
@@ -1650,7 +1650,7 @@ class Main_Helper {
 		}
 
 		/**
-		 * Filter to allow editing of all global posts, no matter the status.
+		 * Filter to allow editing of all synced posts, no matter the status.
 		 *
 		 * @param bool $can_edit
 		 *

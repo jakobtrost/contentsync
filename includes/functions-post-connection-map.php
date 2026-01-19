@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 /**
- * Add a new internal post connection to a global post
+ * Add a new internal post connection to a synced post
  *
  * @param string $gid           Global ID of the root post.
  * @param int    $blog_id       Blog ID of the imported post.
@@ -29,7 +29,7 @@ function add_post_connection_to_connection_map( $gid, $blog_id, $post_id, $post_
 }
 
 /**
- * Remove a new internal connection from a global post
+ * Remove a new internal connection from a synced post
  *
  * @param string $gid           Global ID of the root post.
  * @param int    $blog_id       Blog ID of the imported post.
@@ -50,7 +50,7 @@ function remove_post_connection_from_connection_map( $gid, $blog_id, $post_id, $
 }
 
 /**
- * Log a new internal connection to a global post
+ * Log a new internal connection to a synced post
  *
  * @param string $gid           Global ID of the root post.
  * @param array  $args          array( blog_id => post_connection_array, ... )
@@ -321,7 +321,7 @@ function get_local_post_links( $blog_id, $post_id ) {
 }
 
 /**
- * Get edit, blog and nice url of a global post by GID.
+ * Get edit, blog and nice url of a synced post by GID.
  *
  * @param string $gid
  *
@@ -565,7 +565,7 @@ function check_connection_map( $post_id ) {
 }
 
 /**
- * Get all connected posts of a global post on this network
+ * Get all connected posts of a synced post on this network
  * by using a multisite query.
  *
  * @since 1.7.5
@@ -596,7 +596,7 @@ function get_all_local_post_connections( $gid ) {
 }
 
 /**
- * Get all connected posts of a global post on this network
+ * Get all connected posts of a synced post on this network
  * by using a multisite query.
  *
  * @since 1.7.5
