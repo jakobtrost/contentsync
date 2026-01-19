@@ -59,7 +59,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
 		$rel   = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'open';
-		$items = get_synced_post_reviews( $rel == 'open' ? null : $rel );
+		$items = get_post_reviews( $rel == 'open' ? null : $rel );
 		// debug($items);
 
 		// sort
@@ -140,10 +140,10 @@ class Post_Review_List_Table extends \WP_List_Table {
 			if ( $type == 'open' ) {
 				$items_count = 0;
 				foreach ( array( 'new', 'in_review', 'denied' ) as $state ) {
-					$items_count += count( get_synced_post_reviews( $state ) );
+					$items_count += count( get_post_reviews( $state ) );
 				}
 			} else {
-				$items_count = count( get_synced_post_reviews( $type ) );
+				$items_count = count( get_post_reviews( $type ) );
 			}
 			$query = remove_query_arg( array( 'rel', 'paged', 'action', 'post', '_wpnonce' ) );
 
@@ -349,7 +349,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		if ( in_array( $post->state, array( 'approved', 'denied', 'reverted' ) ) ) {
 			$reviewer         = 'N/A';
 			$info             = ' ';
-			$reviewer_message = get_latest_message_by_synced_post_review_id( $post->ID );
+			$reviewer_message = get_latest_message_by_post_review_id( $post->ID );
 			if ( $reviewer_message && $reviewer_message->action === $post->state ) {
 				$reviewer = $reviewer_message->get_reviewer();
 				if ( $post->state != 'approved' ) {
@@ -540,7 +540,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 
 		if ( count( $post_ids ) > 0 ) {
 			foreach ( $post_ids as $post_id ) {
-				$post = get_synced_post_review_by_id( $post_id );
+				$post = get_post_review_by_id( $post_id );
 				if ( $post ) {
 					// get root post
 					$root_post = is_multisite() ? get_blog_post( $post->blog_id, $post->post_id ) : get_post( $post->post_id );
@@ -552,21 +552,21 @@ class Post_Review_List_Table extends \WP_List_Table {
 					switch ( $bulk_action ) {
 						case 'approve':
 							Main_Helper::switch_to_blog( $post->blog_id );
-							$result = (bool) \Contentsync\Contents\Actions::approve_post_review( $post_id );
+							$result = (bool) \Contentsync\approve_post_review( $post_id );
 							Main_Helper::restore_blog();
 							break;
 						case 'deny':
 							Main_Helper::switch_to_blog( $post->blog_id );
-							$result = (bool) \Contentsync\Contents\Actions::deny_post_review( $post_id );
+							$result = (bool) \Contentsync\deny_post_review( $post_id );
 							Main_Helper::restore_blog();
 							break;
 						case 'revert':
 							Main_Helper::switch_to_blog( $post->blog_id );
-							$result = (bool) \Contentsync\Contents\Actions::revert_post_review( $post_id, $root_post->ID );
+							$result = (bool) \Contentsync\revert_post_review( $post_id, $root_post->ID );
 							Main_Helper::restore_blog();
 							break;
 						case 'delete':
-							$result = (bool) delete_synced_post_review( $post_id );
+							$result = (bool) delete_post_review( $post_id );
 							break;
 						default:
 							break;

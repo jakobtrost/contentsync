@@ -427,7 +427,7 @@ class Global_List_Table extends \WP_List_Table {
 		// debug( $post );
 
 		$item = new_synced_post( $post );
-		$gid  = Main_Helper::get_contentsync_meta( $item, 'synced_post_id' );
+		$gid  = \Contentsync\get_contentsync_meta_values( $item, 'synced_post_id' );
 
 		// return if not global post
 		if ( ! isset( $item->meta ) || empty( $gid ) ) {
@@ -698,7 +698,7 @@ class Global_List_Table extends \WP_List_Table {
 				}
 
 				// Highlight Posttypes
-				$options = Main_Helper::get_contentsync_meta( $item, 'contentsync_options' );
+				$options = \Contentsync\get_contentsync_meta_values( $item, 'contentsync_export_options' );
 				if ( isset( $options['whole_posttype'] ) && $options['whole_posttype'] ) {
 					if ( $item->post_type == 'tp_posttypes' ) {
 						$title .= '<strong> — ' . __( 'Dynamic Post Type incl. posts', 'contentsync' ) . '</strong>';
@@ -760,7 +760,7 @@ class Global_List_Table extends \WP_List_Table {
 				}
 
 				if ( empty( $root_net_url ) ) {
-					$connections = Main_Helper::get_contentsync_meta( $item, 'contentsync_connection_map' );
+					$connections = \Contentsync\get_contentsync_meta_values( $item, 'contentsync_connection_map' );
 				} else {
 					$connections = Main_Helper::get_network_remote_connection_map_by_gid( $gid );
 				}
@@ -804,7 +804,7 @@ class Global_List_Table extends \WP_List_Table {
 
 			case 'options':
 				if ( empty( $root_net_url ) ) {
-					$options      = Main_Helper::get_contentsync_meta( $item, 'contentsync_options' );
+					$options      = \Contentsync\get_contentsync_meta_values( $item, 'contentsync_export_options' );
 					$option_infos = array(
 						'append_nested'  => array(
 							'icon'     => 'networking',
@@ -1042,7 +1042,7 @@ class Global_List_Table extends \WP_List_Table {
 
 				// unlink error posts
 				if ( $gids_are_post_ids ) {
-					$result        = Actions::contentsync_unimport_post( $root_post_id );
+					$result        = \Contentsync\unlink_synced_post( $root_post_id );
 					$post_titles[] = get_post( $root_post_id )->post_title;
 				}
 
@@ -1050,14 +1050,14 @@ class Global_List_Table extends \WP_List_Table {
 				elseif ( $root_blog_id === get_current_blog_id() && empty( $root_net_url ) ) {
 					$status = get_post_meta( $root_post_id, 'synced_post_status', true );
 					if ( $status === 'root' ) {
-						$result        = Actions::contentsync_unexport_post( $gid );
+						$result        = \Contentsync\unlink_synced_root_post( $gid );
 						$post_titles[] = get_post( $root_post_id )->post_title;
 					}
 				}
 
 				// unimport linked posts from this stage
 				elseif ( $post = Main_Helper::get_local_post_by_gid( $gid ) ) {
-					$result        = Actions::contentsync_unimport_post( $post->ID );
+					$result        = \Contentsync\unlink_synced_post( $post->ID );
 					$post_titles[] = $post->post_title;
 				}
 			}
@@ -1068,7 +1068,7 @@ class Global_List_Table extends \WP_List_Table {
 					return false;
 				}
 
-				$result = Actions::contentsync_unexport_post( $gid );
+				$result = \Contentsync\unlink_synced_root_post( $gid );
 			}
 
 			// import
@@ -1088,7 +1088,7 @@ class Global_List_Table extends \WP_List_Table {
 				// continue;
 				// }
 
-				// $result = Actions::contentsync_import_post( $gid );
+				// $result = \Contentsync\import_synced_post( $gid );
 				// if ( $result === true && $post = get_post( $result ) ) {
 				// $post_titles[] = $post->post_title;
 				// }
@@ -1152,7 +1152,7 @@ class Global_List_Table extends \WP_List_Table {
 				$post = Main_Helper::get_global_post( $gid );
 				if ( $post ) {
 					$post_title = $post->post_title;
-					$result     = (bool) Actions::delete_global_post( $gid );
+					$result     = (bool) \Contentsync\delete_global_post( $gid );
 					if ( $result ) {
 						$post_titles[] = $post_title;
 					}

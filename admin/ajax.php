@@ -73,7 +73,7 @@ class Ajax {
 				$this->fail( 'post_id is not defined.' );
 			}
 
-			$args      = Main_Helper::default_export_args();
+			$args      = \Contentsync\get_contentsync_default_export_options();
 			$form_data = isset( $data['form_data'] ) ? (array) $data['form_data'] : array();
 			foreach ( $args as $k => $v ) {
 				if ( isset( $form_data[ $k ] ) ) {
@@ -81,7 +81,7 @@ class Ajax {
 				}
 			}
 
-			$gid = Actions::make_post_global( $post_id, $args );
+			$gid = \Contentsync\make_post_global( $post_id, $args );
 
 			// failure
 			if ( ! $gid ) {
@@ -106,7 +106,7 @@ class Ajax {
 				$this->fail( 'global ID is not defined.' );
 			}
 
-			$result = Actions::contentsync_unexport_post( $gid );
+			$result = \Contentsync\unlink_synced_root_post( $gid );
 
 			// failure
 			if ( ! $result ) {
@@ -119,7 +119,7 @@ class Ajax {
 		}
 
 		/** CHECK IMPORT */
-		elseif ( $action === 'contentsync_check_import' ) {
+		elseif ( $action === 'contentsync_check_synced_post_import' ) {
 
 			if ( self::DEBUG ) {
 				echo "\r\n" . '* check to be imported post...';
@@ -131,7 +131,7 @@ class Ajax {
 				$this->fail( 'global ID is not defined.' );
 			}
 
-			$result = Actions::contentsync_check_import( $gid );
+			$result = \Contentsync\check_synced_post_import( $gid );
 
 			// failure
 			if ( ! $result ) {
@@ -141,7 +141,7 @@ class Ajax {
 			else {
 				$this->success( $result );
 			}
-		} elseif ( $action === 'contentsync_check_import_bulk' ) {
+		} elseif ( $action === 'contentsync_check_synced_post_import_bulk' ) {
 
 			if ( self::DEBUG ) {
 				echo "\r\n" . '* check to be imported posts...';
@@ -155,7 +155,7 @@ class Ajax {
 
 			$results = array();
 			foreach ( $posts as $post ) {
-				$conflict = Actions::contentsync_check_import( $post['gid'] );
+				$conflict = \Contentsync\check_synced_post_import( $post['gid'] );
 				if ( $conflict ) {
 					$results[] = array(
 						'gid'      => $post['gid'],
@@ -191,7 +191,7 @@ class Ajax {
 			$conflicts        = isset( $data['form_data'] ) ? (array) $data['form_data'] : array();
 			$conflict_actions = Main_Helper::call_post_export_func( 'import_get_conflict_actions_from_backend_form', $conflicts );
 
-			$result = Actions::contentsync_import_post( $gid, $conflict_actions );
+			$result = \Contentsync\import_synced_post( $gid, $conflict_actions );
 
 			// failure
 			if ( $result !== true ) {
@@ -200,35 +200,6 @@ class Ajax {
 			// success
 			else {
 				$this->success( 'post was imported!' );
-			}
-		}
-
-		/** IMPORT POSTTYPE */
-		elseif ( $action === 'contentsync_import_posttype' ) {
-
-			if ( self::DEBUG ) {
-				echo "\r\n" . '* try to import a posttype...';
-			}
-
-			$gid = isset( $data['gid'] ) ? strval( $data['gid'] ) : null;
-
-			if ( empty( $gid ) ) {
-				$this->fail( 'global ID is not defined.' );
-			}
-
-			// get conflicts with current posts
-			$conflicts        = isset( $data['form_data'] ) ? (array) $data['form_data'] : array();
-			$conflict_actions = Main_Helper::call_post_export_func( 'import_get_conflict_actions_from_backend_form', $conflicts );
-
-			$result = Actions::contentsync_import_posttype( $gid, $conflict_actions );
-
-			// failure
-			if ( $result !== true ) {
-				$this->fail( $result );
-			}
-			// success
-			else {
-				$this->success( 'posttype was imported!' );
 			}
 		}
 
@@ -246,7 +217,7 @@ class Ajax {
 			}
 
 			// get global post
-			$result = Actions::contentsync_unimport_post( $post_id );
+			$result = \Contentsync\unlink_synced_post( $post_id );
 
 			// failure
 			if ( ! $result ) {
@@ -281,7 +252,7 @@ class Ajax {
 				);
 			}
 
-			$result = Actions::contentsync_import_post( $gid, $current_posts );
+			$result = \Contentsync\import_synced_post( $gid, $current_posts );
 
 			// failure
 			if ( ! $result ) {
@@ -371,7 +342,7 @@ class Ajax {
 				$this->fail( 'global ID is not defined.' );
 			}
 
-			$result = Actions::delete_global_post( $gid );
+			$result = \Contentsync\delete_global_post( $gid );
 
 			// failure
 			if ( ! $result ) {
@@ -500,7 +471,7 @@ class Ajax {
 			$review_id = isset( $data['review_id'] ) ? intval( $data['review_id'] ) : 0;
 			$post_id   = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 
-			$result = Actions::approve_post_review( $review_id, $post_id );
+			$result = \Contentsync\approve_post_review( $review_id, $post_id );
 
 			if ( $result ) {
 				$this->success( 'review was approved.' );
@@ -520,7 +491,7 @@ class Ajax {
 			$post_id   = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 			$message   = isset( $data['message'] ) ? esc_attr( $data['message'] ) : null;
 
-			$result = Actions::deny_post_review( $review_id, $post_id, $message );
+			$result = \Contentsync\deny_post_review( $review_id, $post_id, $message );
 
 			if ( $result ) {
 				$this->success( 'review was denied.' );
@@ -540,7 +511,7 @@ class Ajax {
 			$post_id   = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 			$message   = isset( $data['message'] ) ? esc_attr( $data['message'] ) : null;
 
-			$result = Actions::revert_post_review( $review_id, $post_id, $message );
+			$result = \Contentsync\revert_post_review( $review_id, $post_id, $message );
 
 			if ( $result ) {
 				$this->success( 'review was reverted.' );

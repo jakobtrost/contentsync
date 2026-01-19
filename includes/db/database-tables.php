@@ -51,7 +51,7 @@ function maybe_add_cluster_table() {
 /**
  * Add the table to the database.
  */
-function maybe_add_synced_post_reviews_table() {
+function maybe_add_post_reviews_table() {
 
 	global $wpdb;
 	$charset_collate = $wpdb->get_charset_collate();
@@ -162,6 +162,6 @@ function maybe_add_queue_distribution_items_table() {
 }
 
 add_action( 'init', __NAMESPACE__ . '\maybe_add_cluster_table' );
-add_action( 'init', __NAMESPACE__ . '\maybe_add_synced_post_reviews_table' );
+add_action( 'init', __NAMESPACE__ . '\maybe_add_post_reviews_table' );
 add_action( 'init', __NAMESPACE__ . '\maybe_add_cluster_content_conditions_table' );
 add_action( 'init', __NAMESPACE__ . '\maybe_add_queue_distribution_items_table' );

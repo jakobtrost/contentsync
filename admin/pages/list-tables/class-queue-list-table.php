@@ -10,7 +10,6 @@
 namespace Contentsync\Distribution;
 
 use Contentsync\Main_Helper;
-use Contentsync\Contents\Actions;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {

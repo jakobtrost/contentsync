@@ -19,7 +19,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 use Contentsync\Main_Helper;
-use Contentsync\Contents\Actions;
 
 new Cluster_Admin();
 
@@ -1150,7 +1149,7 @@ class Cluster_Admin {
 						// make post static
 						$gid = Main_Helper::get_gid( $post->ID );
 						if ( $gid ) {
-							$result = Actions::contentsync_unexport_post( $gid );
+							$result = \Contentsync\unlink_synced_root_post( $gid );
 						}
 					}
 					Main_Helper::restore_blog();

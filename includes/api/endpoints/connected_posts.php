@@ -16,7 +16,6 @@
 namespace Contentsync\Api;
 
 use Contentsync\Main_Helper;
-use Contentsync\Contents\Actions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -150,7 +149,7 @@ class Connected_Posts extends Endpoint {
 
 		// add filter to modify gid before import
 		add_filter( 'filter_gid_for_conflict_action', array( $this, 'match_gid_before_import' ), 10, 3 );
-		add_filter( 'contentsync_import_post_meta-synced_post_id', array( $this, 'match_gid_before_import' ), 10, 3 );
+		add_filter( 'import_synced_post_meta-synced_post_id', array( $this, 'match_gid_before_import' ), 10, 3 );
 
 		$message = 'Try to update all posts on all connected blogs of the network "' . network_site_url() . '": ';
 
@@ -197,7 +196,7 @@ class Connected_Posts extends Endpoint {
 
 		// remove filter
 		remove_filter( 'filter_gid_for_conflict_action', array( $this, 'match_gid_before_import' ) );
-		remove_filter( 'contentsync_import_post_meta-synced_post_id', array( $this, 'match_gid_before_import' ) );
+		remove_filter( 'import_synced_post_meta-synced_post_id', array( $this, 'match_gid_before_import' ) );
 
 		return $this->respond( $response, $message );
 	}
@@ -229,7 +228,7 @@ class Connected_Posts extends Endpoint {
 
 				Main_Helper::switch_to_blog( $blog_id );
 
-				$result = Actions::contentsync_import_post( $remote_gid );
+				$result = \Contentsync\import_synced_post( $remote_gid );
 
 				if ( $result === true ) {
 					$message .= ' - post successfully imported';
@@ -269,7 +268,7 @@ class Connected_Posts extends Endpoint {
 		 * @todo if $request['posts'] isset, use this array to import the post,
 		 * otherwise use the global post.
 		 */
-		$result = Actions::contentsync_import_post( $remote_gid );
+		$result = \Contentsync\import_synced_post( $remote_gid );
 
 		if ( $result === true ) {
 			$message .= ' - post successfully imported';

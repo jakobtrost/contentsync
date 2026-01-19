@@ -138,7 +138,7 @@ function get_all_remote_connected_posts( $connection_or_site_url, $gid ) {
 /**
  * Delete all connected posts of a global post from a certain connection
  *
- * @see \Contentsync\Contents\Actions->delete_global_post()
+ * @see \Contentsync\delete_global_post()
  *
  * @param array|string $connection_or_site_url
  * @param string       $gid               Global ID of the root post with an appended network_url.

@@ -21,7 +21,7 @@ namespace Contentsync\Mails;
 function get_mail_content_for_reviews_editor_denied( $review, $post ) {
 	$subject = __( 'The reviewer requested modifications', 'contentsync' );
 
-	$reviewer_message         = get_latest_message_by_synced_post_review_id( $review->ID );
+	$reviewer_message         = get_latest_message_by_post_review_id( $review->ID );
 	$reviewer_message_content = $reviewer_message->get_content();
 	$reviewer                 = $reviewer_message->get_reviewer();
 

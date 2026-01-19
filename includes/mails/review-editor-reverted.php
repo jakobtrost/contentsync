@@ -20,7 +20,7 @@ namespace Contentsync\Mails;
 function get_mail_content_for_reviews_editor_reverted( $review, $post ) {
 	$subject = __( 'Your review has been reverted', 'contentsync' );
 
-	$reviewer_message = get_latest_message_by_synced_post_review_id( $review->ID );
+	$reviewer_message = get_latest_message_by_post_review_id( $review->ID );
 
 	if ( ! $reviewer_message ) {
 		// If no reviewer message is found, use a default message

@@ -16,7 +16,6 @@
 namespace Contentsync;
 
 use Contentsync\Main_Helper;
-use Contentsync\Contents\Actions;
 use Remote_Operations;
 use WP_Error;
 
@@ -51,7 +50,7 @@ function distribute_single_post( $root_post, $destination_ids_or_arrays = array(
 	}
 
 	// Check if post is a root post.
-	$root_post_status = Main_Helper::get_contentsync_meta( $root_post, 'synced_post_status' );
+	$root_post_status = get_contentsync_meta_values( $root_post, 'synced_post_status' );
 	if ( $root_post_status !== 'root' ) {
 		return new WP_Error( 'post_not_root', __( 'Post is not a root post.', 'global-contents' ) );
 	}
@@ -66,7 +65,7 @@ function distribute_single_post( $root_post, $destination_ids_or_arrays = array(
 	// Prepare posts for distribution.
 	$prepared_posts = prepare_posts_for_distribution(
 		$post_ids,
-		! empty( $export_args ) ? $export_args : Main_Helper::get_contentsync_meta( $root_post, 'contentsync_options' ),
+		! empty( $export_args ) ? $export_args : get_contentsync_meta_values( $root_post, 'contentsync_export_options' ),
 		$root_post_id
 	);
 
@@ -583,7 +582,7 @@ function prepare_posts_for_distribution( $post_ids_or_objects, $export_args = ar
 		 * export of the root post yet. So we need to make it a global post.
 		 */
 		if ( empty( $gid ) ) {
-			$gid = Actions::make_post_global( $post_id, $export_args );
+			$gid = \Contentsync\make_post_global( $post_id, $export_args );
 
 			/**
 			 * We now manually set the global meta infos.

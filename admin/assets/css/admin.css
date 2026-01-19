@@ -114,6 +114,7 @@ ul.contentsync_box_list li .flex {
 	padding: 0;
 	background: none;
 }
+
 .contentsync_status .button {
 	padding: 6px 10px;
 	align-items: center;
@@ -121,38 +122,38 @@ ul.contentsync_box_list li .flex {
 }
 
 /* options */
-.contentsync_options_toggle .dashicons {
+.contentsync_export_options_toggle .dashicons {
 	padding: 8px;
 	opacity: 0.6;
 	cursor: pointer;
 }
 
-.contentsync_options_toggle:hover .dashicons {
+.contentsync_export_options_toggle:hover .dashicons {
 	opacity: 1;
 }
 
-._contentsync_options_toggle:checked ~ .contentsync_options_toggle .dashicons {
+._contentsync_export_options_toggle:checked ~ .contentsync_export_options_toggle .dashicons {
 	opacity: 1;
 	color: var(--wp-admin-theme-color);
 }
 
-.editable_contentsync_options b,
-.editable_contentsync_options label {
+.editable_contentsync_export_options b,
+.editable_contentsync_export_options label {
 	display: inline-block;
 	margin-bottom: 4px;
 }
 
-.editable_contentsync_options {
+.editable_contentsync_export_options {
 	display: none;
 }
 
-._contentsync_options_toggle {
+._contentsync_export_options_toggle {
 	opacity: 0;
 	position: absolute;
 	z-index: -1;
 }
 
-._contentsync_options_toggle:checked ~ .editable_contentsync_options {
+._contentsync_export_options_toggle:checked ~ .editable_contentsync_export_options {
 	display: block;
 }
 
@@ -496,6 +497,7 @@ body.contentsync-locked .interface-pinned-items > .components-button
 .contentsync_overlay .inner_content:has(.synced_post_list) {
 	padding-bottom: 20px;
 }
+
 .contentsync_overlay .inner_content .inner_content {
 	margin: 10px 0 0;
 	padding: 15px 0 5px;

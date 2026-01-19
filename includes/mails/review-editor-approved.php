@@ -20,7 +20,7 @@ namespace Contentsync\Mails;
 function get_mail_content_for_reviews_editor_approved( $review, $post ) {
 	$subject = __( 'The reviewer approved your request', 'contentsync' );
 
-	$reviewer_message = get_latest_message_by_synced_post_review_id( $review->ID );
+	$reviewer_message = get_latest_message_by_post_review_id( $review->ID );
 	if ( ! $reviewer_message ) {
 		// If no reviewer message is found, use a default message
 		$mail_title = sprintf(

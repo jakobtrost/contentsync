@@ -86,12 +86,12 @@ class Posts_Meta extends Endpoint {
 			// if no meta key set, we get all contentsync_meta
 			if ( empty( $meta_key ) ) {
 				$post_meta = array();
-				$meta_keys = Main_Helper::contentsync_meta();
+				$meta_keys = \Contentsync\get_contentsync_meta_keys();
 				foreach ( $meta_keys as $meta_key ) {
-					$post_meta[ $meta_key ] = Main_Helper::get_contentsync_meta( $post_id, $meta_key );
+					$post_meta[ $meta_key ] = \Contentsync\get_contentsync_meta_values( $post_id, $meta_key );
 				}
 			} else {
-				$post_meta = Main_Helper::get_contentsync_meta( $post_id, $meta_key );
+				$post_meta = \Contentsync\get_contentsync_meta_values( $post_id, $meta_key );
 			}
 			Main_Helper::restore_blog();
 
@@ -143,7 +143,7 @@ class Posts_Meta extends Endpoint {
 
 		// if no meta key set, we delete all contentsync_meta
 		if ( empty( $meta_key ) ) {
-			Main_Helper::delete_contentsync_meta( $post_id );
+			\Contentsync\delete_contentsync_meta_values( $post_id );
 		} else {
 			delete_post_meta( $post_id, $meta_key );
 		}
@@ -201,7 +201,7 @@ class Posts_Meta extends Endpoint {
 	 * @return bool True if the key is part of the Contentsync meta set, false otherwise.
 	 */
 	public function is_contentsync_meta( $value ) {
-		$meta_keys = Main_Helper::contentsync_meta();
+		$meta_keys = \Contentsync\get_contentsync_meta_keys();
 		return isset( array_flip( $meta_keys )[ $value ] );
 	}
 	/**

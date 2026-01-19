@@ -54,7 +54,7 @@ final class Post_Review_Message {
 	 *
 	 * @var int
 	 */
-	public $synced_post_review_id;
+	public $post_review_id;
 
 
 
@@ -63,19 +63,19 @@ final class Post_Review_Message {
 	 *
 	 * @since 3.5.0
 	 *
-	 * @param int   $synced_post_review_id The post review ID
+	 * @param int   $post_review_id The post review ID
 	 * @param array $args              The message arguments
 	 */
-	public function __construct( $synced_post_review_id, $args ) {
+	public function __construct( $post_review_id, $args ) {
 		if ( ! is_array( $args ) ) {
 			$args = array();
 		}
 
-		$this->timestamp             = isset( $args['timestamp'] ) ? $args['timestamp'] : '';
-		$this->reviewer              = isset( $args['reviewer'] ) ? $args['reviewer'] : 0;
-		$this->content               = isset( $args['content'] ) ? $args['content'] : '';
-		$this->action                = isset( $args['action'] ) ? $args['action'] : '';
-		$this->synced_post_review_id = $synced_post_review_id;
+		$this->timestamp      = isset( $args['timestamp'] ) ? $args['timestamp'] : '';
+		$this->reviewer       = isset( $args['reviewer'] ) ? $args['reviewer'] : 0;
+		$this->content        = isset( $args['content'] ) ? $args['content'] : '';
+		$this->action         = isset( $args['action'] ) ? $args['action'] : '';
+		$this->post_review_id = $post_review_id;
 	}
 
 	public function get_date() {
@@ -99,13 +99,13 @@ final class Post_Review_Message {
 		// save to db
 		global $wpdb;
 
-		$post_review_id = (int) $this->synced_post_review_id;
+		$post_review_id = (int) $this->post_review_id;
 		if ( ! $post_review_id ) {
 			return false;
 		}
 
 		// get messages
-		$messages = get_messages_by_synced_post_review_id( $post_review_id );
+		$messages = get_messages_by_post_review_id( $post_review_id );
 		if ( ! is_array( $messages ) ) {
 			$messages = array();
 		}

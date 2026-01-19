@@ -36,18 +36,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 function send_review_mail( $review_id, $status, $recipient ) {
 
 	// Get the review post
-	$synced_post_review = get_synced_post_review_by_id( $review_id );
-	$post               = get_post( $synced_post_review->post_id );
+	$post_review = get_post_review_by_id( $review_id );
+	$post        = get_post( $post_review->post_id );
 	if ( ! $post ) {
-		$post = $synced_post_review->previous_post;
+		$post = $post_review->previous_post;
 	}
 
 	// Get the recipients of the email
 	$mail_to = '';
 	if ( $recipient === 'reviewers' ) {
-		$mail_to = get_post_reviewer_mails( $synced_post_review->post_id );
+		$mail_to = get_post_reviewer_mails( $post_review->post_id );
 	} elseif ( $recipient === 'editor' ) {
-		$editor = get_user_by( 'id', $synced_post_review->editor );
+		$editor = get_user_by( 'id', $post_review->editor );
 		if ( $editor ) {
 			$mail_to = $editor->user_email;
 		}
@@ -81,21 +81,21 @@ function send_review_mail( $review_id, $status, $recipient ) {
 	if ( $recipient === 'reviewers' ) {
 		if ( $status === 'new' ) {
 			require_once __DIR__ . '/mails/review-reviewer-new.php';
-			$content = \Contentsync\Mails\get_mail_content_for_reviews_reviewer_new( $synced_post_review, $post );
+			$content = \Contentsync\Mails\get_mail_content_for_reviews_reviewer_new( $post_review, $post );
 		} elseif ( $status === 'in_review' ) {
 			require_once __DIR__ . '/mails/review-reviewer-updated.php';
-			$content = \Contentsync\Mails\get_mail_content_for_reviews_reviewer_updated( $synced_post_review, $post );
+			$content = \Contentsync\Mails\get_mail_content_for_reviews_reviewer_updated( $post_review, $post );
 		}
 	} elseif ( $recipient === 'editor' ) {
 		if ( $status === 'approved' ) {
 			require_once __DIR__ . '/mails/review-editor-approved.php';
-			$content = \Contentsync\Mails\get_mail_content_for_reviews_editor_approved( $synced_post_review, $post );
+			$content = \Contentsync\Mails\get_mail_content_for_reviews_editor_approved( $post_review, $post );
 		} elseif ( $status === 'denied' ) {
 			require_once __DIR__ . '/mails/review-editor-denied.php';
-			$content = \Contentsync\Mails\get_mail_content_for_reviews_editor_denied( $synced_post_review, $post );
+			$content = \Contentsync\Mails\get_mail_content_for_reviews_editor_denied( $post_review, $post );
 		} elseif ( $status === 'reverted' ) {
 			require_once __DIR__ . '/mails/review-editor-reverted.php';
-			$content = \Contentsync\Mails\get_mail_content_for_reviews_editor_reverted( $synced_post_review, $post );
+			$content = \Contentsync\Mails\get_mail_content_for_reviews_editor_reverted( $post_review, $post );
 		}
 	}
 

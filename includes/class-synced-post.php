@@ -19,7 +19,7 @@
  * if it is not provided; for remote posts the language is resolved differently.
  *
  * The `get_meta` method gathers metadata associated with the post. It starts with
- * default values provided by `Main_Helper::default_meta_values` and then merges any
+ * default values provided by `get_contentsync_meta_default_values` and then merges any
  * existing metadata, converting objects to arrays when necessary. For remote posts
  * it calculates additional values such as the global ID and a connection map based
  * on network and blog identifiers. The method returns the complete meta array,
@@ -223,7 +223,7 @@ class Synced_Post {
 	 *
 	 * This helper method assembles all meta data that describes a global
 	 * post. It begins with the default values provided by the
-	 * `Main_Helper::default_meta_values()` method and then merges in any
+	 * `get_contentsync_meta_default_values()` method and then merges in any
 	 * existing post meta stored in the database. For remote posts it
 	 * calculates additional values such as the global ID and connection
 	 * map. When called on a local post with pre‑existing `$this->meta`
@@ -239,7 +239,7 @@ class Synced_Post {
 	public function get_meta() {
 
 		// get default meta
-		$meta = \Contentsync\Main_Helper::default_meta_values();
+		$meta = \Contentsync\get_contentsync_meta_default_values();
 
 		// if the post meta does already exist we make sure that all contentsync_meta infos are set
 		if ( ! empty( $this->meta ) ) {

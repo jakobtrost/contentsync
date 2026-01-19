@@ -46,19 +46,7 @@ new Main_Helper();
 class Main_Helper {
 
 	public function __construct() {
-		add_filter( 'contentsync_export_blacklisted_meta', array( $this, 'add_blacklisted_meta' ) );
-
-		// add_filter( 'wp_get_attachment_url', array( $this, '__unstable_filter_global_attachment_url' ), 10, 2 );
-
 		add_filter( 'upload_dir', array( $this, 'filter_wp_upload_dir' ), 98, 1 );
-
-		// Mark Contentsync meta keys as protected to prevent syncing by translation plugins.
-		// This is the most reliable method as it hooks into WordPress core.
-		add_filter( 'is_protected_meta', array( $this, 'protect_contentsync_meta_keys' ), 99, 2 );
-
-		// Polylang: Exclude Contentsync meta keys from being synced between translations.
-		// This is a fallback in case is_protected_meta doesn't catch everything.
-		add_filter( 'pll_copy_post_metas', array( $this, 'exclude_contentsync_metas_from_polylang_sync' ), 99, 1 );
 	}
 
 	/**
@@ -165,7 +153,7 @@ class Main_Helper {
 			if ( $status === 'root' ) {
 				$post = new_synced_post( $post_id );
 				if ( $post ) {
-					$args = array_merge( self::get_contentsync_meta( $post, 'contentsync_options' ), $args );
+					$args = array_merge( get_contentsync_meta_values( $post, 'contentsync_export_options' ), $args );
 
 					if ( $post->post_type === 'tp_posttypes' && $args['whole_posttype'] ) {
 						$args['query_args'] = array(
@@ -225,7 +213,7 @@ class Main_Helper {
 		 */
 		return apply_filters(
 			'contentsync_get_gid',
-			self::get_contentsync_meta( $post, 'synced_post_id' ),
+			get_contentsync_meta_values( $post, 'synced_post_id' ),
 			$post
 		);
 	}
@@ -509,6 +497,46 @@ class Main_Helper {
 	}
 
 	/**
+	 * Extend the WP_Post object by attaching contentsync post-meta & language
+	 *
+	 * @return WP_Post|WP_Post[]    Depends on the input.
+	 */
+	public static function extend_post_object( $post, $current_blog = 0 ) {
+		// multiple posts
+		if ( is_array( $post ) && count( $post ) > 0 ) {
+			foreach ( $post as $key => $_post ) {
+				$post[ $key ] = self::extend_post_object( $_post, $current_blog );
+			}
+			return $post;
+		}
+		// single post
+		elseif ( is_object( $post ) && isset( $post->ID ) ) {
+
+			// attach meta
+			$meta = array();
+			foreach ( get_contentsync_meta_keys() as $meta_key ) {
+				if ( $meta_key == 'contentsync_connection_map' ) {
+					$meta_value = self::get_post_connection_map( $post->ID );
+				} else {
+					$meta_value = get_post_meta( $post->ID, $meta_key, true );
+				}
+				$meta[ $meta_key ] = $meta_value;
+			}
+			$post->meta = $meta;
+
+			// attach language
+			$post->language = self::get_post_language_code( $post );
+
+			// attach blog id
+			$post->blog_id = $current_blog ? $current_blog : get_current_blog_id();
+
+			// attach theme used in blog
+			$post->blog_theme = self::get_wp_template_theme( $post );
+		}
+		return $post;
+	}
+
+	/**
 	 * Get post from current blog by global ID
 	 *
 	 * @param string $gid
@@ -591,7 +619,7 @@ class Main_Helper {
 		foreach ( $all_posts as $global_post ) {
 
 			$global_post = new_synced_post( $global_post );
-			$gid         = self::get_contentsync_meta( $global_post, 'synced_post_id' );
+			$gid         = get_contentsync_meta_values( $global_post, 'synced_post_id' );
 
 			list( $_blog_id, $_post_id, $_net_url ) = self::explode_gid( $gid );
 
@@ -1127,7 +1155,7 @@ class Main_Helper {
 	 */
 	public static function check_connection_map( $post_id ) {
 
-		$status = self::get_contentsync_meta( $post_id, 'synced_post_status' );
+		$status = get_contentsync_meta_values( $post_id, 'synced_post_status' );
 		if ( $status !== 'root' ) {
 			return array(
 				'status' => 'not_root_post',
@@ -1420,201 +1448,6 @@ class Main_Helper {
 		}
 
 		return array();
-	}
-
-
-	/**
-	 * =================================================================
-	 *                          META OPTIONS
-	 * =================================================================
-	 */
-
-	/**
-	 * Returns list of contentsync meta keys
-	 *
-	 * @return array $meta_keys
-	 */
-	public static function contentsync_meta() {
-		return array(
-			'synced_post_status',
-			'synced_post_id',
-			'contentsync_connection_map',
-			'contentsync_options',
-			'contentsync_canonical_url',
-			// 'contentsync_nested',
-		);
-	}
-
-	/**
-	 * Returns list of blacklisted contentsync meta keys
-	 *
-	 * @return array $meta_keys
-	 */
-	public static function blacklisted_meta() {
-		return array(
-			'contentsync_connection_map',
-			'contentsync_options',
-			// 'contentsync_nested',
-		);
-	}
-
-	/**
-	 * Add blacklisted meta for Post_Export class.
-	 *
-	 * @filter 'contentsync_export_blacklisted_meta'.
-	 *
-	 * @return array $meta_keys
-	 */
-	public function add_blacklisted_meta( $meta_values ) {
-		return array_merge( $meta_values, self::blacklisted_meta() );
-	}
-
-	/**
-	 * Mark Contentsync meta keys as protected to prevent syncing by translation plugins.
-	 *
-	 * WordPress considers meta keys starting with '_' as protected by default.
-	 * This filter allows us to mark our contentsync_ prefixed meta keys as protected too,
-	 * which prevents Polylang (and other plugins) from syncing them.
-	 *
-	 * @filter is_protected_meta
-	 *
-	 * @param bool   $protected Whether the meta key is protected.
-	 * @param string $meta_key  The meta key being checked.
-	 * @return bool Whether the meta key should be protected.
-	 */
-	public function protect_contentsync_meta_keys( $protected, $meta_key ) {
-		if ( in_array( $meta_key, self::contentsync_meta(), true ) ) {
-			return true;
-		}
-		return $protected;
-	}
-
-	/**
-	 * Exclude Content Syncs meta keys from Polylang synchronization.
-	 *
-	 * Polylang syncs custom fields between translations, but Contentsync meta values
-	 * are unique per post and should never be copied or synced.
-	 *
-	 * @filter pll_copy_post_metas
-	 *
-	 * @param string[] $metas List of meta keys to be synced.
-	 * @return string[] Filtered list of meta keys.
-	 */
-	public function exclude_contentsync_metas_from_polylang_sync( $metas ) {
-		return array_diff( $metas, self::contentsync_meta() );
-	}
-
-	/**
-	 * get_post_meta() but with default values.
-	 *
-	 * @param int|WP_Post $post_id  Post ID or Preparred post object.
-	 * @param string      $meta_key Key of the meta option.
-	 *
-	 * @return mixed
-	 */
-	public static function get_contentsync_meta( $post_id, $meta_key ) {
-		$value = null;
-		if ( is_object( $post_id ) || is_array( $post_id ) ) {
-			$post = (object) $post_id;
-			if ( isset( $post->meta ) ) {
-				$post->meta = (array) $post->meta;
-				$value      = isset( $post->meta[ $meta_key ] ) ? $post->meta[ $meta_key ] : null;
-				if ( is_array( $value ) && isset( $value[0] ) ) {
-					$value = $value[0];
-				}
-			}
-		} elseif ( $meta_key == 'contentsync_connection_map' ) {
-				$value = self::get_post_connection_map( $post_id );
-		} else {
-			$value = get_post_meta( $post_id, $meta_key, true );
-		}
-		$default = self::default_meta_values()[ $meta_key ];
-		if ( ! $value ) {
-			$value = $default;
-		} elseif ( is_array( $default ) ) {
-			$value = (array) $value;
-		}
-		return $value;
-	}
-
-	/**
-	 * Return the default export options
-	 */
-	public static function default_export_args() {
-		return self::default_meta_values()['contentsync_options'];
-	}
-
-	/**
-	 * @return array $default_values
-	 */
-	public static function default_meta_values() {
-		return array(
-			'synced_post_status'         => null,
-			'synced_post_id'             => null,
-			'contentsync_connection_map' => array(),
-			'contentsync_options'        => array(
-				'append_nested'  => true,
-				'whole_posttype' => false,
-				'all_terms'      => false,
-				'resolve_menus'  => true,
-				'translations'   => true,
-			),
-		);
-	}
-
-	/**
-	 * Extend the WP_Post object by attaching contentsync post-meta & language
-	 *
-	 * @return WP_Post|WP_Post[]    Depends on the input.
-	 */
-	public static function extend_post_object( $post, $current_blog = 0 ) {
-		// multiple posts
-		if ( is_array( $post ) && count( $post ) > 0 ) {
-			foreach ( $post as $key => $_post ) {
-				$post[ $key ] = self::extend_post_object( $_post, $current_blog );
-			}
-			return $post;
-		}
-		// single post
-		elseif ( is_object( $post ) && isset( $post->ID ) ) {
-
-			// attach meta
-			$meta = array();
-			foreach ( self::contentsync_meta() as $meta_key ) {
-				if ( $meta_key == 'contentsync_connection_map' ) {
-					$meta_value = self::get_post_connection_map( $post->ID );
-				} else {
-					$meta_value = get_post_meta( $post->ID, $meta_key, true );
-				}
-				$meta[ $meta_key ] = $meta_value;
-			}
-			$post->meta = $meta;
-
-			// attach language
-			$post->language = self::get_post_language_code( $post );
-
-			// attach blog id
-			$post->blog_id = $current_blog ? $current_blog : get_current_blog_id();
-
-			// attach theme used in blog
-			$post->blog_theme = self::get_wp_template_theme( $post );
-		}
-		return $post;
-	}
-
-	/**
-	 * Delete all global meta infos.
-	 * Used to unimport & unexport posts.
-	 */
-	public static function delete_contentsync_meta( $post_id ) {
-		$return = true;
-		foreach ( self::contentsync_meta() as $meta_key ) {
-			$result = delete_post_meta( $post_id, $meta_key );
-			if ( ! $result ) {
-				$return = false;
-			}
-		}
-		return $return;
 	}
 
 
@@ -1996,7 +1829,7 @@ class Main_Helper {
 
 		// delete meta
 		if ( $delete_meta ) {
-			$success = self::delete_contentsync_meta( $post_id );
+			$success = delete_contentsync_meta_values( $post_id );
 
 			if ( $repaired === null ) {
 				$repaired = (bool) $success;
@@ -2055,7 +1888,7 @@ class Main_Helper {
 
 		// trash other linked post
 		if ( $trash_other_post && isset( $other_linked_post ) ) {
-			$success = self::delete_contentsync_meta( $other_linked_post->ID );
+			$success = delete_contentsync_meta_values( $other_linked_post->ID );
 			$success = wp_trash_post( $other_linked_post->ID );
 			$success = true;
 
@@ -2074,7 +1907,7 @@ class Main_Helper {
 
 		// trash post
 		if ( $trash_post ) {
-			$success = self::delete_contentsync_meta( $post_id );
+			$success = delete_contentsync_meta_values( $post_id );
 			$success = wp_trash_post( $post_id );
 			$success = true;
 
@@ -2189,11 +2022,11 @@ class Main_Helper {
 			\Contentsync\post_export_enable_logs( false );
 		}
 
-		if ( ! method_exists( '\Contentsync\Contents\Actions', 'make_post_global' ) ) {
+		if ( ! function_exists( '\Contentsync\make_post_global' ) ) {
 			return false;
 		}
 
-		$gid = \Contentsync\Contents\Actions::make_post_global( $post_id, $options );
+		$gid = \Contentsync\make_post_global( $post_id, $options );
 
 		// loop through all blogs and change the gid
 		foreach ( self::get_all_blogs() as $blog_id => $blog_args ) {
@@ -2212,7 +2045,7 @@ class Main_Helper {
 		}
 
 		// update meta
-		update_post_meta( $post_id, 'contentsync_options', $options );
+		update_post_meta( $post_id, 'contentsync_export_options', $options );
 		update_post_meta( $post_id, 'contentsync_connection_map', $connection_map );
 
 		return true;
@@ -2891,51 +2724,6 @@ class Main_Helper {
 			return $theme[0]->name;
 		}
 		return '';
-	}
-
-
-	/**
-	 * =================================================================
-	 *                          Unstable
-	 * =================================================================
-	 */
-
-	/**
-	 * Filters the attachment URL.
-	 *
-	 * @since 1.7.4
-	 *
-	 * @param string $url           URL for the given attachment.
-	 * @param int    $attachment_id Attachment post ID.
-	 *
-	 * @return string
-	 */
-	public function __unstable_filter_global_attachment_url( $url, $attachment_id ) {
-
-		// check if url is an mp4 file
-		if ( strpos( $url, '.mp4' ) === false ) {
-			return $url;
-		}
-
-		// only for linked posts
-		$status = get_post_meta( $attachment_id, 'synced_post_status', true );
-		if ( $status !== 'linked' ) {
-			return $url;
-		}
-
-		// get the global id
-		$gid = get_post_meta( $attachment_id, 'synced_post_id', true );
-		if ( ! $gid ) {
-			return $url;
-		}
-
-		// get the global post
-		$global_post = self::get_global_post( $gid );
-		if ( $global_post && isset( $global_post->guid ) ) {
-			return $global_post->guid;
-		}
-
-		return $url;
 	}
 
 

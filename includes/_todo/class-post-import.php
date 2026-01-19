@@ -56,7 +56,7 @@ class Post_Import {
 		add_action( 'contentsync_ajax_mode_check_post_import', array( $this, 'check_import' ) );
 		add_action( 'contentsync_ajax_mode_post_import', array( $this, 'handle_import' ) );
 		add_action( 'contentsync_ajax_mode_posttype_import', array( $this, 'handle_posttype_import' ) );
-		add_filter( 'contentsync_import_post_meta-dynamic_meta', array( $this, 'set_dynamic_meta' ), 10, 2 );
+		add_filter( 'import_synced_post_meta-dynamic_meta', array( $this, 'set_dynamic_meta' ), 10, 2 );
 
 		add_filter( 'contentsync_filter_post_content_before_post_import', array( $this, 'filter_block_content_on_import' ), 10, 3 );
 	}
@@ -364,7 +364,7 @@ class Post_Import {
 			 * when creating or updating posts during import. It's useful for modifying
 			 * post attributes, adding custom fields, or implementing custom import logic.
 			 *
-			 * @filter contentsync_import_postarr
+			 * @filter import_synced_postarr
 			 *
 			 * @param array $postarr        Array of post parameters used for wp_insert_post().
 			 * @param Prepared_Post $post  Preparred post object with meta, taxonomy terms, etc.
@@ -373,7 +373,7 @@ class Post_Import {
 			 * @return array $postarr       Modified array of post parameters for import.
 			 */
 			$postarr = apply_filters(
-				'contentsync_import_postarr',
+				'import_synced_postarr',
 				array(
 					'post_title'    => $post->post_title,
 					'post_name'     => $post->post_name,
@@ -1234,7 +1234,7 @@ class Post_Import {
 				 * during import. The filter name is dynamic based on the meta key,
 				 * allowing for targeted modifications of specific meta fields.
 				 *
-				 * @filter contentsync_import_post_meta-{{meta_key}}
+				 * @filter import_synced_post_meta-{{meta_key}}
 				 *
 				 * @param mixed $meta_value     The meta value to be imported.
 				 * @param int   $post_id        The ID of the post being imported.
@@ -1242,7 +1242,7 @@ class Post_Import {
 				 *
 				 * @return mixed             The modified meta value for import.
 				 */
-				$meta_value = apply_filters( 'contentsync_import_post_meta-' . $meta_key, $meta_value, $post_id, $post );
+				$meta_value = apply_filters( 'import_synced_post_meta-' . $meta_key, $meta_value, $post_id, $post );
 
 				if ( $has_prev_value ) {
 					update_post_meta( $post_id, $meta_key, $meta_value, $prev_value );
@@ -1262,7 +1262,7 @@ class Post_Import {
 	 * handling dynamic post type fields, resolving placeholders, or applying
 	 * post-import transformations.
 	 *
-	 * @filter contentsync_import_post_meta-dynamic_meta
+	 * @filter import_synced_post_meta-dynamic_meta
 	 *
 	 * @param mixed $meta_value  The meta value after initial import processing.
 	 * @param int   $post_id     The ID of the post that was imported.
@@ -1950,14 +1950,14 @@ class Post_Import {
 		 * with posts being imported. It's useful for adding custom conflict detection
 		 * logic or filtering out certain types of conflicts.
 		 *
-		 * @filter contentsync_import_post_conflicts
+		 * @filter import_synced_post_conflicts
 		 *
 		 * @param array $conflicts  Array of conflicting posts, keyed by post ID.
 		 * @param array $posts      Array of posts being imported, keyed by post ID.
 		 *
 		 * @return array            Modified array of conflicting posts.
 		 */
-		return apply_filters( 'contentsync_import_post_conflicts', $conflicts, $posts );
+		return apply_filters( 'import_synced_post_conflicts', $conflicts, $posts );
 	}
 
 	/**

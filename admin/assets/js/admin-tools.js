@@ -166,7 +166,7 @@ var contentsync = new function () {
 				'mode': 'global_action',
 				'data': {
 					'gid': gid,
-					'action': 'contentsync_check_import',
+					'action': 'contentsync_check_synced_post_import',
 				}
 			},
 			function ( response ) {
@@ -227,35 +227,7 @@ var contentsync = new function () {
 			}, {} );
 		}
 
-		// normal posts
-		if ( typeof postType === 'undefined' || postType !== 'tp_posttypes' ) {
-			contentsync.ajax( action, data );
-		}
-		// whole posttypes
-		else {
-			/**
-			 * first we install only the posttype, to get
-			 * taxonomies, terms and everything ready.
-			 */
-			data.action = 'contentsync_import_posttype';
-			$.post(
-				greyd.ajax_url ?? wizzard_details.ajax_url,
-				{
-					'action': 'contentsync_ajax',
-					'_ajax_nonce': greyd.nonce ?? wizzard_details.nonce,
-					'mode': 'global_action',
-					'data': data
-				},
-				function ( response ) {
-					console.log( response );
-					/**
-					 * After that, we insert the posts as usual.
-					 */
-					data.action = 'contentsync_import';
-					contentsync.ajax( action, { gid: gid } );
-				}
-			);
-		}
+		contentsync.ajax( action, data );
 	};
 
 
@@ -341,7 +313,7 @@ var contentsync = new function () {
 				'mode': 'global_action',
 				'data': {
 					'posts': posts,
-					'action': 'contentsync_check_import_bulk',
+					'action': 'contentsync_check_synced_post_import_bulk',
 				}
 			},
 			function ( response ) {
@@ -494,29 +466,6 @@ var contentsync = new function () {
 				} );
 			}
 			else {
-				// console.log("trigger import", item);
-				if ( item.post_type == 'tp_posttypes' ) {
-					// install the posttype
-					contentsync.importQueue.push( {
-						gid: item.gid,
-						ajax_data: {
-							gid: item.gid,
-							action: 'contentsync_import_posttype',
-							form_data: data
-						},
-						callback: ( response ) => {
-							// console.log( response );
-							if ( response.indexOf( 'success::' ) > -1 ) {
-								return true;
-							}
-							else {
-								console.warn( item.gid+' posttype import failed:', response );
-
-								return response;
-							}
-						}
-					} );
-				}
 
 				// import post
 				contentsync.importQueue.push( {
