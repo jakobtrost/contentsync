@@ -402,7 +402,7 @@ class Distribution_Endpoint extends Endpoint {
 				case 'ID':
 					$post[ $key ] = intval( $value );
 					break;
-				case 'is_contentsync_root_post':
+				case 'is_root_post':
 					$post[ $key ] = $value == '1' ? true : false;
 					break;
 				case 'meta':

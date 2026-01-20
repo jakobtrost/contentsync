@@ -13,21 +13,14 @@ class Post_Transfer {
 	 *
 	 * @var Prepared_Post[]
 	 */
-	private $posts = array();
-
-	/**
-	 * Holds all WP_Media objects for a post transfer, keyed by post ID.
-	 *
-	 * @var array
-	 */
-	private $media = array();
+	protected $posts = array();
 
 	/**
 	 * Holds different arguments based on the transfer type (import, export).
 	 *
 	 * @var array
 	 */
-	private $arguments = array();
+	protected $arguments = array();
 
 	/**
 	 * Constructor.
@@ -36,8 +29,6 @@ class Post_Transfer {
 	 * @param array          $arguments             Arguments.
 	 */
 	public function __construct( $post_ids_or_objects, $arguments = array() ) {
-		$this->posts     = array();
-		$this->media     = array();
 		$this->arguments = $this->parse_arguments( $arguments );
 	}
 
@@ -48,7 +39,7 @@ class Post_Transfer {
 	 *
 	 * @return array The parsed arguments.
 	 */
-	private function parse_arguments( $arguments ) {
+	protected function parse_arguments( $arguments ) {
 		return $arguments;
 	}
 
@@ -59,8 +50,5 @@ class Post_Transfer {
 	 */
 	public function get_posts() {
 		return $this->posts;
-	}
-	public function get_media() {
-		return $this->media;
 	}
 }

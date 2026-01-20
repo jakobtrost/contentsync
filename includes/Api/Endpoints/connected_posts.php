@@ -17,6 +17,7 @@ namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Posts\Transfer\Post_Import;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -179,9 +180,15 @@ class Connected_Posts extends Endpoint {
 					/**
 					 * We now import all the posts to the target blog.
 					 */
-					$result = \Contentsync\import_posts( $all_posts, $conflict_actions );
+					$post_import   = new Post_Import(
+						$all_posts,
+						array(
+							'conflict_actions' => $conflict_actions,
+						)
+					);
+					$import_result = $post_import->import_posts();
 
-					if ( $result ) {
+					if ( $import_result ) {
 						$message .= ' - post successfully imported';
 					} else {
 						$message .= ' - post could not be imported';

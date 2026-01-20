@@ -9,6 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Post_Export extends Post_Transfer {
 
 	/**
+	 * Holds all WP_Media objects for a post transfer, keyed by post ID.
+	 *
+	 * @var array
+	 */
+	protected $media = array();
+
+	/**
 	 * Export posts with all its meta, taxonomies, media etc.
 	 *
 	 * @since 2.18.0
@@ -270,7 +277,7 @@ class Post_Export extends Post_Transfer {
 
 		// set monthly folder
 		$folder = date( 'y-m' );
-		$path   = get_export_file_path( $folder );
+		$path   = \Contentsync\Utils\get_wp_content_folder_path( $folder );
 
 		// write the temporary posts.json file
 		$json_name = 'posts.json';

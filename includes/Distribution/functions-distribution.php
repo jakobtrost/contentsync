@@ -23,6 +23,7 @@ use Contentsync\Cluster\Content_Condition;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Distribution\Destinations\Remote_Destination
 use Contentsync\Distribution\Destinations\Blog_Destination;
+use Contentsync\Posts\Transfer\Post_Import;
 
 require_once CONTENTSYNC_PLUGIN_PATH . '/libs/action-scheduler/action-scheduler.php';
 
@@ -573,7 +574,7 @@ function prepare_posts_for_distribution( $post_ids_or_objects, $export_args = ar
 		'import_action',
 		'conflict_action',
 		'export_arguments',
-		'is_contentsync_root_post',
+		'is_root_post',
 	);
 
 	/**
@@ -619,8 +620,8 @@ function prepare_posts_for_distribution( $post_ids_or_objects, $export_args = ar
 		 * @var bool
 		 */
 		if ( $root_post_id && $root_post_id == $post_id ) {
-			Logger::add( 'is_contentsync_root_post = true' );
-			$prepared_posts[ $post_id ]->is_contentsync_root_post = true;
+			Logger::add( 'is_root_post = true' );
+			$prepared_posts[ $post_id ]->is_root_post = true;
 		}
 
 		/**
@@ -971,16 +972,17 @@ function import_posts_to_blog( &$item ) {
 	Logger::add( 'Importing posts to blog: ' . $item->destination->ID );
 
 	// import the posts
-	$result = Main_Helper::import_posts( $item->posts );
+	$post_import   = new Post_Import( $item->posts );
+	$import_result = $post_import->import_posts();
 
-		// error importing posts
-	if ( is_wp_error( $result ) ) {
-		$item->destination->error = $result;
+	// error importing posts
+	if ( is_wp_error( $import_result ) ) {
+		$item->destination->error = $import_result;
 		return false;
 	}
 
 	// add imported post ids to destination
-	$imported_post_ids = method_exists( '\Contentsync\Posts\Transfer\Post_Import', 'get_all_posts' ) ? \Contentsync\Posts\Transfer\Post_Import::get_all_posts() : false;
+	$imported_post_ids = $post_import->get_posts();
 	if ( $imported_post_ids ) {
 		foreach ( $imported_post_ids as $root_post_id => $imported_post_id ) {
 			$item->destination->set_post(

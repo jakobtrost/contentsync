@@ -14,7 +14,9 @@
  */
 namespace Contentsync\Reviews;
 
+use Contentsync\Utils\Logger;
 use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Posts\Transfer\Post_Import;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -257,18 +259,20 @@ function revert_post_review( $review_id, $post_id = null, $message_content = '' 
 	if ( $previous_post && $previous_post->post_status === 'auto-draft' ) {
 		wp_trash_post( $post_id );
 	} else {
+
 		// revert the post to the previous state
-		$result = Main_Helper::import_posts(
-			// posts
-			array( $post_id => $previous_post ),
-			// conflict actions
+		$post_import   = new Post_Import(
+			array( $post_id => $previous_post ), // posts
 			array(
-				$post_id => array(
-					'post_id' => $post_id,
-					'action'  => 'replace',
+				'conflict_actions' => array(
+					$post_id => array(
+						'post_id' => $post_id,
+						'action'  => 'replace',
+					),
 				),
 			)
 		);
+		$import_result = $post_import->import_posts();
 
 		// distribute the post
 		$result = \Contentsync\Distribution\distribute_single_post( $post_id, $destination_ids );
