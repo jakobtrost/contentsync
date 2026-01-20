@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync;
+namespace Contentsync\Posts\Sync;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

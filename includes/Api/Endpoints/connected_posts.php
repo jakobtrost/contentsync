@@ -16,6 +16,7 @@
 namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
+use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -156,7 +157,7 @@ class Connected_Posts extends Endpoint {
 		foreach ( $connected_posts as $blog_id => $post_con ) {
 			if ( is_numeric( $blog_id ) ) {
 
-				\Contentsync\switch_blog( $blog_id );
+				Multisite_Manager::switch_blog( $blog_id );
 
 				$post_id  = $post_con['post_id'];
 				$message .= " - check post #$post_id on blog <u>" . get_site_url( $blog_id ) . " (ID: $blog_id)</u>";
@@ -188,7 +189,7 @@ class Connected_Posts extends Endpoint {
 				} else {
 					$message .= ' - this is not a linked post';
 				}
-				\Contentsync\restore_blog();
+				Multisite_Manager::restore_blog();
 			}
 			$response = true;
 		}
@@ -225,7 +226,7 @@ class Connected_Posts extends Endpoint {
 		foreach ( $connected_posts as $blog_id => $post_con ) {
 			if ( is_numeric( $blog_id ) ) {
 
-				\Contentsync\switch_blog( $blog_id );
+				Multisite_Manager::switch_blog( $blog_id );
 
 				$result = \Contentsync\import_synced_post( $remote_gid );
 
@@ -234,7 +235,7 @@ class Connected_Posts extends Endpoint {
 				} else {
 					$message .= ' - post could not be imported';
 				}
-				\Contentsync\restore_blog();
+				Multisite_Manager::restore_blog();
 			}
 			$response = true;
 		}
@@ -261,7 +262,7 @@ class Connected_Posts extends Endpoint {
 
 		$message = "Try to import post $remote_gid on connected blogs with id $blog_id: ";
 
-		\Contentsync\switch_blog( $blog_id );
+		Multisite_Manager::switch_blog( $blog_id );
 
 		/**
 		 * @todo if $request['posts'] isset, use this array to import the post,
@@ -274,7 +275,7 @@ class Connected_Posts extends Endpoint {
 		} else {
 			$message .= ' - post could not be imported';
 		}
-		\Contentsync\restore_blog();
+		Multisite_Manager::restore_blog();
 
 		$response = true;
 
@@ -302,14 +303,14 @@ class Connected_Posts extends Endpoint {
 				foreach ( $connected_posts as $blog_id => $post_con ) {
 
 					if ( is_numeric( $blog_id ) && get_blog_details( $blog_id, false ) ) {
-						\Contentsync\switch_blog( $blog_id );
+						Multisite_Manager::switch_blog( $blog_id );
 						$result = wp_delete_post( $post_con['post_id'], true );
 						if ( $result ) {
 							$message .= ' - Post #' . $post_con['post_id'] . " was deleted from the blog $blog_id";
 						} else {
 							$message .= ' - Post #' . $post_con['post_id'] . " could not be deleted from the blog $blog_id";
 						}
-						\Contentsync\restore_blog();
+						Multisite_Manager::restore_blog();
 					}
 				}
 				$response = true;

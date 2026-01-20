@@ -9,6 +9,8 @@
 
 namespace Contentsync\Cluster;
 
+use Contentsync\Utils\Multisite_Manager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -524,19 +526,19 @@ class Post_Review_List_Table extends \WP_List_Table {
 					$result = false;
 					switch ( $bulk_action ) {
 						case 'approve':
-							\Contentsync\switch_blog( $post->blog_id );
+							Multisite_Manager::switch_blog( $post->blog_id );
 							$result = (bool) \Contentsync\approve_post_review( $post_id );
-							\Contentsync\restore_blog();
+							Multisite_Manager::restore_blog();
 							break;
 						case 'deny':
-							\Contentsync\switch_blog( $post->blog_id );
+							Multisite_Manager::switch_blog( $post->blog_id );
 							$result = (bool) \Contentsync\deny_post_review( $post_id );
-							\Contentsync\restore_blog();
+							Multisite_Manager::restore_blog();
 							break;
 						case 'revert':
-							\Contentsync\switch_blog( $post->blog_id );
+							Multisite_Manager::switch_blog( $post->blog_id );
 							$result = (bool) \Contentsync\revert_post_review( $post_id, $root_post->ID );
-							\Contentsync\restore_blog();
+							Multisite_Manager::restore_blog();
 							break;
 						case 'delete':
 							$result = (bool) delete_post_review( $post_id );
@@ -616,9 +618,9 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 * @param int $post_id The post id.
 	 */
 	public function get_root_post_edit_link( $blog_id, $post_id ) {
-		\Contentsync\switch_blog( $blog_id );
+		Multisite_Manager::switch_blog( $blog_id );
 		$edit_post_link = \Contentsync\get_edit_post_link( $post_id );
-		\Contentsync\restore_blog();
+		Multisite_Manager::restore_blog();
 		return $edit_post_link;
 	}
 
@@ -628,9 +630,9 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 * @param int $blog_id The blog id.
 	 */
 	public function get_root_blog_url( $blog_id ) {
-		\Contentsync\switch_blog( $blog_id );
+		Multisite_Manager::switch_blog( $blog_id );
 		$root_post_url = get_bloginfo( 'url' );
-		\Contentsync\restore_blog();
+		Multisite_Manager::restore_blog();
 		return $root_post_url;
 	}
 

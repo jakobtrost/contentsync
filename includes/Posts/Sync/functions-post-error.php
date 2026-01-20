@@ -6,7 +6,9 @@
  * across multisite networks.
  */
 
-namespace Contentsync;
+namespace Contentsync\Posts\Sync;
+
+use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -146,7 +148,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 	 */
 
 	// switch blog to prevent errors
-	switch_blog( $blog_id );
+	Multisite_Manager::switch_blog( $blog_id );
 
 	// this is a root post
 	if ( $status == 'root' ) {
@@ -479,7 +481,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 		}
 	}
 
-	restore_blog();
+	Multisite_Manager::restore_blog();
 
 	$error->repaired = (bool) $repaired;
 	$error->log      = implode( ' ', $error->log );
@@ -498,11 +500,11 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
  */
 function repair_post( $post_id, $blog_id = null, $return_error = false ) {
 
-	switch_blog( $blog_id );
+	Multisite_Manager::switch_blog( $blog_id );
 
 	$error = check_post_for_errors( $post_id, true, true );
 
-	restore_blog();
+	Multisite_Manager::restore_blog();
 
 	return $return_error ? $error : is_error_repaired( $error );
 }
@@ -519,7 +521,7 @@ function get_synced_posts_of_blog_with_errors( $blog_id = 0, $repair_posts = fal
 
 	$error_posts = array();
 
-	switch_blog( $blog_id );
+	Multisite_Manager::switch_blog( $blog_id );
 
 	$posts = \Contentsync\get_synced_posts_of_blog( '', '', $query_args );
 
@@ -531,7 +533,7 @@ function get_synced_posts_of_blog_with_errors( $blog_id = 0, $repair_posts = fal
 		}
 	}
 
-	restore_blog();
+	Multisite_Manager::restore_blog();
 
 	return $error_posts;
 }
@@ -545,7 +547,7 @@ function get_synced_posts_of_blog_with_errors( $blog_id = 0, $repair_posts = fal
  */
 function get_network_synced_posts_with_errors( $repair_posts = false, $query_args = null ) {
 	$error_posts = array();
-	foreach ( get_all_blogs() as $blog_id => $blog_args ) {
+	foreach ( Multisite_Manager::get_all_blogs() as $blog_id => $blog_args ) {
 		$error_posts = array_merge(
 			get_synced_posts_of_blog_with_errors( $blog_id, $repair_posts, $query_args ),
 			$error_posts
@@ -580,19 +582,19 @@ function convert_post_to_root( $post_id, $old_gid ) {
 	$gid = \Contentsync\make_post_global( $post_id, $options );
 
 	// loop through all blogs and change the gid
-	foreach ( get_all_blogs() as $blog_id => $blog_args ) {
+	foreach ( Multisite_Manager::get_all_blogs() as $blog_id => $blog_args ) {
 
 		if ( $blog_id == $current_blog ) {
 			continue;
 		}
 
-		switch_blog( $blog_id );
+		Multisite_Manager::switch_blog( $blog_id );
 		$post = \Contentsync\get_local_post_by_gid( $old_gid );
 		if ( $post ) {
 			$connection_map[ $blog_id ] = get_post_connection_map( $blog_id, $post->ID );
 			update_post_meta( $post->ID, 'synced_post_id', $gid );
 		}
-		restore_blog();
+		Multisite_Manager::restore_blog();
 	}
 
 	// update meta

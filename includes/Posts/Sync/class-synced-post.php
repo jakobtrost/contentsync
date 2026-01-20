@@ -32,7 +32,9 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Posts\Sync;
+
+use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

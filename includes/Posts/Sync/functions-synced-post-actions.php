@@ -10,9 +10,11 @@
  * metadata, and queue exports via the distribution system.
  */
 
-namespace Contentsync;
+namespace Contentsync\Posts\Sync;
 
 use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -259,7 +261,7 @@ function unlink_synced_root_post( $gid ) {
 		return false;
 	}
 
-	switch_blog( $blog_id );
+	Multisite_Manager::switch_blog( $blog_id );
 
 	$connection_map = get_post_connection_map( $post_id );
 
@@ -267,9 +269,9 @@ function unlink_synced_root_post( $gid ) {
 	if ( is_array( $connection_map ) && count( $connection_map ) > 0 ) {
 		foreach ( $connection_map as $_blog_id => $post_connection ) {
 			if ( is_numeric( $_blog_id ) ) {
-				switch_blog( $_blog_id );
+				Multisite_Manager::switch_blog( $_blog_id );
 				delete_contentsync_meta_values( $post_connection['post_id'] );
-				restore_blog();
+				Multisite_Manager::restore_blog();
 			} else {
 				/**
 				 * @todo handle remote connections
@@ -283,7 +285,7 @@ function unlink_synced_root_post( $gid ) {
 	// delete meta of exported post
 	delete_contentsync_meta_values( $post_id );
 
-	restore_blog();
+	Multisite_Manager::restore_blog();
 
 	return true;
 }
@@ -378,7 +380,7 @@ function untrash_connected_posts( $post_id, $delete = false ) {
 			continue;
 		}
 
-		switch_blog( $destination_id );
+		Multisite_Manager::switch_blog( $destination_id );
 		$trashed = get_unfiltered_posts(
 			array(
 				'numberposts' => -1,
@@ -412,7 +414,7 @@ function untrash_connected_posts( $post_id, $delete = false ) {
 			}
 		}
 
-		restore_blog();
+		Multisite_Manager::restore_blog();
 	}
 
 	return $result;
@@ -537,7 +539,7 @@ function delete_synced_post( $gid, $keep_root_post = false ) {
 	}
 
 	$result = true;
-	switch_blog( $root_blog_id );
+	Multisite_Manager::switch_blog( $root_blog_id );
 
 	// delete imported posts
 	$connection_map = get_post_connection_map( $synced_post->ID );
@@ -563,7 +565,7 @@ function delete_synced_post( $gid, $keep_root_post = false ) {
 	}
 
 	// restore blog
-	restore_blog();
+	Multisite_Manager::restore_blog();
 
 	return $result;
 }

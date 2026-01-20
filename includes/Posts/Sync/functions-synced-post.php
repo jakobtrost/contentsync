@@ -1,6 +1,9 @@
 <?php
 
-namespace Contentsync;
+namespace Contentsync\Posts\Sync;
+
+use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Posts\Transfer\Post_Export;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,7 +38,7 @@ function get_synced_post( $gid ) {
 
 	// network post
 	if ( empty( $site_url ) ) {
-		switch_blog( $blog_id );
+		Multisite_Manager::switch_blog( $blog_id );
 
 		$status = get_post_meta( $post_id, 'synced_post_status', true );
 
@@ -48,7 +51,7 @@ function get_synced_post( $gid ) {
 			wp_cache_set( 'gid_' . $gid, $post, 'synced_posts' );
 		}
 
-		restore_blog();
+		Multisite_Manager::restore_blog();
 	}
 	// remote post
 	else {
@@ -99,7 +102,7 @@ function prepare_synced_post_for_import( $gid, $args = array() ) {
 	// network post
 	if ( empty( $site_url ) ) {
 
-		switch_blog( $blog_id );
+		Multisite_Manager::switch_blog( $blog_id );
 		$status = get_post_meta( $post_id, 'synced_post_status', true );
 
 		if ( $status === 'root' ) {
@@ -123,7 +126,7 @@ function prepare_synced_post_for_import( $gid, $args = array() ) {
 			}
 		}
 
-		restore_blog();
+		Multisite_Manager::restore_blog();
 	}
 	// remote post
 	else {
@@ -239,7 +242,7 @@ function get_all_synced_posts_from_current_network( $query = null ) {
 
 	// loop through all blogs and get the posts
 	$all_network_posts = array();
-	foreach ( get_all_blogs() as $blog_id => $blog_args ) {
+	foreach ( Multisite_Manager::get_all_blogs() as $blog_id => $blog_args ) {
 		$posts = \Contentsync\get_synced_posts_of_blog( $blog_id, 'root', $query );
 
 		if ( is_array( $posts ) && ! empty( $posts ) ) {
@@ -279,7 +282,7 @@ function get_all_synced_posts_from_current_network( $query = null ) {
  */
 function get_synced_posts_of_blog( $blog_id = '', $filter_status = '', $query = null ) {
 
-	switch_blog( $blog_id );
+	Multisite_Manager::switch_blog( $blog_id );
 
 	$post_type = 'any';
 	if ( empty( $post_type ) || $post_type === 'any' ) {
@@ -321,7 +324,7 @@ function get_synced_posts_of_blog( $blog_id = '', $filter_status = '', $query = 
 
 	$posts = \Contentsync\extend_post_object( get_unfiltered_posts( $args ) );
 
-	restore_blog();
+	Multisite_Manager::restore_blog();
 
 	/**
 	 * Filter to modify the array of blog synced posts before returning.

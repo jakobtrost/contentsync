@@ -15,6 +15,7 @@
 namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
+use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -248,7 +249,7 @@ class Posts extends Endpoint {
 
 		// build sql query
 		$results = array();
-		foreach ( \Contentsync\get_all_blogs() as $blog_id => $blog_args ) {
+		foreach ( Multisite_Manager::get_all_blogs() as $blog_id => $blog_args ) {
 			$prefix   = $blog_args['prefix'];
 			$site_url = $blog_args['site_url'];
 			$query    = "

@@ -15,6 +15,8 @@
  */
 namespace Contentsync\Cluster;
 
+use Contentsync\Utils\Multisite_Manager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -223,7 +225,7 @@ function get_posts_by_cluster_content_condition( $condition ) {
 
 	$blog_id = get_current_blog_id();
 	if ( $blog_id != $condition->blog_id ) {
-		switch_blog( $condition->blog_id );
+		Multisite_Manager::switch_blog( $condition->blog_id );
 	}
 
 	// export arguments
@@ -254,7 +256,7 @@ function get_posts_by_cluster_content_condition( $condition ) {
 	}
 
 	if ( $blog_id != $condition->blog_id ) {
-		restore_blog();
+		Multisite_Manager::restore_blog();
 	}
 
 	return $cluster_posts;

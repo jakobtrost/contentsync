@@ -20,6 +20,7 @@ use Contentsync\Logger;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Cluster\Cluster;
 use Contentsync\Cluster\Content_Condition;
+use Contentsync\Utils\Multisite_Manager;
 
 require_once CONTENTSYNC_PLUGIN_PATH . '/libs/action-scheduler/action-scheduler.php';
 
@@ -159,7 +160,7 @@ function distribute_posts_per_blog( $posts_keyed_by_blog, $destination_ids_or_ar
 
 	foreach ( $posts_keyed_by_blog as $blog_id => $posts ) {
 
-		switch_blog( $blog_id );
+		Multisite_Manager::switch_blog( $blog_id );
 
 		$result = distribute_posts( $posts, $destination_ids_or_arrays, $export_args );
 
@@ -914,7 +915,7 @@ function distribute_to_blog( $item ) {
 
 	Logger::add( 'Distributing to blog: ' . $item->destination->ID . ' - ' . $item->destination->url );
 
-	switch_blog( $item->destination->ID );
+	Multisite_Manager::switch_blog( $item->destination->ID );
 
 	/**
 	 * This should be working, but it somehow influences the posts in
@@ -952,7 +953,7 @@ function distribute_to_blog( $item ) {
 		$result = import_posts_to_blog( $item );
 	}
 
-	restore_blog();
+	Multisite_Manager::restore_blog();
 
 	return $result;
 }

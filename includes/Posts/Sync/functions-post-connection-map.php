@@ -1,6 +1,8 @@
 <?php
 
-namespace Contentsync;
+namespace Contentsync\Posts\Sync;
+
+use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -70,7 +72,7 @@ function add_or_remove_post_connection_from_connection_map( $gid, $args, $add = 
 
 	// network post
 	if ( ! $site_url ) {
-		switch_blog( $blog_id );
+		Multisite_Manager::switch_blog( $blog_id );
 		$connection_map = $old_connection = get_post_connection_map( $post_id );
 		if ( ! is_array( $connection_map ) ) {
 			$connection_map = array();
@@ -106,7 +108,7 @@ function add_or_remove_post_connection_from_connection_map( $gid, $args, $add = 
 		} else {
 			$result = update_post_meta( $post_id, 'contentsync_connection_map', $connection_map );
 		}
-		restore_blog();
+		Multisite_Manager::restore_blog();
 	}
 	// remote post
 	else {
@@ -307,9 +309,9 @@ function convert_connection_map_to_destination_ids( $connection_map ) {
  */
 function get_local_post_links( $blog_id, $post_id ) {
 
-	switch_blog( $blog_id );
+	Multisite_Manager::switch_blog( $blog_id );
 	$edit_url = \Contentsync\get_edit_post_link( $post_id );
-	restore_blog();
+	Multisite_Manager::restore_blog();
 
 	$blog_url = get_site_url( $blog_id );
 	$nice_url = strpos( $blog_url, '://' ) !== false ? explode( '://', $blog_url )[1] : $blog_url;
@@ -367,14 +369,14 @@ function get_network_remote_connection_map_by_gid( $gid ) {
 
 	// loop through all blogs and get the posts
 	$connection_map = array();
-	foreach ( get_all_blogs() as $blog_id => $blog_args ) {
+	foreach ( Multisite_Manager::get_all_blogs() as $blog_id => $blog_args ) {
 
-		switch_blog( $blog_id );
+		Multisite_Manager::switch_blog( $blog_id );
 		$post = \Contentsync\get_local_post_by_gid( $gid );
 		if ( $post ) {
 			$connection_map[ $blog_id ] = create_post_connection_map_array( $blog_id, $post->ID );
 		}
-		restore_blog();
+		Multisite_Manager::restore_blog();
 	}
 
 	return array(
@@ -618,7 +620,7 @@ function get_all_local_linked_posts( $gid ) {
 
 	// build sql query
 	$results = array();
-	foreach ( get_all_blogs() as $blog_id => $blog_args ) {
+	foreach ( Multisite_Manager::get_all_blogs() as $blog_id => $blog_args ) {
 		$prefix   = $blog_args['prefix'];
 		$site_url = $blog_args['site_url'];
 		$query    = "

@@ -9,6 +9,7 @@
 namespace Contentsync\Contents;
 
 use Contentsync\Translations\Translation_Manager;
+use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -171,13 +172,13 @@ class Global_List_Table extends \WP_List_Table {
 		 * @since 2.3.0 support wpml and polylang
 		 */
 		if ( is_multisite() && is_network_admin() ) {
-			\Contentsync\switch_blog( get_main_site_id() );
+			Multisite_Manager::switch_blog( get_main_site_id() );
 			foreach ( $items as $post ) {
 				if ( isset( $post->language ) && ! empty( $post->language ) ) {
 					// get translation tool of post
-					\Contentsync\switch_blog( $post->blog_id );
+					Multisite_Manager::switch_blog( $post->blog_id );
 					$tool = Translation_Manager::get_translation_tool();
-					\Contentsync\restore_blog();
+					Multisite_Manager::restore_blog();
 					// compare to this
 					if ( Translation_Manager::get_translation_tool() != $tool ) {
 						switch ( $tool ) {
@@ -209,7 +210,7 @@ class Global_List_Table extends \WP_List_Table {
 				}
 				break;
 			}
-			\Contentsync\restore_blog();
+			Multisite_Manager::restore_blog();
 		}
 	}
 
@@ -1099,14 +1100,14 @@ class Global_List_Table extends \WP_List_Table {
 
 				if ( $gids_are_post_ids ) {
 					if ( is_network_admin() && $root_blog_id ) {
-						\Contentsync\switch_blog( $root_blog_id );
+						Multisite_Manager::switch_blog( $root_blog_id );
 					}
 					$result = (bool) wp_trash_post( $root_post_id );
 					if ( $result ) {
 						$post_titles[] = get_post( $root_post_id )->post_title;
 					}
 					if ( is_network_admin() && $root_blog_id ) {
-						\Contentsync\restore_blog();
+						Multisite_Manager::restore_blog();
 					}
 				} else {
 					$post = \Contentsync\get_local_post_by_gid( $gid );

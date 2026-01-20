@@ -16,6 +16,7 @@
 namespace Contentsync\Admin;
 
 use Contentsync\Translations\Translation_Manager;
+use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -1146,7 +1147,7 @@ class Cluster_Admin {
 				$cluster       = get_cluster_by_id( $cluster_id );
 				$cluster_posts = get_cluster_posts_per_blog( $cluster );
 				foreach ( $cluster_posts as $blog_id => $posts ) {
-					\Contentsync\switch_blog( $blog_id );
+					Multisite_Manager::switch_blog( $blog_id );
 					foreach ( $posts as $post ) {
 						// make post static
 						$gid = \Contentsync\get_gid( $post->ID );
@@ -1154,7 +1155,7 @@ class Cluster_Admin {
 							$result = \Contentsync\unlink_synced_root_post( $gid );
 						}
 					}
-					\Contentsync\restore_blog();
+					Multisite_Manager::restore_blog();
 				}
 
 				// delete all conditions
@@ -1431,7 +1432,7 @@ class Cluster_Admin {
 		foreach ( $blogs as $blog ) {
 			$blog_id = $blog['blog_id'];
 
-			\Contentsync\switch_blog( $blog_id );
+			Multisite_Manager::switch_blog( $blog_id );
 
 			// merge core posttypes with dynamic and greyd posttypes
 			$posttypes = array_merge( $core_posttypes );
@@ -1510,7 +1511,7 @@ class Cluster_Admin {
 				}
 			}
 
-			\Contentsync\restore_blog();
+			Multisite_Manager::restore_blog();
 		}
 
 		// debug($data);

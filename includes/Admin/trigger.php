@@ -18,6 +18,7 @@ namespace Contentsync;
 
 use Contentsync\Post_Export;
 use Contentsync\Logger;
+use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -680,9 +681,9 @@ class Trigger {
 					/**
 					 * @todo REWORK delete post from destinations
 					 */
-					\Contentsync\switch_blog( $blog_id );
+					Multisite_Manager::switch_blog( $blog_id );
 					\Contentsync\unlink_synced_post( $post_id );
-					\Contentsync\restore_blog();
+					Multisite_Manager::restore_blog();
 				}
 			}
 		} elseif ( $status === 'root' ) {

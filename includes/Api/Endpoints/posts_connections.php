@@ -15,6 +15,7 @@
 namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
+use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -82,9 +83,9 @@ class Posts_Connections extends Endpoint {
 
 		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
-			\Contentsync\switch_blog( $blog_id );
+			Multisite_Manager::switch_blog( $blog_id );
 			$connection_map = \Contentsync\get_post_connection_map( $post_id );
-			\Contentsync\restore_blog();
+			Multisite_Manager::restore_blog();
 
 			if ( $connection_map ) {
 				$message = "Post connections for post '$gid' found [$net_url]";

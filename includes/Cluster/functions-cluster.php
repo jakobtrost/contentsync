@@ -14,6 +14,8 @@
  */
 namespace Contentsync\Cluster;
 
+use Contentsync\Utils\Multisite_Manager;
+
 /**
  * Global Cluster Functions
  */
@@ -203,7 +205,7 @@ function is_post_in_cluster( $post_or_post_id, $cluster_or_cluster_id ) {
 
 		// if blog_id isset, switch to that blog
 		if ( isset( $post->blog_id ) ) {
-			switch_blog( $post->blog_id );
+			Multisite_Manager::switch_blog( $post->blog_id );
 		}
 	}
 
@@ -213,14 +215,14 @@ function is_post_in_cluster( $post_or_post_id, $cluster_or_cluster_id ) {
 		foreach ( $conditions as $condition ) {
 			if ( post_meets_cluster_content_condition( $post, $condition ) ) {
 				if ( isset( $post->blog_id ) ) {
-					restore_blog();
+					Multisite_Manager::restore_blog();
 				}
 				return true;
 			}
 		}
 	}
 	if ( isset( $post->blog_id ) ) {
-		restore_blog();
+		Multisite_Manager::restore_blog();
 	}
 	return false;
 }
@@ -280,7 +282,7 @@ function get_clusters_including_post( $post, $with_filter = null ) {
 
 	// if blog_id isset, switch to that blog
 	if ( isset( $post->blog_id ) ) {
-		switch_blog( $post->blog_id );
+		Multisite_Manager::switch_blog( $post->blog_id );
 	}
 
 	$clusters = array();
@@ -299,7 +301,7 @@ function get_clusters_including_post( $post, $with_filter = null ) {
 	}
 
 	if ( isset( $post->blog_id ) ) {
-		restore_blog();
+		Multisite_Manager::restore_blog();
 	}
 
 	return $clusters;
@@ -332,7 +334,7 @@ function get_clusters_including_posttype( $post_or_posttype ) {
 
 	// if blog_id isset, switch to that blog
 	if ( is_object( $post ) && isset( $post->blog_id ) ) {
-		switch_blog( $post->blog_id );
+		Multisite_Manager::switch_blog( $post->blog_id );
 	}
 
 	$conditions = get_cluster_content_conditions_including_posttype( $posttype );
@@ -350,7 +352,7 @@ function get_clusters_including_posttype( $post_or_posttype ) {
 	}
 
 	if ( is_object( $post ) && isset( $post->blog_id ) ) {
-		restore_blog();
+		Multisite_Manager::restore_blog();
 	}
 
 	return $clusters;
