@@ -2,8 +2,6 @@
 
 namespace Contentsync\Api;
 
-use Contentsync\Main_Helper;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }

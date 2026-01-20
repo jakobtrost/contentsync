@@ -4,7 +4,9 @@
  *
  * @link {{your-domain}}/wp-json/contentsync/v1/check_auth
  */
-namespace Contentsync\Api;
+namespace Contentsync\Api\Endpoints;
+
+use Contentsync\Api\Endpoint;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -30,7 +32,7 @@ class Check_Auth extends Endpoint {
 	 */
 	public function callback( $request ) {
 		$request_url = $request->get_header( 'Origin' );
-		$current_url = \Contentsync\Utils\get_network_url();
+		$current_url = \Contentsync\get_network_url();
 		return $this->respond( 'true', "The connection from $request_url (current site) to $current_url (remote site) is active." );
 	}
 
@@ -40,7 +42,7 @@ class Check_Auth extends Endpoint {
 	public function permission_callback( $request ) {
 		if ( $this->is_request_allowed() ) {
 			$origin = $request->get_header( 'Origin' );
-			if ( $origin && get_site_connection( $origin ) ) {
+			if ( $origin && \Contentsync\Site_Connections\get_site_connection( $origin ) ) {
 				return true;
 			} else {
 				return new \WP_Error( 'rest_not_connected', esc_html__( 'You do have the correct admin credentials, but the connection is not setup both ways.' ), array( 'status' => $this->authorization_status_code() ) );

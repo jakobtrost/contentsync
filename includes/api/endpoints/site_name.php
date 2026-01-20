@@ -4,7 +4,9 @@
  *
  * @link {{your-domain}}/wp-json/contentsync/v1/site_name
  */
-namespace Contentsync\Api;
+namespace Contentsync\Api\Endpoints;
+
+use Contentsync\Api\Endpoint;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

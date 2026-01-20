@@ -13,9 +13,9 @@
  * /connected_posts (GET, POST & DELETE)
  * /connected_posts/export
  */
-namespace Contentsync\Api;
+namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Main_Helper;
+use Contentsync\Api\Endpoint;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -106,7 +106,7 @@ class Connected_Posts extends Endpoint {
 		$gid      = isset( $request['gid'] ) ? $request['gid'] : null;
 		$origin   = $request->get_header( 'Origin' );
 
-		list( $root_blog_id, $root_post_id, $root_net_url ) = Main_Helper::explode_gid( $gid );
+		list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\explode_gid( $gid );
 
 		// something is missing
 		if ( empty( $root_post_id ) ) {
@@ -137,7 +137,7 @@ class Connected_Posts extends Endpoint {
 		$all_posts       = isset( $request['posts'] ) ? $request['posts'] : null;
 		$origin          = $request->get_header( 'Origin' );
 
-		list( $root_blog_id, $root_post_id, $root_net_url ) = Main_Helper::explode_gid( $gid );
+		list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\explode_gid( $gid );
 
 		// something is missing
 		if ( empty( $root_post_id ) || ! is_array( $connected_posts ) || ! is_array( $all_posts ) || empty( $origin ) ) {
@@ -178,8 +178,7 @@ class Connected_Posts extends Endpoint {
 					/**
 					 * We now import all the posts to the target blog.
 					 */
-					\Contentsync\post_export_enable_logs();
-					$result = Main_Helper::import_posts( $all_posts, $conflict_actions );
+					$result = \Contentsync\import_posts( $all_posts, $conflict_actions );
 
 					if ( $result ) {
 						$message .= ' - post successfully imported';
@@ -211,7 +210,7 @@ class Connected_Posts extends Endpoint {
 		$connected_posts = isset( $request['args'] ) ? $request['args'] : null;
 		$origin          = $request->get_header( 'Origin' );
 
-		list( $root_blog_id, $root_post_id, $root_net_url ) = Main_Helper::explode_gid( $gid );
+		list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\explode_gid( $gid );
 
 		// something is missing
 		if ( empty( $root_post_id ) || ! is_array( $connected_posts ) || empty( $origin ) ) {
@@ -250,7 +249,7 @@ class Connected_Posts extends Endpoint {
 		$blog_id  = isset( $request['blog_id'] ) ? $request['blog_id'] : null;
 		$origin   = $request->get_header( 'Origin' );
 
-		list( $root_blog_id, $root_post_id ) = Main_Helper::explode_gid( $gid );
+		list( $root_blog_id, $root_post_id ) = \Contentsync\explode_gid( $gid );
 
 		// something is missing
 		if ( empty( $root_post_id ) || empty( $origin ) || empty( $blog_id ) ) {
@@ -293,7 +292,7 @@ class Connected_Posts extends Endpoint {
 		$response = false;
 		$message  = "The global ID was set incorrectly (input: {$gid}).";
 
-		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $gid );
+		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $gid );
 		if ( $post_id !== null && ! empty( $net_url ) ) {
 
 			if ( is_array( $connected_posts ) && count( $connected_posts ) ) {
@@ -342,9 +341,9 @@ class Connected_Posts extends Endpoint {
 		// echo "\r\n".sprintf( "Match gid before import: %s", $gid );
 
 		$origin  = $this->origin;
-		$current = \Contentsync\Utils\get_network_url();
+		$current = \Contentsync\get_network_url();
 
-		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $gid );
+		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $gid );
 		if ( ! empty( $post_id ) && ! empty( $origin ) ) {
 
 			/**
@@ -411,7 +410,7 @@ class Connected_Posts extends Endpoint {
 	public function allow_request_from_same_origin( $request ) {
 
 		$origin  = $request->get_header( 'Origin' );
-		$current = \Contentsync\Utils\get_network_url();
+		$current = \Contentsync\get_network_url();
 
 		if ( $current == $origin ) {
 			return true;

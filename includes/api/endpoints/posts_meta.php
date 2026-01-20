@@ -9,9 +9,9 @@
  *
  * /posts/{{gid}}/meta
  */
-namespace Contentsync\Api;
+namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Main_Helper;
+use Contentsync\Api\Endpoint;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -77,7 +77,7 @@ class Posts_Meta extends Endpoint {
 		$result  = false;
 		$message = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $request['gid'] );
+		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
 
 			$meta_key = isset( $request['meta_key'] ) ? esc_attr( urldecode( $request['meta_key'] ) ) : null;

@@ -32,9 +32,9 @@
  * @see inc/distribution/classes/class-remote-destination.php
  * @see inc/distribution/classes/class-blog-destination.php
  */
-namespace Contentsync\Api;
+namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Main_Helper;
+use Contentsync\Api\Endpoint;
 use Contentsync\Logger;
 use Contentsync\Distribution_Item;
 
@@ -433,9 +433,9 @@ class Distribution_Endpoint extends Endpoint {
 	public function match_gid_before_import( $gid ) {
 
 		$origin  = $this->origin;
-		$current = \Contentsync\Utils\get_network_url();
+		$current = \Contentsync\get_network_url();
 
-		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $gid );
+		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $gid );
 
 		if ( ! empty( $post_id ) && ! empty( $origin ) ) {
 

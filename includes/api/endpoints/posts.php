@@ -12,9 +12,9 @@
  * /posts/{{gid}}/prepare
  * /posts/linked
  */
-namespace Contentsync\Api;
+namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Main_Helper;
+use Contentsync\Api\Endpoint;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -96,7 +96,7 @@ class Posts extends Endpoint {
 		$args = isset( $request['args'] ) ? $request['args'] : null;
 
 		$posts = $this->get_synced_posts_for_endpoint( $args );
-		// $posts = Main_Helper::get_all_synced_posts_from_current_network();
+		// $posts = \Contentsync\get_all_synced_posts_from_current_network();
 
 		$message = 'No synced posts found on this stage';
 		if ( $posts ) {
@@ -119,11 +119,11 @@ class Posts extends Endpoint {
 		$post    = false;
 		$message = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $request['gid'] );
+		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
 
 			$gid  = $blog_id . '-' . $post_id;
-			$post = Main_Helper::get_synced_post( $gid );
+			$post = \Contentsync\get_synced_post( $gid );
 
 			if ( $post ) {
 				$message = "Synced post '$gid' found on this site ($net_url).";
@@ -152,14 +152,14 @@ class Posts extends Endpoint {
 		$post    = false;
 		$message = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $request['gid'] );
+		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
 
 			// add filter to modify gid before export
 			add_filter( 'contentsync_export_post_meta-synced_post_id', array( $this, 'maybe_append_network_url_to_gid_on_export' ), 10, 2 );
 
 			$gid  = $blog_id . '-' . $post_id;
-			$post = Main_Helper::prepare_synced_post_for_import( $gid );
+			$post = \Contentsync\prepare_synced_post_for_import( $gid );
 
 			// remove filter
 			remove_filter( 'contentsync_export_post_meta-synced_post_id', array( $this, 'maybe_append_network_url_to_gid_on_export' ) );
@@ -185,12 +185,12 @@ class Posts extends Endpoint {
 	 */
 	public function maybe_append_network_url_to_gid_on_export( $gid, $post_id ) {
 
-		list( $_blog_id, $_post_id, $net_url ) = Main_Helper::explode_gid( $gid );
+		list( $_blog_id, $_post_id, $net_url ) = \Contentsync\explode_gid( $gid );
 		if ( $post_id === null || ! empty( $net_url ) ) {
 			return $gid;
 		}
 
-		$gid = $_blog_id . '-' . $_post_id . '-' . \Contentsync\Utils\get_network_url();
+		$gid = $_blog_id . '-' . $_post_id . '-' . \Contentsync\get_network_url();
 
 		return $gid;
 	}
@@ -244,7 +244,7 @@ class Posts extends Endpoint {
 			}
 		}
 
-		$network_url = \Contentsync\Utils\get_network_url();
+		$network_url = \Contentsync\get_network_url();
 
 		// build sql query
 		$results = array();

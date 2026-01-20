@@ -12,9 +12,9 @@
  *
  * /posts/{{gid}}/connections (GET, POST & DELETE)
  */
-namespace Contentsync\Api;
+namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Main_Helper;
+use Contentsync\Api\Endpoint;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -80,7 +80,7 @@ class Posts_Connections extends Endpoint {
 		$connection_map = false;
 		$message        = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $request['gid'] );
+		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
 			\Contentsync\switch_blog( $blog_id );
 			$connection_map = \Contentsync\get_post_connection_map( $post_id );
@@ -104,7 +104,7 @@ class Posts_Connections extends Endpoint {
 		$result  = false;
 		$message = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $_blog_id, $_post_id, $net_url ) = Main_Helper::explode_gid( $request['gid'] );
+		list( $_blog_id, $_post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
 		if ( $_post_id !== null ) {
 			$gid      = $_blog_id . '-' . $_post_id; // remove the remote url as it is this site
 			$site_url = isset( $request['site_url'] ) ? esc_attr( $request['site_url'] ) : null;
@@ -133,7 +133,7 @@ class Posts_Connections extends Endpoint {
 		$result  = false;
 		$message = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $_blog_id, $_post_id, $net_url ) = Main_Helper::explode_gid( $request['gid'] );
+		list( $_blog_id, $_post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
 		if ( $_post_id !== null ) {
 			$gid      = $_blog_id . '-' . $_post_id; // remove the remote url as it is this site
 			$site_url = isset( $request['site_url'] ) ? esc_attr( $request['site_url'] ) : null;

@@ -4,7 +4,9 @@
  *
  * @link {{your-domain}}/wp-json/contentsync/v1/add_site_connection
  */
-namespace Contentsync\Api;
+namespace Contentsync\Api\Endpoints;
+
+use Contentsync\Api\Endpoint;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -51,7 +53,7 @@ class Add_Connection extends Endpoint {
 	public function add_site_connection( $request ) {
 
 		$request_url    = $request->get_header( 'Origin' );
-		$current_url    = \Contentsync\Utils\get_network_url();
+		$current_url    = \Contentsync\get_network_url();
 		$new_connection = $request->get_param( 'connection' );
 
 		if ( ! $new_connection ) {
