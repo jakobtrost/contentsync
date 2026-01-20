@@ -91,9 +91,9 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 	$status       = $post->meta['synced_post_status'];
 	$current_blog = get_current_blog_id();
 	$blog_id      = $post->blog_id ? $post->blog_id : $current_blog;
-	$cur_net_url  = \Contentsync\Utils\get_network_url();
+	$cur_net_url  = \Contentsync\get_network_url();
 
-	list( $root_blog_id, $root_post_id, $root_net_url ) = Main_Helper::explode_gid( $gid );
+	list( $root_blog_id, $root_post_id, $root_net_url ) = explode_gid( $gid );
 	if ( $root_post_id === null ) {
 		return false;
 	}
@@ -154,7 +154,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 			$error->message = __( 'The post is not originally from this page.', 'contentsync' );
 
 			if ( $repair ) {
-				if ( $root_post = Main_Helper::get_synced_post( $gid ) ) {
+				if ( $root_post = \Contentsync\get_synced_post( $gid ) ) {
 					$new_status         = 'linked';
 					$restore_connection = true;
 				} else {
@@ -165,7 +165,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 			$error->message = __( 'The synced post ID is linked incorrectly.', 'contentsync' );
 
 			if ( $repair ) {
-				if ( $root_post = Main_Helper::get_synced_post( $gid ) ) {
+				if ( $root_post = \Contentsync\get_synced_post( $gid ) ) {
 					$delete_meta = true;
 				} else {
 					$convert_to_root = true;
@@ -241,7 +241,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 		// root comes from another blog
 		else {
 
-			$root_post = Main_Helper::get_synced_post( $gid );
+			$root_post = \Contentsync\get_synced_post( $gid );
 
 			// root post found
 			if ( $root_post ) {
@@ -521,7 +521,7 @@ function get_synced_posts_of_blog_with_errors( $blog_id = 0, $repair_posts = fal
 
 	switch_blog( $blog_id );
 
-	$posts = Main_Helper::get_synced_posts_of_blog( '', '', $query_args );
+	$posts = \Contentsync\get_synced_posts_of_blog( '', '', $query_args );
 
 	foreach ( $posts as $post ) {
 		$error = check_post_for_errors( $post, true, $repair_posts );
@@ -573,10 +573,6 @@ function convert_post_to_root( $post_id, $old_gid ) {
 		'translations'   => true,
 	);
 
-	if ( function_exists( '\Contentsync\post_export_enable_logs' ) ) {
-		\Contentsync\post_export_enable_logs( false );
-	}
-
 	if ( ! function_exists( '\Contentsync\make_post_global' ) ) {
 		return false;
 	}
@@ -591,7 +587,7 @@ function convert_post_to_root( $post_id, $old_gid ) {
 		}
 
 		switch_blog( $blog_id );
-		$post = Main_Helper::get_local_post_by_gid( $old_gid );
+		$post = \Contentsync\get_local_post_by_gid( $old_gid );
 		if ( $post ) {
 			$connection_map[ $blog_id ] = get_post_connection_map( $blog_id, $post->ID );
 			update_post_meta( $post->ID, 'synced_post_id', $gid );

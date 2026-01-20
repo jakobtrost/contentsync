@@ -12,7 +12,7 @@
 
 namespace Contentsync;
 
-use Contentsync\Main_Helper;
+use Contentsync\Posts\Transfer\Post_Export;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -32,10 +32,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function make_post_global( $post_id, $args ) {
 
-	$first_post = null;
-	$post       = Main_Helper::call_post_export_func( 'export_post', $post_id, $args );
-	$posts      = Main_Helper::call_post_export_func( 'get_all_posts' );
-	$gid        = get_current_blog_id() . '-' . strval( $post_id );
+	$first_post  = null;
+	$post_export = new Post_Export( $post_id, $args );
+	$posts       = $post_export->get_posts();
+	$gid         = get_current_blog_id() . '-' . strval( $post_id );
 
 	// loop through all the nested posts and make them global.
 	foreach ( $posts as $_post_id => $_post ) {
@@ -100,7 +100,7 @@ function make_post_global( $post_id, $args ) {
  */
 function check_synced_post_import( $gid ) {
 
-	$posts = Main_Helper::prepare_synced_post_for_import( $gid );
+	$posts = \Contentsync\prepare_synced_post_for_import( $gid );
 	if ( ! $posts ) {
 		return false;
 	}
@@ -130,11 +130,11 @@ function remove_conflict_when_same_gid( $conflicts, $all_posts ) {
 
 	foreach ( $conflicts as $post_id => $post ) {
 
-		$current_gid = Main_Helper::get_gid( $post->ID );
-		$import_gid  = Main_Helper::get_gid( $all_posts[ $post_id ] );
+		$current_gid = get_gid( $post->ID );
+		$import_gid  = get_gid( $all_posts[ $post_id ] );
 
 		// remove the conflict if it is the same synced post
-		if ( Main_Helper::get_synced_post( $current_gid ) && $current_gid === $import_gid ) {
+		if ( \Contentsync\get_synced_post( $current_gid ) && $current_gid === $import_gid ) {
 			unset( $conflicts[ $post_id ] );
 		}
 	}
@@ -156,12 +156,12 @@ add_filter( 'import_synced_post_conflicts', __NAMESPACE__ . '\remove_conflict_wh
  */
 function import_synced_post( $gid, $conflict_actions = array() ) {
 
-	$posts = Main_Helper::prepare_synced_post_for_import( $gid );
+	$posts = \Contentsync\prepare_synced_post_for_import( $gid );
 	if ( ! $posts ) {
 		return false;
 	}
 
-	do_action( 'post_export_log', "\r\n------\r\n\r\n" . 'All posts prepared. Now we insert them.' );
+	Logger::add( '========= ALL POSTS PREPARED. NOW WE INSERT THEM =========' );
 
 	$result = Main_Helper::import_posts( $posts, $conflict_actions );
 
@@ -214,9 +214,9 @@ function match_synced_posts_before_import( $conflict_actions, $all_posts ) {
 		 *
 		 * @return string $gid   The modified GID for conflict resolution.
 		 */
-		$gid = apply_filters( 'filter_gid_for_conflict_action', Main_Helper::get_gid( $post ), $post->ID, (object) $post );
+		$gid = apply_filters( 'filter_gid_for_conflict_action', get_gid( $post ), $post->ID, (object) $post );
 
-		$existing_post = Main_Helper::get_local_post_by_gid( $gid, $post->post_type );
+		$existing_post = \Contentsync\get_local_post_by_gid( $gid, $post->post_type );
 		if ( $existing_post ) {
 
 			$action = isset( $post->is_contentsync_root_post ) && $post->is_contentsync_root_post ? 'replace' : 'skip';
@@ -252,7 +252,7 @@ add_filter( 'contentsync_import_conflict_actions', __NAMESPACE__ . '\match_synce
  */
 function unlink_synced_root_post( $gid ) {
 
-	list( $blog_id, $post_id, $net_url ) = Main_Helper::explode_gid( $gid );
+	list( $blog_id, $post_id, $net_url ) = explode_gid( $gid );
 
 	// only local network posts
 	if ( ! empty( $net_url ) ) {
@@ -525,13 +525,13 @@ function delete_synced_post( $gid, $keep_root_post = false ) {
 	Logger::add( sprintf( "DELETE synced post with gid '%s'", $gid ) );
 
 	// needs to be from this site
-	list( $root_blog_id, $root_post_id, $root_net_url ) = Main_Helper::explode_gid( $gid );
+	list( $root_blog_id, $root_post_id, $root_net_url ) = explode_gid( $gid );
 	if ( $root_post_id === null || ! empty( $root_net_url ) ) {
 		return false;
 	}
 
 	// needs to be the root post
-	$synced_post = Main_Helper::get_synced_post( $gid );
+	$synced_post = \Contentsync\get_synced_post( $gid );
 	if ( ! $synced_post || $synced_post->meta['synced_post_status'] !== 'root' ) {
 		return false;
 	}

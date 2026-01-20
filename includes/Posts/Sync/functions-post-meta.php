@@ -192,12 +192,12 @@ function delete_contentsync_meta_values( $post_id ) {
  */
 function adjust_synced_post_status_after_import( $post_id, $post ) {
 
-	$gid = Main_Helper::get_gid( $post_id );
+	$gid = get_gid( $post_id );
 	if ( empty( $gid ) ) {
 		return;
 	}
 
-	list( $root_blog_id, $root_post_id, $root_net_url ) = Main_Helper::explode_gid( $gid );
+	list( $root_blog_id, $root_post_id, $root_net_url ) = explode_gid( $gid );
 	if ( $root_post_id === null ) {
 		return false;
 	}
@@ -285,3 +285,93 @@ function exclude_contentsync_metas_from_polylang_sync( $metas ) {
 // Polylang: Exclude Contentsync meta keys from being synced between translations.
 // This is a fallback in case is_protected_meta doesn't catch everything.
 add_filter( 'pll_copy_post_metas', __NAMESPACE__ . '\\exclude_contentsync_metas_from_polylang_sync', 99, 1 );
+
+
+
+/**
+ * Returns list of blacklisted meta keys that should not be exported.
+ *
+ * This function provides a list of meta keys that are automatically
+ * excluded from post exports. The list can be customized using the
+ * 'contentsync_export_blacklisted_meta' filter.
+ *
+ * @param string $context      The context of the operation (export or import). @since 2.18.0
+ * @param int    $post_id      The ID of the post being exported or imported. @since 2.18.0
+ *
+ * @return array Array of meta keys to exclude from export or import.
+ */
+function get_blacklisted_meta_for_export( $context = 'export', $post_id = 0 ) {
+	/**
+	 * Filter to customize the list of blacklisted meta keys for export or import.
+	 *
+	 * This filter allows developers to add or remove meta keys that should
+	 * be excluded from post exports or imports. It's useful for preventing sensitive
+	 * or site-specific meta data from being exported or imported.
+	 *
+	 * @filter contentsync_export_blacklisted_meta
+	 * @filter contentsync_import_blacklisted_meta @since 2.18.0
+	 *
+	 * @param array $blacklisted_meta Array of meta keys to exclude from export or import.
+	 * @param int   $post_id        The ID of the post being exported or imported.
+	 *
+	 * @return array                   Modified array of blacklisted meta keys.
+	 */
+	return apply_filters(
+		'contentsync_' . $context . '_blacklisted_meta',
+		array(
+			'_wp_attached_file',
+			'_wp_attachment_metadata',
+			'_edit_lock',
+			'_edit_last',
+			'_wp_old_slug',
+			'_wp_old_date',
+			'_wpb_vc_js_status',
+		),
+		$post_id
+	);
+}
+
+/**
+ * Check whether to skip a certain meta key and not im- or export it
+ *
+ * @param string $meta_key     The meta key being evaluated.
+ * @param mixed  $meta_value   The meta value being evaluated.
+ * @param string $context      The context of the operation (export or import). @since 2.18.0
+ * @param int    $post_id      The ID of the post being exported or imported. @since 2.18.0
+ *
+ * @return bool                Whether to skip the meta option.
+ */
+function maybe_skip_meta_option( $meta_key, $meta_value, $context = 'export', $post_id = 0 ) {
+
+	$skip = false;
+
+	// skip empty options
+	if ( $meta_value === '' ) {
+		Logger::add( "  - skipped empty meta option for '$meta_key'" );
+		$skip = true;
+	}
+	// skip oembed meta options
+	elseif ( strpos( $meta_key, '_oembed_' ) === 0 ) {
+		Logger::add( "  - skipped oembed option '$meta_key'" );
+		$skip = true;
+	}
+
+	/**
+	 * Filter to determine whether a specific meta option should be skipped during export or import.
+	 *
+	 * This filter allows developers to implement custom logic for determining
+	 * whether specific meta keys or values should be excluded from export or import.
+	 * It's useful for implementing site-specific export/import rules or business logic.
+	 *
+	 * @filter contentsync_export_maybe_skip_meta_option
+	 * @filter contentsync_import_maybe_skip_meta_option @since 2.18.0
+	 *
+	 * @param bool   $skip_meta    Whether to skip the meta option (default: false).
+	 * @param string $meta_key     The meta key being evaluated.
+	 * @param mixed  $meta_value   The meta value being evaluated.
+	 * @param int    $post_id      The ID of the post being exported or imported. @since 2.18.0
+	 *
+	 * @return bool                Whether to skip the meta option.
+	 */
+	return apply_filters( 'contentsync_' . $context . '_maybe_skip_meta_option', $skip, $meta_key, $meta_value, $post_id );
+}

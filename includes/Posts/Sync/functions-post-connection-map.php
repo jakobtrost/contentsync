@@ -61,7 +61,7 @@ function remove_post_connection_from_connection_map( $gid, $blog_id, $post_id, $
  */
 function add_or_remove_post_connection_from_connection_map( $gid, $args, $add = true, $post_site_url = '' ) {
 
-	list( $blog_id, $post_id, $site_url ) = Main_Helper::explode_gid( $gid );
+	list( $blog_id, $post_id, $site_url ) = explode_gid( $gid );
 	if ( $post_id === null ) {
 		return false;
 	}
@@ -111,7 +111,7 @@ function add_or_remove_post_connection_from_connection_map( $gid, $args, $add = 
 	// remote post
 	else {
 		// the network url is the current network, as we just imported a post here
-		$post_site_url = \Contentsync\Utils\get_network_url();
+		$post_site_url = \Contentsync\get_network_url();
 		$result        = \Contentsync\Api\update_remote_post_connection( $site_url, $gid, $args, $add, $post_site_url );
 	}
 
@@ -331,13 +331,13 @@ function get_post_links_by_gid( $gid ) {
 
 	$post_links = array();
 
-	$synced_post = Main_Helper::get_synced_post( $gid );
+	$synced_post = \Contentsync\get_synced_post( $gid );
 
 	if ( ! $synced_post ) {
 		return $post_links;
 	}
 
-	list( $root_blog_id, $root_post_id, $root_net_url ) = Main_Helper::explode_gid( $gid );
+	list( $root_blog_id, $root_post_id, $root_net_url ) = explode_gid( $gid );
 
 	// local network post
 	if ( empty( $root_net_url ) ) {
@@ -370,7 +370,7 @@ function get_network_remote_connection_map_by_gid( $gid ) {
 	foreach ( get_all_blogs() as $blog_id => $blog_args ) {
 
 		switch_blog( $blog_id );
-		$post = Main_Helper::get_local_post_by_gid( $gid );
+		$post = \Contentsync\get_local_post_by_gid( $gid );
 		if ( $post ) {
 			$connection_map[ $blog_id ] = create_post_connection_map_array( $blog_id, $post->ID );
 		}
@@ -378,7 +378,7 @@ function get_network_remote_connection_map_by_gid( $gid ) {
 	}
 
 	return array(
-		\Contentsync\Utils\get_network_url() => $connection_map,
+		\Contentsync\get_network_url() => $connection_map,
 	);
 }
 
@@ -406,9 +406,9 @@ function check_connection_map( $post_id ) {
 		);
 	}
 
-	$gid            = Main_Helper::get_gid( $post_id );
+	$gid            = get_gid( $post_id );
 	$connection_map = get_post_connection_map( $post_id );
-	$cur_net_url    = \Contentsync\Utils\get_network_url();
+	$cur_net_url    = \Contentsync\get_network_url();
 	$return         = array();
 
 	$updated_post_connection_map = array();
@@ -467,7 +467,7 @@ function check_connection_map( $post_id ) {
 				 */
 				// switch_to_blog( $_blog_id );
 				// $_post_id = $_post_con['post_id'];
-				// if ( ! get_post( $_post_id ) || Main_Helper::get_gid( $_post_id ) != $gid ) {
+				// if ( ! get_post( $_post_id ) || get_gid( $_post_id ) != $gid ) {
 				// remove_post_connection_from_connection_map( $gid, $_blog_id, $_post_id );
 				// $return[] = sprintf(
 				// __( "An orphaned post connection (%s) was deleted.", 'contentsync' ),
@@ -528,7 +528,7 @@ function check_connection_map( $post_id ) {
 	// if ( is_array( $other_blogs ) && count( $other_blogs ) ) {
 	// foreach ( $other_blogs as $_blog_id ) {
 	// switch_to_blog( $_blog_id );
-	// $_post = Main_Helper::get_local_post_by_gid( $gid );
+	// $_post = \Contentsync\get_local_post_by_gid( $gid );
 	// if ( $_post ) {
 	// $_post_id = $_post->ID;
 	// $status   = get_post_meta( $_post_id, 'synced_post_status', true );
@@ -614,7 +614,7 @@ function get_all_local_linked_posts( $gid ) {
 
 	list( $root_blog_id, $root_post_id, $root_site_url ) = explode_gid( $gid );
 
-	$network_url = \Contentsync\Utils\get_network_url();
+	$network_url = \Contentsync\get_network_url();
 
 	// build sql query
 	$results = array();
