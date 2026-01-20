@@ -97,7 +97,7 @@ function create_post_review( $post_id, $post_before = null ) {
 	}
 
 	if ( $send_mail ) {
-		\contentsync\mails\send_review_mail( $review_id, $state, 'reviewers' );
+		Mails\send_review_mail( $review_id, $state, 'reviewers' );
 	}
 }
 
@@ -167,7 +167,7 @@ function approve_post_review( $review_id, $post_id = null ) {
 	);
 	$new_message->save();
 
-	\contentsync\mails\send_review_mail( $review_id, 'approved', 'editor' );
+	Mails\send_review_mail( $review_id, 'approved', 'editor' );
 
 	return true;
 }
@@ -209,7 +209,7 @@ function deny_post_review( $review_id, $post_id = null, $message_content = '' ) 
 
 	$result = set_post_review_state( $review_id, 'denied' );
 
-	\contentsync\mails\send_review_mail( $review_id, 'denied', 'editor' );
+	Mails\send_review_mail( $review_id, 'denied', 'editor' );
 
 	return $result;
 }
@@ -274,7 +274,7 @@ function revert_post_review( $review_id, $post_id = null, $message_content = '' 
 		$result = \Contentsync\distribute_single_post( $post_id, $destination_ids );
 	}
 
-	\contentsync\mails\send_review_mail( $review_id, 'reverted', 'editor' );
+	Mails\send_review_mail( $review_id, 'reverted', 'editor' );
 
 	$result = set_post_review_state( $review_id, 'reverted' );
 

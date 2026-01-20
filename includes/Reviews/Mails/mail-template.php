@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Mails;
+namespace Contentsync\Reviews\Mails;
 
 /**
  * Email template HTML structure.

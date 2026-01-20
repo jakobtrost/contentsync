@@ -15,7 +15,7 @@
  * @since 2.17.0
  */
 
-namespace Contentsync\Mails;
+namespace Contentsync\Reviews\Mails;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -240,7 +240,7 @@ function create_mail_template( $title, $body, $footer = null ) {
 	}
 
 	require_once __DIR__ . '/templates/mail-template.php';
-	return Templates\get_mail_template( $title, $body, $footer );
+	return get_mail_template( $title, $body, $footer );
 }
 
 /**
