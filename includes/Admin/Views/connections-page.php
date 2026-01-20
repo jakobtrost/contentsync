@@ -70,7 +70,7 @@ class Connections_Page {
 
 		// connection declined -> add error
 		if ( isset( $_GET['success'] ) && $_GET['success'] === 'false' ) {
-			\Contentsync\Admin\render_admin_notice( __( 'The connection was not approved.', 'contentsync_hub' ), 'error' );
+			\Contentsync\Admin\Utils\render_admin_notice( __( 'The connection was not approved.', 'contentsync_hub' ), 'error' );
 		}
 
 		// display the table
@@ -82,7 +82,7 @@ class Connections_Page {
 		<form method='post' class='add_site_connection'>
 			<input type='hidden' name='_nonce' value='" . wp_create_nonce( \Contentsync\Posts\Sync\get_site_connections_option_name() ) . "' />
 
-			" . ( is_ssl() ? '' : \Contentsync\Admin\make_admin_info_box(
+			" . ( is_ssl() ? '' : \Contentsync\Admin\Utils\make_admin_info_box(
 				array(
 					'style' => 'warning',
 					'above' => __( 'Missing SSL certificate', 'contentsync_hub' ),
@@ -364,7 +364,7 @@ class Connections_Page {
 	public function display_errors() {
 		if ( count( self::get_errors() ) ) {
 			foreach ( self::get_errors() as $error ) {
-				\Contentsync\Admin\render_admin_notice( $error, 'error' );
+				\Contentsync\Admin\Utils\render_admin_notice( $error, 'error' );
 			}
 		}
 	}

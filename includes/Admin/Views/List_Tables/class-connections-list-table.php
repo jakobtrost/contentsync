@@ -154,7 +154,7 @@ class Connections_List_Table extends \WP_List_Table {
 			case 'active':
 				$unused = isset( $item['contents'] ) && $item['contents'] === false && isset( $item['search'] ) && $item['search'] === false;
 				if ( $unused ) {
-					return \Contentsync\Admin\make_admin_info_box(
+					return \Contentsync\Admin\Utils\make_admin_info_box(
 						array(
 							'style' => '',
 							'text'  => __( 'Connection not used', 'contentsync_hub' ),
@@ -162,7 +162,7 @@ class Connections_List_Table extends \WP_List_Table {
 					);
 				} else {
 					$active = isset( $item['active'] ) ? (bool) $item['active'] : false;
-					return \Contentsync\Admin\make_admin_info_box(
+					return \Contentsync\Admin\Utils\make_admin_info_box(
 						array(
 							'style' => $active ? 'green' : 'red',
 							'text'  => $active ? __( 'Connection active', 'contentsync_hub' ) : __( 'Connection inactive', 'contentsync_hub' ),
@@ -228,7 +228,7 @@ class Connections_List_Table extends \WP_List_Table {
 			$deleted         = \Contentsync\Posts\Sync\delete_site_connection( $delete_site_url );
 			// successfull
 			if ( $deleted ) {
-				\Contentsync\Admin\render_admin_notice(
+				\Contentsync\Admin\Utils\render_admin_notice(
 					sprintf(
 						__( 'The connection to the %s page was successfully deleted.', 'contentsync_hub' ),
 						'<strong>' . $delete_site_url . '</strong>'
@@ -238,7 +238,7 @@ class Connections_List_Table extends \WP_List_Table {
 			}
 			// failed
 			elseif ( $deleted === false ) {
-				\Contentsync\Admin\render_admin_notice(
+				\Contentsync\Admin\Utils\render_admin_notice(
 					sprintf(
 						__( "Errors occurred while deleting the connection to the '%s' page.", 'contentsync_hub' ),
 						'<strong>' . $delete_site_url . '</strong>'

@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Admin;
+namespace Contentsync\Admin\Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -130,7 +130,7 @@ class Trigger {
 
 		// abort if the current user is not allowed to edit synced posts
 		if ( ! empty( $contentsync_status ) ) {
-			$current_user_can_edit = \Contentsync\Admin\current_user_can_edit_synced_posts( $contentsync_status );
+			$current_user_can_edit = \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $contentsync_status );
 			if ( ! $current_user_can_edit ) {
 				wp_die(
 					__( 'You are not allowed to edit synced posts.', 'global-contents' ),
@@ -143,11 +143,11 @@ class Trigger {
 		if ( ! empty( $_POST ) && is_array( $_POST ) ) {
 
 			if ( isset( $_POST['editable_contentsync_export_options'] ) ) {
-				\Contentsync\Posts\Sync\update_contentsync_post_export_options( $post_id, $_POST['editable_contentsync_export_options'] );
+				\Contentsync\Admin\Sync\update_contentsync_post_export_options( $post_id, $_POST['editable_contentsync_export_options'] );
 			}
 
 			if ( isset( $_POST['contentsync_canonical_url'] ) ) {
-				\Contentsync\Posts\Sync\update_contentsync_post_canonical_url( $post_id, $_POST['contentsync_canonical_url'] );
+				\Contentsync\Admin\Sync\update_contentsync_post_canonical_url( $post_id, $_POST['contentsync_canonical_url'] );
 			}
 		}
 
@@ -619,7 +619,7 @@ class Trigger {
 			/**
 			 * Check if the current user can trash synced posts.
 			 */
-			$current_user_can_trash = \Contentsync\Admin\current_user_can_edit_synced_posts( $status );
+			$current_user_can_trash = \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status );
 			if ( ! $current_user_can_trash ) {
 				wp_die(
 					__( 'You are not allowed to trash synced posts.', 'global-contents' ),

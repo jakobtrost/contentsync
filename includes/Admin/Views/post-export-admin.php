@@ -154,7 +154,7 @@ class Post_Export_Admin {
 
 		// add notices
 		if ( $screen->id === 'edit-page' ) {
-			$export_form .= \Contentsync\Admin\make_admin_info_box(
+			$export_form .= \Contentsync\Admin\Utils\make_admin_info_box(
 				array(
 					'text'  => __( 'Posts in query loops are not included in the import. Posts and Post Types must be exported separately.', 'contentsync_hub' ),
 					'style' => 'info',
@@ -291,7 +291,7 @@ class Post_Export_Admin {
 			$mode      = $transient[0];
 			$msg       = $transient[1];
 			// this is my last resort
-			\Contentsync\Admin\render_admin_notice( $msg, $mode );
+			\Contentsync\Admin\Utils\render_admin_notice( $msg, $mode );
 
 			// delete transient
 			delete_transient( 'contentsync_transient_notice' );

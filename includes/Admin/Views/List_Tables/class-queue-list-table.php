@@ -441,7 +441,7 @@ class Queue_List_Table extends \WP_List_Table {
 		switch ( $column_name ) {
 
 			case 'status':
-				echo \Contentsync\Admin\make_admin_icon_status_box( $item->status );
+				echo \Contentsync\Admin\Utils\make_admin_icon_status_box( $item->status );
 
 				if ( $item->status === 'failed' ) {
 
@@ -463,7 +463,7 @@ class Queue_List_Table extends \WP_List_Table {
 							$message = $error;
 						}
 						if ( ! empty( $message ) ) {
-							echo '&nbsp;' . \Contentsync\Admin\make_admin_info_popup( $message );
+							echo '&nbsp;' . \Contentsync\Admin\Utils\make_admin_info_popup( $message );
 						}
 					}
 				}
@@ -487,7 +487,7 @@ class Queue_List_Table extends \WP_List_Table {
 					$color = 'red';
 					$text  = __( 'Delete', 'contentsync' );
 				}
-				echo \Contentsync\Admin\make_admin_icon_status_box( $color, $text, false );
+				echo \Contentsync\Admin\Utils\make_admin_icon_status_box( $color, $text, false );
 				break;
 
 			case 'references':
@@ -508,7 +508,7 @@ class Queue_List_Table extends \WP_List_Table {
 						$post_with_escaped_content->posts[ $idx ]->post_content = esc_html( $post->post_content );
 					}
 				}
-				echo \Contentsync\Admin\make_admin_info_dialog( '<pre>' . print_r( $post_with_escaped_content, true ) . '</pre>' );
+				echo \Contentsync\Admin\Utils\make_admin_info_dialog( '<pre>' . print_r( $post_with_escaped_content, true ) . '</pre>' );
 				break;
 
 			case 'time':
@@ -532,9 +532,9 @@ class Queue_List_Table extends \WP_List_Table {
 			$item_id = intval( $_GET['run_now'] );
 			$result  = \Contentsync\Distribution\distribute_item( $item_id );
 			if ( $result !== false ) {
-				$this->render_admin_notice( __( 'Distribution started successfully.', 'contentsync' ), 'success' );
+				\Contentsync\Admin\Utils\render_admin_notice( __( 'Distribution started successfully.', 'contentsync' ), 'success' );
 			} else {
-				$this->render_admin_notice( __( 'Failed to start distribution.', 'contentsync' ), 'error' );
+				\Contentsync\Admin\Utils\render_admin_notice( __( 'Failed to start distribution.', 'contentsync' ), 'error' );
 			}
 		}
 
@@ -543,9 +543,9 @@ class Queue_List_Table extends \WP_List_Table {
 			$item_id = intval( $_GET['reschedule'] );
 			$result  = \Contentsync\Distribution\schedule_distribution_item_by_id( $item_id );
 			if ( ! is_wp_error( $result ) ) {
-				$this->render_admin_notice( __( 'Distribution rescheduled successfully.', 'contentsync' ), 'success' );
+				\Contentsync\Admin\Utils\render_admin_notice( __( 'Distribution rescheduled successfully.', 'contentsync' ), 'success' );
 			} else {
-				$this->render_admin_notice( sprintf( __( 'Failed to reschedule distribution: %s', 'contentsync' ), $result->get_error_message() ), 'error' );
+				\Contentsync\Admin\Utils\render_admin_notice( sprintf( __( 'Failed to reschedule distribution: %s', 'contentsync' ), $result->get_error_message() ), 'error' );
 			}
 		}
 
@@ -554,9 +554,9 @@ class Queue_List_Table extends \WP_List_Table {
 			$item_id = intval( $_GET['delete_queue'] );
 			$item    = \Contentsync\Distribution\get_distribution_item( $item_id );
 			if ( $item && $item->delete() ) {
-				$this->render_admin_notice( __( 'Distribution deleted successfully.', 'contentsync' ), 'success' );
+				\Contentsync\Admin\Utils\render_admin_notice( __( 'Distribution deleted successfully.', 'contentsync' ), 'success' );
 			} else {
-				$this->render_admin_notice( __( 'Failed to delete distribution.', 'contentsync' ), 'error' );
+				\Contentsync\Admin\Utils\render_admin_notice( __( 'Failed to delete distribution.', 'contentsync' ), 'error' );
 			}
 		}
 
@@ -582,7 +582,7 @@ class Queue_List_Table extends \WP_List_Table {
 				$message      = sprintf( __( 'Deleted %1$d queue items. Failed to delete %2$d items.', 'contentsync' ), $deleted_count, $failed_count );
 				$message_type = 'warning';
 			}
-			$this->render_admin_notice( $message, $message_type );
+			\Contentsync\Admin\Utils\render_admin_notice( $message, $message_type );
 
 		}
 	}
@@ -757,25 +757,7 @@ class Queue_List_Table extends \WP_List_Table {
 		}
 
 		// display the admin notice
-		$this->render_admin_notice( $content . $notice_content, $notice_class );
-	}
-
-	/**
-	 * Show WordPress style notice in top of page.
-	 *
-	 * @param string $msg   The message to show.
-	 * @param string $mode  Style of the notice (error, warning, success, info).
-	 * @param bool   $list    Add to hub msg list (default: false).
-	 */
-	public static function render_admin_notice( $msg, $mode = 'info', $list = false ) {
-		if ( empty( $msg ) ) {
-			return;
-		}
-		if ( $list ) {
-			echo "<p class='hub_msg msg_list {$mode}'>{$msg}</p>";
-		} else {
-			echo "<div class='notice notice-{$mode} is-dismissible'><p>{$msg}</p></div>";
-		}
+		\Contentsync\Admin\Utils\render_admin_notice( $content . $notice_content, $notice_class );
 	}
 
 	public function get_remote_blog( $connection_slug, $blog_id ) {

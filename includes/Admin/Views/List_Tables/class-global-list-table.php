@@ -722,15 +722,15 @@ class Global_List_Table extends \WP_List_Table {
 			case 'relationship':
 				if ( $item->error ) {
 					if ( \Contentsync\Admin\is_error_repaired( $item->error ) ) {
-						return \Contentsync\Admin\make_admin_icon_status_box( 'info', __( 'Error fixed', 'contentsync' ) );
+						return \Contentsync\Admin\Utils\make_admin_icon_status_box( 'info', __( 'Error fixed', 'contentsync' ) );
 					} else {
-						return \Contentsync\Admin\make_admin_icon_status_box( 'error', __( 'Error', 'contentsync' ) );
+						return \Contentsync\Admin\Utils\make_admin_icon_status_box( 'error', __( 'Error', 'contentsync' ) );
 					}
 				} elseif ( $item->relationship === 'unused' ) {
 					return __( 'Not imported', 'contentsync' );
 				} else {
 					$text = $item->relationship == 'export' ? __( 'Exported', 'contentsync' ) : __( 'Imported', 'contentsync' );
-					return \Contentsync\Admin\make_admin_icon_status_box( $item->relationship, $text );
+					return \Contentsync\Admin\Utils\make_admin_icon_status_box( $item->relationship, $text );
 				}
 				break;
 
@@ -1224,7 +1224,7 @@ class Global_List_Table extends \WP_List_Table {
 		}
 
 		// display the admin notice
-		\Contentsync\Admin\render_admin_notice( $content . $notice_content, $notice_class );
+		\Contentsync\Admin\Utils\render_admin_notice( $content . $notice_content, $notice_class );
 	}
 
 

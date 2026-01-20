@@ -302,7 +302,7 @@ class Admin {
 			$notice = 'error';
 			$icon   = 'warning color_red';
 			$text   = get_error_message( self::$error );
-			if ( \Contentsync\Admin\current_user_can_edit_synced_posts() ) {
+			if ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts() ) {
 				$buttons = array(
 					array(
 						'label'   => __( 'Repair', 'contentsync' ),
@@ -322,7 +322,7 @@ class Admin {
 					__( 'This post is synced from the site %s', 'contentsync' ),
 					'<strong>' . $post_links['nice'] . '</strong>'
 				);
-				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( 'linked' ) ) {
+				if ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( 'linked' ) ) {
 					$buttons = array(
 						array(
 							'label'   => __( 'Edit the original post', 'contentsync' ),
@@ -499,7 +499,7 @@ class Admin {
 				$text   = '<p class="heading"><strong>' . __( 'Global Source Post', 'contentsync' ) . '</strong>' . $status_pill . '</p>';
 				$text  .= '<p>' . $status_text . '</p>';
 
-				if ( ! \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
+				if ( ! \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status ) ) {
 					$text .= '<p>' . __( 'You are not allowed to edit this synced post.', 'contentsync' ) . '</p>';
 				}
 
@@ -664,7 +664,7 @@ class Admin {
 		if ( empty( $status ) || empty( $gid ) ) {
 
 			// make global
-			if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
+			if ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status ) ) {
 				$return .= '<p>' . __( 'Do you want this post to be available throughout all connected sites?', 'contentsync' ) . '</p>' .
 					'<span class="button" onclick="contentsync.exportPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' .
 						__( 'Convert to global content', 'contentsync' ) .
@@ -699,7 +699,7 @@ class Admin {
 			'</div>';
 
 			// add warning for contentsync_export (shown via JS)
-			self::$overlay_warnings['contentsync_export'] = '<div class="export_warning_similar_posts hidden" style="margin:1em 0 -2em;">' . make_admin_info_box(
+			self::$overlay_warnings['contentsync_export'] = '<div class="export_warning_similar_posts hidden" style="margin:1em 0 -2em;">' . \Contentsync\Admin\Utils\make_admin_info_box(
 				array(
 					'text'  => __( 'Similar content is already available globally. Are you sure you want to make this content global additionally?', 'contentsync' ),
 					'style' => 'orange',
@@ -726,8 +726,8 @@ class Admin {
 			 * Error post
 			 */
 			if ( ! is_error_repaired( self::$error ) ) {
-				$return .= make_admin_icon_status_box( 'error', get_error_message( self::$error ) );
-				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
+				$return .= \Contentsync\Admin\Utils\make_admin_icon_status_box( 'error', get_error_message( self::$error ) );
+				if ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status ) ) {
 					// repair button
 					$return                  .= '<br><br><span class="button" onclick="contentsync.repairPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' . __( 'Repair', 'contentsync' ) . '</span>';
 					self::$overlay_contents[] = 'contentsync_repair';
@@ -753,12 +753,12 @@ class Admin {
 				// debug( $connection_map, true );
 
 				// render status
-				$return .= make_admin_icon_status_box( $status, __( 'Root post', 'contentsync' ) );
+				$return .= \Contentsync\Admin\Utils\make_admin_icon_status_box( $status, __( 'Root post', 'contentsync' ) );
 
 				/**
 				 * @since 1.7 'contentsync_export_options' can now be edited.
 				 */
-				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
+				if ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status ) ) {
 
 					$options          = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
 					$editable_options = self::get_contentsync_export_options_for_post( $post_id );
@@ -775,7 +775,7 @@ class Admin {
 							'<label><input type="checkbox" name="editable_contentsync_export_options[' . $option['name'] . ']" ' . $checked . ' />' . $option['title'] . '</label><br>';
 					}
 					if ( is_array( $connection_map ) && count( $connection_map ) > 0 ) {
-						$return .= make_admin_info_box(
+						$return .= \Contentsync\Admin\Utils\make_admin_info_box(
 							array(
 								'text'  => __( 'Subsequently changing the options has an impact on all imported content and can lead to unforeseen behavior, especially in combination with translations.', 'contentsync' ),
 								'style' => 'warning',
@@ -798,7 +798,7 @@ class Admin {
 
 				// subscribed posttype info
 				if ( isset( $options['whole_posttype'] ) && $options['whole_posttype'] && get_post_type( $post_id ) === 'tp_posttypes' ) {
-					$return .= make_admin_info_box(
+					$return .= \Contentsync\Admin\Utils\make_admin_info_box(
 						array(
 							'text'  => __( 'This post type including posts was provided for all connected sites. All posts are synchronized permanently.', 'contentsync' ),
 							'style' => 'info',
@@ -923,7 +923,7 @@ class Admin {
 					}
 				}
 
-				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
+				if ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status ) ) {
 					// unexport
 					$return .= '<div class="contentsync-gray-box">' .
 						'<p>' . __( 'No longer make this post available globally?', 'contentsync' ) . '</p>' .
@@ -944,12 +944,12 @@ class Admin {
 				$post_links = \Contentsync\Posts\Sync\get_post_links_by_gid( $gid );
 
 				// status
-				$return .= make_admin_icon_status_box( $status, __( 'Linked post', 'contentsync' ) );
+				$return .= \Contentsync\Admin\Utils\make_admin_icon_status_box( $status, __( 'Linked post', 'contentsync' ) );
 
 				// options
 				$options = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
 				if ( $options['whole_posttype'] && get_post_type( $post_id ) === 'tp_posttypes' ) {
-					$return .= make_admin_info_box(
+					$return .= \Contentsync\Admin\Utils\make_admin_info_box(
 						array(
 							'text'  => __( 'This post type including posts was provided for all connected sites. All posts are synchronized permanently.', 'contentsync' ),
 							'style' => 'info',
@@ -969,7 +969,7 @@ class Admin {
 						'<code style="word-break: break-word;">' . $contentsync_canonical_url . '</code>'
 					) . '</p>';
 				}
-				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
+				if ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status ) ) {
 					$return .= '<a href="' . $post_links['edit'] . '" target="_blank">' . __( 'Go to the original post', 'contentsync' ) . '</a>';
 
 					// unlink
@@ -986,7 +986,7 @@ class Admin {
 
 			// display fix info
 			if ( self::$error && is_error_repaired( self::$error ) ) {
-				$return .= make_admin_icon_status_box( 'info', get_error_repaired_log( self::$error ) );
+				$return .= \Contentsync\Admin\Utils\make_admin_icon_status_box( 'info', get_error_repaired_log( self::$error ) );
 			}
 		}
 
@@ -1022,7 +1022,7 @@ class Admin {
 			$classes .= ' contentsync-locked';
 		}
 		// add locked class if user cannot edit synced posts
-		elseif ( ! empty( $status ) && ! \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
+		elseif ( ! empty( $status ) && ! \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status ) ) {
 			$classes .= ' contentsync-locked';
 		}
 
@@ -1086,7 +1086,7 @@ class Admin {
 			unset( $actions['inline hide-if-no-js'] );
 		}
 
-		if ( ! empty( $status ) && ! \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
+		if ( ! empty( $status ) && ! \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status ) ) {
 			unset( $actions['trash'] );
 		}
 
@@ -1140,7 +1140,7 @@ class Admin {
 		unset( $columns['date'] );
 
 		// register custom column
-		$columns['contentsync_status'] = make_dashicon( 'admin-site-alt' );
+		$columns['contentsync_status'] = \Contentsync\Admin\Utils\make_dashicon( 'admin-site-alt' );
 
 		// re-insert date column after our column
 		$columns['date'] = esc_html__( 'Date' );
@@ -1169,8 +1169,8 @@ class Admin {
 			if ( ! empty( $status ) ) {
 				// don't check for errors on overview pages, as it costs performance with remote posts...
 				// $status = get_post_error( $post_id ) ? 'error' : $status;
-				echo make_admin_icon_status_box( $status );
-			} elseif ( \Contentsync\Admin\current_user_can_edit_synced_posts( 'root' ) ) {
+				echo \Contentsync\Admin\Utils\make_admin_icon_status_box( $status );
+			} elseif ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( 'root' ) ) {
 				// if the status is empty, the post is not a synced post and therefore we will render a button to make it global
 
 				self::$overlay_contents = array_merge(
@@ -1195,7 +1195,7 @@ class Admin {
 	}
 
 	public function bulk_action_make_global( $bulk_actions ) {
-		if ( \Contentsync\Admin\current_user_can_edit_synced_posts( 'root' ) ) {
+		if ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( 'root' ) ) {
 			$bulk_actions['contentsync_make_posts_global'] = __( 'Content Sync: Make posts global', 'contentsync' );
 		}
 		return $bulk_actions;
@@ -1546,7 +1546,7 @@ class Admin {
 						__( 'The global content is permanently deleted on all pages. If you want to make the posts static instead, select %s.', 'contentsync' ),
 						'<strong>' . __( 'Unlink', 'contentsync' ) . '</strong>'
 					),
-					'content'      => make_admin_info_box(
+					'content'      => \Contentsync\Admin\Utils\make_admin_info_box(
 						array(
 							'text'  => __( 'This action cannot be undone.', 'contentsync' ),
 							'style' => 'red',

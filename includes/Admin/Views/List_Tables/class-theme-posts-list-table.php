@@ -129,7 +129,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 
 		// debug( $items );
 
-		// debug( \Contentsync\Admin\Export\Post_Export_Manager::handle_admin_ajax_post_export_bulk_action( 'localhost', 'contentsync_export', array_map( function( $item ) {
+		// debug( \Contentsync\Admin\Export\Post_Export_Manager::handle_post_export_bulk_action( 'localhost', 'contentsync_export', array_map( function( $item ) {
 		// return $item->ID;
 		// }, $items ) ) );
 
@@ -380,13 +380,13 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	public function column_title( $post ) {
 
 		$edit_post_link  = \Contentsync\Utils\get_edit_post_link( $post );
-		$trash_post_link = \Contentsync\Admin\get_delete_post_link( $post );
+		$trash_post_link = \Contentsync\Admin\Utils\get_delete_post_link( $post );
 
 		$is_trash    = ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' );
 		$row_actions = array();
 		if ( $is_trash ) {
 			// Restore
-			$restore_link           = \Contentsync\Admin\get_untrash_post_link( $post );
+			$restore_link           = \Contentsync\Admin\Utils\get_untrash_post_link( $post );
 			$row_actions['restore'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
 				$restore_link,
@@ -394,7 +394,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				__( 'Restore', 'contentsync_hub' )
 			);
 			// Delete Permanently
-			$delete_link           = \Contentsync\Admin\get_permanent_delete_post_link( $post );
+			$delete_link           = \Contentsync\Admin\Utils\get_permanent_delete_post_link( $post );
 			$row_actions['delete'] = sprintf(
 				'<a href="%s" aria-label="%s" onclick="return confirm(\'Are you sure you want to delete this item permanently?\');">%s</a>',
 				$delete_link,
@@ -501,7 +501,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				'<strong><span class="row-title">%s</span>%s&nbsp;%s</strong>',
 				$post->post_title,
 				$post_status,
-				\Contentsync\Admin\make_admin_info_popup( $error, 'right' )
+				\Contentsync\Admin\Utils\make_admin_info_popup( $error, 'right' )
 			);
 		}
 
@@ -672,12 +672,12 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				if ( $post ) {
 					$result = wp_delete_post( $post_id, true );
 					if ( $result ) {
-						\Contentsync\Admin\render_admin_notice(
+						\Contentsync\Admin\Utils\render_admin_notice(
 							sprintf( __( 'The post "%s" has been permanently deleted.', 'contentsync_hub' ), $post->post_title ),
 							'success'
 						);
 					} else {
-						\Contentsync\Admin\render_admin_notice( __( 'Error occurred when deleting the post permanently.', 'contentsync_hub' ), 'error' );
+						\Contentsync\Admin\Utils\render_admin_notice( __( 'Error occurred when deleting the post permanently.', 'contentsync_hub' ), 'error' );
 					}
 				}
 				return;
@@ -791,7 +791,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				break;
 
 			case 'export':
-				$zip_uri = \Contentsync\Admin\Export\Post_Export_Manager::handle_admin_ajax_post_export_bulk_action( '', 'contentsync_export', $post_ids );
+				$zip_uri = \Contentsync\Admin\Export\Post_Export_Manager::handle_post_export_bulk_action( '', 'contentsync_export', $post_ids );
 
 				if ( empty( $zip_uri ) ) {
 					$result = false;
@@ -856,7 +856,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		}
 
 		// display the admin notice
-		\Contentsync\Admin\render_admin_notice( $content . $notice_content, $notice_class );
+		\Contentsync\Admin\Utils\render_admin_notice( $content . $notice_content, $notice_class );
 	}
 
 

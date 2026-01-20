@@ -322,7 +322,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 			$content = sprintf(
 				'<strong><span class="row-title">%s</span> %s</strong>',
 				$title,
-				\Contentsync\Admin\make_admin_info_popup( $msg, 'right' )
+				\Contentsync\Admin\Utils\make_admin_info_popup( $msg, 'right' )
 			);
 		}
 
@@ -356,11 +356,11 @@ class Post_Review_List_Table extends \WP_List_Table {
 				if ( $post->state != 'approved' ) {
 					$reviewer_message_content = $reviewer_message->get_content( true );
 					if ( empty( $reviewer_message_content ) ) {
-						$info .= \Contentsync\Admin\make_admin_info_popup(
+						$info .= \Contentsync\Admin\Utils\make_admin_info_popup(
 							"<div class='log_title'>" . sprintf( __( 'The reviewer (%s) left no message.', 'contentsync' ), $reviewer ) . '</div>'
 						);
 					} else {
-						$info .= \Contentsync\Admin\make_admin_info_popup(
+						$info .= \Contentsync\Admin\Utils\make_admin_info_popup(
 							"<div class='log_title'>" . sprintf( __( 'The reviewer (%s) left the following message:', 'contentsync' ), $reviewer ) . '</div>' .
 							"<div class='log_items'><b>" . $reviewer_message_content . '</b></div>'
 						);
@@ -416,7 +416,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 			$color = 'red';
 			$text  = __( 'Reverted', 'contentsync' );
 		}
-		return \Contentsync\Admin\make_admin_icon_status_box( $color, $text, false );
+		return \Contentsync\Admin\Utils\make_admin_icon_status_box( $color, $text, false );
 	}
 
 	/**
@@ -603,7 +603,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		}
 
 		// display the admin notice
-		$this->render_admin_notice( $content . $notice_content, $notice_class );
+		\Contentsync\Admin\Utils\render_admin_notice( $content . $notice_content, $notice_class );
 	}
 
 	/**
@@ -635,24 +635,6 @@ class Post_Review_List_Table extends \WP_List_Table {
 		$root_post_url = get_bloginfo( 'url' );
 		Multisite_Manager::restore_blog();
 		return $root_post_url;
-	}
-
-	/**
-	 * Show WordPress style notice in top of page.
-	 *
-	 * @param string $msg   The message to show.
-	 * @param string $mode  Style of the notice (error, warning, success, info).
-	 * @param bool   $list    Add to hub msg list (default: false).
-	 */
-	public static function render_admin_notice( $msg, $mode = 'info', $list = false ) {
-		if ( empty( $msg ) ) {
-			return;
-		}
-		if ( $list ) {
-			echo "<p class='hub_msg msg_list {$mode}'>{$msg}</p>";
-		} else {
-			echo "<div class='notice notice-{$mode} is-dismissible'><p>{$msg}</p></div>";
-		}
 	}
 
 
