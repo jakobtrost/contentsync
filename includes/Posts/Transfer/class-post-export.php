@@ -161,7 +161,6 @@ class Post_Export extends Post_Transfer {
 	 * @return array The default arguments.
 	 */
 	private function get_default_arguments() {
-
 		return apply_filters(
 			'contentsync_export_default_arguments',
 			array(
@@ -271,7 +270,7 @@ class Post_Export extends Post_Transfer {
 
 		// set monthly folder
 		$folder = date( 'y-m' );
-		$path   = File_Handler::get_export_file_path( $folder );
+		$path   = get_export_file_path( $folder );
 
 		// write the temporary posts.json file
 		$json_name = 'posts.json';

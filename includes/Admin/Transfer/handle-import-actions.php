@@ -19,7 +19,6 @@ namespace Contentsync\Admin\Transfer;
 
 use WP_Error;
 use Contentsync\Translations\Translation_Manager;
-use Contentsync\Posts\Transfer\File_Handler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -84,7 +83,7 @@ public function check_import( $data ) {
 	Logger::add( '  - file is valid ZIP.' );
 
 	// create tmp zip
-	$new_file = File_Handler::get_export_file_path( 'tmp' ) . $filename;
+	$new_file = get_export_file_path( 'tmp' ) . $filename;
 	$result   = move_uploaded_file( $filepath, $new_file );
 	Logger::add( sprintf( '  - temporary file "%s" created.', $new_file ) );
 
@@ -129,7 +128,7 @@ public function handle_import( $data ) {
 	}
 
 	// get post data
-	$zip_file  = File_Handler::get_export_file_path( 'tmp' ) . $filename;
+	$zip_file  = get_export_file_path( 'tmp' ) . $filename;
 	$post_data = self::get_zip_posts_file_contents( $zip_file );
 
 	// error
@@ -1815,7 +1814,7 @@ public static function get_zip_media_file( $filepath, $medianame ) {
  * usually called after a successfull import
  */
 public static function delete_tmp_files() {
-	$path = File_Handler::get_export_file_path( 'tmp' );
+	$path = get_export_file_path( 'tmp' );
 	$dir  = substr( $path, -1 ) === '/' ? substr( $path, 0, -1 ) : $path;
 
 	foreach ( scandir( $dir ) as $item ) {

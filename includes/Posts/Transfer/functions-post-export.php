@@ -102,3 +102,48 @@ function admin_ajax_return_success( $message = '' ) {
 	Logger::echo_logs_to_console();
 	wp_die( 'success::' . $message );
 }
+
+
+/**
+ * Get path to the export folder. Use this path to write files.
+ *
+ * @param string $folder Folder inside wp-content/backup/posts/
+ *
+ * @return string $path
+ */
+function get_export_file_path( $folder = '' ) {
+
+	// check cache
+	$path = wp_cache_get( 'contentsync_posts_transfer_file_path' );
+
+	if ( ! $path ) {
+
+		$path = WP_CONTENT_DIR . '/contentsync';
+
+		if ( ! file_exists( $path ) ) {
+			Logger::add( sprintf( '  - create folder "%s".', $path ) );
+			mkdir( $path, 0755, true );
+		}
+		$path .= '/posts';
+		if ( ! file_exists( $path ) ) {
+			Logger::add( sprintf( '  - create folder "%s".', $path ) );
+			mkdir( $path, 0755, true );
+		}
+		$path .= '/';
+
+		// save in cache
+		wp_cache_set( 'contentsync_posts_transfer_file_path', $path );
+	}
+
+	// get directory
+	if ( ! empty( $folder ) ) {
+		$path .= $folder;
+		if ( ! file_exists( $path ) ) {
+			Logger::add( sprintf( '  - create folder "%s".', $path ) );
+			mkdir( $path, 0755, true );
+		}
+	}
+
+	$path .= '/';
+	return $path;
+}

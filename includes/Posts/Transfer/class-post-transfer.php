@@ -54,7 +54,7 @@ class Post_Transfer {
 
 	/**
 	 * ==================================================
-	 * Getters and setters
+	 * Getters
 	 * ==================================================
 	 */
 	public function get_posts() {

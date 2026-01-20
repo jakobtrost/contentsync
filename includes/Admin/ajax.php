@@ -139,7 +139,10 @@ class Ajax {
 			else {
 				$this->success( $result );
 			}
-		} elseif ( $action === 'contentsync_check_synced_post_import_bulk' ) {
+		}
+
+		/** CHECK IMPORT BULK */
+		elseif ( $action === 'contentsync_check_synced_post_import_bulk' ) {
 
 			if ( self::DEBUG ) {
 				echo "\r\n" . '* check to be imported posts...';
