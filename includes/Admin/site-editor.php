@@ -182,7 +182,7 @@ class Site_Editor {
 								}
 								return $cluster;
 							},
-							get_clusters_including_post( $post_id )
+							\Contentsync\Cluster\get_clusters_including_post( $post_id )
 						),
 						'error'            => get_post_error( $post_id ),
 					) : array() ),

@@ -1056,7 +1056,7 @@ class Admin {
 
 	public static function get_clusters_including_this_post( $post_id ) {
 		if ( self::$clusters_including_this_post === null ) {
-			self::$clusters_including_this_post = get_clusters_including_post( $post_id );
+			self::$clusters_including_this_post = \Contentsync\Cluster\get_clusters_including_post( $post_id );
 		}
 		return self::$clusters_including_this_post;
 	}

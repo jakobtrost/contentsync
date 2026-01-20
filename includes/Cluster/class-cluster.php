@@ -103,7 +103,7 @@ final class Cluster {
 				$this->$key = empty( $value ) ? array() : explode( ',', $value );
 				continue;
 			} elseif ( 'content_conditions' === $key ) {
-				$this->$key = empty( $value ) ? array() : array_map( 'get_cluster_content_condition_by_id', (array) unserialize( $value ) );
+				$this->$key = empty( $value ) ? array() : array_map( '\Contentsync\Cluster\get_cluster_content_condition_by_id', (array) unserialize( $value ) );
 				continue;
 			}
 

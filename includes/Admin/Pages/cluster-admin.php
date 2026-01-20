@@ -17,6 +17,7 @@ namespace Contentsync\Admin;
 
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Cluster\Cluster;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -200,7 +201,7 @@ class Cluster_Admin {
 			echo 'Cluster not found';
 			return;
 		}
-		$cluster = get_cluster_by_id( $cluster_id );
+		$cluster = \Contentsync\Cluster\get_cluster_by_id( $cluster_id );
 
 		// $cluster = get_cluster($cluster_id);
 		$asset_url    = CONTENTSYNC_PLUGIN_URL . '/assets/icon';
@@ -282,8 +283,8 @@ class Cluster_Admin {
 		if ( isset( $_POST['save'] ) && $nonce && wp_verify_nonce( $nonce, $nonce_action ) && $cluster_id ) {
 
 			// get all posts and destination ids before
-			$cluster_posts_before   = get_cluster_posts_per_blog( $cluster_id );
-			$cluster_before         = get_cluster_by_id( $cluster_id );
+			$cluster_posts_before   = \Contentsync\Cluster\get_cluster_posts_per_blog( $cluster_id );
+			$cluster_before         = \Contentsync\Cluster\get_cluster_by_id( $cluster_id );
 			$destination_ids_before = $cluster_before->get( 'destination_ids' );
 
 			// make new cluster
@@ -315,7 +316,7 @@ class Cluster_Admin {
 				$content_conditions = $_POST['conditions'];
 
 				// check if there are existing conditions
-				$existing_conditions = get_cluster_content_conditions_by_cluster_id( $cluster_id );
+				$existing_conditions = \Contentsync\Cluster\get_cluster_content_conditions_by_cluster_id( $cluster_id );
 
 				// loop through the conditions
 				foreach ( $content_conditions as $index => $condition ) {
@@ -342,23 +343,23 @@ class Cluster_Admin {
 					// if the condition is new
 					if ( $condition_id == 'new' ) {
 						$condition['contentsync_cluster_id'] = $cluster_id;
-						$condition_id                        = insert_cluster_content_condition( $condition );
+						$condition_id                        = \Contentsync\Cluster\insert_cluster_content_condition( $condition );
 					} else {
 						$condition['ID']  = $condition_id;
-						$condition_before = get_cluster_content_condition_by_id( $condition_id );
+						$condition_before = \Contentsync\Cluster\get_cluster_content_condition_by_id( $condition_id );
 						// if (
 						// (bool) $condition_before->make_posts_global_automatically === true
 						// && (bool) $condition_before->make_posts_global_automatically !== (bool)$condition['make_posts_global_automatically']
 						// ) {
 						// 'make_posts_global_automatically' changed to false: remove posts from sync
-						// $conditon_posts = get_posts_by_cluster_content_condition( $condition_before, true );
+						// $conditon_posts = \Contentsync\Cluster\get_posts_by_cluster_content_condition( $condition_before, true );
 						// foreach ( $conditon_posts as $blog_id_and_post_id ) {
 						// if ( ( $key = array_search( $blog_id_and_post_id, $cluster_posts_before ) ) !== false ) {
 						// unset( $cluster_posts_before[ $key ] );
 						// }
 						// }
 						// }
-						$res = update_cluster_content_condition( $condition );
+						$res = \Contentsync\Cluster\update_cluster_content_condition( $condition );
 					}
 
 					// check if condition has 'date_mode'
@@ -381,7 +382,7 @@ class Cluster_Admin {
 					foreach ( $existing_conditions as $existing_condition ) {
 						$existing_condition = (array) $existing_condition;
 						if ( ! in_array( $existing_condition['ID'], $content_condition_ids ) ) {
-							delete_cluster_content_condition( $existing_condition['ID'] );
+							\Contentsync\Cluster\delete_cluster_content_condition( $existing_condition['ID'] );
 						}
 					}
 				}
@@ -389,7 +390,7 @@ class Cluster_Admin {
 				$cluster['content_conditions'] = serialize( $content_condition_ids );
 			}
 
-			$result = update_cluster( $cluster );
+			$result = \Contentsync\Cluster\update_cluster( $cluster );
 
 			if ( $result ) {
 
@@ -403,7 +404,7 @@ class Cluster_Admin {
 
 					// distribute posts
 					$distribute_result = \Contentsync\Distribution\distribute_cluster_posts(
-						new \Contentsync\Cluster\Cluster( (object) $cluster ),
+						new Cluster( (object) $cluster ),
 						array(
 							'posts'           => $cluster_posts_before,
 							'destination_ids' => $destination_ids_before,
@@ -412,7 +413,7 @@ class Cluster_Admin {
 
 					// start scheduler (only if condition has 'date_mode')
 					if ( $has_date_condition ) {
-						schedule_cluster_date_check();
+						\Contentsync\Cluster\schedule_cluster_date_check();
 					}
 				}
 			}
@@ -583,7 +584,7 @@ class Cluster_Admin {
 
 		$cluster = (array) $cluster;
 
-		$conditions = $cluster['content_conditions']; // get_cluster_content_conditions_by_cluster_id( $cluster['ID'] );
+		$conditions = $cluster['content_conditions']; // \Contentsync\Cluster\get_cluster_content_conditions_by_cluster_id( $cluster['ID'] );
 
 		if ( ! is_array( $conditions ) ) {
 			$conditions = array();
@@ -1128,14 +1129,14 @@ class Cluster_Admin {
 		// delete cluster
 		switch ( $mode ) {
 			case 'retain_post_connections':
-				$cluster = get_cluster_by_id( $cluster_id );
+				$cluster = \Contentsync\Cluster\get_cluster_by_id( $cluster_id );
 
 				// delete all conditions
 				foreach ( $cluster->content_conditions as $condition ) {
-					delete_cluster_content_condition( $condition->ID );
+					\Contentsync\Cluster\delete_cluster_content_condition( $condition->ID );
 				}
 
-				$result = delete_cluster( $cluster_id );
+				$result = \Contentsync\Cluster\delete_cluster( $cluster_id );
 
 				if ( ! $result ) {
 					wp_send_json_error( array( 'message' => 'Could not delete cluster' ), 400 );
@@ -1144,8 +1145,8 @@ class Cluster_Admin {
 				}
 				break;
 			case 'make_posts_static':
-				$cluster       = get_cluster_by_id( $cluster_id );
-				$cluster_posts = get_cluster_posts_per_blog( $cluster );
+				$cluster       = \Contentsync\Cluster\get_cluster_by_id( $cluster_id );
+				$cluster_posts = \Contentsync\Cluster\get_cluster_posts_per_blog( $cluster );
 				foreach ( $cluster_posts as $blog_id => $posts ) {
 					Multisite_Manager::switch_blog( $blog_id );
 					foreach ( $posts as $post ) {
@@ -1160,10 +1161,10 @@ class Cluster_Admin {
 
 				// delete all conditions
 				foreach ( $cluster->content_conditions as $condition ) {
-					delete_cluster_content_condition( $condition->ID );
+					\Contentsync\Cluster\delete_cluster_content_condition( $condition->ID );
 				}
 
-				$result = delete_cluster( $cluster_id );
+				$result = \Contentsync\Cluster\delete_cluster( $cluster_id );
 				if ( ! $result ) {
 					wp_send_json_error( array( 'message' => 'Could not delete cluster' ), 400 );
 				}
@@ -1174,7 +1175,7 @@ class Cluster_Admin {
 			case 'delete_connected_posts':
 				// delete all connections and posts
 
-				$cluster = get_cluster_by_id( $cluster_id );
+				$cluster = \Contentsync\Cluster\get_cluster_by_id( $cluster_id );
 
 				// format destinations
 				$destination_arrays = array();
@@ -1187,7 +1188,7 @@ class Cluster_Admin {
 					);
 				}
 
-				$cluster_posts = get_cluster_posts_per_blog( $cluster );
+				$cluster_posts = \Contentsync\Cluster\get_cluster_posts_per_blog( $cluster );
 
 				/**
 				 * Distribute posts to all destinations, step by step per blog.
@@ -1196,10 +1197,10 @@ class Cluster_Admin {
 
 				// delete all conditions
 				foreach ( $cluster->content_conditions as $condition ) {
-					delete_cluster_content_condition( $condition->ID );
+					\Contentsync\Cluster\delete_cluster_content_condition( $condition->ID );
 				}
 
-				$result = delete_cluster( $cluster_id );
+				$result = \Contentsync\Cluster\delete_cluster( $cluster_id );
 
 				if ( ! $result ) {
 					wp_send_json_error( array( 'message' => 'Could not delete cluster' ), 400 );
@@ -1297,7 +1298,7 @@ class Cluster_Admin {
 			wp_send_json_error( array( 'message' => 'Please enter a title' ), 400 );
 		}
 		// $result = false;
-		$cluster_id = insert_cluster(
+		$cluster_id = \Contentsync\Cluster\insert_cluster(
 			array(
 				'title' => $data['title'],
 			)

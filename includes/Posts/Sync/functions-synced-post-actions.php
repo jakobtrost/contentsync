@@ -370,7 +370,7 @@ function untrash_connected_posts( $post_id, $delete = false ) {
 
 	// debug("untrash linked posts");
 	$destination_ids = array();
-	foreach ( get_clusters_including_post( $post_id ) as $cluster ) {
+	foreach ( \Contentsync\Cluster\get_clusters_including_post( $post_id ) as $cluster ) {
 		$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
 	}
 	$destination_ids = array_unique( $destination_ids );
@@ -466,7 +466,7 @@ function unlink_connected_posts( $post_id ) {
 	$root_gid = get_contentsync_meta_values( $post_id, 'synced_post_id' );
 
 	$destination_ids = array();
-	foreach ( get_clusters_including_post( $post_id ) as $cluster ) {
+	foreach ( \Contentsync\Cluster\get_clusters_including_post( $post_id ) as $cluster ) {
 		$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
 	}
 	$destination_ids = array_unique( $destination_ids );

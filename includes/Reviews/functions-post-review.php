@@ -142,7 +142,7 @@ function approve_post_review( $review_id, $post_id = null ) {
 		$result = Trigger::on_untrash_synced_post( $post_id );
 	} else {
 		$destination_ids = array();
-		foreach ( get_clusters_including_post( $post ) as $cluster ) {
+		foreach ( \Contentsync\Cluster\get_clusters_including_post( $post ) as $cluster ) {
 			$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
 		}
 
@@ -249,7 +249,7 @@ function revert_post_review( $review_id, $post_id = null, $message_content = '' 
 
 	// get the destination ids
 	$destination_ids = array();
-	foreach ( get_clusters_including_post( $post_id ) as $cluster ) {
+	foreach ( \Contentsync\Cluster\get_clusters_including_post( $post_id ) as $cluster ) {
 		$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
 	}
 

@@ -61,32 +61,6 @@ function get_clusters() {
 }
 
 /**
- * Get all clusters that contain a given destination.
- *
- * @param int $blog_id
- *
- * @return array
- */
-function get_clusters_by_destination_id( $blog_id ) {
-
-	global $wpdb;
-
-	$table_name = $wpdb->base_prefix . 'contentsync_clusters';
-	$clusters   = $wpdb->get_results( "SELECT * FROM $table_name WHERE FIND_IN_SET('$blog_id', destination_ids)" );
-
-	if ( ! $clusters ) {
-		return array();
-	}
-
-	$cluster_objects = array();
-	foreach ( $clusters as $cluster ) {
-		$cluster_objects[] = new Cluster( $cluster );
-	}
-
-	return $cluster_objects;
-}
-
-/**
  * Insert a new cluster.
  *
  * @param array $cluster
@@ -301,57 +275,6 @@ function get_clusters_including_post( $post, $with_filter = null ) {
 	}
 
 	if ( isset( $post->blog_id ) ) {
-		Multisite_Manager::restore_blog();
-	}
-
-	return $clusters;
-}
-
-/**
- * Get all clusters that include rules for a post type.
- *
- * @param mixed $post_or_posttype  The post object, post ID or post type.
- *
- * @return Cluster[]             All clusters containing the post type, keyed by cluster ID.
- */
-function get_clusters_including_posttype( $post_or_posttype ) {
-
-	if ( is_object( $post_or_posttype ) ) {
-		$posttype = $post_or_posttype->post_type;
-	} elseif ( is_numeric( $post_or_posttype ) ) {
-		$post = get_post( $post_or_posttype );
-		if ( ! $post ) {
-			return array();
-		}
-		$posttype = $post->post_type;
-	} else {
-		$posttype = $post_or_posttype;
-	}
-
-	if ( empty( $posttype ) ) {
-		return array();
-	}
-
-	// if blog_id isset, switch to that blog
-	if ( is_object( $post ) && isset( $post->blog_id ) ) {
-		Multisite_Manager::switch_blog( $post->blog_id );
-	}
-
-	$conditions = get_cluster_content_conditions_including_posttype( $posttype );
-
-	if ( ! $conditions ) {
-		return array();
-	}
-
-	$clusters = array();
-	foreach ( $conditions as $condition ) {
-		$cluster = get_cluster_by_id( $condition->contentsync_cluster_id );
-		if ( $cluster ) {
-			$clusters[ $condition->contentsync_cluster_id ] = $cluster;
-		}
-	}
-
-	if ( is_object( $post ) && isset( $post->blog_id ) ) {
 		Multisite_Manager::restore_blog();
 	}
 

@@ -59,7 +59,7 @@ class Cluster_List_Table extends \WP_List_Table {
 		$hidden                = $this->get_hidden_columns();
 		$sortable              = $this->get_sortable_columns();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
-		$items                 = get_clusters();
+		$items                 = \Contentsync\Cluster\get_clusters();
 
 		// sort
 		$orderby  = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'post_date';

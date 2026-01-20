@@ -254,7 +254,7 @@ function get_post_reviewer_mails( $post_id ) {
 
 	$reviewer_ids = array();
 
-	foreach ( get_clusters_including_post( $post_id ) as $cluster ) {
+	foreach ( \Contentsync\Cluster\get_clusters_including_post( $post_id ) as $cluster ) {
 		if ( $cluster->enable_reviews ) {
 			$reviewer_ids = array_merge( $reviewer_ids, $cluster->reviewer_ids );
 		}

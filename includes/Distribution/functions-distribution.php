@@ -204,7 +204,7 @@ function distribute_cluster_posts( $cluster_or_cluster_id, $before = array() ) {
 	// Logger::add( "Before:", $before );
 
 	if ( ! $cluster_or_cluster_id instanceof \Contentsync\Cluster\Cluster ) {
-		$cluster = get_cluster_by_id( $cluster_or_cluster_id );
+		$cluster = \Contentsync\Cluster\get_cluster_by_id( $cluster_or_cluster_id );
 		if ( ! $cluster ) {
 			return false;
 		}
@@ -221,7 +221,7 @@ function distribute_cluster_posts( $cluster_or_cluster_id, $before = array() ) {
 		$destination_arrays[ $destination_id ] = array();
 	}
 
-	$cluster_posts = get_cluster_posts_per_blog( $cluster );
+	$cluster_posts = \Contentsync\Cluster\get_cluster_posts_per_blog( $cluster );
 
 	// Logger::add( 'Cluster:', $cluster );
 	// Logger::add( 'Cluster posts:', $cluster_posts );
@@ -292,7 +292,7 @@ function distribute_cluster_content_condition_posts( $condition_or_condition_id,
 	Logger::add( 'distribute_cluster_content_condition_posts' );
 
 	if ( ! $condition_or_condition_id instanceof \Contentsync\Cluster\Content_Condition ) {
-		$condition = get_cluster_content_condition_by_id( $condition_or_condition_id );
+		$condition = \Contentsync\Cluster\get_cluster_content_condition_by_id( $condition_or_condition_id );
 		if ( ! $condition ) {
 			return false;
 		}
@@ -300,7 +300,7 @@ function distribute_cluster_content_condition_posts( $condition_or_condition_id,
 		$condition = $condition_or_condition_id;
 	}
 
-	$cluster = get_cluster_by_id( $condition->contentsync_cluster_id );
+	$cluster = \Contentsync\Cluster\get_cluster_by_id( $condition->contentsync_cluster_id );
 	if ( ! $cluster ) {
 		return false;
 	}
@@ -315,7 +315,7 @@ function distribute_cluster_content_condition_posts( $condition_or_condition_id,
 	}
 
 	// get posts for this condition
-	$condition_posts = get_posts_by_cluster_content_condition( $condition );
+	$condition_posts = \Contentsync\Cluster\get_posts_by_cluster_content_condition( $condition );
 
 	// export arguments
 	$export_arguments = isset( $condition->export_arguments ) ? wp_parse_args(
