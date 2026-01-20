@@ -6,7 +6,9 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Distribution;
+
+use Contentsync\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

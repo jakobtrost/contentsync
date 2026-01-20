@@ -33,7 +33,11 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync\Destinations;
+namespace Contentsync\Distribution\Destinations;
+
+use Contentsync\Logger;
+use Contentsync\Distribution\Destinations\Destination;
+use Contentsync\Distribution\Destinations\Blog_Destination;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

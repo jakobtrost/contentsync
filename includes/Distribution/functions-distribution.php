@@ -13,11 +13,13 @@
  * @since 2.17.0
  */
 
-namespace Contentsync;
+namespace Contentsync\Distribution;
 
-use Contentsync\Main_Helper;
-use Remote_Operations;
 use WP_Error;
+use Contentsync\Logger;
+use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Cluster\Cluster;
+use Contentsync\Cluster\Content_Condition;
 
 require_once CONTENTSYNC_PLUGIN_PATH . '/libs/action-scheduler/action-scheduler.php';
 
@@ -277,8 +279,8 @@ function distribute_cluster_posts( $cluster_or_cluster_id, $before = array() ) {
 /**
  * Distribute posts just for a specific condition.
  *
- * @param Cluster_Content_Condition|int $condition_or_condition_id  The condition or the condition ID.
- * @param array                         $posts_before               Posts before the distribution.
+ * @param Content_Condition|int $condition_or_condition_id  The condition or the condition ID.
+ * @param array                 $posts_before               Posts before the distribution.
  *
  * @return bool
  */
@@ -286,7 +288,7 @@ function distribute_cluster_content_condition_posts( $condition_or_condition_id,
 
 	Logger::add( 'distribute_cluster_content_condition_posts' );
 
-	if ( ! $condition_or_condition_id instanceof \Contentsync\Cluster_Content_Condition ) {
+	if ( ! $condition_or_condition_id instanceof \Contentsync\Cluster\Content_Condition ) {
 		$condition = get_cluster_content_condition_by_id( $condition_or_condition_id );
 		if ( ! $condition ) {
 			return false;
@@ -415,7 +417,7 @@ function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 		if ( strpos( $destination_id, '|' ) !== false ) {
 			list( $remote_blog_id, $remote_network_url ) = explode( '|', $destination_id );
 
-			$remote_network_url = \Contentsync\Utils\get_nice_url( $remote_network_url );
+			$remote_network_url = \Contentsync\get_nice_url( $remote_network_url );
 
 			if ( ! isset( $destinations[ $remote_network_url ] ) ) {
 				$destinations[ $remote_network_url ] = new \Contentsync\Destinations\Remote_Destination( $remote_network_url );
@@ -562,7 +564,7 @@ function prepare_posts_for_distribution( $post_ids_or_objects, $export_args = ar
 		return new WP_Error( 'invalid_post_ids', __( 'Invalid post IDs.', 'global-contents' ) );
 	}
 
-	$prepared_posts = Main_Helper::export_posts( $post_ids_or_objects, $export_args );
+	$prepared_posts = ( new Post_Export( $post_ids_or_objects, $export_args ) )->get_posts();
 
 	$inherit_properties = array(
 		'import_action',
@@ -965,11 +967,6 @@ function distribute_to_blog( $item ) {
 function import_posts_to_blog( &$item ) {
 	Logger::add( 'Importing posts to blog: ' . $item->destination->ID );
 
-	// if debug mode is enabled, add the log action
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		add_action( 'post_export_log', array( '\Contentsync\Logger', 'add' ), 10, 2 );
-	}
-
 	// import the posts
 	$result = Main_Helper::import_posts( $item->posts );
 
@@ -1024,7 +1021,7 @@ function delete_posts_from_blog( &$item ) {
 		// Logger::add( 'Deleting post with gid: ' . $gid );
 		if ( $gid ) {
 			$posttype   = $prepared_post->post_type;
-			$local_post = Main_Helper::get_local_post_by_gid( $gid, $posttype );
+			$local_post = \Contentsync\get_local_post_by_gid( $gid, $posttype );
 			if ( $local_post ) {
 				// Logger::add( 'Deleting local post with id: ' . $local_post->ID );
 				$result = wp_delete_post( $local_post->ID, true );
