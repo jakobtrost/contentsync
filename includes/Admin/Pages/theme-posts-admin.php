@@ -30,10 +30,7 @@ class Theme_Posts_Admin {
 		// add overlay contents
 		add_filter( 'contentsync_overlay_contents', array( $this, 'add_overlay_contents' ) );
 
-		// ajax
-		add_action( 'contentsync_ajax_mode_switch_template_theme', array( $this, 'handle_switch_template_theme' ) );
-		add_action( 'contentsync_ajax_mode_switch_global_styles', array( $this, 'handle_switch_global_styles' ) );
-		add_action( 'contentsync_ajax_mode_rename_template', array( $this, 'handle_rename_template' ) );
+		// Note: AJAX handlers have been moved to includes/Admin/Ajax/
 	}
 
 	/**
@@ -210,115 +207,5 @@ class Theme_Posts_Admin {
 		);
 
 		return $contents;
-	}
-
-	/**
-	 * Handle the ajax request to switch the theme of a template or template part
-	 *
-	 * @action 'contentsync_ajax_mode_switch_template_theme'
-	 *
-	 * @param array $data   holds the $_POST['data']
-	 */
-	public function handle_switch_template_theme( $data ) {
-
-		Logger::add( '========= HANDLE SWITCH TEMPLATE THEME =========', $data );
-
-		$post_id                      = isset( $data['post_id'] ) ? $data['post_id'] : '';
-		$switch_references_in_content = isset( $data['switch_references_in_content'] ) ? $data['switch_references_in_content'] : '';
-
-		if ( ! empty( $post_id ) ) {
-
-			$post = get_post( $post_id );
-
-			$result = \Contentsync\Posts\set_wp_template_theme( $post, $switch_references_in_content );
-
-			if ( is_wp_error( $result ) ) {
-				\Contentsync\admin_ajax_return_error( $result->get_error_message() );
-				return;
-			}
-
-			if ( $result ) {
-				admin_ajax_return_success( __( 'Template was assigned to the current theme.', 'contentsync_hub' ) );
-				return;
-			}
-
-			\Contentsync\admin_ajax_return_error( __( 'Template could not be assigned to the current theme.', 'contentsync_hub' ) );
-		}
-		\Contentsync\admin_ajax_return_error( __( 'No valid post ID found.', 'contentsync_hub' ) );
-	}
-
-	/**
-	 * Handle the ajax request to overwrite the global styles of the current theme
-	 *
-	 * @action 'contentsync_ajax_mode_switch_global_styles'
-	 *
-	 * @param array $data   holds the $_POST['data']
-	 */
-	public function handle_switch_global_styles( $data ) {
-
-		Logger::add( '========= HANDLE SWITCH GLOBAL STYLES =========', $data );
-
-		$post_id = isset( $data['post_id'] ) ? $data['post_id'] : '';
-
-		if ( ! empty( $post_id ) ) {
-
-			$post = get_post( $post_id );
-
-			$result = \Contentsync\Posts\set_wp_global_styles_theme( $post );
-
-			if ( is_wp_error( $result ) ) {
-				\Contentsync\admin_ajax_return_error( $result->get_error_message() );
-				return;
-			}
-
-			if ( $result ) {
-				admin_ajax_return_success( __( 'Styles were assigned to the current theme.', 'contentsync_hub' ) );
-				return;
-			}
-
-			\Contentsync\admin_ajax_return_error( __( 'Styles could not be assigned to the current theme.', 'contentsync_hub' ) );
-		}
-		\Contentsync\admin_ajax_return_error( __( 'No valid post ID found.', 'contentsync_hub' ) );
-	}
-
-	/**
-	 * Handle the ajax request to rename a template or template part
-	 *
-	 * @action 'contentsync_ajax_mode_rename_template'
-	 *
-	 * @param array $data   holds the $_POST['data']
-	 */
-	public function handle_rename_template( $data ) {
-
-		Logger::add( '========= HANDLE RENAME TEMPLATE =========', $data );
-
-		$post_id    = isset( $data['post_id'] ) ? $data['post_id'] : '';
-		$post_title = isset( $data['post_title'] ) ? $data['post_title'] : '';
-		$post_name  = isset( $data['post_name'] ) ? $data['post_name'] : '';
-
-		if ( ! empty( $post_id ) ) {
-
-			$post = get_post( $post_id );
-
-			$post->post_title = $post_title;
-			$post->post_name  = $post_name;
-
-			debug( $post );
-
-			$result = wp_update_post( $post );
-
-			if ( is_wp_error( $result ) ) {
-				\Contentsync\admin_ajax_return_error( $result->get_error_message() );
-				return;
-			}
-
-			if ( $result ) {
-				admin_ajax_return_success( __( 'Template was renamed.', 'contentsync_hub' ) );
-				return;
-			}
-
-			\Contentsync\admin_ajax_return_error( __( 'Template could not be renamed.', 'contentsync_hub' ) );
-		}
-		\Contentsync\admin_ajax_return_error( __( 'No valid post ID found.', 'contentsync_hub' ) );
 	}
 }
