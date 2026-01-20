@@ -1,5 +1,8 @@
 <?php
-namespace Contentsync;
+
+namespace Contentsync
+
+use Contentsync\Translations\Translation_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -220,7 +223,7 @@ class Prepared_Post {
 			return;
 		}
 
-		do_action( 'post_export_log', "\r\n\r\n|\r\n|  PREPARE POST {$post->ID} '{$post->post_title}'\r\n|" );
+		Logger::add( sprintf( "========= PREPARE POST %s '%s' =========", $post->ID, $post->post_title ) );
 
 		// set base object vars from WP_Post
 		foreach ( get_object_vars( $post ) as $key => $value ) {
@@ -255,12 +258,12 @@ class Prepared_Post {
 	 */
 	public function prepare_nested_posts() {
 
-		do_action( 'post_export_log', "\r\n" . 'Prepare nested posts.' );
+		Logger::add( 'Prepare nested posts.' );
 
 		$nested_posts = array();
 
 		if ( empty( $this->post_content ) ) {
-			do_action( 'post_export_log', '=> post content is empty' );
+			Logger::add( '=> post content is empty' );
 			return;
 		}
 
@@ -282,14 +285,14 @@ class Prepared_Post {
 
 			$match_regex = '/' . implode( '([\da-z\-\_]+?)', $pattern['search'] ) . '/';
 			$regex_group = isset( $pattern['group'] ) ? (int) $pattern['group'] : 2;
-			// do_action( "post_export_log", "  - test regex: ".esc_attr($match_regex) );
+			Logger::add( '  - test regex: ' . esc_attr( $match_regex ) );
 
 			// search for all occurrences
 			preg_match_all( $match_regex, $this->post_content, $matches );
 			$found_posts = isset( $matches[ $regex_group ] ) ? $matches[ $regex_group ] : null;
 			if ( ! empty( $found_posts ) ) {
 
-				do_action( 'post_export_log', "\r\n" . "  Replace '" . $key . "':" );
+				Logger::add( "  Replace '" . $key . "':" );
 				foreach ( $found_posts as $name_or_id ) {
 
 					$nested_post = null;
@@ -317,7 +320,7 @@ class Prepared_Post {
 					}
 
 					if ( ! $nested_post ) {
-						do_action( 'post_export_log', "  - post with id or name '$name_or_id' could not be found." );
+						Logger::add( "  - post with id or name '$name_or_id' could not be found." );
 						continue;
 					}
 
@@ -406,8 +409,7 @@ class Prepared_Post {
 				$this->post_content = str_replace( $this->nested[ $nested_id ]['front_url'], '{{' . $nested_id . '-front-url}}', $this->post_content );
 			}
 
-			do_action(
-				'post_export_log',
+			Logger::add(
 				sprintf(
 					"  - nested post '%s' attached for export.\r\n     * ID: %s\r\n     * TYPE: %s\r\n     * URL: %s",
 					$nested_post->post_name,
@@ -418,19 +420,19 @@ class Prepared_Post {
 			);
 		}
 
-		do_action( 'post_export_log', '=> nested elements were prepared' );
+		Logger::add( '=> nested elements were prepared' );
 	}
 
 	/**
 	 * Prepare nested terms inside the post content.
 	 */
 	public function prepare_nested_terms() {
-		do_action( 'post_export_log', "\r\n" . 'Prepare nested terms.' );
+		Logger::add( 'Prepare nested terms.' );
 
 		$nested_term_ids = array();
 
 		if ( empty( $this->post_content ) ) {
-			do_action( 'post_export_log', '=> post content is empty' );
+			Logger::add( '=> post content is empty' );
 			return;
 		}
 
@@ -452,14 +454,14 @@ class Prepared_Post {
 
 			$match_regex = '/' . implode( '([\da-z\-\_]+?)', $pattern['search'] ) . '/';
 			$regex_group = isset( $pattern['group'] ) ? (int) $pattern['group'] : 2;
-			// do_action( "post_export_log", "  - test regex: ".esc_attr($match_regex) );
+			Logger::add( '  - test regex: ' . esc_attr( $match_regex ) );
 
 			// search for all occurrences
 			preg_match_all( $match_regex, $this->post_content, $matches );
 			$found_terms = isset( $matches[ $regex_group ] ) ? $matches[ $regex_group ] : null;
 			if ( ! empty( $found_terms ) ) {
 
-				do_action( 'post_export_log', '  - replace ' . $key . ':' );
+				Logger::add( '  - replace ' . $key . ':' );
 				foreach ( $found_terms as $term_id ) {
 
 					// default value for term_ids
@@ -539,29 +541,52 @@ class Prepared_Post {
 
 			$term_object = get_term( $term_id );
 			if ( ! $term_object || is_wp_error( $term_object ) ) {
-				do_action( 'post_export_log', "  - term with id '$term_id' could not be found." );
+				Logger::add( "  - term with id '$term_id' could not be found." );
 				$this->nested_terms[ $term_id ] = null;
 			} else {
-				do_action( 'post_export_log', "  - term with id '$term_id' found.", $term_object );
+				Logger::add( "  - term with id '$term_id' found.", $term_object );
 				$this->nested_terms[ $term_id ] = $term_object;
 			}
 		}
 
-		do_action( 'post_export_log', '=> nested terms were prepared' );
+		Logger::add( '=> nested terms were prepared' );
 	}
 
 	/**
 	 * Replace strings for export
 	 */
 	public function prepare_strings() {
-		$this->post_content = \Contentsync\replace_dynamic_post_strings( $this->post_content, $this->ID );
+		$this->post_content = $this->replace_dynamic_post_strings( $this->post_content, $this->ID );
+	}
+
+	/**
+	 * Replace strings for export
+	 *
+	 * @param string $subject
+	 * @param int    $post_id
+	 *
+	 * @return string $subject
+	 */
+	private function replace_dynamic_post_strings( $subject, $post_id ) {
+
+		if ( empty( $subject ) ) {
+			return $subject;
+		}
+
+		// get patterns
+		$replace_strings = (array) get_nested_string_patterns( $subject, $post_id );
+		foreach ( $replace_strings as $name => $string ) {
+			$subject = str_replace( $string, '{{' . $name . '}}', $subject );
+		}
+
+		return $subject;
 	}
 
 	/**
 	 * Prepare meta for consumption
 	 */
 	public function prepare_meta() {
-		do_action( 'post_export_log', "\r\n" . 'Prepare post meta.' );
+		Logger::add( 'Prepare post meta.' );
 
 		$meta = get_post_meta( $this->ID );
 
@@ -601,7 +626,7 @@ class Prepared_Post {
 			}
 		}
 
-		do_action( 'post_export_log', '=> post meta prepared' );
+		Logger::add( '=> post meta prepared' );
 	}
 
 	/**
@@ -609,7 +634,7 @@ class Prepared_Post {
 	 */
 	public function prepare_terms() {
 
-		do_action( 'post_export_log', "\r\n" . 'Prepare taxonomy terms.' );
+		Logger::add( 'Prepare taxonomy terms.' );
 
 		$posttype_meta = (array) get_post_meta( $this->ID, 'posttype_settings', true );
 		$is_taxonomy   = $posttype_meta && isset( $posttype_meta['is_taxonomy'] ) && $posttype_meta['is_taxonomy'];
@@ -645,7 +670,7 @@ class Prepared_Post {
 		$taxonomies = get_object_taxonomies( $this );
 
 		if ( empty( $taxonomies ) ) {
-			do_action( 'post_export_log', '=> no taxonomy terms found' );
+			Logger::add( '=> no taxonomy terms found' );
 			return array();
 		}
 
@@ -679,18 +704,23 @@ class Prepared_Post {
 
 			if ( empty( $terms ) ) {
 				$prepared_terms[ $taxonomy ] = array();
-				do_action( 'post_export_log', "  - no terms found for taxonomy '$taxonomy'." );
+				Logger::add( "  - no terms found for taxonomy '$taxonomy'." );
 			} else {
 				$count = count( $terms );
-				do_action(
-					'post_export_log',
-					"  - {$count} " . ( $count > 1 ? 'terms' : 'term' ) . " of taxonomy '$taxonomy' prepared:\r\n    - " . implode(
-						"\r\n    - ",
-						array_map(
-							function ( $term ) {
-								return "{$term->name} (#{$term->term_id})";
-							},
-							$terms
+				Logger::add(
+					sprintf(
+						"  - %s %s of taxonomy '%s' prepared:\r\n    - %s",
+						$count,
+						$count > 1 ? 'terms' : 'term',
+						$taxonomy,
+						implode(
+							"\r\n    - ",
+							array_map(
+								function ( $term ) {
+									return "{$term->name} (#{$term->term_id})";
+								},
+								$terms
+							)
 						)
 					)
 				);
@@ -730,7 +760,7 @@ class Prepared_Post {
 		 */
 		$this->terms = apply_filters( 'synced_post_export_terms_after_prepare', $prepared_terms, $this->ID, $this );
 
-		do_action( 'post_export_log', '=> all taxonomy terms prepared' );
+		Logger::add( '=> all taxonomy terms prepared' );
 	}
 
 	/**
@@ -744,9 +774,9 @@ class Prepared_Post {
 	public function get_term_parents( $term, $prepared ) {
 
 		if ( $term->parent != 0 && ! in_array( $term->parent, $prepared ) ) {
-			do_action( 'post_export_log', "    - parent of '" . $term->term_id . "' found: '" . $term->parent . "'" );
+			Logger::add( "    - parent of '" . $term->term_id . "' found: '" . $term->parent . "'" );
 			$parent = get_term( $term->parent );
-			// do_action( 'post_export_log', json_encode( $parent ) );
+			// Logger::add( json_encode( $parent ) );
 			$term->parent = $this->get_term_parents( $parent, $prepared );
 		}
 
@@ -783,7 +813,7 @@ class Prepared_Post {
 				'relative_path' => $relative_path, // /2025/10/my-image.jpg
 			);
 
-			do_action( 'post_export_log', "\r\n" . sprintf( "The file '%s' was added to the post.", $file_name ) );
+			Logger::add( sprintf( "The file '%s' was added to the post.", $file_name ) );
 		}
 	}
 
@@ -794,7 +824,7 @@ class Prepared_Post {
 	 */
 	public function prepare_language() {
 
-		do_action( 'post_export_log', "\r\n" . 'Prepare post language info.' );
+		Logger::add( 'Prepare post language info.' );
 
 		// Use Translation_Manager to prepare all language data in one call
 		$this->language = Translation_Manager::prepare_post_language_data(
@@ -802,7 +832,7 @@ class Prepared_Post {
 			$this->export_arguments['translations']
 		);
 
-		do_action( 'post_export_log', '=> post language info prepared', $this->language );
+		Logger::add( '=> post language info prepared', $this->language );
 	}
 
 
@@ -831,13 +861,13 @@ class Prepared_Post {
 			return;
 		}
 
-		do_action( 'post_export_log', "\r\n" . 'Prepare nested menus.' );
+		Logger::add( 'Prepare nested menus.' );
 
 		$subject = $this->post_content;
 
 		// return if subject doesn't contain any navigation blocks
 		if ( strpos( $subject, 'wp:navigation-' ) === false ) {
-			do_action( 'post_export_log', '=> no navigation blocks found' );
+			Logger::add( '=> no navigation blocks found' );
 			return $subject;
 		}
 
@@ -871,7 +901,7 @@ class Prepared_Post {
 			$subject
 		);
 
-		do_action( 'post_export_log', '=> nested menus were resolved' );
+		Logger::add( '=> nested menus were resolved' );
 
 		/**
 		 * Filter to modify the post content after resolving navigation menus.
