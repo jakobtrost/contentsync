@@ -8,7 +8,7 @@
  * @since 2.19.0
  */
 
-namespace Contentsync\Translation_Tools;
+namespace Contentsync\Translations;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -147,19 +147,6 @@ abstract class Translation_Tool_Base {
 		}
 
 		return $post;
-	}
-
-	/**
-	 * Log a message.
-	 *
-	 * Convenience wrapper for the post_export_log action.
-	 *
-	 * @since 2.19.0
-	 * @param string $message Message to log.
-	 * @param mixed  $data Optional data to log.
-	 */
-	protected function log( $message, $data = 'do_not_log' ) {
-		do_action( 'post_export_log', $message, $data );
 	}
 
 	/**

@@ -180,13 +180,13 @@ if ( ! function_exists( 'contentsync_wpml_set_element_language_details' ) ) {
 
 		// Validate required fields
 		if ( empty( $element_id ) || empty( $language_code ) ) {
-			do_action( 'post_export_log', '  - WPML standalone: missing element_id or language_code.' );
+			Logger::add( '  - WPML standalone: missing element_id or language_code.' );
 			return false;
 		}
 
 		// Element type cannot be longer than 60 chars
 		if ( strlen( $element_type ) > 60 ) {
-			do_action( 'post_export_log', '  - WPML standalone: element_type too long (max 60 chars).' );
+			Logger::add( '  - WPML standalone: element_type too long (max 60 chars).' );
 			return false;
 		}
 
@@ -194,7 +194,7 @@ if ( ! function_exists( 'contentsync_wpml_set_element_language_details' ) ) {
 
 		// Check if WPML table exists
 		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) != $table_name ) {
-			do_action( 'post_export_log', "  - WPML standalone: table {$table_name} does not exist." );
+			Logger::add( "  - WPML standalone: table {$table_name} does not exist." );
 			return false;
 		}
 
@@ -289,14 +289,14 @@ if ( ! function_exists( 'contentsync_wpml_set_element_language_details' ) ) {
 				);
 
 				if ( ! $wpdb->insert_id ) {
-					do_action( 'post_export_log', "  - WPML standalone: failed to insert translation entry. Error: {$wpdb->last_error}" );
+					Logger::add( "  - WPML standalone: failed to insert translation entry. Error: {$wpdb->last_error}" );
 				}
 
 				return $wpdb->insert_id;
 			}
 
 			// Entry already exists for this trid + language with different element_id - conflict
-			do_action( 'post_export_log', "  - WPML standalone: conflict - entry exists for trid={$trid} + language={$language_code} with different element_id." );
+			Logger::add( "  - WPML standalone: conflict - entry exists for trid={$trid} + language={$language_code} with different element_id." );
 			return false;
 
 		} else {
@@ -331,7 +331,7 @@ if ( ! function_exists( 'contentsync_wpml_set_element_language_details' ) ) {
 			);
 
 			if ( ! $wpdb->insert_id ) {
-				do_action( 'post_export_log', "  - WPML standalone: failed to insert new translation group. Error: {$wpdb->last_error}" );
+				Logger::add( "  - WPML standalone: failed to insert new translation group. Error: {$wpdb->last_error}" );
 			}
 
 			return $wpdb->insert_id;

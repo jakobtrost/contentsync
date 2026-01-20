@@ -8,9 +8,7 @@
  * @since 2.19.0
  */
 
-namespace Contentsync\Translation_Tools;
-
-use Contentsync\Main_Helper;
+namespace Contentsync\Translations;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

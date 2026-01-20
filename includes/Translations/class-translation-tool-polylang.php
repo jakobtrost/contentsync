@@ -8,7 +8,7 @@
  * @since 2.19.0
  */
 
-namespace Contentsync\Translation_Tools;
+namespace Contentsync\Translations;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -46,11 +46,11 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 		// If Polylang is already loaded, no initialization needed
 		if ( function_exists( 'PLL' ) || function_exists( 'pll_get_post_language' ) ) {
-			do_action( 'post_export_log', '  - Polylang is already loaded.' );
+			Logger::add( '  - Polylang is already loaded.' );
 			return true;
 		}
 
-		do_action( 'post_export_log', '  - Polylang is not loaded, initializing environment.' );
+		Logger::add( '  - Polylang is not loaded, initializing environment.' );
 
 		// Register language taxonomies for database queries
 		$this->register_taxonomies();
@@ -177,7 +177,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 		// This ensures the post is visible in the admin area
 		if ( ! $this->is_language_supported( $language_code ) ) {
 			$default_language = $this->get_polylang_default_language();
-			$this->log( sprintf( "  - the language '%s' is not supported, using default language '%s' instead.", $language_code, $default_language ) );
+			Logger::add( sprintf( "  - the language '%s' is not supported, using default language '%s' instead.", $language_code, $default_language ) );
 			$language_code = $default_language;
 		}
 
@@ -185,9 +185,9 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 			$result = pll_set_post_language( $post_id, $language_code );
 
 			if ( $result ) {
-				$this->log( sprintf( "  - set language of post '%s' to '%s'.", $post_id, $language_code ) );
+				Logger::add( sprintf( "  - set language of post '%s' to '%s'.", $post_id, $language_code ) );
 			} else {
-				$this->log( sprintf( "  - failed to set language of post '%s' to '%s'.", $post_id, $language_code ) );
+				Logger::add( sprintf( "  - failed to set language of post '%s' to '%s'.", $post_id, $language_code ) );
 			}
 
 			return $result;
@@ -237,7 +237,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 		// // Only proceed if all translations have been imported
 		// if ( count( $original_post_ids ) != $check ) {
-		// $this->log( sprintf( "  - Not all translations imported yet (%d of %d). Skipping translation setup.", $check, count( $original_post_ids ) ) );
+		// Logger::add( sprintf( "  - Not all translations imported yet (%d of %d). Skipping translation setup.", $check, count( $original_post_ids ) ) );
 		// return false;
 		// }
 
@@ -245,9 +245,9 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 		$term = term_exists( $language_code, 'language' );
 		if ( $term ) {
 			wp_set_post_terms( $post_id, array( (int) $term['term_id'] ), 'language', false );
-			$this->log( sprintf( "  - Set language term '%s' for post %d", $language_code, $post_id ) );
+			Logger::add( sprintf( "  - Set language term '%s' for post %d", $language_code, $post_id ) );
 		} else {
-			$this->log( sprintf( "  - Language term '%s' does not exist", $language_code ) );
+			Logger::add( sprintf( "  - Language term '%s' does not exist", $language_code ) );
 		}
 
 		// Set the translations using Polylang
@@ -255,15 +255,15 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 			$result = pll_save_post_translations( $translation_map );
 
 			if ( ! empty( $result ) ) {
-				$this->log( "\r\n" . 'Set translations:', $translation_map );
+				Logger::add( "\r\n" . 'Set translations:', $translation_map );
 				return true;
 			} else {
-				$this->log( "\r\n" . 'Failed to save translations' );
+				Logger::add( "\r\n" . 'Failed to save translations' );
 				return false;
 			}
 		}
 
-		$this->log( "\r\n" . 'pll_save_post_translations function not available' );
+		Logger::add( "\r\n" . 'pll_save_post_translations function not available' );
 		return false;
 	}
 
@@ -295,7 +295,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 		if ( $language_details && isset( $language_details['language_code'] ) ) {
 			$language_data['code'] = $language_details['language_code'];
 			$language_data['args'] = $language_details;
-			$this->log( "  - post has language '{$language_data['code']}'" );
+			Logger::add( "  - post has language '{$language_data['code']}'" );
 		}
 
 		// Get translations if requested
@@ -315,7 +315,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 			$language_data['post_ids'] = $translations;
 
 			if ( ! empty( $language_data['post_ids'] ) ) {
-				$this->log( '  - translations of this post prepared: ' . implode( ', ', $language_data['post_ids'] ) );
+				Logger::add( '  - translations of this post prepared: ' . implode( ', ', $language_data['post_ids'] ) );
 			}
 		}
 
@@ -501,7 +501,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 		// Store the hooks we're removing so we can restore them later
 		self::$removed_hooks = array();
 
-		// $this->log( 'Unloading Polylang hooks for unconfigured blog' );
+		// Logger::add( 'Unloading Polylang hooks for unconfigured blog' );
 
 		// Add taxonomy cleanup filter to remove Polylang taxonomies from exports
 		add_filter( 'synced_post_export_taxonomies_before_prepare', array( $this, 'cleanup_polylang_taxonomies' ) );
@@ -569,7 +569,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 		$removed_count = count( self::$removed_hooks );
 		// if ( $removed_count > 0 ) {
-		// $this->log( sprintf( 'Removed %d Polylang hooks', $removed_count ) );
+		// Logger::add( sprintf( 'Removed %d Polylang hooks', $removed_count ) );
 		// }
 
 		return $removed_count > 0;
@@ -584,7 +584,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 * @return bool True if hooks were restored, false if nothing was done.
 	 */
 	public function reload_hooks() {
-		// $this->log( 'Reloading Polylang hooks' );
+		// Logger::add( 'Reloading Polylang hooks' );
 
 		if ( ! empty( self::$removed_hooks ) ) {
 			foreach ( self::$removed_hooks as $hook_data ) {
@@ -598,7 +598,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 			}
 
 			$restored_count = count( self::$removed_hooks );
-			// $this->log( sprintf( 'Restored %d Polylang hooks', $restored_count ) );
+			// Logger::add( sprintf( 'Restored %d Polylang hooks', $restored_count ) );
 		}
 
 		// Remove the taxonomy cleanup filter
@@ -652,7 +652,7 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 * @return array The filtered taxonomies.
 	 */
 	public function cleanup_polylang_taxonomies( $taxonomies ) {
-		$this->log( 'Cleaning up Polylang taxonomies from export' );
+		Logger::add( 'Cleaning up Polylang taxonomies from export' );
 
 		// Remove 'language' & 'post_translations' taxonomies
 		$taxonomies = array_diff( $taxonomies, array( 'language', 'post_translations' ) );
@@ -678,7 +678,7 @@ function skip_post_translations_taxonomies_during_post_import( $skip, $taxonomy,
 
 	// always skip 'post_translations' taxonomy
 	if ( $taxonomy === 'post_translations' ) {
-		do_action( 'post_export_log', "  - taxonomy '{$taxonomy}' is skipped." );
+		Logger::add( "  - taxonomy '{$taxonomy}' is skipped." );
 		return true;
 	}
 
@@ -724,7 +724,7 @@ function skip_unsupported_language_terms_during_post_import( $terms, $taxonomy, 
 				return false;
 			}
 			$skip = in_array( $term['slug'], $language_slugs );
-			do_action( 'post_export_log', "  - term '{$term['name']}' of taxonomy '{$taxonomy}' is skipped: " . ( $skip ? 'true' : 'false' ) );
+			Logger::add( "  - term '{$term['name']}' of taxonomy '{$taxonomy}' is skipped: " . ( $skip ? 'true' : 'false' ) );
 			return $skip;
 		}
 	);
