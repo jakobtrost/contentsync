@@ -2,7 +2,7 @@
 /**
  * Content Sync condition object
  *
- * This file defines the `Cluster_Content_Condition` class used to
+ * This file defines the `Content_Condition` class used to
  * encapsulate a rule for selecting posts to include in clusters or to
  * make global automatically. Each condition stores identifiers for the
  * cluster and blog it belongs to, the post type, taxonomy and term
@@ -14,13 +14,13 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Cluster;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-final class Cluster_Content_Condition {
+final class Content_Condition {
 
 
 	/**
@@ -113,7 +113,7 @@ final class Cluster_Content_Condition {
 			return false;
 		}
 
-		return new Cluster_Content_Condition( $_content_condition );
+		return new Content_Condition( $_content_condition );
 	}
 
 	/**
@@ -121,7 +121,7 @@ final class Cluster_Content_Condition {
 	 *
 	 * @since 3.5.0
 	 *
-	 * @param Cluster_Content_Condition|object $content_condition Content Condition object.
+	 * @param Content_Condition|object $content_condition Content Condition object.
 	 */
 	public function __construct( $content_condition ) {
 		foreach ( get_object_vars( $content_condition ) as $key => $value ) {
@@ -184,7 +184,7 @@ final class Cluster_Content_Condition {
 	 * @param array $args  Array of properties to filter by, supported properties are:
 	 *                     contentsync_cluster_id, blog_id, post_type, taxonomy, terms
 	 *
-	 * @return Cluster_Content_Condition[]|false
+	 * @return Content_Condition[]|false
 	 */
 	public static function get_conditions_by( $args ) {
 		global $wpdb;
@@ -224,7 +224,7 @@ final class Cluster_Content_Condition {
 
 		$conditions = array();
 		foreach ( $results as $condition ) {
-			$condition_object             = new Cluster_Content_Condition( $condition );
+			$condition_object             = new Content_Condition( $condition );
 			$conditions[ $condition->ID ] = $condition_object;
 		}
 

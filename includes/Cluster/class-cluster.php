@@ -15,7 +15,7 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Cluster;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

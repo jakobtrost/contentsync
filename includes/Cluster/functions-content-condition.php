@@ -3,7 +3,7 @@
  * Content condition helper functions.
  *
  * This file contains procedural helper functions for working with
- * `Cluster_Content_Condition` objects, which represent rules for selecting
+ * `Content_Condition` objects, which represent rules for selecting
  * posts to include in clusters or to export automatically. The
  * functions allow you to retrieve conditions by ID, list all
  * conditions, fetch conditions for a given cluster or blog, insert
@@ -13,7 +13,7 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Cluster;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -24,16 +24,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @param int $content_condition_id
  *
- * @return Cluster_Content_Condition|false
+ * @return Content_Condition|false
  */
 function get_cluster_content_condition_by_id( $content_condition_id ) {
-	return Cluster_Content_Condition::get_instance( $content_condition_id );
+	return Content_Condition::get_instance( $content_condition_id );
 }
 
 /**
  * Get all content conditions
  *
- * @return Cluster_Content_Condition[]|false
+ * @return Content_Condition[]|false
  */
 function get_cluster_content_conditions() {
 	global $wpdb;
@@ -47,7 +47,7 @@ function get_cluster_content_conditions() {
 
 	$content_condition_objects = array();
 	foreach ( $content_conditions as $content_condition ) {
-		$content_condition_objects[] = new Cluster_Content_Condition( $content_condition );
+		$content_condition_objects[] = new Content_Condition( $content_condition );
 	}
 
 	return $content_condition_objects;
@@ -58,7 +58,7 @@ function get_cluster_content_conditions() {
  *
  * @param int $cluster_id
  *
- * @return Cluster_Content_Condition[]|false
+ * @return Content_Condition[]|false
  */
 function get_cluster_content_conditions_by_cluster_id( $cluster_id ) {
 	global $wpdb;
@@ -72,7 +72,7 @@ function get_cluster_content_conditions_by_cluster_id( $cluster_id ) {
 
 	$content_condition_objects = array();
 	foreach ( $content_conditions as $content_condition ) {
-		$content_condition_objects[] = new Cluster_Content_Condition( $content_condition );
+		$content_condition_objects[] = new Content_Condition( $content_condition );
 	}
 
 	return $content_condition_objects;
@@ -83,7 +83,7 @@ function get_cluster_content_conditions_by_cluster_id( $cluster_id ) {
  *
  * @param int $blog_id
  *
- * @return Cluster_Content_Condition[]|false
+ * @return Content_Condition[]|false
  */
 function insert_cluster_content_condition( $content_condition ) {
 	global $wpdb;
@@ -113,7 +113,7 @@ function insert_cluster_content_condition( $content_condition ) {
 /**
  * Update a content condition
  *
- * @param Cluster_Content_Condition $content_condition
+ * @param Content_Condition $content_condition
  *
  * @return int|false
  */
@@ -210,7 +210,7 @@ function delete_cluster_content_condition( $content_condition_id ) {
 /**
  * Get all posts inside a cluster by condition.
  *
- * @param Cluster_Content_Condition $condition  Content condition object.
+ * @param Content_Condition $condition  Content condition object.
  *
  * @return array        All WP_Post objects (+ @property int blog_id) keyed by post_id.
  */
@@ -263,8 +263,8 @@ function get_posts_by_cluster_content_condition( $condition ) {
 /**
  * Check if a post meets a content condition
  *
- * @param WP_Post|int                   $post_or_post_id
- * @param Cluster_Content_Condition|int $condition_or_condition_id
+ * @param WP_Post|int           $post_or_post_id
+ * @param Content_Condition|int $condition_or_condition_id
  *
  * @return bool
  */
@@ -272,7 +272,7 @@ function post_meets_cluster_content_condition( $post_or_post_id, $condition_or_c
 
 	// error_log( "post_meets_cluster_content_condition" );
 
-	if ( ! $condition_or_condition_id instanceof Cluster_Content_Condition ) {
+	if ( ! $condition_or_condition_id instanceof Content_Condition ) {
 		$condition = get_cluster_content_condition_by_id( $condition_or_condition_id );
 		if ( ! $condition ) {
 			return false;
@@ -333,7 +333,7 @@ function post_meets_cluster_content_condition( $post_or_post_id, $condition_or_c
 /**
  * Get query args for a content condition.
  *
- * @param Cluster_Content_Condition $condition  Content condition object.
+ * @param Content_Condition $condition  Content condition object.
  */
 function get_query_args_for_cluster_content_condition( $condition ) {
 
@@ -460,10 +460,10 @@ function get_query_args_for_cluster_content_condition( $condition ) {
  *
  * @param string $post_type
  *
- * @return Cluster_Content_Condition[]|false
+ * @return Content_Condition[]|false
  */
 function get_cluster_content_conditions_including_posttype( $post_type ) {
-	$conditions = Cluster_Content_Condition::get_conditions_by(
+	$conditions = Content_Condition::get_conditions_by(
 		array(
 			'blog_id'   => get_current_blog_id(),
 			'post_type' => $post_type,
@@ -479,7 +479,7 @@ function get_cluster_content_conditions_including_posttype( $post_type ) {
  * @param WP_Post|int $post
  * @param string      $with_filter    Either 'count' or 'date_mode'
  *
- * @return Cluster_Content_Condition[]|false
+ * @return Content_Condition[]|false
  */
 function get_cluster_content_conditions_including_post( $post, $with_filter = null ) {
 
@@ -494,7 +494,7 @@ function get_cluster_content_conditions_including_post( $post, $with_filter = nu
 	}
 
 	// first, we filter by blog_id and post_type
-	$conditions_that_match_blog_and_posttype = Cluster_Content_Condition::get_conditions_by(
+	$conditions_that_match_blog_and_posttype = Content_Condition::get_conditions_by(
 		array(
 			'blog_id'   => get_current_blog_id(),
 			'post_type' => $post->post_type,

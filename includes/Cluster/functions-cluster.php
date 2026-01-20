@@ -12,7 +12,7 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Cluster;
 
 /**
  * Global Cluster Functions
