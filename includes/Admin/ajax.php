@@ -412,14 +412,14 @@ class Ajax {
 			$site_url   = isset( $data['site_url'] ) ? esc_attr( $data['site_url'] ) : null;
 			$contents   = isset( $data['contents'] ) ? $data['contents'] === 'true' : true;
 			$search     = isset( $data['search'] ) ? $data['search'] === 'true' : true;
-			$connection = get_site_connection( $site_url );
+			$connection = \Contentsync\Posts\Sync\get_site_connection( $site_url );
 
 			// debug( $connection );
 
 			if ( $connection ) {
 				$connection['contents'] = $contents;
 				$connection['search']   = $search;
-				$result                 = update_site_connection( $connection );
+				$result                 = \Contentsync\Posts\Sync\update_site_connection( $connection );
 			}
 
 			if ( $result ) {

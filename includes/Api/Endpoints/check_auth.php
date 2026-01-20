@@ -42,7 +42,7 @@ class Check_Auth extends Endpoint {
 	public function permission_callback( $request ) {
 		if ( $this->is_request_allowed() ) {
 			$origin = $request->get_header( 'Origin' );
-			if ( $origin && \Contentsync\Distribution\get_site_connection( $origin ) ) {
+			if ( $origin && \Contentsync\Posts\Sync\get_site_connection( $origin ) ) {
 				return true;
 			} else {
 				return new \WP_Error( 'rest_not_connected', esc_html__( 'You do have the correct admin credentials, but the connection is not setup both ways.' ), array( 'status' => $this->authorization_status_code() ) );

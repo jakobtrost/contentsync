@@ -282,7 +282,7 @@ function get_all_synced_posts( $query = null, $network_url = null ) {
 	}
 
 	// get remote posts
-	foreach ( \Contentsync\get_site_connections() as $site_url => $connection ) {
+	foreach ( get_site_connections() as $site_url => $connection ) {
 
 		// continue if filter is different
 		if ( ! empty( $network_url ) && $network_url !== $site_url ) {

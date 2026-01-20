@@ -431,7 +431,7 @@ function check_connection_map( $post_id ) {
 	 * @since 1.7.5
 	 */
 	$remote_connected_posts = array();
-	foreach ( \Contentsync\get_site_connections() as $site_url => $connected_site ) {
+	foreach ( get_site_connections() as $site_url => $connected_site ) {
 		$remote_connected_posts = \Contentsync\Api\get_all_remote_connected_posts( $connected_site, $gid );
 		if ( ! empty( $remote_connected_posts ) ) {
 			$remote_connected_posts                   = (array) $remote_connected_posts;

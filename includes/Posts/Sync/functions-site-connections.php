@@ -7,7 +7,7 @@
  *
  * @see https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
  */
-namespace Contentsync\Distribution;
+namespace Contentsync\Posts\Sync;
 
 use Contentsync\Utils\Logger;
 
@@ -191,7 +191,7 @@ function add_site_connection( $connection ) {
  *
  * @return true|false|null True in success, false on failure, null if it doesn't exist.
  */
-function delete_connection( $site_url ) {
+function delete_site_connection( $site_url ) {
 
 	if ( empty( $site_url ) ) {
 		return false;

@@ -121,7 +121,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 				$update_gid = true;
 			}
 		} else {
-			$connection = \Contentsync\Admin\get_site_connection( $root_net_url );
+			$connection = \Contentsync\Posts\Sync\get_site_connection( $root_net_url );
 
 			// connection doesn't exist
 			if ( ! $connection ) {

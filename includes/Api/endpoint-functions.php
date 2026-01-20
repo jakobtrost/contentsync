@@ -237,7 +237,7 @@ function send_request( $connection_or_site_url, $rest_base, $body = array(), $me
 	if ( is_array( $connection_or_site_url ) ) {
 		$connection = $connection_or_site_url;
 	} else {
-		$connection = get_site_connection( $connection_or_site_url );
+		$connection = \Contentsync\Posts\Sync\get_site_connection( $connection_or_site_url );
 	}
 
 	// set user auth

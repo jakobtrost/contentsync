@@ -61,7 +61,7 @@ class Add_Connection extends Endpoint {
 		}
 
 		// If the connection to the current site doesn't exist, create it.
-		$result = \Contentsync\Distribution\add_site_connection( $new_connection );
+		$result = \Contentsync\Posts\Sync\add_site_connection( $new_connection );
 
 		if ( $result === null ) {
 			return new \WP_Error( 'connection_not_added', 'Connection already exists', array( 'status' => 400 ) );

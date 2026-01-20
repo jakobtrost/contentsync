@@ -98,7 +98,7 @@ class Global_List_Table extends \WP_List_Table {
 
 		// get posts
 		$blog_id     = get_current_blog_id();
-		$connections = is_network_admin() || ! is_multisite() ? \Contentsync\get_site_connections() : false;
+		$connections = is_network_admin() || ! is_multisite() ? \Contentsync\Posts\Sync\get_site_connections() : false;
 		$rel         = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'all';
 
 		$this->posts['all'] = \Contentsync\Posts\Sync\get_all_synced_posts( $query_args );
@@ -303,8 +303,7 @@ class Global_List_Table extends \WP_List_Table {
 		$views       = array();
 		$return      = array();
 		$rel         = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'all';
-		$connections = is_network_admin() || ! is_multisite() ? \Contentsync\get_site_connections() : false;
-
+		$connections = is_network_admin() || ! is_multisite() ? \Contentsync\Posts\Sync\get_site_connections() : false;
 		if ( is_network_admin() ) {
 			if ( $connections && count( $connections ) > 0 ) {
 				$views = array(

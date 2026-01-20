@@ -80,7 +80,7 @@ class Connections_Page {
 		// add connection form
 		echo "<h1 style='margin-top:2em;'>" . __( 'Add connection', 'contentsync_hub' ) . "</h1>
 		<form method='post' class='add_site_connection'>
-			<input type='hidden' name='_nonce' value='" . wp_create_nonce( \Contentsync\Distribution\get_site_connections_option_name() ) . "' />
+			<input type='hidden' name='_nonce' value='" . wp_create_nonce( \Contentsync\Posts\Sync\get_site_connections_option_name() ) . "' />
 
 			" . ( is_ssl() ? '' : \Contentsync\Admin\make_admin_info_box(
 				array(
@@ -129,7 +129,7 @@ class Connections_Page {
 
 		// verify the nonce
 		$nonce = isset( $_POST['_nonce'] ) ? $_POST['_nonce'] : null;
-		if ( ! $nonce || wp_verify_nonce( $nonce, \Contentsync\Distribution\get_site_connections_option_name() ) !== 1 ) {
+		if ( ! $nonce || wp_verify_nonce( $nonce, \Contentsync\Posts\Sync\get_site_connections_option_name() ) !== 1 ) {
 			self::add_error( __( 'The request could not be verified.', 'contentsync_hub' ) );
 		}
 
@@ -184,7 +184,7 @@ class Connections_Page {
 			'contents'   => true,
 			'search'     => true,
 		);
-		$update     = \Contentsync\add_site_connection( $connection );
+		$update     = \Contentsync\Posts\Sync\add_site_connection( $connection );
 
 		// update successfull
 		if ( $update ) {
@@ -239,7 +239,7 @@ class Connections_Page {
 		}
 
 		// get connections
-		$connections = \Contentsync\get_site_connections();
+		$connections = \Contentsync\Posts\Sync\get_site_connections();
 		if ( ! is_array( $connections ) || empty( $connections ) ) {
 			return;
 		}
@@ -340,7 +340,7 @@ class Connections_Page {
 
 		// update connections
 		if ( $changed ) {
-			\Contentsync\update_site_connections( $connections );
+			\Contentsync\Posts\Sync\update_site_connections( $connections );
 		}
 	}
 

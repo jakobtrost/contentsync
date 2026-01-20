@@ -56,7 +56,7 @@ class Connections_List_Table extends \WP_List_Table {
 		);
 
 		// set items
-		$this->items = \Contentsync\get_site_connections();
+		$this->items = \Contentsync\Posts\Sync\get_site_connections();
 		// debug($this->items);
 	}
 
@@ -225,7 +225,7 @@ class Connections_List_Table extends \WP_List_Table {
 		// delete GET request
 		if ( isset( $_GET['delete'] ) ) {
 			$delete_site_url = urldecode( $_GET['delete'] );
-			$deleted         = \Contentsync\Distribution\delete_connection( $delete_site_url );
+			$deleted         = \Contentsync\Posts\Sync\delete_site_connection( $delete_site_url );
 			// successfull
 			if ( $deleted ) {
 				\Contentsync\Admin\render_admin_notice(
