@@ -1,7 +1,8 @@
 <?php
-namespace Contentsync;
+namespace Contentsync\Posts\Transfer;
 
 use Contentsync\Translations\Translation_Manager;
+use Contentsync\Utils\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

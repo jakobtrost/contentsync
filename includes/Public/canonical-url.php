@@ -48,7 +48,7 @@ if ( defined( 'USE_CANONICAL_URL_AS_PERMALINK' ) && constant( 'USE_CANONICAL_URL
  * @return string The filtered permalink.
  */
 function filter_permalink( $permalink, $post ) {
-	$global_permalink = \Contentsync\get_global_permalink( $permalink, $post );
+	$global_permalink = get_global_permalink( $permalink, $post );
 	if ( $global_permalink && $global_permalink !== $permalink ) {
 		return $global_permalink;
 	}
@@ -66,7 +66,7 @@ function filter_permalink( $permalink, $post ) {
  * @return string The filtered canonical URL.
  */
 function filter_canonical_url( $permalink, $post ) {
-	$global_permalink = \Contentsync\get_global_permalink( $permalink, $post );
+	$global_permalink = get_global_permalink( $permalink, $post );
 	if ( $global_permalink && $global_permalink !== $permalink ) {
 		return $global_permalink;
 	}
@@ -84,7 +84,7 @@ function filter_canonical_url( $permalink, $post ) {
  */
 function filter_yoast_seo_canonical_url( $permalink ) {
 	$post             = get_post();
-	$global_permalink = \Contentsync\get_global_permalink( null, $post );
+	$global_permalink = get_global_permalink( null, $post );
 
 	if ( $global_permalink && $global_permalink !== $permalink ) {
 		return $global_permalink;
@@ -128,7 +128,7 @@ function maybe_mark_as_duplicate() {
 		}
 	}
 
-	$global_permalink = \Contentsync\get_global_permalink( null, $post );
+	$global_permalink = get_global_permalink( null, $post );
 
 	if ( $global_permalink ) {
 		echo '<link rel="canonical" href="' . $global_permalink . '" />';

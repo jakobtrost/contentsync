@@ -12,7 +12,7 @@
  * components or adjust existing ones to suit custom workflows.
  */
 
-namespace Contentsync\Contents;
+namespace Contentsync\Admin;
 
 use Contentsync\Translations\Translation_Manager;
 
@@ -121,7 +121,7 @@ class Admin {
 			CONTENTSYNC_PLUGIN_URL . '/assets/icon/greyd-menuicon-contentsync.svg', // icon url
 			72 // position
 		);
-		add_action( "load-$hook", array( $this, 'add_overview_screen_options' ) );
+		add_action( 'load-' . $hook, array( $this, 'add_overview_screen_options' ) );
 
 		/**
 		 * add the ghost submenu item
@@ -346,7 +346,7 @@ class Admin {
 				 *
 				 * The post can have different statuses: live, in review, denied, empty (new post)
 				 */
-				$review                = get_post_review_by_post( $post_id, get_current_blog_id() );
+				$review                = \Contentsync\Reviews\get_post_review_by_post( $post_id, get_current_blog_id() );
 				$default_review_status = empty( self::get_clusters_including_this_post( $post_id ) ) && empty( $connection_map ) ? 'new' : 'live';
 				$review_status         = $review && $review->state ? $review->state : $default_review_status;
 
@@ -357,7 +357,7 @@ class Admin {
 				$reviewer_message         = '';
 				$reviewer_message_content = '';
 				if ( $review && $review->ID ) {
-					$reviewer_message = get_latest_message_by_post_review_id( $review->ID );
+					$reviewer_message = \Contentsync\Reviews\get_latest_message_by_post_review_id( $review->ID );
 					if ( $reviewer_message && ! empty( $reviewer_message->content ) && $reviewer_message->action === 'denied' ) {
 						$reviewer_message_content = $reviewer_message->get_content( true );
 						$reviewer                 = $reviewer_message->get_reviewer();
@@ -537,31 +537,31 @@ class Admin {
 			// block editor notice
 			if ( $mode === 'block_editor' ) {
 
-				return "<script id='contentsync-notice__script'>
-					( function ( wp ) {
-						wp.data.dispatch( 'core/notices' ).createNotice(
-							'" . ( $notice === 'info' ? 'success' : $notice ) . " contentsync_components_notice',
-							'" . $text . "',
-							{
-								className: 'contentsync-notice__element',
-								isDismissible: false,
-								__unstableHTML: true,
-								icon: wp.element.createElement( wp.components.Icon, { icon: '$icon' } ),
-								actions: [
-									" . implode(
-				', ',
-				array_map(
-				function ( $button ) {
-					return '{' . ( isset( $button['label'] ) ? "label: '{$button['label']}'," : '' ) . '' . ( isset( $button['url'] ) ? "url: '{$button['url']}'," : '' ) . '' . ( isset( $button['onClick'] ) ? "onClick: () => {{$button['onClick']}}," : '' ) . '' . ( isset( $button['variant'] ) ? "variant: '{$button['variant']}'," : '' ) . '' . ( isset( $button['className'] ) ? "className: '{$button['className']} contentsync-notice__action'" : "className: 'contentsync-notice__action'" ) . ',}';
-				},
-        $buttons
-	)
-				) . '
-								],
-							}
-						);
-					} )( window.wp );
-				</script>';
+				return '<script id="contentsync-notice__script">' .
+					'( function ( wp ) {' .
+						'wp.data.dispatch( \'core/notices\' ).createNotice(' .
+							'\'' . ( $notice === 'info' ? 'success' : $notice ) . ' contentsync_components_notice\',' .
+							'\'' . $text . '\',' .
+							'{' .
+								'className: \'contentsync-notice__element\',' .
+								'isDismissible: false,' .
+								'__unstableHTML: true,' .
+								'icon: wp.element.createElement( wp.components.Icon, { icon: \'' . $icon . '\' } ),' .
+								'actions: [' .
+									implode(
+										', ',
+										array_map(
+											function ( $button ) {
+												return '{' . ( isset( $button['label'] ) ? 'label: \'' . $button['label'] . '\',' : '' ) . '' . ( isset( $button['url'] ) ? 'url: \'' . $button['url'] . '\',' : '' ) . '' . ( isset( $button['onClick'] ) ? 'onClick: () => {' . $button['onClick'] . '},' : '' ) . '' . ( isset( $button['variant'] ) ? 'variant: \'' . $button['variant'] . '\',' : '' ) . '' . ( isset( $button['className'] ) ? 'className: \'' . $button['className'] . ' contentsync-notice__action\'' : 'className: \'contentsync-notice__action\'' ) . ',}';
+											},
+											$buttons
+										)
+									) .
+								'],' .
+							'}' .
+						');' .
+					'} )( window.wp );' .
+				'</script>';
 			}
 			// site editor notice arguments
 			elseif ( $mode === 'site_editor' ) {
@@ -590,25 +590,24 @@ class Admin {
 			}
 			// classic editor admin notice
 			else {
-				$return = "<div class='notice notice-$notice synced_post_notice'>" .
+				$return = '<div class="notice notice-' . $notice . ' synced_post_notice">' .
 					'<div>' .
-						"<div><span class='dashicons dashicons-$icon'></span></div>" .
-						'<div>' .
-							'<p>' . $text . '</p>' .
-						'</div>';
+					'<div><span class="dashicons dashicons-' . $icon . '"></span></div>' .
+					'<div>' .
+					'<p>' . $text . '</p>' .
+					'</div>';
 				if ( $buttons && ! empty( $buttons ) ) {
-					$return .= "<div class='buttons'>";
+					$return .= '<div class="buttons">';
 					foreach ( (array) $buttons as $button ) {
 						if ( isset( $button['url'] ) ) {
-							$return .= "<a class='button " . ( isset( $button['className'] ) ? $button['className'] : '' ) . "' href='{$button['url']}'>{$button['label']}</a>";
+							$return .= '<a class="button ' . ( isset( $button['className'] ) ? $button['className'] : '' ) . '" href="' . $button['url'] . '">' . $button['label'] . '</a>';
 						} elseif ( isset( $button['onClick'] ) ) {
-							$return .= "<span class='button " . ( isset( $button['className'] ) ? $button['className'] : '' ) . "' onclick='{$button['onClick']}'>{$button['label']}</span>";
+							$return .= '<span class="button ' . ( isset( $button['className'] ) ? $button['className'] : '' ) . '" onclick="' . $button['onClick'] . '">' . $button['label'] . '</span>';
 						}
 					}
-							$return .= '</div>';
+					$return .= '</div>';
 				}
-					$return .= '</div>' .
-				'</div>';
+				$return .= '</div></div>';
 				return $return;
 			}
 		}
@@ -666,8 +665,8 @@ class Admin {
 
 			// make global
 			if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
-				$return .= '<p>' . __( 'Do you want this post to be available throughout all connected sites?', 'contentsync' ) . "</p>
-					<span class='button' onclick='contentsync.exportPost(this);' data-post_id='" . esc_attr( $post_id ) . "'>" .
+				$return .= '<p>' . __( 'Do you want this post to be available throughout all connected sites?', 'contentsync' ) . '</p>' .
+					'<span class="button" onclick="contentsync.exportPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' .
 						__( 'Convert to global content', 'contentsync' ) .
 					'</span>';
 			}
@@ -675,32 +674,32 @@ class Admin {
 			/**
 			 * Get similar posts via JS-ajax
 			 */
-			$return .= "<div id='contentsync_similar_posts'>
-				<div class='found hidden'>
-					<p class='singular hidden'>" . __( 'A similar post is available globally:', 'contentsync' ) . "</p>
-					<p class='plural hidden'>" . __( 'Similar posts are available globally:', 'contentsync' ) . "</p>
-					<ul class='contentsync_box_list' data-item='" . preg_replace(
+			$return .= '<div id="contentsync_similar_posts">' .
+				'<div class="found hidden">' .
+					'<p class="singular hidden">' . __( 'A similar post is available globally:', 'contentsync' ) . '</p>' .
+					'<p class="plural hidden">' . __( 'Similar posts are available globally:', 'contentsync' ) . '</p>' .
+					'<ul class="contentsync_box_list" data-item="' . preg_replace(
 						'/\s{2,}/',
 						'',
 						esc_attr(
-							"<li>
-							<span class='flex'>
-								<a href='{{href}}' target='_blank'>{{post_title}}</a>
-								<span class='button button-ghost tiny' onclick='contentsync.overwritePost(this);' data-post_id='{{post_id}}' data-gid='{{gid}}'>" . __( 'Use', 'contentsync' ) . '</span>
-							</span>
-							<small>{{nice_url}}</small>
-						</li>'
+							'<li>' .
+							'<span class="flex">' .
+								'<a href="{{href}}" target="_blank">{{post_title}}</a>' .
+								'<span class="button button-ghost tiny" onclick="contentsync.overwritePost(this);" data-post_id="{{post_id}}" data-gid="{{gid}}">' . __( 'Use', 'contentsync' ) . '</span>' .
+							'</span>' .
+							'<small>{{nice_url}}</small>' .
+							'</li>'
 						)
-					) . "'></ul>
-				</div>
-				<p class='not_found hidden'><i>" . __( 'No similar global contents found.', 'contentsync' ) . "</i></p>
-				<p class='loading'>
-					<span class='loader'></span>
-				</p>
-			</div>";
+					) . '"></ul>' .
+				'</div>' .
+				'<p class="not_found hidden"><i>' . __( 'No similar global contents found.', 'contentsync' ) . '</i></p>' .
+				'<p class="loading">' .
+					'<span class="loader"></span>' .
+				'</p>' .
+			'</div>';
 
 			// add warning for contentsync_export (shown via JS)
-			self::$overlay_warnings['contentsync_export'] = "<div class='export_warning_similar_posts hidden' style='margin:1em 0 -2em;'>" . make_admin_info_box(
+			self::$overlay_warnings['contentsync_export'] = '<div class="export_warning_similar_posts hidden" style="margin:1em 0 -2em;">' . make_admin_info_box(
 				array(
 					'text'  => __( 'Similar content is already available globally. Are you sure you want to make this content global additionally?', 'contentsync' ),
 					'style' => 'orange',
@@ -721,7 +720,7 @@ class Admin {
 				self::$error = \Contentsync\get_post_error( $post_id );
 			}
 
-			$return .= "<input type='hidden' name='_gid' value='$gid'>";
+			$return .= '<input type="hidden" name="_gid" value="' . $gid . '">';
 
 			/**
 			 * Error post
@@ -730,16 +729,16 @@ class Admin {
 				$return .= make_admin_icon_status_box( 'error', \Contentsync\get_error_message( self::$error ) );
 				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
 					// repair button
-					$return                  .= "<br><br><span class='button' onclick='contentsync.repairPost(this);' data-post_id='" . esc_attr( $post_id ) . "'>" . __( 'Repair', 'contentsync' ) . '</span>';
+					$return                  .= '<br><br><span class="button" onclick="contentsync.repairPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' . __( 'Repair', 'contentsync' ) . '</span>';
 					self::$overlay_contents[] = 'contentsync_repair';
 
 					// unlink
-					$return .= "<div class='contentsync-gray-box'>
-						<p>" . __( 'Edit this post?', 'contentsync' ) . "</p>
-						<span class='button' onclick='contentsync.unimportPost(this);' data-post_id='" . esc_attr( $post_id ) . "'>
-							" . __( 'Convert to local post', 'contentsync' ) . '
-						</span>
-					</div>';
+					$return .= '<div class="contentsync-gray-box">' .
+						'<p>' . __( 'Edit this post?', 'contentsync' ) . '</p>' .
+						'<span class="button" onclick="contentsync.unimportPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' .
+							__( 'Convert to local post', 'contentsync' ) .
+						'</span>' .
+					'</div>';
 
 					self::$overlay_contents[] = 'contentsync_unimport';
 				}
@@ -760,17 +759,20 @@ class Admin {
 				 * @since 1.7 'contentsync_export_options' can now be edited.
 				 */
 				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
+
 					$options          = \Contentsync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
 					$editable_options = self::get_contentsync_export_options_for_post( $post_id );
 					// debug( $options );
-					$return .= "<input type='checkbox' class='hidden _contentsync_export_options_toggle' id='_contentsync_export_options_toggle1'/>
-					<label class='contentsync_export_options_toggle' for='_contentsync_export_options_toggle1'><span class='dashicons dashicons-admin-generic'></span></label>
-					<div class='editable_contentsync_export_options contentsync-gray-box'>
-						<p><b>" . __( 'Edit options:', 'contentsync' ) . '</b><br>';
+
+					$return .= '<input type="checkbox" class="hidden _contentsync_export_options_toggle" id="_contentsync_export_options_toggle1"/>' .
+						'<label class="contentsync_export_options_toggle" for="_contentsync_export_options_toggle1"><span class="dashicons dashicons-admin-generic"></span></label>' .
+						'<div class="editable_contentsync_export_options contentsync-gray-box">' .
+						'<p><b>' . __( 'Edit options:', 'contentsync' ) . '</b><br>';
+
 					foreach ( $editable_options as $option ) {
-						$checked = isset( $options[ $option['name'] ] ) && $options[ $option['name'] ] ? "checked='checked'" : '';
-						$return .= "<input type='hidden' name='editable_contentsync_export_options[{$option['name']}]' value='off' />
-								<label><input type='checkbox' name='editable_contentsync_export_options[{$option['name']}]' {$checked} />{$option['title']}</label><br>";
+						$checked = isset( $options[ $option['name'] ] ) && $options[ $option['name'] ] ? 'checked="checked"' : '';
+						$return .= '<input type="hidden" name="editable_contentsync_export_options[' . $option['name'] . ']" value="off" />' .
+							'<label><input type="checkbox" name="editable_contentsync_export_options[' . $option['name'] . ']" ' . $checked . ' />' . $option['title'] . '</label><br>';
 					}
 					if ( is_array( $connection_map ) && count( $connection_map ) > 0 ) {
 						$return .= make_admin_info_box(
@@ -781,17 +783,17 @@ class Admin {
 						);
 					}
 
-						/**
-						 * @since 1.8 Add a canonical url
-						 */
-						$contentsync_canonical_url = esc_attr( get_post_meta( $post_id, 'contentsync_canonical_url', true ) );
+					/**
+					 * @since 1.8 Add a canonical url
+					 */
+					$contentsync_canonical_url = esc_attr( get_post_meta( $post_id, 'contentsync_canonical_url', true ) );
 					if ( empty( $contentsync_canonical_url ) ) {
 						$contentsync_canonical_url = get_permalink( $post_id );
 					}
-						$return .= '<br><label>' . __( 'Global Canonical URL', 'contentsync' ) . "</label><br>
-							<input type='text' name='contentsync_canonical_url' value='{$contentsync_canonical_url}' style='width:100%'/><br>";
-						$return .= '</p>';
-					$return     .= '</div>';
+					$return .= '<br><label>' . __( 'Global Canonical URL', 'contentsync' ) . '</label><br>' .
+						'<input type="text" name="contentsync_canonical_url" value="' . $contentsync_canonical_url . '" style="width:100%"/><br>';
+					$return .= '</p>';
+					$return .= '</div>';
 				}
 
 				// subscribed posttype info
@@ -808,14 +810,14 @@ class Admin {
 				if ( is_array( $connection_map ) && count( $connection_map ) > 0 ) {
 
 					$count     = 0;
-					$post_list = "<ul class='contentsync_box_list'>";
+					$post_list = '<ul class="contentsync_box_list">';
 					foreach ( $connection_map as $_blog_id => $post_con ) {
 						if ( is_numeric( $_blog_id ) ) {
-							$post_list .= '<li>' . $post_con['nice'] . " (<a href='" . $post_con['edit'] . "' target='_blank'>" . __( 'To the post', 'contentsync' ) . '</a>)</li>';
+							$post_list .= '<li>' . $post_con['nice'] . ' (<a href="' . $post_con['edit'] . '" target="_blank">' . __( 'To the post', 'contentsync' ) . '</a>)</li>';
 							++$count;
 						} elseif ( is_array( $post_con ) ) {
 							foreach ( $post_con as $__blog_id => $_post_con ) {
-								$post_list .= '<li>' . $_post_con['nice'] . " (<a href='" . $_post_con['edit'] . "' target='_blank'>" . __( 'To the post', 'contentsync' ) . '</a>)</li>';
+								$post_list .= '<li>' . $_post_con['nice'] . ' (<a href="' . $_post_con['edit'] . '" target="_blank">' . __( 'To the post', 'contentsync' ) . '</a>)</li>';
 								++$count;
 							}
 						}
@@ -841,7 +843,7 @@ class Admin {
 				if ( ! empty( self::get_clusters_including_this_post( $post_id ) ) ) {
 
 					$post_list           = '<p><strong>' . __( 'Cluster', 'contentsync' ) . '</strong><br>' . __( 'This post is part of a cluster.', 'contentsync' ) . '</p>';
-					$post_list          .= "<ul class='contentsync_box_list'>";
+					$post_list          .= '<ul class="contentsync_box_list">';
 					$cluster_has_reviews = false;
 					foreach ( self::get_clusters_including_this_post( $post_id ) as $cluster ) {
 						if ( $cluster->enable_reviews ) {
@@ -850,7 +852,7 @@ class Admin {
 
 						$post_list .= '<li>';
 						$post_list .= '<strong>' . $cluster->title . '</strong>:';
-						$post_list .= "<ul style='margin:12px 0 0 4px;'>";
+						$post_list .= '<ul style="margin:12px 0 0 4px;">';
 
 						foreach ( $cluster->destination_ids as $blog_id ) {
 
@@ -860,10 +862,10 @@ class Admin {
 								$blog       = isset( $connection[ intval( $tmp[0] ) ] ) ? $connection[ intval( $tmp[0] ) ] : 'unknown';
 
 								if ( isset( $blog['blog'] ) ) {
-									$post_list .= '<li>' . sprintf( __( 'Site %s', 'contentsync' ), "<a href='" . $blog['blog'] . "' target='_blank'>" . $blog['nice'] . '</a>' ) . '</li>';
+									$post_list .= '<li>' . sprintf( __( 'Site %s', 'contentsync' ), '<a href="' . $blog['blog'] . '" target="_blank">' . $blog['nice'] . '</a>' ) . '</li>';
 								}
 							} else {
-								$post_list .= '<li>' . sprintf( __( 'Site %s', 'contentsync' ), "<a href='" . get_site_url( $blog_id ) . "'>" . get_blog_details( $blog_id )->blogname . '</a>' ) . '</li>';
+								$post_list .= '<li>' . sprintf( __( 'Site %s', 'contentsync' ), '<a href="' . get_site_url( $blog_id ) . '">' . get_blog_details( $blog_id )->blogname . '</a>' ) . '</li>';
 							}
 						}
 						$post_list .= '</ul>';
@@ -876,11 +878,11 @@ class Admin {
 					// review history
 					if ( $cluster_has_reviews ) {
 
-						$return .= "<p style='margin-bottom:5px'><strong>" . __( 'Reviews', 'contentsync' ) . '</strong></p>';
-						$return .= "<input type='checkbox' class='hidden _contentsync_export_options_toggle' id='_contentsync_export_options_toggle2'/>";
-						$return .= "<label class='contentsync_export_options_toggle button' for='_contentsync_export_options_toggle2'>" . __( 'Toggle review history', 'contentsync' ) . '</label>';
-						$return .= "<ul class='editable_contentsync_export_options contentsync_box_list'>";
-						$reviews = get_all_post_reviews_by_post( $post_id, get_current_blog_id() );
+						$return .= '<p style="margin-bottom:5px"><strong>' . __( 'Reviews', 'contentsync' ) . '</strong></p>';
+						$return .= '<input type="checkbox" class="hidden _contentsync_export_options_toggle" id="_contentsync_export_options_toggle2"/>';
+						$return .= '<label class="contentsync_export_options_toggle button" for="_contentsync_export_options_toggle2">' . __( 'Toggle review history', 'contentsync' ) . '</label>';
+						$return .= '<ul class="editable_contentsync_export_options contentsync_box_list">';
+						$reviews = \Contentsync\Reviews\get_all_post_reviews_by_post( $post_id, get_current_blog_id() );
 						// debug($reviews);
 						foreach ( $reviews as $review ) {
 							$details  = '';
@@ -892,7 +894,7 @@ class Admin {
 									$reviewer = $message->get_reviewer();
 									$inner    = $message->get_date() . '<br><strong>' . sprintf( __( '%1$s by %2$s', 'contentsync' ), $message->action, $reviewer ) . '</strong>';
 									if ( ! empty( $message->content ) ) {
-										$inner .= "<br><em style='display: block; margin: 4px 0'>'" . $message->get_content( true ) . "'</em>";
+										$inner .= '<br><em style="display: block; margin: 4px 0">\'' . $message->get_content( true ) . '\'</em>';
 									}
 									$details .= '<li>' . $inner . '</li>';
 								}
@@ -910,7 +912,7 @@ class Admin {
 											__( 'Edited by: ', 'contentsync' ) . $review->get_editor() . '<br>' .
 											__( 'Last edited: ', 'contentsync' ) . $review->get_date() . '<br><br>' .
 											'<strong>' . __( 'Review message history', 'contentsync' ) . ':</strong><br>' .
-											"<ul style='margin-top: 8px'>" . $details . '</ul>' .
+											'<ul style="margin-top: 8px">' . $details . '</ul>' .
 										'</li>';
 						}
 						if ( count( $reviews ) == 0 ) {
@@ -923,12 +925,12 @@ class Admin {
 
 				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
 					// unexport
-					$return .= "<div class='contentsync-gray-box'>
-						<p>" . __( 'No longer make this post available globally?', 'contentsync' ) . "</p>
-						<span class='button button-ghost' onclick='contentsync.unexportPost(this);' data-post_id='" . esc_attr( $post_id ) . "' data-gid='" . esc_attr( $gid ) . "'>" .
+					$return .= '<div class="contentsync-gray-box">' .
+						'<p>' . __( 'No longer make this post available globally?', 'contentsync' ) . '</p>' .
+						'<span class="button button-ghost" onclick="contentsync.unexportPost(this);" data-post_id="' . esc_attr( $post_id ) . '" data-gid="' . esc_attr( $gid ) . '">' .
 							__( 'Unlink', 'contentsync' ) .
-						'</span>
-					</div>';
+						'</span>' .
+					'</div>';
 
 					self::$overlay_contents[] = 'contentsync_unexport';
 				}
@@ -964,19 +966,19 @@ class Admin {
 				if ( ! empty( $contentsync_canonical_url ) ) {
 					$return .= '<p>' . sprintf(
 						__( 'The canonical URL of this post was also set in the source post: %s', 'contentsync' ),
-						"<code style='word-break: break-word;'>" . $contentsync_canonical_url . '</code>'
+						'<code style="word-break: break-word;">' . $contentsync_canonical_url . '</code>'
 					) . '</p>';
 				}
 				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
-					$return .= "<a href='" . $post_links['edit'] . "' target='_blank'>" . __( 'Go to the original post', 'contentsync' ) . '</a>';
+					$return .= '<a href="' . $post_links['edit'] . '" target="_blank">' . __( 'Go to the original post', 'contentsync' ) . '</a>';
 
 					// unlink
-					$return .= "<div class='contentsync-gray-box'>
-						<p>" . __( 'Edit this post?', 'contentsync' ) . "</p>
-						<span class='button' onclick='contentsync.unimportPost(this);' data-post_id='" . esc_attr( $post_id ) . "'>
-							" . __( 'Convert to local post', 'contentsync' ) . '
-						</span>
-					</div>';
+					$return .= '<div class="contentsync-gray-box">' .
+						'<p>' . __( 'Edit this post?', 'contentsync' ) . '</p>' .
+						'<span class="button" onclick="contentsync.unimportPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' .
+							__( 'Convert to local post', 'contentsync' ) .
+						'</span>' .
+					'</div>';
 
 					self::$overlay_contents[] = 'contentsync_unimport';
 				}
@@ -1236,15 +1238,15 @@ class Admin {
 		$export_options = self::get_contentsync_export_options_for_post( $post_id );
 
 		// build the form
-		$export_form = "<form id='contentsync_export_form' class='" . ( count( $export_options ) ? 'inner_content' : '' ) . "'>";
+		$export_form = '<form id="contentsync_export_form" class="' . ( count( $export_options ) ? 'inner_content' : '' ) . '">';
 		foreach ( $export_options as $option ) {
 			$name         = $option['name'];
 			$checked      = isset( $option['checked'] ) && $option['checked'] ? "checked='checked'" : '';
-			$export_form .= "<label for='$name'>
-				<input type='checkbox' id='$name' name='$name' $checked />
-				<span>" . $option['title'] . '</span>
-				<small>' . $option['descr'] . '</small>
-			</label>';
+			$export_form .= '<label for="' . $name . '">' .
+				'<input type="checkbox" id="' . $name . '" name="' . $name . '" ' . $checked . ' />' .
+				'<span>' . $option['title'] . '</span>' .
+				'<small>' . $option['descr'] . '</small>' .
+			'</label>';
 		}
 		$export_form .= '</form>';
 
@@ -1257,19 +1259,19 @@ class Admin {
 			'skip'    => __( 'Skip', 'contentsync' ),
 			'keep'    => __( 'Keep both', 'contentsync' ),
 		) as $name => $value ) {
-			$options .= "<option value='$name'>$value</option>";
+			$options .= '<option value="' . $name . '">' . $value . '</option>';
 		}
 		$options = urlencode( $options );
 
-		$import_form = "<form id='contentsync_export_form' class='inner_content'>
-			<label for='handle_conflicts'>
-				" . __( 'What should be done with ', 'contentsync' ) . "
-			</label>
-			<select id='handle_conflicts' name='handle_conflicts'>
-				<option value='replace'>" . __( 'Replace', 'contentsync' ) . "</option>
-				<option value='keep'>" . __( 'Keep both', 'contentsync' ) . '</option>
-			</select>
-		</form>';
+		$import_form = '<form id="contentsync_export_form" class="inner_content">' .
+			'<label for="handle_conflicts">' .
+				__( 'What should be done with ', 'contentsync' ) .
+			'</label>' .
+			'<select id="handle_conflicts" name="handle_conflicts">' .
+				'<option value="replace">' . __( 'Replace', 'contentsync' ) . '</option>' .
+				'<option value="keep">' . __( 'Keep both', 'contentsync' ) . '</option>' .
+			'</select>' .
+		'</form>';
 
 		/**
 		 * Get connected posts
@@ -1280,14 +1282,14 @@ class Admin {
 		if ( is_array( $connection_map ) && count( $connection_map ) > 0 ) {
 
 			$count     = 0;
-			$post_list = "<ul class='contentsync_box_list' style='margin:0px 0 10px'>";
+			$post_list = '<ul class="contentsync_box_list" style="margin:0px 0 10px">';
 			foreach ( $connection_map as $_blog_id => $post_con ) {
 				if ( is_numeric( $_blog_id ) ) {
-					$post_list .= '<li>' . $post_con['nice'] . " (<a href='" . $post_con['edit'] . "' target='_blank'>" . __( 'to the post', 'contentsync' ) . '</a>)</li>';
+					$post_list .= '<li>' . $post_con['nice'] . ' (<a href="' . $post_con['edit'] . '" target="_blank">' . __( 'to the post', 'contentsync' ) . '</a>)</li>';
 					++$count;
 				} elseif ( is_array( $post_con ) ) {
 					foreach ( $post_con as $__blog_id => $_post_con ) {
-						$post_list .= '<li>' . $_post_con['nice'] . " (<a href='" . $_post_con['edit'] . "' target='_blank'>" . __( 'to the post', 'contentsync' ) . '</a>)</li>';
+						$post_list .= '<li>' . $_post_con['nice'] . ' (<a href="' . $_post_con['edit'] . '" target="_blank">' . __( 'to the post', 'contentsync' ) . '</a>)</li>';
 						++$count;
 					}
 				}
@@ -1297,23 +1299,23 @@ class Admin {
 
 			// if the post is in a cluster, show the cluster names
 			if ( ! empty( self::get_clusters_including_this_post( $post_id ) ) ) {
-				$post_list = "<ul class='contentsync_box_list' style='margin:0px 0 10px'>";
+				$post_list = '<ul class="contentsync_box_list" style="margin:0px 0 10px">';
 				foreach ( self::get_clusters_including_this_post( $post_id ) as $cluster ) {
 					$post_list .= '<li>';
-					$post_list .= '<strong>' . sprintf( __( "Cluster '%s'", 'contentsync' ), $cluster->title ) . '</strong>:';
-					$post_list .= "<ul style='margin:12px 0 0 4px;'>";
+					$post_list .= '<strong>' . sprintf( __( 'Cluster \'%s\'', 'contentsync' ), $cluster->title ) . '</strong>:';
+					$post_list .= '<ul style="margin:12px 0 0 4px;">';
 					foreach ( $cluster->destination_ids as $blog_id ) {
-						// $post_list .= "<li>" . sprintf( __("Site %s", "contentsync"), "<a href='".get_site_url( $blog_id )."'>".get_blog_details( $blog_id )->blogname."</a>" ) . "</li>";
+						// $post_list .= '<li>' . sprintf( __( 'Site %s', 'contentsync' ), '<a href="' . get_site_url( $blog_id ) . '">' . get_blog_details( $blog_id )->blogname . '</a>' ) . '</li>';
 						if ( strpos( $blog_id, '|' ) == ! false ) {
 							$tmp        = explode( '|', $blog_id );
 							$connection = isset( $connection_map[ $tmp[1] ] ) ? $connection_map[ $tmp[1] ] : 'unknown';
 							$blog       = isset( $connection[ intval( $tmp[0] ) ] ) ? $connection[ intval( $tmp[0] ) ] : 'unknown';
 
 							if ( isset( $blog['blog'] ) ) {
-								$post_list .= '<li>' . sprintf( __( 'Site %s', 'contentsync' ), "<a href='" . $blog['blog'] . "' target='_blank'>" . $blog['nice'] . '</a>' ) . '</li>';
+								$post_list .= '<li>' . sprintf( __( 'Site %s', 'contentsync' ), '<a href="' . $blog['blog'] . '" target="_blank">' . $blog['nice'] . '</a>' ) . '</li>';
 							}
 						} else {
-							$post_list .= '<li>' . sprintf( __( 'Site %s', 'contentsync' ), "<a href='" . get_site_url( $blog_id ) . "'>" . get_blog_details( $blog_id )->blogname . '</a>' ) . '</li>';
+							$post_list .= '<li>' . sprintf( __( 'Site %s', 'contentsync' ), '<a href="' . get_site_url( $blog_id ) . '">' . get_blog_details( $blog_id )->blogname . '</a>' ) . '</li>';
 						}
 					}
 					$post_list .= '</ul>';
@@ -1328,16 +1330,16 @@ class Admin {
 		/**
 		 * Message Box to deny the review
 		 */
-		$reviewer_message_deny = '<form id="contentsync_review_message_form_deny" class="contentsync_review_message_forms">
-			<label for="review_message_deny">' . __( 'Message to the editor (required)', 'contentsync' ) . '</label>
-			<textarea id="review_message_deny" name="review_message_deny" placeholder="' . __( 'Please enter a message for the editor.', 'contentsync' ) . '" rows="4"></textarea></form>';
+		$reviewer_message_deny = '<form id="contentsync_review_message_form_deny" class="contentsync_review_message_forms">' .
+			'<label for="review_message_deny">' . __( 'Message to the editor (required)', 'contentsync' ) . '</label>' .
+			'<textarea id="review_message_deny" name="review_message_deny" placeholder="' . __( 'Please enter a message for the editor.', 'contentsync' ) . '" rows="4"></textarea></form>';
 
 		/**
 		 * Message Box to revert the review
 		 */
-		$reviewer_message_revert = '<form id="contentsync_review_message_form_revert" class="contentsync_review_message_forms">
-			<label for="review_message_revert">' . __( 'Message to the editor (optional)', 'contentsync' ) . '</label>
-			<textarea id="review_message_revert" name="review_message_revert" placeholder="' . __( 'Please enter a message for the editor.', 'contentsync' ) . '" rows="4"></textarea></form>';
+		$reviewer_message_revert = '<form id="contentsync_review_message_form_revert" class="contentsync_review_message_forms">' .
+			'<label for="review_message_revert">' . __( 'Message to the editor (optional)', 'contentsync' ) . '</label>' .
+			'<textarea id="review_message_revert" name="review_message_revert" placeholder="' . __( 'Please enter a message for the editor.', 'contentsync' ) . '" rows="4"></textarea></form>';
 
 		/**
 		 * Add all the contents
@@ -1374,15 +1376,15 @@ class Admin {
 				),
 				'confirm'    => array(
 					'title'   => __( 'Import content on this site', 'contentsync' ),
-					'content' => "<form id='contentsync_import_form'>
-										<div class='conflicts'>
-											<p>" . __( '<b>Attention:</b> Some content already seems to exist on this site. Choose what to do with it.', 'contentsync' ) . "</p>
-											<div class='inner_content' data-multioption='" . __( 'Multiselect', 'contentsync' ) . "' data-options='$options'></div>
-										</div>
-										<div class='new'>
-											<p>" . sprintf( __( 'No conflicts found. Do you want to make the post "%s" available on this site now?', 'contentsync' ), "<strong class='post_title'></strong>" ) . '</p>
-										</div>
-									</form>',
+					'content' => '<form id="contentsync_import_form">' .
+									'<div class="conflicts">' .
+										'<p>' . __( '<b>Attention:</b> Some content already seems to exist on this site. Choose what to do with it.', 'contentsync' ) . '</p>' .
+										'<div class="inner_content" data-multioption="' . __( 'Multiselect', 'contentsync' ) . '" data-options="' . $options . '"></div>' .
+									'</div>' .
+									'<div class="new">' .
+										'<p>' . sprintf( __( 'No conflicts found. Do you want to make the post "%s" available on this site now?', 'contentsync' ), '<strong class="post_title"></strong>' ) . '</p>' .
+									'</div>' .
+								'</form>',
 					'button'  => __( 'Import now', 'contentsync' ),
 				),
 				'loading'    => array(
@@ -1409,28 +1411,28 @@ class Admin {
 				),
 				'confirm'    => array(
 					'title'   => __( 'Import content on this site', 'contentsync' ),
-					'content' => "<form id='contentsync_import_bulk_form'>
-										<div class='new'>
-											<p>" . sprintf( __( 'No conflicts found. Do you want to make the posts available on this site now?', 'contentsync' ), "<strong class='post_title'></strong>" ) . "</p>
-										</div>
-										<div class='conflicts'>
-											<p>" . __( '<b>Attention:</b> Some content already seems to exist on this site. Choose what to do with it.', 'contentsync' ) . "</p>
-											<div class='inner_content' data-multioption='" . __( 'Multiselect', 'contentsync' ) . "' data-options='$options' data-unused='" . __( 'No conflicts', 'contentsync' ) . "' data-import='" . __( 'Already imported', 'contentsync' ) . "' data-success='" . __( 'Import successful', 'contentsync' ) . " ✅' data-fail='" . __( 'Import failed', 'contentsync' ) . " ❌'></div>
-										</div>
-									</form>",
+					'content' => '<form id="contentsync_import_bulk_form">' .
+									'<div class="new">' .
+										'<p>' . sprintf( __( 'No conflicts found. Do you want to make the posts available on this site now?', 'contentsync' ), '<strong class="post_title"></strong>' ) . '</p>' .
+									'</div>' .
+									'<div class="conflicts">' .
+										'<p>' . __( '<b>Attention:</b> Some content already seems to exist on this site. Choose what to do with it.', 'contentsync' ) . '</p>' .
+										'<div class="inner_content" data-multioption="' . __( 'Multiselect', 'contentsync' ) . '" data-options="' . $options . '" data-unused="' . __( 'No conflicts', 'contentsync' ) . '" data-import="' . __( 'Already imported', 'contentsync' ) . '" data-success="' . __( 'Import successful', 'contentsync' ) . ' ✅" data-fail="' . __( 'Import failed', 'contentsync' ) . ' ❌"></div>' .
+									'</div>' .
+								'</form>',
 					'button'  => __( 'import now', 'contentsync' ),
 				),
 				'loading'    => array(
-					'content' => "<div class='import_bulk conflicts' style='margin-bottom: 20px;'><div class='inner_content' data-multioption='" . __( 'Multiselect', 'contentsync' ) . "' data-options='$options' data-unused='" . __( 'No conflicts', 'contentsync' ) . "' data-import='" . __( 'Already imported', 'contentsync' ) . "' data-success='" . __( 'Import successful', 'contentsync' ) . " ✅' data-fail='" . __( 'Import failed', 'contentsync' ) . " ❌'></div></div>",
+					'content' => '<div class="import_bulk conflicts" style="margin-bottom: 20px;"><div class="inner_content" data-multioption="' . __( 'Multiselect', 'contentsync' ) . '" data-options="' . $options . '" data-unused="' . __( 'No conflicts', 'contentsync' ) . '" data-import="' . __( 'Already imported', 'contentsync' ) . '" data-success="' . __( 'Import successful', 'contentsync' ) . ' ✅" data-fail="' . __( 'Import failed', 'contentsync' ) . ' ❌"></div></div>',
 				),
 				'success'    => array(
 					'title'   => __( 'Import successful.', 'contentsync' ),
-					'content' => "<div class='import_bulk conflicts' style='margin-bottom: 20px;'><div class='inner_content' data-multioption='" . __( 'Multiselect', 'contentsync' ) . "' data-options='$options' data-unused='" . __( 'No conflicts', 'contentsync' ) . "' data-import='" . __( 'Already imported', 'contentsync' ) . "' data-success='" . __( 'Import successful', 'contentsync' ) . " ✅' data-fail='" . __( 'Import failed', 'contentsync' ) . " ❌'></div></div>",
+					'content' => '<div class="import_bulk conflicts" style="margin-bottom: 20px;"><div class="inner_content" data-multioption="' . __( 'Multiselect', 'contentsync' ) . '" data-options="' . $options . '" data-unused="' . __( 'No conflicts', 'contentsync' ) . '" data-import="' . __( 'Already imported', 'contentsync' ) . '" data-success="' . __( 'Import successful', 'contentsync' ) . ' ✅" data-fail="' . __( 'Import failed', 'contentsync' ) . ' ❌"></div></div>',
 				),
 				'fail'       => array(
 					'title'   => __( 'Import failed.', 'contentsync' ),
 					'descr'   => '<strong class="replace">' . __( 'At least some posts failed to import, please check the log:', 'contentsync' ) . '</strong>',
-					'content' => "<div class='import_bulk' style='margin-bottom: 20px;'></div>",
+					'content' => '<div class="import_bulk" style="margin-bottom: 20px;"></div>',
 				),
 			),
 			'contentsync_unexport'       => array(
@@ -1569,7 +1571,7 @@ class Admin {
 				'confirm' => array(
 					'title'   => __( 'Approve changes', 'contentsync' ),
 					'descr'   => __( 'The current version of this post is going to be published on the following sites. Afterwards you can still revert the changes, if anything goes wrong.', 'contentsync' ),
-					'content' => "<div class='inner_content'>" . $post_list . '</div>',
+					'content' => '<div class="inner_content">' . $post_list . '</div>',
 					'button'  => __( 'Publish changes', 'contentsync' ),
 				),
 				'loading' => array(
@@ -1594,7 +1596,7 @@ class Admin {
 				'confirm' => array(
 					'title'   => __( 'Request modification', 'contentsync' ),
 					'descr'   => __( 'Tell the editor what needs to be changed.', 'contentsync' ),
-					'content' => "<div class='inner_content'>" . $reviewer_message_deny . '</div>',
+					'content' => '<div class="inner_content">' . $reviewer_message_deny . '</div>',
 					'button'  => __( 'Send to the editor', 'contentsync' ),
 				),
 				'loading' => array(
@@ -1614,7 +1616,7 @@ class Admin {
 				'confirm' => array(
 					'title'   => __( 'Revert changes', 'contentsync' ),
 					'descr'   => __( 'Reset the post to the previous version.', 'contentsync' ),
-					'content' => "<div class='inner_content'>" . $reviewer_message_revert . '</div>',
+					'content' => '<div class="inner_content">' . $reviewer_message_revert . '</div>',
 					'button'  => __( 'Reset post', 'contentsync' ),
 				),
 				'loading' => array(

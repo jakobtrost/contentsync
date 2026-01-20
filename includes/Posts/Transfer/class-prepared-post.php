@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync
+namespace Contentsync\Posts\Transfer;
 
 use Contentsync\Translations\Translation_Manager;
 
@@ -313,7 +313,7 @@ class Prepared_Post {
 							$args = $name_or_id;
 						}
 						// get post
-						$nested_post = \Contentsync\get_post_by_name_and_type( $args );
+						$nested_post = get_post_by_name_and_type( $args );
 						if ( $nested_post ) {
 							$nested_id = $nested_post->ID;
 						}
@@ -595,11 +595,11 @@ class Prepared_Post {
 			foreach ( $meta_array as $meta_value ) {
 
 				// don't prepare blacklisted meta
-				if ( in_array( $meta_key, \Contentsync\get_blacklisted_meta_for_export( 'export', $this->ID ), true ) ) {
+				if ( in_array( $meta_key, \Contentsync\Posts\Sync\get_blacklisted_meta_for_export( 'export', $this->ID ), true ) ) {
 					continue;
 				}
 				// skip certain meta keys
-				elseif ( \Contentsync\maybe_skip_meta_option( $meta_key, $meta_value, 'export', $this->ID ) ) {
+				elseif ( \Contentsync\Posts\Sync\maybe_skip_meta_option( $meta_key, $meta_value, 'export', $this->ID ) ) {
 					continue;
 				}
 
@@ -692,13 +692,9 @@ class Prepared_Post {
 			/**
 			 * Retrieve post terms directly from the database.
 			 *
-			 * @since 1.2.7
-			 *
 			 * WPML attaches a lot of filters to the function wp_get_object_terms(). This results
 			 * in terms of the wrong language beeing attached to a post export. This function performs
 			 * way more consistent in all tests. Therefore it completely replaced it in this class.
-			 *
-			 * @deprecated since 1.2.7: $terms = wp_get_object_terms( $this->ID, $taxonomy );
 			 */
 			$terms = get_post_taxonomy_terms( $this->ID, $taxonomy );
 
@@ -930,7 +926,7 @@ class Prepared_Post {
 	 * information about the parent post (if any) and all child posts (if any are found).
 	 * This information is used during the import process to try to restore the same hierarchy
 	 * based on the posts provided on the destination site.
-	 * @see \Contentsync\Post_Import::set_post_hierarchy()
+	 * @see Post_Import::set_post_hierarchy()
 	 *
 	 * @var array $this->post_hierarchy Information about the post hierarchy.
 	 *    @property array $parent       Information about the parent post.

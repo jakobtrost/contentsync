@@ -68,7 +68,7 @@ function get_similar_synced_posts( $post ) {
 
 	$found   = array();
 	$blog_id = get_current_blog_id();
-	$net_url = \Contentsync\get_network_url();
+	$net_url = \Contentsync\Utils\get_network_url();
 
 	if ( ! isset( $post->post_name ) ) {
 		return $found;

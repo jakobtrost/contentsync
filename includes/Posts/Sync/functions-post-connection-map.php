@@ -113,7 +113,7 @@ function add_or_remove_post_connection_from_connection_map( $gid, $args, $add = 
 	// remote post
 	else {
 		// the network url is the current network, as we just imported a post here
-		$post_site_url = \Contentsync\get_network_url();
+		$post_site_url = \Contentsync\Utils\get_network_url();
 		$result        = \Contentsync\Api\update_remote_post_connection( $site_url, $gid, $args, $add, $post_site_url );
 	}
 
@@ -310,7 +310,7 @@ function convert_connection_map_to_destination_ids( $connection_map ) {
 function get_local_post_links( $blog_id, $post_id ) {
 
 	Multisite_Manager::switch_blog( $blog_id );
-	$edit_url = \Contentsync\get_edit_post_link( $post_id );
+	$edit_url = \Contentsync\Utils\get_edit_post_link( $post_id );
 	Multisite_Manager::restore_blog();
 
 	$blog_url = get_site_url( $blog_id );
@@ -380,7 +380,7 @@ function get_network_remote_connection_map_by_gid( $gid ) {
 	}
 
 	return array(
-		\Contentsync\get_network_url() => $connection_map,
+		\Contentsync\Utils\get_network_url() => $connection_map,
 	);
 }
 
@@ -410,7 +410,7 @@ function check_connection_map( $post_id ) {
 
 	$gid            = get_gid( $post_id );
 	$connection_map = get_post_connection_map( $post_id );
-	$cur_net_url    = \Contentsync\get_network_url();
+	$cur_net_url    = \Contentsync\Utils\get_network_url();
 	$return         = array();
 
 	$updated_post_connection_map = array();
@@ -463,20 +463,6 @@ function check_connection_map( $post_id ) {
 						"$_blog_id-{$_post_con['post_id']}"
 					);
 				}
-
-				/**
-				 * @deprecated 1.7.0
-				 */
-				// switch_to_blog( $_blog_id );
-				// $_post_id = $_post_con['post_id'];
-				// if ( ! get_post( $_post_id ) || get_gid( $_post_id ) != $gid ) {
-				// remove_post_connection_from_connection_map( $gid, $_blog_id, $_post_id );
-				// $return[] = sprintf(
-				// __( "An orphaned post connection (%s) was deleted.", 'contentsync' ),
-				// "$_blog_id-$_post_id"
-				// );
-				// }
-				// restore_blog();
 			} else {
 
 				$rem_net_url = $_blog_id;
@@ -517,34 +503,6 @@ function check_connection_map( $post_id ) {
 			}
 		}
 	}
-
-	/**
-	 * @deprecated 1.7.0
-	 */
-	// // check other blogs for orphaned connected posts
-	// $other_blogs = array_diff(
-	// array_keys( get_all_blogs() ),
-	// is_array( $connection_map ) ? array_keys( $connection_map ) : array(),
-	// array( get_current_blog_id() )
-	// );
-	// if ( is_array( $other_blogs ) && count( $other_blogs ) ) {
-	// foreach ( $other_blogs as $_blog_id ) {
-	// switch_to_blog( $_blog_id );
-	// $_post = \Contentsync\get_local_post_by_gid( $gid );
-	// if ( $_post ) {
-	// $_post_id = $_post->ID;
-	// $status   = get_post_meta( $_post_id, 'synced_post_status', true );
-	// if ( $status === 'linked' ) {
-	// add_post_connection_to_connection_map( $gid, $_blog_id, $_post_id );
-	// $return[] = sprintf(
-	// __( 'Eine fehlende Post Verknüpfung (%s) wurde wiederhergestellt.', 'contentsync' ),
-	// "$_blog_id-$_post_id"
-	// );
-	// }
-	// }
-	// restore_blog();
-	// }
-	// }
 
 	// update post meta
 	if ( $connection_map != $updated_post_connection_map ) {
@@ -616,7 +574,7 @@ function get_all_local_linked_posts( $gid ) {
 
 	list( $root_blog_id, $root_post_id, $root_site_url ) = explode_gid( $gid );
 
-	$network_url = \Contentsync\get_network_url();
+	$network_url = \Contentsync\Utils\get_network_url();
 
 	// build sql query
 	$results = array();

@@ -29,7 +29,7 @@
  */
 namespace Contentsync\Distribution\Destinations;
 
-use Contentsync\Logger;
+use Contentsync\Utils\Logger;
 use Contentsync\Distribution\Destinations\Post_Destination;
 
 if ( ! defined( 'ABSPATH' ) ) {

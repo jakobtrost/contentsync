@@ -20,7 +20,7 @@ namespace Contentsync\Mails\Templates;
 function get_mail_content_for_reviews_editor_approved( $review, $post ) {
 	$subject = __( 'The reviewer approved your request', 'contentsync' );
 
-	$reviewer_message = get_latest_message_by_post_review_id( $review->ID );
+	$reviewer_message = \Contentsync\Reviews\get_latest_message_by_post_review_id( $review->ID );
 	if ( ! $reviewer_message ) {
 		// If no reviewer message is found, use a default message
 		$mail_title = sprintf(
@@ -42,7 +42,7 @@ function get_mail_content_for_reviews_editor_approved( $review, $post ) {
 
 	$mail_note = __( 'No further action is needed.', 'contentsync' ) . '<br><br>';
 
-	$links = "<a href='" . \Contentsync\get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
+	$links = '<a href="' . \Contentsync\Utils\get_edit_post_link( $post->ID ) . '">' . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
 
 	$message = $mail_title . $mail_note . $links;
 

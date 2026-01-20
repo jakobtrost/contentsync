@@ -73,11 +73,6 @@ final class Post_Review {
 	 */
 	public $previous_post;
 
-	/**
-	 * @deprecated
-	 */
-	public $messages;
-
 
 	public static function get_instance( $post_review_id ) {
 		global $wpdb;

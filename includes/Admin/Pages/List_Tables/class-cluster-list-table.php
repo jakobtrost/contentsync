@@ -6,7 +6,7 @@
  * @extends WP_List_Table ( wp-admin/includes/class-wp-list-table.php )
  */
 
-namespace Contentsync\Cluster;
+namespace Contentsync\Admin\Pages\List_Tables;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

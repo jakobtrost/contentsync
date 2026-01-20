@@ -14,10 +14,10 @@
  * @since 2.17.0
  */
 
-namespace Contentsync;
+namespace Contentsync\Admin;
 
-use Contentsync\Post_Export;
-use Contentsync\Logger;
+use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Utils\Logger;
 use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -301,7 +301,7 @@ class Trigger {
 			// check if cluster has reviews enabled
 			$cluster = get_cluster_by_id( $condition->contentsync_cluster_id );
 			if ( $cluster->enable_reviews ) {
-				create_post_review( $post_id, $post_before );
+				\Contentsync\Reviews\create_post_review( $post_id, $post_before );
 			}
 
 			// check if the post is still in this cluster.
@@ -350,7 +350,7 @@ class Trigger {
 			// check if cluster has reviews enabled
 			$cluster = get_cluster_by_id( $condition->contentsync_cluster_id );
 			if ( $cluster->enable_reviews ) {
-				create_post_review( $post_id, $post_before );
+				\Contentsync\Reviews\create_post_review( $post_id, $post_before );
 			}
 
 			// check if the condition has a count filter enabled
@@ -432,7 +432,7 @@ class Trigger {
 		 * Create a review if the post needs review.
 		 */
 		if ( $post_needs_review ) {
-			create_post_review( $post_id, $post_before );
+			\Contentsync\Reviews\create_post_review( $post_id, $post_before );
 		}
 		/**
 		 * Distribute the post to all connections
@@ -473,7 +473,7 @@ class Trigger {
 
 		// Create a review if the post needs review
 		if ( $post_needs_review ) {
-			create_post_review( $post_id, $post_before );
+			\Contentsync\Reviews\create_post_review( $post_id, $post_before );
 		}
 		// Distribute the post to all connections & destinations
 		else {
@@ -635,7 +635,7 @@ class Trigger {
 			if ( self::post_needs_review( $post_id ) ) {
 				$post_before              = $post;
 				$post_before->post_status = $previous_status;
-				create_post_review( $post_id, $post_before );
+				\Contentsync\Reviews\create_post_review( $post_id, $post_before );
 				return;
 			}
 			self::on_trash_synced_post( $post_id );
@@ -657,7 +657,7 @@ class Trigger {
 			if ( self::post_needs_review( $post_id ) ) {
 				$post_before              = get_post( $post_id );
 				$post_before->post_status = 'trash';
-				create_post_review( $post_id, $post_before );
+				\Contentsync\Reviews\create_post_review( $post_id, $post_before );
 				return;
 			}
 			self::on_untrash_synced_post( $post_id );
@@ -688,7 +688,7 @@ class Trigger {
 			}
 		} elseif ( $status === 'root' ) {
 			if ( self::post_needs_review( $post_id ) ) {
-				create_post_review( $post_id, $post );
+				\Contentsync\Reviews\create_post_review( $post_id, $post );
 				return;
 			}
 			self::on_delete_synced_post( $post );

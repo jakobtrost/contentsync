@@ -14,7 +14,7 @@
  * Content Sync features.
  */
 
-namespace Contentsync\Contents;
+namespace Contentsync\Admin;
 
 use Contentsync\Utils\Multisite_Manager;
 
@@ -469,7 +469,7 @@ class Ajax {
 			$review_id = isset( $data['review_id'] ) ? intval( $data['review_id'] ) : 0;
 			$post_id   = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 
-			$result = \Contentsync\approve_post_review( $review_id, $post_id );
+			$result = \Contentsync\Reviews\approve_post_reviewt_review( $review_id, $post_id );
 
 			if ( $result ) {
 				$this->success( 'review was approved.' );
@@ -489,7 +489,7 @@ class Ajax {
 			$post_id   = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 			$message   = isset( $data['message'] ) ? esc_attr( $data['message'] ) : null;
 
-			$result = \Contentsync\deny_post_review( $review_id, $post_id, $message );
+			$result = \Contentsync\Reviews\deny_post_review( $review_id, $post_id, $message );
 
 			if ( $result ) {
 				$this->success( 'review was denied.' );
@@ -509,7 +509,7 @@ class Ajax {
 			$post_id   = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 			$message   = isset( $data['message'] ) ? esc_attr( $data['message'] ) : null;
 
-			$result = \Contentsync\revert_post_review( $review_id, $post_id, $message );
+			$result = \Contentsync\Reviews\revert_post_review( $review_id, $post_id, $message );
 
 			if ( $result ) {
 				$this->success( 'review was reverted.' );

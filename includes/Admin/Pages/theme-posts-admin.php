@@ -2,7 +2,7 @@
 /**
  *
  */
-namespace Contentsync;
+namespace Contentsync\Admin\Pages;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

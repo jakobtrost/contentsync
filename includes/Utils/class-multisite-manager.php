@@ -91,7 +91,7 @@ class Multisite_Manager {
 		Translation_Manager::init_translation_environment();
 
 		// remove filters from the query args within the export process
-		add_filter( 'contentsync_export_post_query_args', '\Contentsync\remove_filters_from_query_args' );
+		add_filter( 'contentsync_export_post_query_args', '\Contentsync\Posts\remove_filters_from_query_args' );
 
 		return true;
 	}

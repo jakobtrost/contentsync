@@ -14,7 +14,7 @@
  * @since 2.17.0
  */
 
-namespace Contentsync\Distribution;
+namespace Contentsync\Admin\Pages;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

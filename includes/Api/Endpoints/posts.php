@@ -191,7 +191,7 @@ class Posts extends Endpoint {
 			return $gid;
 		}
 
-		$gid = $_blog_id . '-' . $_post_id . '-' . \Contentsync\get_network_url();
+		$gid = $_blog_id . '-' . $_post_id . '-' . \Contentsync\Utils\get_network_url();
 
 		return $gid;
 	}
@@ -245,7 +245,7 @@ class Posts extends Endpoint {
 			}
 		}
 
-		$network_url = \Contentsync\get_network_url();
+		$network_url = \Contentsync\Utils\get_network_url();
 
 		// build sql query
 		$results = array();

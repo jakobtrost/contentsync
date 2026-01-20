@@ -6,7 +6,7 @@
  * @extends WP_List_Table ( wp-admin/includes/class-wp-list-table.php )
  */
 
-namespace Contentsync;
+namespace Contentsync\Admin\Pages\List_Tables;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -379,7 +379,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	 */
 	public function column_title( $post ) {
 
-		$edit_post_link  = \Contentsync\get_edit_post_link( $post );
+		$edit_post_link  = \Contentsync\Utils\get_edit_post_link( $post );
 		$trash_post_link = \Contentsync\Admin\get_delete_post_link( $post );
 
 		$is_trash    = ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' );
@@ -446,7 +446,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		$error       = '';
 		$post_status = '';
 
-		$template_theme = \Contentsync\get_wp_template_theme( $post );
+		$template_theme = \Contentsync\Posts\get_wp_template_theme( $post );
 		if ( $template_theme ) {
 
 			$template_theme_name = '';

@@ -403,7 +403,7 @@ class Cluster_Admin {
 
 					// distribute posts
 					$distribute_result = \Contentsync\distribute_cluster_posts(
-						new \Contentsync\Cluster( (object) $cluster ),
+						new \Contentsync\Cluster\Cluster( (object) $cluster ),
 						array(
 							'posts'           => $cluster_posts_before,
 							'destination_ids' => $destination_ids_before,

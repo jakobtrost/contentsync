@@ -35,7 +35,7 @@
  */
 namespace Contentsync\Distribution\Destinations;
 
-use Contentsync\Logger;
+use Contentsync\Utils\Logger;
 use Contentsync\Distribution\Destinations\Destination;
 use Contentsync\Distribution\Destinations\Blog_Destination;
 

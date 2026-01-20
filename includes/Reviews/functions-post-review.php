@@ -3,10 +3,10 @@
  * Post review helper functions.
  *
  * This file defines a set of helper functions used to retrieve
- * `\Contentsync\Reviews\Post_Review` objects by ID, by post and blog combination, or to
+ * `Post_Review` objects by ID, by post and blog combination, or to
  * retrieve all reviews for a specific post. These functions provide
  * convenient accessors around the underlying database queries and
- * object construction performed by the `\Contentsync\Reviews\Post_Review` class. Use
+ * object construction performed by the `Post_Review` class. Use
  * them from your templates or controllers to interact with post review
  * data without directly writing SQL.
  *
@@ -156,7 +156,7 @@ function approve_post_review( $review_id, $post_id = null ) {
 		return false;
 	}
 
-	$new_message = new \Contentsync\Reviews\Post_Review_Message(
+	$new_message = new Post_Review_Message(
 		$review_id,
 		array(
 			'content'   => '',
@@ -204,7 +204,7 @@ function deny_post_review( $review_id, $post_id = null, $message_content = '' ) 
 		'reviewer'  => get_current_user_id(),
 	);
 
-	$new_message = new \Contentsync\Reviews\Post_Review_Message( $review_id, $new_message_args );
+	$new_message = new Post_Review_Message( $review_id, $new_message_args );
 	$new_message->save();
 
 	$result = set_post_review_state( $review_id, 'denied' );
@@ -242,7 +242,7 @@ function revert_post_review( $review_id, $post_id = null, $message_content = '' 
 		'reviewer'  => get_current_user_id(),
 	);
 
-	$new_message = new \Contentsync\Reviews\Post_Review_Message( $review_id, $new_message_args );
+	$new_message = new Post_Review_Message( $review_id, $new_message_args );
 	$new_message->save();
 
 	$previous_post = $post_review->previous_post;
@@ -294,10 +294,10 @@ function revert_post_review( $review_id, $post_id = null, $message_content = '' 
  *
  * @param int $post_review_id
  *
- * @return \Contentsync\Reviews\Post_Review|false
+ * @return Post_Review|false
  */
 function get_post_review_by_id( $post_review_id ) {
-	return \Contentsync\Reviews\Post_Review::get_instance( $post_review_id );
+	return Post_Review::get_instance( $post_review_id );
 }
 
 /**
@@ -305,7 +305,7 @@ function get_post_review_by_id( $post_review_id ) {
  *
  * @param int $post_id
  *
- * @return \Contentsync\Reviews\Post_Review|false
+ * @return Post_Review|false
  */
 function get_post_review_by_post( $post_id, $blog_id, $state = null ) {
 	global $wpdb;
@@ -329,7 +329,7 @@ function get_post_review_by_post( $post_id, $blog_id, $state = null ) {
 		return false;
 	}
 
-	return new \Contentsync\Reviews\Post_Review( $_post_review );
+	return new Post_Review( $_post_review );
 }
 
 /**
@@ -337,7 +337,7 @@ function get_post_review_by_post( $post_id, $blog_id, $state = null ) {
  *
  * @param int $post_id
  *
- * @return \Contentsync\Reviews\Post_Review[]
+ * @return Post_Review[]
  */
 function get_all_post_reviews_by_post( $post_id, $blog_id, $state = null ) {
 	global $wpdb;
@@ -364,7 +364,7 @@ function get_all_post_reviews_by_post( $post_id, $blog_id, $state = null ) {
 
 	$post_review_objects = array();
 	foreach ( $post_reviews as $post_review ) {
-		$post_review_objects[] = new \Contentsync\Reviews\Post_Review( $post_review );
+		$post_review_objects[] = new Post_Review( $post_review );
 	}
 
 	return $post_review_objects;
@@ -375,7 +375,7 @@ function get_all_post_reviews_by_post( $post_id, $blog_id, $state = null ) {
  *
  * @param string|array $state
  *
- * @return \Contentsync\Reviews\Post_Review[]
+ * @return Post_Review[]
  */
 function get_post_reviews( $state = null ) {
 	global $wpdb;
@@ -396,7 +396,7 @@ function get_post_reviews( $state = null ) {
 
 	$post_review_objects = array();
 	foreach ( $post_reviews as $post_review ) {
-		$post_review_objects[] = new \Contentsync\Reviews\Post_Review( $post_review );
+		$post_review_objects[] = new Post_Review( $post_review );
 	}
 
 	return $post_review_objects;
@@ -428,10 +428,10 @@ function get_messages_by_post_review_id( $post_review_id ) {
 	// unserialize
 	$messages = unserialize( $messages );
 
-	// loop through the messages and create \Contentsync\Reviews\Post_Review_Message objects
+	// loop through the messages and create Post_Review_Message objects
 	$messages = array_map(
 		function ( $message ) use ( $post_review_id ) {
-			return new \Contentsync\Reviews\Post_Review_Message( $post_review_id, $message );
+			return new Post_Review_Message( $post_review_id, $message );
 		},
 		$messages
 	);
@@ -444,7 +444,7 @@ function get_messages_by_post_review_id( $post_review_id ) {
  *
  * @param int $post_review_id
  *
- * @return \Contentsync\Reviews\Post_Review_Message|false
+ * @return Post_Review_Message|false
  */
 function get_latest_message_by_post_review_id( $post_review_id ) {
 	$messages = get_messages_by_post_review_id( $post_review_id );
@@ -456,8 +456,8 @@ function get_latest_message_by_post_review_id( $post_review_id ) {
 	$latest_message = end( $messages );
 
 	// if no object of post_review_message, create one
-	if ( ! $latest_message instanceof \Contentsync\Reviews\Post_Review_Message ) {
-		$latest_message = new \Contentsync\Reviews\Post_Review_Message( $post_review_id, $latest_message );
+	if ( ! $latest_message instanceof Post_Review_Message ) {
+		$latest_message = new Post_Review_Message( $post_review_id, $latest_message );
 	}
 
 	return $latest_message;
@@ -620,4 +620,4 @@ function replace_posts_with_previous_version_before_distribution( $prepared_post
 	return $prepared_posts;
 }
 
-add_filter( 'contentsync_prepared_posts_for_distribution', 'replace_posts_with_previous_version_before_distribution', 10, 3 );
+add_filter( 'contentsync_prepared_posts_for_distribution', __NAMESPACE__ . '\replace_posts_with_previous_version_before_distribution', 10, 3 );

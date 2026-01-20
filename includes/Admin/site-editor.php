@@ -13,7 +13,7 @@
  * into the Site Editor.
  */
 
-namespace Contentsync\Contents;
+namespace Contentsync\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -340,7 +340,7 @@ class Site_Editor {
 			case 'wp_template':
 			case 'wp_template_part':
 				// greyd-theme//footer, greyd-theme//404 ...
-				return \Contentsync\get_wp_template_theme( $post ) . '//' . $post->post_name;
+				return \Contentsync\Posts\get_wp_template_theme( $post ) . '//' . $post->post_name;
 
 			case 'wp_navigation':
 			case 'wp_block':

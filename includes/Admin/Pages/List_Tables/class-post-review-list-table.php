@@ -7,9 +7,10 @@
  * @since 2.17.0
  */
 
-namespace Contentsync\Cluster;
+namespace Contentsync\Admin\Pages\List_Tables;
 
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Reviews\Post_Review;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -59,7 +60,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
 		$rel   = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'open';
-		$items = get_post_reviews( $rel == 'open' ? null : $rel );
+		$items = \Contentsync\Reviews\get_post_reviews( $rel == 'open' ? null : $rel );
 		// debug($items);
 
 		// sort
@@ -140,10 +141,10 @@ class Post_Review_List_Table extends \WP_List_Table {
 			if ( $type == 'open' ) {
 				$items_count = 0;
 				foreach ( array( 'new', 'in_review', 'denied' ) as $state ) {
-					$items_count += count( get_post_reviews( $state ) );
+					$items_count += count( \Contentsync\Reviews\get_post_reviews( $state ) );
 				}
 			} else {
-				$items_count = count( get_post_reviews( $type ) );
+				$items_count = count( \Contentsync\Reviews\get_post_reviews( $type ) );
 			}
 			$query = remove_query_arg( array( 'rel', 'paged', 'action', 'post', '_wpnonce' ) );
 
@@ -231,7 +232,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the post title & actions column output.
 	 *
-	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
+	 * @param Post_Review $post The current Post_Review object.
 	 */
 	public function column_post_title( $post ) {
 
@@ -334,7 +335,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the editor column output.
 	 *
-	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
+	 * @param Post_Review $post The current Post_Review object.
 	 */
 	public function column_editor( $post ) {
 		return $post->get_editor();
@@ -343,13 +344,13 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the reviewer column output.
 	 *
-	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
+	 * @param Post_Review $post The current Post_Review object.
 	 */
 	public function column_reviewer( $post ) {
 		if ( in_array( $post->state, array( 'approved', 'denied', 'reverted' ) ) ) {
 			$reviewer         = 'N/A';
 			$info             = ' ';
-			$reviewer_message = get_latest_message_by_post_review_id( $post->ID );
+			$reviewer_message = \Contentsync\Reviews\get_latest_message_by_post_review_id( $post->ID );
 			if ( $reviewer_message && $reviewer_message->action === $post->state ) {
 				$reviewer = $reviewer_message->get_reviewer();
 				if ( $post->state != 'approved' ) {
@@ -374,7 +375,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the post date column output.
 	 *
-	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
+	 * @param Post_Review $post The current Post_Review object.
 	 */
 	public function column_date( $post ) {
 
@@ -393,7 +394,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the state column output.
 	 *
-	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
+	 * @param Post_Review $post The current Post_Review object.
 	 */
 	public function column_state( $post ) {
 		// return $post->state;
@@ -421,7 +422,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the root_stage column output.
 	 *
-	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
+	 * @param Post_Review $post The current Post_Review object.
 	 */
 	public function column_root_stage( $post ) {
 		return $this->get_root_blog_url( $post->blog_id );
@@ -430,7 +431,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the destinations column output.
 	 *
-	 * @param \Contentsync\Reviews\Post_Review $post The current \Contentsync\Reviews\Post_Review object.
+	 * @param Post_Review $post The current Post_Review object.
 	 */
 	public function column_destinations( $post ) {
 		return '';
@@ -515,7 +516,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 
 		if ( count( $post_ids ) > 0 ) {
 			foreach ( $post_ids as $post_id ) {
-				$post = get_post_review_by_id( $post_id );
+				$post = \Contentsync\Reviews\get_post_review_by_id( $post_id );
 				if ( $post ) {
 					// get root post
 					$root_post = is_multisite() ? get_blog_post( $post->blog_id, $post->post_id ) : get_post( $post->post_id );
@@ -527,21 +528,21 @@ class Post_Review_List_Table extends \WP_List_Table {
 					switch ( $bulk_action ) {
 						case 'approve':
 							Multisite_Manager::switch_blog( $post->blog_id );
-							$result = (bool) \Contentsync\approve_post_review( $post_id );
+							$result = (bool) \Contentsync\Reviews\approve_post_review( $post_id );
 							Multisite_Manager::restore_blog();
 							break;
 						case 'deny':
 							Multisite_Manager::switch_blog( $post->blog_id );
-							$result = (bool) \Contentsync\deny_post_review( $post_id );
+							$result = (bool) \Contentsync\Reviews\deny_post_review( $post_id );
 							Multisite_Manager::restore_blog();
 							break;
 						case 'revert':
 							Multisite_Manager::switch_blog( $post->blog_id );
-							$result = (bool) \Contentsync\revert_post_review( $post_id, $root_post->ID );
+							$result = (bool) \Contentsync\Reviews\revert_post_review( $post_id, $root_post->ID );
 							Multisite_Manager::restore_blog();
 							break;
 						case 'delete':
-							$result = (bool) delete_post_review( $post_id );
+							$result = (bool) \Contentsync\Reviews\delete_post_review( $post_id );
 							break;
 						default:
 							break;
@@ -619,7 +620,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 */
 	public function get_root_post_edit_link( $blog_id, $post_id ) {
 		Multisite_Manager::switch_blog( $blog_id );
-		$edit_post_link = \Contentsync\get_edit_post_link( $post_id );
+		$edit_post_link = \Contentsync\Utils\get_edit_post_link( $post_id );
 		Multisite_Manager::restore_blog();
 		return $edit_post_link;
 	}

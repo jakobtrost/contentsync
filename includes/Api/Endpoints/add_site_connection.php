@@ -53,7 +53,7 @@ class Add_Connection extends Endpoint {
 	public function add_site_connection( $request ) {
 
 		$request_url    = $request->get_header( 'Origin' );
-		$current_url    = \Contentsync\get_network_url();
+		$current_url    = \Contentsync\Utils\get_network_url();
 		$new_connection = $request->get_param( 'connection' );
 
 		if ( ! $new_connection ) {
@@ -61,7 +61,7 @@ class Add_Connection extends Endpoint {
 		}
 
 		// If the connection to the current site doesn't exist, create it.
-		$result = \Contentsync\Site_Connections\add_site_connection( $new_connection );
+		$result = \Contentsync\Distribution\add_site_connection( $new_connection );
 
 		if ( $result === null ) {
 			return new \WP_Error( 'connection_not_added', 'Connection already exists', array( 'status' => 400 ) );

@@ -167,7 +167,7 @@ function get_post_id_by_gid( $gid ) {
 function get_all_synced_posts( $query = null, $network_url = null ) {
 
 	$all_synced_posts = array();
-	$current_network  = \Contentsync\get_network_url();
+	$current_network  = \Contentsync\Utils\get_network_url();
 
 	// get network posts
 	if ( empty( $network_url ) || $network_url === 'here' || $network_url === $current_network ) {
@@ -183,7 +183,7 @@ function get_all_synced_posts( $query = null, $network_url = null ) {
 		}
 
 		// don't add posts from the same network
-		if ( \Contentsync\get_nice_url( $site_url ) === $current_network ) {
+		if ( \Contentsync\Utils\get_nice_url( $site_url ) === $current_network ) {
 			continue;
 		}
 
@@ -286,7 +286,7 @@ function get_synced_posts_of_blog( $blog_id = '', $filter_status = '', $query = 
 
 	$post_type = 'any';
 	if ( empty( $post_type ) || $post_type === 'any' ) {
-		$post_type = \Contentsync\is_rest_request() ? 'any' : \Contentsync\get_export_post_types();
+		$post_type = is_rest_request() ? 'any' : \Contentsync\get_export_post_types();
 	}
 
 	$args = array(
@@ -380,7 +380,7 @@ function extend_post_object( $post, $current_blog = 0 ) {
 		$post->blog_id = $current_blog ? $current_blog : get_current_blog_id();
 
 		// attach theme used in blog
-		$post->blog_theme = get_wp_template_theme( $post );
+		$post->blog_theme = \Contentsync\Posts\get_wp_template_theme( $post );
 	}
 	return $post;
 }
@@ -401,7 +401,7 @@ function get_local_post_by_gid( $gid, $post_type = 'any' ) {
 	$local_post = false;
 
 	if ( empty( $post_type ) || $post_type === 'any' ) {
-		$post_type = \Contentsync\is_rest_request() ? 'any' : \Contentsync\get_export_post_types();
+		$post_type = is_rest_request() ? 'any' : \Contentsync\get_export_post_types();
 	}
 
 	$result = get_unfiltered_posts(
@@ -434,4 +434,11 @@ function get_local_post_by_gid( $gid, $post_type = 'any' ) {
 	 * @return WP_Post|bool The modified local post object or false.
 	 */
 	return apply_filters( 'contentsync_get_local_post_by_gid', $local_post, $gid, $post_type );
+}
+
+/**
+ * Whether we are in a REST REQUEST. Similar to is_admin().
+ */
+function is_rest_request() {
+	return defined( 'REST_REQUEST' ) && REST_REQUEST;
 }

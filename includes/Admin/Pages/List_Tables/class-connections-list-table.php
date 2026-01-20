@@ -5,7 +5,7 @@
  *
  * @see wp-admin/includes/class-wp-list-table.php
  */
-namespace Contentsync\Connections;
+namespace Contentsync\Admin\Pages\List_Tables;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -137,7 +137,7 @@ class Connections_List_Table extends \WP_List_Table {
 				if ( ! $site_name ) {
 					$site_name = \Contentsync\Api\get_site_name( $site_url ) ?? $site_url;
 				}
-				$network_url = \Contentsync\get_nice_url( $site_url );
+				$network_url = \Contentsync\Utils\get_nice_url( $site_url );
 				$delete_url  = remove_query_arg( array( 'user_login', 'password', 'site_url', 'success' ), add_query_arg( 'delete', $network_url ) );
 				$actions     = array(
 					'view'   => "<a href='$site_url' target='_blank'>" . __( 'View website', 'contentsync_hub' ) . '</a>',
@@ -225,7 +225,7 @@ class Connections_List_Table extends \WP_List_Table {
 		// delete GET request
 		if ( isset( $_GET['delete'] ) ) {
 			$delete_site_url = urldecode( $_GET['delete'] );
-			$deleted         = \Contentsync\Site_Connections\delete_connection( $delete_site_url );
+			$deleted         = \Contentsync\Distribution\delete_connection( $delete_site_url );
 			// successfull
 			if ( $deleted ) {
 				\Contentsync\Admin\render_admin_notice(

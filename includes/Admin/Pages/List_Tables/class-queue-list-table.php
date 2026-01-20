@@ -7,7 +7,7 @@
  * @since 2.17.0
  */
 
-namespace Contentsync\Distribution;
+namespace Contentsync\Admin\Pages\List_Tables;
 
 use WP_Error;
 

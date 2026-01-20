@@ -35,8 +35,10 @@
 namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
-use Contentsync\Logger;
-use Contentsync\Distribution_Item;
+use Contentsync\Utils\Logger;
+use Contentsync\Distribution\Distribution_Item;
+use Contentsync\Distribution\Destinations\Remote_Destination;
+use Contentsync\Distribution\Destinations\Blog_Destination;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -164,7 +166,7 @@ class Distribution_Endpoint extends Endpoint {
 				'origin_id'   => $distribution_item_id,
 			);
 
-			$distribution_item = \Contentsync\schedule_distribution_item( $distribution_item_properties );
+			$distribution_item = \Contentsync\Distribution\schedule_distribution_item( $distribution_item_properties );
 
 			Logger::add( 'Distribution to destination scheduled: ' . $distribution_item->destination->ID );
 		}
@@ -312,7 +314,7 @@ class Distribution_Endpoint extends Endpoint {
 		$blogs = isset( $destination['blogs'] ) ? $destination['blogs'] : array();
 		unset( $destination['blogs'] );
 
-		$remote_destination = new \Contentsync\Destinations\Remote_Destination( $destination );
+		$remote_destination = new Remote_Destination( $destination );
 
 		if ( empty( $blogs ) ) {
 			Logger::add( 'sanitize_remote_destination', 'The destination has no blogs.' );
@@ -433,7 +435,7 @@ class Distribution_Endpoint extends Endpoint {
 	public function match_gid_before_import( $gid ) {
 
 		$origin  = $this->origin;
-		$current = \Contentsync\get_network_url();
+		$current = \Contentsync\Utils\get_network_url();
 
 		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $gid );
 
@@ -520,13 +522,13 @@ class Distribution_Endpoint extends Endpoint {
 			return $this->respond( $response, 'The request arguments were set incorrectly (status, distribution_item_id, destination).' );
 		}
 
-		$remote_blog_destination = isset( $destination['ID'] ) ? new \Contentsync\Destinations\Blog_Destination( $destination['ID'], $destination ) : false;
+		$remote_blog_destination = isset( $destination['ID'] ) ? new Blog_Destination( $destination['ID'], $destination ) : false;
 
 		if ( ! $remote_blog_destination ) {
 			return $this->respond( $response, 'The remote blog destination does not have an ID.' );
 		}
 
-		$distribution_item = \Contentsync\get_distribution_item( $distribution_item_id );
+		$distribution_item = \Contentsync\Distribution\get_distribution_item( $distribution_item_id );
 
 		if ( ! $distribution_item ) {
 			return $this->respond( $response, 'The distribution item could not be found.' );

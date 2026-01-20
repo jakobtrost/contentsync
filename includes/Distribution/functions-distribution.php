@@ -16,11 +16,13 @@
 namespace Contentsync\Distribution;
 
 use WP_Error;
-use Contentsync\Logger;
+use Contentsync\Utils\Logger;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Cluster\Cluster;
 use Contentsync\Cluster\Content_Condition;
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Distribution\Destinations\Remote_Destination
+use Contentsync\Distribution\Destinations\Blog_Destination;
 
 require_once CONTENTSYNC_PLUGIN_PATH . '/libs/action-scheduler/action-scheduler.php';
 
@@ -201,7 +203,7 @@ function distribute_cluster_posts( $cluster_or_cluster_id, $before = array() ) {
 	// Logger::add( "Cluster or ID:", $cluster_or_cluster_id );
 	// Logger::add( "Before:", $before );
 
-	if ( ! $cluster_or_cluster_id instanceof \Contentsync\Cluster ) {
+	if ( ! $cluster_or_cluster_id instanceof \Contentsync\Cluster\Cluster ) {
 		$cluster = get_cluster_by_id( $cluster_or_cluster_id );
 		if ( ! $cluster ) {
 			return false;
@@ -359,7 +361,7 @@ function distribute_cluster_content_condition_posts( $condition_or_condition_id,
  *                                          the distribution. We use this to make sure this post will be updated and not
  *                                          skipped, as it probably has been changed.
  *
- * @return \Contentsync\Destinations\Destination[] Array of Blog_Destination and Remote_Destination objects.
+ * @return Destination[] Array of Blog_Destination and Remote_Destination objects.
  */
 function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 
@@ -418,10 +420,10 @@ function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 		if ( strpos( $destination_id, '|' ) !== false ) {
 			list( $remote_blog_id, $remote_network_url ) = explode( '|', $destination_id );
 
-			$remote_network_url = \Contentsync\get_nice_url( $remote_network_url );
+			$remote_network_url = \Contentsync\Utils\get_nice_url( $remote_network_url );
 
 			if ( ! isset( $destinations[ $remote_network_url ] ) ) {
-				$destinations[ $remote_network_url ] = new \Contentsync\Destinations\Remote_Destination( $remote_network_url );
+				$destinations[ $remote_network_url ] = new Remote_Destination( $remote_network_url );
 			}
 
 			$blog = $destinations[ $remote_network_url ]->set_blog( $remote_blog_id );
@@ -443,7 +445,7 @@ function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 			}
 
 			if ( ! isset( $destinations[ $blog_id ] ) ) {
-				$destinations[ $blog_id ] = new \Contentsync\Destinations\Blog_Destination(
+				$destinations[ $blog_id ] = new Blog_Destination(
 					$blog_id,
 					array(
 						'url' => get_home_url( $blog_id ),
@@ -494,7 +496,7 @@ function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 				$post_connection = $post_connection_or_blogs;
 
 				if ( ! isset( $destinations[ $blod_id ] ) ) {
-					$destinations[ $blod_id ] = new \Contentsync\Destinations\Blog_Destination(
+					$destinations[ $blod_id ] = new Blog_Destination(
 						$blod_id,
 						array(
 							'url' => get_home_url( $blod_id ),
@@ -518,7 +520,7 @@ function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 				$blogs              = $post_connection_or_blogs;
 
 				if ( ! isset( $destinations[ $remote_network_url ] ) ) {
-					$destinations[ $remote_network_url ] = new \Contentsync\Destinations\Remote_Destination( $remote_network_url );
+					$destinations[ $remote_network_url ] = new Remote_Destination( $remote_network_url );
 				}
 
 				foreach ( $blogs as $blog_id => $post_connection ) {
@@ -585,7 +587,7 @@ function prepare_posts_for_distribution( $post_ids_or_objects, $export_args = ar
 		 * export of the root post yet. So we need to make it a synced post.
 		 */
 		if ( empty( $gid ) ) {
-			$gid = \Contentsync\make_post_global( $post_id, $export_args );
+			$gid = \Contentsync\Posts\Sync\make_post_global( $post_id, $export_args );
 
 			/**
 			 * We now manually set the global meta infos.
@@ -659,8 +661,8 @@ function prepare_posts_for_distribution( $post_ids_or_objects, $export_args = ar
 /**
  * Schedule post distribution.
  *
- * @param Prepared_Post[]                         $prepared_posts  Array of prepared posts.
- * @param \Contentsync\Destinations\Destination[] $destinations        Array of Blog_Destination and Remote_Destination objects.
+ * @param Prepared_Post[] $prepared_posts  Array of prepared posts.
+ * @param Destination[]   $destinations        Array of Blog_Destination and Remote_Destination objects.
  *
  * @return WP_Error|true  WP_Error on failure, true on success.
  */
@@ -714,7 +716,7 @@ function schedule_post_distribution( $prepared_posts, $destinations ) {
  *
  * @param array $distribution_item_properties  The distribution item properties.
  *   @property Prepared_Post[] $posts       Array of prepared posts.
- *   @property \Contentsync\Destinations\Destination      $destination The destination object
+ *   @property Destination      $destination The destination object
  *
  * @return WP_Error|int  WP_Error on failure, the action ID on success.
  */
@@ -978,7 +980,7 @@ function import_posts_to_blog( &$item ) {
 	}
 
 	// add imported post ids to destination
-	$imported_post_ids = method_exists( '\Contentsync\Post_Import', 'get_all_posts' ) ? \Contentsync\Post_Import::get_all_posts() : false;
+	$imported_post_ids = method_exists( '\Contentsync\Posts\Transfer\Post_Import', 'get_all_posts' ) ? \Contentsync\Posts\Transfer\Post_Import::get_all_posts() : false;
 	if ( $imported_post_ids ) {
 		foreach ( $imported_post_ids as $root_post_id => $imported_post_id ) {
 			$item->destination->set_post(
@@ -986,7 +988,7 @@ function import_posts_to_blog( &$item ) {
 				$imported_post_id,
 				array(
 					'status' => 'success',
-					'url'    => \Contentsync\get_edit_post_link( $imported_post_id ),
+					'url'    => \Contentsync\Utils\get_edit_post_link( $imported_post_id ),
 				)
 			);
 		}

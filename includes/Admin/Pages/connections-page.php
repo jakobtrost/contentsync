@@ -2,7 +2,7 @@
 /**
  * Includes an admin page to  overview & add global connections.
  */
-namespace Contentsync\Connections;
+namespace Contentsync\Admin\Pages;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -80,7 +80,7 @@ class Connections_Page {
 		// add connection form
 		echo "<h1 style='margin-top:2em;'>" . __( 'Add connection', 'contentsync_hub' ) . "</h1>
 		<form method='post' class='add_site_connection'>
-			<input type='hidden' name='_nonce' value='" . wp_create_nonce( \Contentsync\get_site_connections_option_name() ) . "' />
+			<input type='hidden' name='_nonce' value='" . wp_create_nonce( \Contentsync\Distribution\get_site_connections_option_name() ) . "' />
 
 			" . ( is_ssl() ? '' : \Contentsync\Admin\make_admin_info_box(
 				array(
@@ -99,7 +99,7 @@ class Connections_Page {
 			<p>' . __( 'In addition, a valid SSL certificate should be available on both sides and the Content Sync Plugin should be active and up-to-date.', 'contentsync_hub' ) . '</p>
 			<p>' . sprintf(
 				__( 'To add a connection to this page on another page, enter the URL %s.', 'contentsync_hub' ),
-				'<code>' . \Contentsync\get_network_url() . '</code>'
+				'<code>' . \Contentsync\Utils\get_network_url() . '</code>'
 			) . '</p>
 		</form>';
 
@@ -129,7 +129,7 @@ class Connections_Page {
 
 		// verify the nonce
 		$nonce = isset( $_POST['_nonce'] ) ? $_POST['_nonce'] : null;
-		if ( ! $nonce || wp_verify_nonce( $nonce, \Contentsync\get_site_connections_option_name() ) !== 1 ) {
+		if ( ! $nonce || wp_verify_nonce( $nonce, \Contentsync\Distribution\get_site_connections_option_name() ) !== 1 ) {
 			self::add_error( __( 'The request could not be verified.', 'contentsync_hub' ) );
 		}
 
@@ -151,7 +151,7 @@ class Connections_Page {
 		$success_path   = $_GET['page'] === 'gc_connections' ? 'admin.php?page=gc_connections' : 'admin.php?page=contentsync_hub&tab=connections';
 		$success_url    = is_network_admin() ? network_admin_url( $success_path ) : admin_url( $success_path );
 
-		$app_name   = urlencode( sprintf( __( 'Connection for %s', 'contentsync_hub' ), \Contentsync\get_network_url() ) );
+		$app_name   = urlencode( sprintf( __( 'Connection for %s', 'contentsync_hub' ), \Contentsync\Utils\get_network_url() ) );
 		$query_args = array(
 			'app_name'    => $app_name,
 			'app_id'      => urlencode( wp_generate_uuid4() ),
@@ -174,7 +174,7 @@ class Connections_Page {
 		}
 
 		$site_url   = esc_attr( $_GET['site_url'] );
-		$nice_url   = \Contentsync\get_nice_url( $site_url );
+		$nice_url   = \Contentsync\Utils\get_nice_url( $site_url );
 		$connection = array(
 			'site_name'  => \Contentsync\Api\get_site_name( $site_url ),
 			'user_login' => esc_attr( $_GET['user_login'] ),
@@ -197,7 +197,7 @@ class Connections_Page {
 				sprintf(
 					__( 'To do this, go to the admin or network admin area of the page %1$s and enter the URL %2$s at "Add Connection".', 'contentsync_hub' ),
 					"<a href='" . esc_url( $site_url ) . "' target='_blank'>$nice_url</a>",
-					'<strong>' . \Contentsync\get_network_url() . '</strong>'
+					'<strong>' . \Contentsync\Utils\get_network_url() . '</strong>'
 				)
 			);
 		}

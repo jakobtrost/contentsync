@@ -307,7 +307,7 @@ function post_meets_cluster_content_condition( $post_or_post_id, $condition_or_c
 		$query_args['post__in'] = array( $post_id );
 	}
 
-	$posts = \Contentsync\get_unfiltered_posts( $query_args );
+	$posts = \Contentsync\Posts\get_unfiltered_posts( $query_args );
 
 	// ... so we have to check manually
 	if ( ! isset( $query_args['post__in'] ) ) {

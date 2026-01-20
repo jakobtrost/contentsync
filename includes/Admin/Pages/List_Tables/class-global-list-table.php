@@ -6,7 +6,7 @@
  * @extends WP_List_Table ( wp-admin/includes/class-wp-list-table.php )
  */
 
-namespace Contentsync\Contents;
+namespace Contentsync\Admin\Pages\List_Tables;
 
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Multisite_Manager;
@@ -137,7 +137,7 @@ class Global_List_Table extends \WP_List_Table {
 		// sort
 		$orderby  = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'post_date';
 		$order    = isset( $_GET['order'] ) ? $_GET['order'] : 'desc';
-		$class    = 'Contentsync\Contents\Global_List_Table';
+		$class    = 'Contentsync\Admin\Pages\List_Tables\Global_List_Table';
 		$callback = method_exists( $class, 'sortby_' . $orderby . '_' . $order ) ? array( $class, 'sortby_' . $orderby . '_' . $order ) : array( $class, 'sortby_post_date_desc' );
 		usort( $items, $callback );
 
@@ -164,7 +164,7 @@ class Global_List_Table extends \WP_List_Table {
 		);
 
 		// set class vars
-		$this->network_url = \Contentsync\get_network_url();
+		$this->network_url = \Contentsync\Utils\get_network_url();
 
 		/**
 		 * display message if translation tool is not active on the main site
@@ -516,7 +516,7 @@ class Global_List_Table extends \WP_List_Table {
 			// because the theme will automatically be switched to the theme of the destination blog
 			// during import.
 			if ( $item->local_post ) {
-				$blog_theme = \Contentsync\get_wp_template_theme( $item->local_post );
+				$blog_theme = \Contentsync\Posts\get_wp_template_theme( $item->local_post );
 			}
 			// debug( $item, true );
 			$item->post_links = array(

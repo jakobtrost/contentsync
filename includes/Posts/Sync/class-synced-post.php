@@ -314,7 +314,7 @@ class Synced_Post {
 				$gid = $this->blog_id . '-' . $this->ID;
 
 				if ( ! empty( $this->network_url ) ) {
-					$gid .= '-' . \Contentsync\\Contentsync\get_nice_url( $this->network_url );
+					$gid .= '-' . \Contentsync\Utils\get_nice_url( $this->network_url );
 				}
 
 				$meta['synced_post_id'] = $gid;
@@ -323,10 +323,10 @@ class Synced_Post {
 			// contentsync_connection_map (add connection only for current site)
 			if ( isset( $gid ) && empty( $this->meta['contentsync_connection_map'] ) ) {
 
-				$imported_post = \Contentsync\\Contentsync\get_local_post_by_gid( $gid );
+				$imported_post = \Contentsync\get_local_post_by_gid( $gid );
 				if ( $imported_post && isset( $imported_post->ID ) ) {
 					$blog_id                            = get_current_blog_id();
-					$net_url                            = \Contentsync\get_network_url();
+					$net_url                            = \Contentsync\Utils\get_network_url();
 					$meta['contentsync_connection_map'] = array(
 						$net_url => array(
 							$blog_id => \Contentsync\get_post_connection_map( $blog_id, $imported_post->ID ),

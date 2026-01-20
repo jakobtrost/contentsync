@@ -9,7 +9,7 @@
  */
 namespace Contentsync\Distribution;
 
-use Contentsync\Logger;
+use Contentsync\Utils\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -59,7 +59,7 @@ function get_site_connections() {
  */
 function get_site_connection( $site_url ) {
 
-	$site_url = apply_filters( 'contentsync_connection_key', \Contentsync\get_nice_url( $site_url ) );
+	$site_url = apply_filters( 'contentsync_connection_key', \Contentsync\Utils\get_nice_url( $site_url ) );
 	Logger::add( 'get_site_connection', $site_url );
 
 	$connections = get_site_connections();
@@ -67,7 +67,7 @@ function get_site_connection( $site_url ) {
 	if ( isset( $connections[ $site_url ] ) ) {
 		$connection = $connections[ $site_url ];
 	} else {
-		$site_url   = \Contentsync\get_nice_url( $site_url );
+		$site_url   = \Contentsync\Utils\get_nice_url( $site_url );
 		$connection = isset( $connections[ $site_url ] ) ? $connections[ $site_url ] : null;
 	}
 
@@ -120,7 +120,7 @@ function update_site_connection( $connection = array() ) {
 	}
 
 	$connections = get_site_connections();
-	$site_url    = isset( $connection['site_url'] ) ? \Contentsync\get_nice_url( $connection['site_url'] ) : null;
+	$site_url    = isset( $connection['site_url'] ) ? \Contentsync\Utils\get_nice_url( $connection['site_url'] ) : null;
 
 	if ( empty( $site_url ) ) {
 		return false;
@@ -160,7 +160,7 @@ function add_site_connection( $connection ) {
 		return false;
 	}
 
-	$site_url = \Contentsync\get_nice_url( $connection['site_url'] );
+	$site_url = \Contentsync\Utils\get_nice_url( $connection['site_url'] );
 
 	// get connections
 	$connections = get_site_connections();
@@ -172,7 +172,7 @@ function add_site_connection( $connection ) {
 	}
 
 	// don't add if from this network
-	if ( $site_url === \Contentsync\get_network_url() ) {
+	if ( $site_url === \Contentsync\Utils\get_network_url() ) {
 		return null;
 	}
 
@@ -197,7 +197,7 @@ function delete_connection( $site_url ) {
 		return false;
 	}
 
-	$site_url = \Contentsync\get_nice_url( $site_url );
+	$site_url = \Contentsync\Utils\get_nice_url( $site_url );
 
 	// get connections
 	$connections = get_site_connections();

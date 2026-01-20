@@ -52,11 +52,6 @@ final class Content_Condition {
 	public $post_type;
 
 	/**
-	 * @deprecated
-	 */
-	public $title;
-
-	/**
 	 * Make posts global automatically
 	 *
 	 * @var bool
@@ -168,7 +163,6 @@ final class Content_Condition {
 				'blog_id'                         => $this->blog_id,
 				'post_type'                       => $this->post_type,
 				'filter'                          => serialize( $this->filter ),
-				// 'title'  => $this->title,
 				'make_posts_global_automatically' => $this->make_posts_global_automatically,
 				'taxonomy'                        => $this->taxonomy,
 				'terms'                           => serialize( $this->terms ),

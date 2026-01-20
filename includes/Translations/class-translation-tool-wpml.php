@@ -78,7 +78,7 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 * Get language information for a post.
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
+	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array|null Language info array or null.
 	 */
 	public function get_post_language_info( $post ) {
@@ -190,7 +190,7 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 * Get post translations.
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
+	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array Translation array.
 	 */
 	public function get_post_translations( $post ) {
@@ -520,8 +520,8 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 * Prepare complete language data for a post.
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
-	 * @param bool                                    $include_translations Whether to include translation post IDs.
+	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
+	 * @param bool                      $include_translations Whether to include translation post IDs.
 	 * @return array Language data structure.
 	 */
 	public function prepare_post_language_data( $post, $include_translations = false ) {
@@ -575,8 +575,8 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 * Analyze whether a post translation should be imported.
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post|object $post Prepared_Post object with language property.
-	 * @param array                             $already_imported_posts Map of original post IDs to new post IDs.
+	 * @param Prepared_Post|object $post Prepared_Post object with language property.
+	 * @param array                $already_imported_posts Map of original post IDs to new post IDs.
 	 * @return array Analysis result.
 	 */
 	public function analyze_translation_import( $post, $already_imported_posts = array() ) {
@@ -664,7 +664,7 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 * as we can directly set the language in the database.
 	 *
 	 * @since 2.19.0
-	 * @param \Contentsync\Prepared_Post|object $post Prepared_Post object with language property.
+	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @return mixed null if no language info, false if language not supported, true if switched.
 	 */
 	public function switch_to_language_context( $post ) {

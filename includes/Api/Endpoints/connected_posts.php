@@ -342,7 +342,7 @@ class Connected_Posts extends Endpoint {
 		// echo "\r\n".sprintf( "Match gid before import: %s", $gid );
 
 		$origin  = $this->origin;
-		$current = \Contentsync\get_network_url();
+		$current = \Contentsync\Utils\get_network_url();
 
 		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $gid );
 		if ( ! empty( $post_id ) && ! empty( $origin ) ) {
@@ -411,7 +411,7 @@ class Connected_Posts extends Endpoint {
 	public function allow_request_from_same_origin( $request ) {
 
 		$origin  = $request->get_header( 'Origin' );
-		$current = \Contentsync\get_network_url();
+		$current = \Contentsync\Utils\get_network_url();
 
 		if ( $current == $origin ) {
 			return true;

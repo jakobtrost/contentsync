@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function send_review_mail( $review_id, $status, $recipient ) {
 
 	// Get the review post
-	$post_review = get_post_review_by_id( $review_id );
+	$post_review = \Contentsync\Reviews\get_post_review_by_id( $review_id );
 	$post        = get_post( $post_review->post_id );
 	if ( ! $post ) {
 		$post = $post_review->previous_post;
@@ -95,7 +95,7 @@ function send_review_mail( $review_id, $status, $recipient ) {
 			$content = Templates\get_mail_content_for_reviews_editor_denied( $post_review, $post );
 		} elseif ( $status === 'reverted' ) {
 			require_once __DIR__ . '/templates/review-editor-reverted.php';
-			$content = Templates\get_mail_content_for_reviews_editor_reverted( $post_review, $post );
+			$content = get_mail_content_for_reviews_editor_reverted( $post_review, $post );
 		}
 	}
 

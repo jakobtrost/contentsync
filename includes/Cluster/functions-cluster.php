@@ -501,7 +501,7 @@ function check_clusters_on_date_change( $clusters_with_date_condition_before ) {
 
 			// -> if post_ids are different, distribute posts
 			if ( $flattened_post_ids !== $flattened_post_ids_before ) {
-				\Contentsync\distribute_cluster_posts( $cluster_id, $before );
+				\Contentsync\Distribution\distribute_cluster_posts( $cluster_id, $before );
 			}
 		}
 	}

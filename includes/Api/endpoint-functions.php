@@ -14,6 +14,8 @@
 
 namespace Contentsync\Api;
 
+use Contentsync\Utils\Logger;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -170,7 +172,7 @@ function distribute_item_to_remote_site( $connection_or_site_url, $remote_distri
 		'distribution/distribute-item',
 		array(
 			'distribution_item' => json_encode( $remote_distribution_item ),
-			'origin'            => \Contentsync\get_network_url(),
+			'origin'            => \Contentsync\Utils\get_network_url(),
 		),
 		'POST',
 		array(
@@ -190,10 +192,10 @@ function distribute_item_to_remote_site( $connection_or_site_url, $remote_distri
  *
  * This function calles the endpoint 'distribution/update-item' on the origin site.
  *
- * @param array|string                                 $connection_or_site_url  The connection or site URL.
- * @param int                                          $distribution_item_id    The Distribution_Item ID.
- * @param string                                       $status                  The status of the distribution.
- * @param \Contentsync\Destinations\Remote_Destination $destination             The destination object.
+ * @param array|string       $connection_or_site_url  The connection or site URL.
+ * @param int                $distribution_item_id    The Distribution_Item ID.
+ * @param string             $status                  The status of the distribution.
+ * @param Remote_Destination $destination             The destination object.
  */
 function update_distribution_item( $connection_or_site_url, $distribution_item_id, $status, $destination ) {
 	return send_request(
@@ -243,14 +245,14 @@ function send_request( $connection_or_site_url, $rest_base, $body = array(), $me
 		$request_url = untrailingslashit( esc_url( $connection['site_url'] ) );
 		$headers     = array(
 			'Authorization' => 'Basic ' . base64_encode( $connection['user_login'] . ':' . str_rot13( $connection['password'] ) ),
-			'Origin'        => \Contentsync\get_network_url(),
+			'Origin'        => \Contentsync\Utils\get_network_url(),
 		);
 	}
 	// try to get data from public endpoint
 	else {
 		$request_url = untrailingslashit( esc_url( $connection_or_site_url ) );
 		$headers     = array(
-			'Origin' => \Contentsync\get_network_url(),
+			'Origin' => \Contentsync\Utils\get_network_url(),
 		);
 	}
 
@@ -344,8 +346,8 @@ function send_response( $data, $message = '', $success = null, $status = null ) 
  * @return mixed Decoded response data on success, false or WP_Error on failure.
  */
 function handle_response( $response, $args = array() ) {
-	\Contentsync\Logger::add( 'handle_response', $response );
-	\Contentsync\Logger::add( 'handle_response args', $args );
+	Logger::add( 'handle_response', $response );
+	Logger::add( 'handle_response - args', $args );
 
 	// parse arguments
 	$args = wp_parse_args(
@@ -386,7 +388,7 @@ function handle_response( $response, $args = array() ) {
 				$code     = $error;
 				$message  = $msg[0];
 				$errors[] = "REST API Error: {$message} (code: {$code})";
-				\Contentsync\Logger::add(
+				Logger::add(
 					'REST API Error',
 					array(
 						'message' => $message,

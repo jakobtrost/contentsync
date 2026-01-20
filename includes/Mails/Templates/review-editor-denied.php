@@ -21,7 +21,7 @@ namespace Contentsync\Mails\Templates;
 function get_mail_content_for_reviews_editor_denied( $review, $post ) {
 	$subject = __( 'The reviewer requested modifications', 'contentsync' );
 
-	$reviewer_message         = get_latest_message_by_post_review_id( $review->ID );
+	$reviewer_message         = \Contentsync\Reviews\get_latest_message_by_post_review_id( $review->ID );
 	$reviewer_message_content = $reviewer_message->get_content();
 	$reviewer                 = $reviewer_message->get_reviewer();
 
@@ -40,7 +40,7 @@ function get_mail_content_for_reviews_editor_denied( $review, $post ) {
 
 	$mail_note .= __( 'Please review the requested modifications and make the necessary changes.', 'contentsync' ) . '<br><br>';
 
-	$links = "<a href='" . \Contentsync\get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
+	$links = '<a href="' . \Contentsync\Utils\get_edit_post_link( $post->ID ) . '">' . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
 
 	$message = $mail_title . $mail_note . $links;
 

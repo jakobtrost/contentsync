@@ -38,7 +38,7 @@
  */
 namespace Contentsync\Distribution;
 
-use Contentsync\Logger;
+use Contentsync\Utils\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

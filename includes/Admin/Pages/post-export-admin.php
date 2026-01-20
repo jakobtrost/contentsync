@@ -2,7 +2,7 @@
 /**
  * Export & Import Post Admin
  */
-namespace Contentsync;
+namespace Contentsync\Admin\Pages;
 
 use Contentsync\Translations\Translation_Manager;
 

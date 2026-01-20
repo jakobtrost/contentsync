@@ -492,7 +492,7 @@ class Translation_Manager {
 	 * Get the active translation tool instance.
 	 *
 	 * @since 2.19.0
-	 * @return \Contentsync\Translations\Translation_Tool_Base|null
+	 * @return Translation_Tool_Base|null
 	 */
 	private static function get_tool_instance() {
 		return Translation_Tool_Factory::get_instance();

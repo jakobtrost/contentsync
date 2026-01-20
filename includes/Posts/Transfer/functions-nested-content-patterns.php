@@ -4,7 +4,7 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Posts\Transfer;
 
 /**
  * Get the patterns to replace post ids in post_content.
