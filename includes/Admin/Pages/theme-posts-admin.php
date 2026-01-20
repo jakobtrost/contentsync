@@ -163,7 +163,7 @@ class Theme_Posts_Admin {
 					__( 'This will assign the styles from the theme %s to your current theme. Be careful, this could lead to errors, because the styles might not be compatible with your theme.', 'contentsync_hub' ),
 					'<strong class="replace"></strong>'
 				),
-				'content' => \Contentsync\Utils\make_admin_info_box(
+				'content' => \Contentsync\Admin\make_admin_info_box(
 					array(
 						'text'  => __( 'You are overwriting the global styles of your current theme. This cannot be made undone. Make sure to make a backup of the current styles beforehand.', 'contentsync_hub' ),
 						'style' => 'warning',
@@ -221,9 +221,7 @@ class Theme_Posts_Admin {
 	 */
 	public function handle_switch_template_theme( $data ) {
 
-		\Contentsync\post_export_enable_logs();
-
-		do_action( 'post_export_log', "\r\n\r\n" . 'HANDLE SWITCH TEMPLATE THEME' . "\r\n", $data );
+		Logger::add( '========= HANDLE SWITCH TEMPLATE THEME =========', $data );
 
 		$post_id                      = isset( $data['post_id'] ) ? $data['post_id'] : '';
 		$switch_references_in_content = isset( $data['switch_references_in_content'] ) ? $data['switch_references_in_content'] : '';
@@ -235,18 +233,18 @@ class Theme_Posts_Admin {
 			$result = \Contentsync\set_wp_template_theme( $post, $switch_references_in_content );
 
 			if ( is_wp_error( $result ) ) {
-				\Contentsync\post_export_return_error( $result->get_error_message() );
+				\Contentsync\admin_ajax_return_error( $result->get_error_message() );
 				return;
 			}
 
 			if ( $result ) {
-				post_export_return_success( __( 'Template was assigned to the current theme.', 'contentsync_hub' ) );
+				admin_ajax_return_success( __( 'Template was assigned to the current theme.', 'contentsync_hub' ) );
 				return;
 			}
 
-			\Contentsync\post_export_return_error( __( 'Template could not be assigned to the current theme.', 'contentsync_hub' ) );
+			\Contentsync\admin_ajax_return_error( __( 'Template could not be assigned to the current theme.', 'contentsync_hub' ) );
 		}
-		\Contentsync\post_export_return_error( __( 'No valid post ID found.', 'contentsync_hub' ) );
+		\Contentsync\admin_ajax_return_error( __( 'No valid post ID found.', 'contentsync_hub' ) );
 	}
 
 	/**
@@ -258,9 +256,7 @@ class Theme_Posts_Admin {
 	 */
 	public function handle_switch_global_styles( $data ) {
 
-		\Contentsync\post_export_enable_logs();
-
-		do_action( 'post_export_log', "\r\n\r\n" . 'HANDLE SWITCH GLOBAL STYLES' . "\r\n", $data );
+		Logger::add( '========= HANDLE SWITCH GLOBAL STYLES =========', $data );
 
 		$post_id = isset( $data['post_id'] ) ? $data['post_id'] : '';
 
@@ -271,18 +267,18 @@ class Theme_Posts_Admin {
 			$result = \Contentsync\set_wp_global_styles_theme( $post );
 
 			if ( is_wp_error( $result ) ) {
-				\Contentsync\post_export_return_error( $result->get_error_message() );
+				\Contentsync\admin_ajax_return_error( $result->get_error_message() );
 				return;
 			}
 
 			if ( $result ) {
-				post_export_return_success( __( 'Styles were assigned to the current theme.', 'contentsync_hub' ) );
+				admin_ajax_return_success( __( 'Styles were assigned to the current theme.', 'contentsync_hub' ) );
 				return;
 			}
 
-			\Contentsync\post_export_return_error( __( 'Styles could not be assigned to the current theme.', 'contentsync_hub' ) );
+			\Contentsync\admin_ajax_return_error( __( 'Styles could not be assigned to the current theme.', 'contentsync_hub' ) );
 		}
-		\Contentsync\post_export_return_error( __( 'No valid post ID found.', 'contentsync_hub' ) );
+		\Contentsync\admin_ajax_return_error( __( 'No valid post ID found.', 'contentsync_hub' ) );
 	}
 
 	/**
@@ -294,9 +290,7 @@ class Theme_Posts_Admin {
 	 */
 	public function handle_rename_template( $data ) {
 
-		\Contentsync\post_export_enable_logs();
-
-		do_action( 'post_export_log', "\r\n\r\n" . 'HANDLE RENAME TEMPLATE' . "\r\n", $data );
+		Logger::add( '========= HANDLE RENAME TEMPLATE =========', $data );
 
 		$post_id    = isset( $data['post_id'] ) ? $data['post_id'] : '';
 		$post_title = isset( $data['post_title'] ) ? $data['post_title'] : '';
@@ -314,17 +308,17 @@ class Theme_Posts_Admin {
 			$result = wp_update_post( $post );
 
 			if ( is_wp_error( $result ) ) {
-				\Contentsync\post_export_return_error( $result->get_error_message() );
+				\Contentsync\admin_ajax_return_error( $result->get_error_message() );
 				return;
 			}
 
 			if ( $result ) {
-				post_export_return_success( __( 'Template was renamed.', 'contentsync_hub' ) );
+				admin_ajax_return_success( __( 'Template was renamed.', 'contentsync_hub' ) );
 				return;
 			}
 
-			\Contentsync\post_export_return_error( __( 'Template could not be renamed.', 'contentsync_hub' ) );
+			\Contentsync\admin_ajax_return_error( __( 'Template could not be renamed.', 'contentsync_hub' ) );
 		}
-		\Contentsync\post_export_return_error( __( 'No valid post ID found.', 'contentsync_hub' ) );
+		\Contentsync\admin_ajax_return_error( __( 'No valid post ID found.', 'contentsync_hub' ) );
 	}
 }

@@ -4,6 +4,8 @@
  */
 namespace Contentsync;
 
+use Contentsync\Translations\Translation_Manager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -152,7 +154,7 @@ class Post_Export_Admin {
 
 		// add notices
 		if ( $screen->id === 'edit-page' ) {
-			$export_form .= \Contentsync\Utils\make_admin_info_box(
+			$export_form .= \Contentsync\Admin\make_admin_info_box(
 				array(
 					'text'  => __( 'Posts in query loops are not included in the import. Posts and Post Types must be exported separately.', 'contentsync_hub' ),
 					'style' => 'info',
@@ -289,7 +291,7 @@ class Post_Export_Admin {
 			$mode      = $transient[0];
 			$msg       = $transient[1];
 			// this is my last resort
-			\Contentsync\Utils\render_admin_notice( $msg, $mode );
+			\Contentsync\Admin\render_admin_notice( $msg, $mode );
 
 			// delete transient
 			delete_transient( 'contentsync_transient_notice' );
@@ -312,7 +314,6 @@ class Post_Export_Admin {
 			return;
 		}
 
-		\Contentsync\post_export_enable_logs();
 		$echo = '';
 		ob_start();
 
@@ -330,7 +331,7 @@ class Post_Export_Admin {
 			// }
 			// }
 
-			$response = Post_Export::export_post(
+			$post_export = new Post_Export(
 				$post_id,
 				array(
 					'append_nested'  => true,
@@ -342,18 +343,13 @@ class Post_Export_Admin {
 			);
 			echo "<hr>\r\n\r\n";
 
-			if ( is_object( $response ) && isset( $response->post_content ) ) {
-				$response->post_content = esc_attr( $response->post_content );
-			}
-
-			foreach ( Post_Export::get_all_posts() as $post ) {
+			foreach ( $post_export->get_posts() as $post ) {
 				$post->post_content = esc_attr( $post->post_content );
 				debug( $post );
 			}
 			echo "<hr>\r\n\r\n=== R E S P O N S E ===\r\n\r\n";
-			var_dump( $response, true );
 		} else {
-			$posts = \Content_Sync\Main_Helper::prepare_synced_post_for_import( strval( $_GET['contentsync_export_debug'] ) );
+			$posts = \Content_Sync\\Contentsync\prepare_synced_post_for_import( strval( $_GET['contentsync_export_debug'] ) );
 			debug( $posts );
 		}
 

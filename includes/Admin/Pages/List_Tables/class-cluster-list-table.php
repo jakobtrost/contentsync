@@ -8,8 +8,6 @@
 
 namespace Contentsync\Cluster;
 
-use Contentsync\Main_Helper;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -194,7 +192,7 @@ class Cluster_List_Table extends \WP_List_Table {
 	public function column_title( $post ) {
 
 		$edit_post_link = network_admin_url( 'admin.php?page=contentsync_clusters&cluster_id=' . $post->ID );
-		// $trash_post_link = \Contentsync\get_delete_post_link( $post );
+		// $trash_post_link = \Contentsync\Admin\get_delete_post_link( $post );
 		// $delete_post_link = wp_nonce_url( admin_url( 'admin-post.php?action=contentsync_delete_cluster&cluster_id=' . $post->ID ), 'contentsync_delete_cluster' )
 
 		$row_actions = array(
@@ -230,7 +228,7 @@ class Cluster_List_Table extends \WP_List_Table {
 				'<strong><span class="row-title">%s</span>%s&nbsp;%s</strong>',
 				$post->title,
 				$post_status,
-				\Contentsync\Utils\make_admin_info_popup( $error, 'right' )
+				\Contentsync\Admin\make_admin_info_popup( $error, 'right' )
 			);
 		}
 
@@ -294,7 +292,7 @@ class Cluster_List_Table extends \WP_List_Table {
 	public function column_reviews( $post ) {
 
 		if ( ! $post->enable_reviews ) {
-			return \Contentsync\Utils\make_admin_icon_status_box( 'info', __( 'No reviews', 'contentsync' ), false );
+			return \Contentsync\Admin\make_admin_icon_status_box( 'info', __( 'No reviews', 'contentsync' ), false );
 		}
 
 		foreach ( $post->reviewer_ids as $reviewer_id ) {
@@ -304,7 +302,7 @@ class Cluster_List_Table extends \WP_List_Table {
 			}
 		}
 
-		return \Contentsync\Utils\make_admin_icon_status_box( 'info', __( 'Reviews active', 'contentsync' ), false );
+		return \Contentsync\Admin\make_admin_icon_status_box( 'info', __( 'Reviews active', 'contentsync' ), false );
 	}
 
 	/**

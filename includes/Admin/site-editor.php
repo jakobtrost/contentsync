@@ -15,8 +15,6 @@
 
 namespace Contentsync\Contents;
 
-use Contentsync\Main_Helper;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -144,7 +142,7 @@ class Site_Editor {
 						'title'          => get_the_title( $post_id ),
 						'gid'            => $gid,
 						'status'         => $status,
-						'currentUserCan' => Main_Helper::current_user_can_edit_synced_posts( $status ),
+						'currentUserCan' => \Contentsync\Admin\current_user_can_edit_synced_posts( $status ),
 					),
 					// root posts
 					( $status === 'root' ? array(
@@ -240,7 +238,7 @@ class Site_Editor {
 			}
 
 			// Check if user can edit this post
-			if ( ! Main_Helper::current_user_can_edit_synced_posts( 'root' ) ) {
+			if ( ! \Contentsync\Admin\current_user_can_edit_synced_posts( 'root' ) ) {
 				return json_encode(
 					array(
 						'status'  => 403,

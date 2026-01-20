@@ -9,8 +9,6 @@
 
 namespace Contentsync\Cluster;
 
-use Contentsync\Main_Helper;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -321,7 +319,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 			$content = sprintf(
 				'<strong><span class="row-title">%s</span> %s</strong>',
 				$title,
-				\Contentsync\Utils\make_admin_info_popup( $msg, 'right' )
+				\Contentsync\Admin\make_admin_info_popup( $msg, 'right' )
 			);
 		}
 
@@ -355,11 +353,11 @@ class Post_Review_List_Table extends \WP_List_Table {
 				if ( $post->state != 'approved' ) {
 					$reviewer_message_content = $reviewer_message->get_content( true );
 					if ( empty( $reviewer_message_content ) ) {
-						$info .= \Contentsync\Utils\make_admin_info_popup(
+						$info .= \Contentsync\Admin\make_admin_info_popup(
 							"<div class='log_title'>" . sprintf( __( 'The reviewer (%s) left no message.', 'contentsync' ), $reviewer ) . '</div>'
 						);
 					} else {
-						$info .= \Contentsync\Utils\make_admin_info_popup(
+						$info .= \Contentsync\Admin\make_admin_info_popup(
 							"<div class='log_title'>" . sprintf( __( 'The reviewer (%s) left the following message:', 'contentsync' ), $reviewer ) . '</div>' .
 							"<div class='log_items'><b>" . $reviewer_message_content . '</b></div>'
 						);
@@ -415,7 +413,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 			$color = 'red';
 			$text  = __( 'Reverted', 'contentsync' );
 		}
-		return \Contentsync\Utils\make_admin_icon_status_box( $color, $text, false );
+		return \Contentsync\Admin\make_admin_icon_status_box( $color, $text, false );
 	}
 
 	/**

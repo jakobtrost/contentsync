@@ -16,8 +16,6 @@
 
 namespace Contentsync\Distribution;
 
-use Contentsync\Main_Helper;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }

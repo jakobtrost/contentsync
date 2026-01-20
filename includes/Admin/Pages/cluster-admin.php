@@ -15,10 +15,12 @@
  */
 namespace Contentsync\Admin;
 
+use Contentsync\Translations\Translation_Manager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-use Contentsync\Main_Helper;
+
 
 new Cluster_Admin();
 
@@ -223,7 +225,7 @@ class Cluster_Admin {
 							<div>
 								<p class="submit"><input type="submit" name="save" id="submit" class="button button-primary huge" value="<?php _e( 'Save Cluster and Sync Contents', 'contentsync' ); ?>"></p>
 								<?php
-								echo \Contentsync\Utils\make_admin_info_box(
+								echo \Contentsync\Admin\make_admin_info_box(
 									array(
 										'text'  => __( 'After saving changes to a cluster, all affected content will be synchronized inside this cluster. Depending on the changes, posts will be added or removed from all destination blogs. If destinations have been removed, all cluster contents will be removed there.', 'contentsync' ),
 										'style' => 'orange',
@@ -416,7 +418,7 @@ class Cluster_Admin {
 		}
 
 		if ( $result ) {
-			\Contentsync\Utils\render_admin_notice(
+			\Contentsync\Admin\render_admin_notice(
 				sprintf(
 					__( 'Settings saved. Contents will be distributed to all destinations. You can see the progress of the distribution on the page %s.', 'contentsync' ),
 					' <a href="' . (
@@ -426,14 +428,14 @@ class Cluster_Admin {
 				'success'
 			);
 		} else {
-			\Contentsync\Utils\render_admin_notice(
+			\Contentsync\Admin\render_admin_notice(
 				__( 'Settings could not be saved and contents have not been synched.', 'contentsync' ),
 				'error'
 			);
 		}
 
 		if ( isset( $distribute_result ) && is_wp_error( $distribute_result ) ) {
-			\Contentsync\Utils\render_admin_notice(
+			\Contentsync\Admin\render_admin_notice(
 				sprintf(
 					__( 'Failed to distribute posts to destinations: %s', 'contentsync' ),
 					'<br>- ' . $distribute_result->get_error_message()
@@ -1147,7 +1149,7 @@ class Cluster_Admin {
 					\Contentsync\switch_blog( $blog_id );
 					foreach ( $posts as $post ) {
 						// make post static
-						$gid = Main_Helper::get_gid( $post->ID );
+						$gid = \Contentsync\get_gid( $post->ID );
 						if ( $gid ) {
 							$result = \Contentsync\unlink_synced_root_post( $gid );
 						}

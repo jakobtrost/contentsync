@@ -16,8 +16,6 @@
 
 namespace Contentsync\Contents;
 
-use Contentsync\Main_Helper;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -57,8 +55,6 @@ class Ajax {
 		if ( empty( $action ) ) {
 			$this->fail( 'action is invalid.' );
 		}
-
-		\Contentsync\post_export_enable_logs();
 
 		/** EXPORT */
 		if ( $action === 'contentsync_export' ) {
@@ -244,7 +240,7 @@ class Ajax {
 			}
 
 			$current_posts = array();
-			$synced_post   = Main_Helper::get_synced_post( $gid );
+			$synced_post   = \Contentsync\get_synced_post( $gid );
 			if ( $synced_post ) {
 				$current_posts[ $synced_post->ID ] = array(
 					'post_id' => $post_id,
@@ -393,7 +389,7 @@ class Ajax {
 			}
 
 			if ( $post = get_post( $post_id ) ) {
-				if ( $similar_posts = Main_Helper::get_similar_synced_posts( $post ) ) {
+				if ( $similar_posts = \Contentsync\Admin\get_similar_synced_posts( $post ) ) {
 					$this->success( json_encode( $similar_posts ) );
 				} else {
 					$this->fail( 'No similar posts found.' );

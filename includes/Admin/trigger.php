@@ -16,7 +16,6 @@
 
 namespace Contentsync;
 
-use Contentsync\Main_Helper;
 use Contentsync\Post_Export;
 use Contentsync\Logger;
 
@@ -130,7 +129,7 @@ class Trigger {
 
 		// abort if the current user is not allowed to edit synced posts
 		if ( ! empty( $contentsync_status ) ) {
-			$current_user_can_edit = Main_Helper::current_user_can_edit_synced_posts( $contentsync_status );
+			$current_user_can_edit = \Contentsync\Admin\current_user_can_edit_synced_posts( $contentsync_status );
 			if ( ! $current_user_can_edit ) {
 				wp_die(
 					__( 'You are not allowed to edit synced posts.', 'global-contents' ),
@@ -619,7 +618,7 @@ class Trigger {
 			/**
 			 * Check if the current user can trash synced posts.
 			 */
-			$current_user_can_trash = Main_Helper::current_user_can_edit_synced_posts( $status );
+			$current_user_can_trash = \Contentsync\Admin\current_user_can_edit_synced_posts( $status );
 			if ( ! $current_user_can_trash ) {
 				wp_die(
 					__( 'You are not allowed to trash synced posts.', 'global-contents' ),
@@ -937,13 +936,13 @@ class Trigger {
 	 * duplicate processing. WordPress often fires the hook 'wp_insert_post_parent' multiple times,
 	 * which would trigger the same post update multiple times.
 	 *
-	 * @param string|array|object                 $postarr_object_or_type The post array, object or type to get the conditions for.
-	 * @param bool                                $use_cache Whether to use the cache.
-	 *                                     If true, the function will check the transient.
-	 *                                     If false, the function will return the all conditions that could be affected by the post update from the database.
+	 * @param string|array|object         $postarr_object_or_type The post array, object or type to get the conditions for.
+	 * @param bool                        $use_cache Whether to use the cache.
+	 *                             If true, the function will check the transient.
+	 *                             If false, the function will return the all conditions that could be affected by the post update from the database.
 	 *
 	 * @return array Keyed by condition_id, value is an array with the condition and the posts.
-	 *      @param Cluster_Content_Condition condition
+	 *      @param Content_Condition condition
 	 *      @param WP_Post[] posts
 	 */
 	public function get_all_conditions_that_can_be_affected_by_post_update( $postarr_object_or_type, $use_cache = true ) {

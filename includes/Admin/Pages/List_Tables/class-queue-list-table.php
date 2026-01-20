@@ -9,7 +9,6 @@
 
 namespace Contentsync\Distribution;
 
-use Contentsync\Main_Helper;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -442,7 +441,7 @@ class Queue_List_Table extends \WP_List_Table {
 		switch ( $column_name ) {
 
 			case 'status':
-				echo \Contentsync\Utils\make_admin_icon_status_box( $item->status );
+				echo \Contentsync\Admin\make_admin_icon_status_box( $item->status );
 
 				if ( $item->status === 'failed' ) {
 
@@ -464,7 +463,7 @@ class Queue_List_Table extends \WP_List_Table {
 							$message = $error;
 						}
 						if ( ! empty( $message ) ) {
-							echo '&nbsp;' . \Contentsync\Utils\make_admin_info_popup( $message );
+							echo '&nbsp;' . \Contentsync\Admin\make_admin_info_popup( $message );
 						}
 					}
 				}
@@ -488,7 +487,7 @@ class Queue_List_Table extends \WP_List_Table {
 					$color = 'red';
 					$text  = __( 'Delete', 'contentsync' );
 				}
-				echo \Contentsync\Utils\make_admin_icon_status_box( $color, $text, false );
+				echo \Contentsync\Admin\make_admin_icon_status_box( $color, $text, false );
 				break;
 
 			case 'references':
@@ -509,7 +508,7 @@ class Queue_List_Table extends \WP_List_Table {
 						$post_with_escaped_content->posts[ $idx ]->post_content = esc_html( $post->post_content );
 					}
 				}
-				echo \Contentsync\Utils\make_admin_info_dialog( '<pre>' . print_r( $post_with_escaped_content, true ) . '</pre>' );
+				echo \Contentsync\Admin\make_admin_info_dialog( '<pre>' . print_r( $post_with_escaped_content, true ) . '</pre>' );
 				break;
 
 			case 'time':
