@@ -15,7 +15,7 @@
  * @since 2.17.0
  */
 
-namespace Contentsync;
+namespace Contentsync\Mails;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -80,22 +80,22 @@ function send_review_mail( $review_id, $status, $recipient ) {
 	// Get the email subject and content
 	if ( $recipient === 'reviewers' ) {
 		if ( $status === 'new' ) {
-			require_once __DIR__ . '/mails/review-reviewer-new.php';
-			$content = \Contentsync\Mails\get_mail_content_for_reviews_reviewer_new( $post_review, $post );
+			require_once __DIR__ . '/templates/review-reviewer-new.php';
+			$content = Templates\get_mail_content_for_reviews_reviewer_new( $post_review, $post );
 		} elseif ( $status === 'in_review' ) {
-			require_once __DIR__ . '/mails/review-reviewer-updated.php';
-			$content = \Contentsync\Mails\get_mail_content_for_reviews_reviewer_updated( $post_review, $post );
+			require_once __DIR__ . '/templates/review-reviewer-updated.php';
+			$content = Templates\get_mail_content_for_reviews_reviewer_updated( $post_review, $post );
 		}
 	} elseif ( $recipient === 'editor' ) {
 		if ( $status === 'approved' ) {
-			require_once __DIR__ . '/mails/review-editor-approved.php';
-			$content = \Contentsync\Mails\get_mail_content_for_reviews_editor_approved( $post_review, $post );
+			require_once __DIR__ . '/templates/review-editor-approved.php';
+			$content = Templates\get_mail_content_for_reviews_editor_approved( $post_review, $post );
 		} elseif ( $status === 'denied' ) {
-			require_once __DIR__ . '/mails/review-editor-denied.php';
-			$content = \Contentsync\Mails\get_mail_content_for_reviews_editor_denied( $post_review, $post );
+			require_once __DIR__ . '/templates/review-editor-denied.php';
+			$content = Templates\get_mail_content_for_reviews_editor_denied( $post_review, $post );
 		} elseif ( $status === 'reverted' ) {
-			require_once __DIR__ . '/mails/review-editor-reverted.php';
-			$content = \Contentsync\Mails\get_mail_content_for_reviews_editor_reverted( $post_review, $post );
+			require_once __DIR__ . '/templates/review-editor-reverted.php';
+			$content = Templates\get_mail_content_for_reviews_editor_reverted( $post_review, $post );
 		}
 	}
 
@@ -239,8 +239,8 @@ function create_mail_template( $title, $body, $footer = null ) {
 		}
 	}
 
-	require_once __DIR__ . '/mails/mail-template.php';
-	return \Contentsync\Mails\get_mail_template( $title, $body, $footer );
+	require_once __DIR__ . '/templates/mail-template.php';
+	return Templates\get_mail_template( $title, $body, $footer );
 }
 
 /**

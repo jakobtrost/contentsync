@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Mails;
+namespace Contentsync\Mails\Templates;
 
 /**
  * Generate the subject and body for a review reverted email.
