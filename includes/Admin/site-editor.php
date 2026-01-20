@@ -115,7 +115,7 @@ class Site_Editor {
 			$post_id        = self::get_numeric_post_id( $postReference );
 			$status         = get_post_meta( $post_id, 'synced_post_status', true );
 			$gid            = get_post_meta( $post_id, 'synced_post_id', true );
-			$connection_map = \Contentsync\get_post_connection_map( $post_id );
+			$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
 
 			// Get Contentsync options and canonical URL
 			$contentsync_export_options = get_post_meta( $post_id, 'contentsync_export_options', true );
@@ -184,13 +184,13 @@ class Site_Editor {
 							},
 							get_clusters_including_post( $post_id )
 						),
-						'error'            => \Contentsync\get_post_error( $post_id ),
+						'error'            => get_post_error( $post_id ),
 					) : array() ),
 					// linked posts
 					( $status === 'linked' ? array(
-						'links'     => \Contentsync\get_post_links_by_gid( $gid ),
+						'links'     => \Contentsync\Posts\Sync\get_post_links_by_gid( $gid ),
 						'canonical' => esc_attr( get_post_meta( $post_id, 'contentsync_canonical_url', true ) ),
-						'error'     => \Contentsync\get_post_error( $post_id ),
+						'error'     => get_post_error( $post_id ),
 					) : array() ),
 				),
 				'notice' => Admin::get_global_notice_content( $post_id, 'site_editor' ),
@@ -293,7 +293,7 @@ class Site_Editor {
 		$parts = explode( '//', $site_editor_post_id );
 		if ( count( $parts ) === 2 ) {
 
-			$posts = \Contentsync\get_unfiltered_posts(
+			$posts = \Contentsync\Posts\get_unfiltered_posts(
 				array(
 					'name'        => $parts[1],
 					'post_type'   => array( 'wp_template', 'wp_template_part' ),

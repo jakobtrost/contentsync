@@ -243,7 +243,7 @@ function get_posts_by_cluster_content_condition( $condition ) {
 	$query_args = get_query_args_for_cluster_content_condition( $condition );
 	// Logger::add( "Query args:", $query_args );
 
-	$posts = get_unfiltered_posts( $query_args );
+	$posts = \Contentsync\Posts\get_unfiltered_posts( $query_args );
 	// Logger::add( "Posts:", $posts );
 
 	$cluster_posts = array();

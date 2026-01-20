@@ -81,10 +81,10 @@ class Posts_Connections extends Endpoint {
 		$connection_map = false;
 		$message        = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
+		list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
 			Multisite_Manager::switch_blog( $blog_id );
-			$connection_map = \Contentsync\get_post_connection_map( $post_id );
+			$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
 			Multisite_Manager::restore_blog();
 
 			if ( $connection_map ) {
@@ -105,7 +105,7 @@ class Posts_Connections extends Endpoint {
 		$result  = false;
 		$message = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $_blog_id, $_post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
+		list( $_blog_id, $_post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $request['gid'] );
 		if ( $_post_id !== null ) {
 			$gid      = $_blog_id . '-' . $_post_id; // remove the remote url as it is this site
 			$site_url = isset( $request['site_url'] ) ? esc_attr( $request['site_url'] ) : null;
@@ -115,7 +115,7 @@ class Posts_Connections extends Endpoint {
 				return $this->respond( false, "Could not add post connection. Request arguments 'site_url' or 'args' were empty [$net_url]" );
 			}
 
-			$result = \Contentsync\add_or_remove_post_connection_from_connection_map( $gid, $args, true, $site_url );
+			$result = \Contentsync\Posts\Sync\add_or_remove_post_connection_from_connection_map( $gid, $args, true, $site_url );
 			if ( $result ) {
 				$message = "Post connection for the post '$gid' to the domain '$site_url' was set successfully [$net_url]";
 			} else {
@@ -134,7 +134,7 @@ class Posts_Connections extends Endpoint {
 		$result  = false;
 		$message = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $_blog_id, $_post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
+		list( $_blog_id, $_post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $request['gid'] );
 		if ( $_post_id !== null ) {
 			$gid      = $_blog_id . '-' . $_post_id; // remove the remote url as it is this site
 			$site_url = isset( $request['site_url'] ) ? esc_attr( $request['site_url'] ) : null;
@@ -144,7 +144,7 @@ class Posts_Connections extends Endpoint {
 				return $this->respond( false, "Could not remove post connection. Request arguments 'site_url' or 'args' were empty [$net_url]" );
 			}
 
-			$result = \Contentsync\add_or_remove_post_connection_from_connection_map( $gid, $args, false, $site_url );
+			$result = \Contentsync\Posts\Sync\add_or_remove_post_connection_from_connection_map( $gid, $args, false, $site_url );
 			if ( $result ) {
 				$message = "Post connection for the post '$gid' to the domain '$site_url' was removed successfully [$net_url]";
 			} else {

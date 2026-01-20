@@ -333,7 +333,7 @@ function get_post_links_by_gid( $gid ) {
 
 	$post_links = array();
 
-	$synced_post = \Contentsync\get_synced_post( $gid );
+	$synced_post = get_synced_post( $gid );
 
 	if ( ! $synced_post ) {
 		return $post_links;
@@ -372,7 +372,7 @@ function get_network_remote_connection_map_by_gid( $gid ) {
 	foreach ( Multisite_Manager::get_all_blogs() as $blog_id => $blog_args ) {
 
 		Multisite_Manager::switch_blog( $blog_id );
-		$post = \Contentsync\get_local_post_by_gid( $gid );
+		$post = get_local_post_by_gid( $gid );
 		if ( $post ) {
 			$connection_map[ $blog_id ] = create_post_connection_map_array( $blog_id, $post->ID );
 		}
@@ -549,7 +549,7 @@ function get_all_local_post_connections( $gid ) {
 
 	foreach ( $connected_posts as $result ) {
 		$blog_id                      = intval( $result->blog_id );
-		$post_connections[ $blog_id ] = Main_Helper::convert_synced_post_into_post_connection( $result );
+		$post_connections[ $blog_id ] = convert_synced_post_into_post_connection( $result );
 	}
 
 	return $post_connections;

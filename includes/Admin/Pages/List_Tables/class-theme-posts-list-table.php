@@ -46,10 +46,10 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		// remove the first char '_' from argument
 		$posttype = isset( $_GET['post_type'] ) ? substr( $_GET['post_type'], 1 ) : '';
 
-		if ( in_array( $posttype, \Contentsync\get_theme_post_types() ) ) {
+		if ( in_array( $posttype, \Contentsync\Posts\get_theme_post_types() ) ) {
 			$this->post_type = $posttype;
 		} else {
-			$this->post_type = \Contentsync\get_theme_post_types();
+			$this->post_type = \Contentsync\Posts\get_theme_post_types();
 		}
 	}
 
@@ -108,7 +108,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 			}
 		}
 
-		$items = \Contentsync\get_theme_posts( $args );
+		$items = \Contentsync\Posts\get_theme_posts( $args );
 
 		// sort
 		$orderby  = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'post_date';
@@ -236,7 +236,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 			( ! $trashed && empty( $current ) ) ? 'active' : '',
 			__( 'All', 'contentsync_hub' )
 		);
-		foreach ( \Contentsync\get_theme_post_types() as $post_type ) {
+		foreach ( \Contentsync\Posts\get_theme_post_types() as $post_type ) {
 			$post_type_obj = get_post_type_object( $post_type );
 			printf(
 				"<a href='%s' class='tab blue %s'>%s</a>",
@@ -266,7 +266,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		$inactive_url  = add_query_arg( array( 'view' => 'inactive' ), $all_url );
 
 		// Determine which post types are currently in scope for counting
-		$scoped_post_types = is_string( $this->post_type ) ? array( $this->post_type ) : \Contentsync\get_theme_post_types();
+		$scoped_post_types = is_string( $this->post_type ) ? array( $this->post_type ) : \Contentsync\Posts\get_theme_post_types();
 		$theme_post_types  = array_filter(
 			$scoped_post_types,
 			function ( $post_type ) {
@@ -306,11 +306,11 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				),
 			),
 		);
-		$current_theme_posts = \Contentsync\get_theme_posts( $current_theme_args );
+		$current_theme_posts = \Contentsync\Posts\get_theme_posts( $current_theme_args );
 		$current_theme_count = count( $current_theme_posts );
 
 		$current_theme_args['tax_query'][0]['operator'] = 'NOT IN';
-		$inactive_theme_posts                           = \Contentsync\get_theme_posts( $current_theme_args );
+		$inactive_theme_posts                           = \Contentsync\Posts\get_theme_posts( $current_theme_args );
 		$inactive_theme_count                           = count( $inactive_theme_posts );
 
 		$views        = array();
@@ -773,9 +773,9 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 						$post_title = $post->post_title;
 
 						if ( $post->post_type == 'wp_template' || $post->post_type == 'wp_template_part' ) {
-							$result = \Contentsync\set_wp_template_theme( $post, true );
+							$result = \Contentsync\Posts\set_wp_template_theme( $post, true );
 						} elseif ( $post->post_type == 'wp_global_styles' ) {
-							$result = \Contentsync\set_wp_global_styles_theme( $post );
+							$result = \Contentsync\Posts\set_wp_global_styles_theme( $post );
 						} else {
 							$result = false;
 						}

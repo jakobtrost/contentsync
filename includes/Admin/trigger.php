@@ -143,11 +143,11 @@ class Trigger {
 		if ( ! empty( $_POST ) && is_array( $_POST ) ) {
 
 			if ( isset( $_POST['editable_contentsync_export_options'] ) ) {
-				update_contentsync_post_export_options( $post_id, $_POST['editable_contentsync_export_options'] );
+				\Contentsync\Posts\Sync\update_contentsync_post_export_options( $post_id, $_POST['editable_contentsync_export_options'] );
 			}
 
 			if ( isset( $_POST['contentsync_canonical_url'] ) ) {
-				update_contentsync_post_canonical_url( $post_id, $_POST['contentsync_canonical_url'] );
+				\Contentsync\Posts\Sync\update_contentsync_post_canonical_url( $post_id, $_POST['contentsync_canonical_url'] );
 			}
 		}
 
@@ -398,9 +398,9 @@ class Trigger {
 			return;
 		}
 
-		$make_post_global  = false;
+		$make_post_synced  = false;
 		$post_needs_review = false;
-		$export_args       = get_contentsync_default_export_options();
+		$export_args       = \Contentsync\Posts\Sync\get_contentsync_default_export_options();
 		$destination_ids   = array();
 
 		/**
@@ -413,20 +413,20 @@ class Trigger {
 			}
 			// save the destination ids, where the post is added to
 			$destination_ids  = array_merge( $destination_ids, $cluster->destination_ids );
-			$make_post_global = true;
+			$make_post_synced = true;
 		}
 
 		$destination_ids = array_unique( array_map( 'strval', $destination_ids ) );
 
 		// return if no need to make post global
-		if ( ! $make_post_global ) {
+		if ( ! $make_post_synced ) {
 			return;
 		}
 
 		/**
 		 * Make the post global, but not distribute it yet.
 		 */
-		$gid = \Contentsync\make_post_global( $post_id, $export_args );
+		$gid = \Contentsync\Posts\Sync\make_post_synced( $post_id, $export_args );
 
 		/**
 		 * Create a review if the post needs review.
@@ -612,8 +612,8 @@ class Trigger {
 
 		$post_id = $post->ID;
 
-		$status = get_contentsync_meta_values( $post_id, 'synced_post_status' );
-		$gid    = get_contentsync_meta_values( $post_id, 'synced_post_id' );
+		$status = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, 'synced_post_status' );
+		$gid    = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, 'synced_post_id' );
 
 		if ( ! empty( $status ) ) {
 			/**
@@ -630,7 +630,7 @@ class Trigger {
 
 		if ( $status === 'linked' ) {
 			// remove connection from root post
-			\Contentsync\remove_post_connection_from_connection_map( $gid, get_current_blog_id(), $post_id );
+			\Contentsync\Posts\Sync\remove_post_connection_from_connection_map( $gid, get_current_blog_id(), $post_id );
 		} elseif ( $status === 'root' ) {
 			if ( self::post_needs_review( $post_id ) ) {
 				$post_before              = $post;
@@ -652,7 +652,7 @@ class Trigger {
 		$status = get_post_meta( $post_id, 'synced_post_status', true );
 		if ( $status === 'linked' ) {
 			$gid = get_post_meta( $post_id, 'synced_post_id', true );
-			\Contentsync\add_post_connection_to_connection_map( $gid, get_current_blog_id(), $post_id );
+			\Contentsync\Posts\Sync\add_post_connection_to_connection_map( $gid, get_current_blog_id(), $post_id );
 		} elseif ( $status === 'root' ) {
 			if ( self::post_needs_review( $post_id ) ) {
 				$post_before              = get_post( $post_id );
@@ -674,7 +674,7 @@ class Trigger {
 
 		$status = get_post_meta( $post_id, 'synced_post_status', true );
 		if ( $status === 'linked' ) {
-			\Contentsync\unlink_synced_post( $post_id );
+			\Contentsync\Posts\Sync\unlink_synced_post( $post_id );
 			// delete also all connected cluster posts
 			foreach ( get_clusters_including_post( $post ) as $cluster ) {
 				foreach ( $cluster->destination_ids as $blog_id ) {
@@ -682,7 +682,7 @@ class Trigger {
 					 * @todo REWORK delete post from destinations
 					 */
 					Multisite_Manager::switch_blog( $blog_id );
-					\Contentsync\unlink_synced_post( $post_id );
+					\Contentsync\Posts\Sync\unlink_synced_post( $post_id );
 					Multisite_Manager::restore_blog();
 				}
 			}
@@ -706,25 +706,25 @@ class Trigger {
 		 * trash everywhere
 		 */
 		if ( $setting == 'trash' ) {
-			$result = \Contentsync\trash_connected_posts( $post_id );
+			$result = \Contentsync\Posts\Sync\trash_connected_posts( $post_id );
 		}
 
 		/**
 		 * delete everywhere
 		 */
 		if ( $setting == 'delete' ) {
-			$result = \Contentsync\delete_connected_posts( $post_id );
+			$result = \Contentsync\Posts\Sync\delete_connected_posts( $post_id );
 		}
 
 		/**
 		 * make local everywhere (default)
 		 */
 		if ( $setting == 'localize' ) {
-			$result = \Contentsync\unlink_connected_posts( $post_id );
+			$result = \Contentsync\Posts\Sync\unlink_connected_posts( $post_id );
 		}
 
 		// display admin notice when root post is trashed and there is still a connection
-		$connection_map = \Contentsync\get_post_connection_map( $post_id );
+		$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
 		if ( $connection_map && is_array( $connection_map ) && count( $connection_map ) ) {
 			set_transient(
 				'contentsync_transient_notice',
@@ -749,7 +749,7 @@ class Trigger {
 		 * trash everywhere
 		 */
 		if ( $setting == 'trash' ) {
-			$result = \Contentsync\untrash_connected_posts( $post_id );
+			$result = \Contentsync\Posts\Sync\untrash_connected_posts( $post_id );
 		}
 
 		/**
@@ -787,17 +787,17 @@ class Trigger {
 		if ( $delete_synced_post_setting == 'delete' ) {
 
 			// get connection_map from review
-			$connection_map = isset( $post->meta['contentsync_connection_map'] ) ? $post->meta['contentsync_connection_map'] : \Contentsync\get_post_connection_map( $post->ID );
-			$result         = \Contentsync\delete_connected_posts( $post->ID, $connection_map );
+			$connection_map = isset( $post->meta['contentsync_connection_map'] ) ? $post->meta['contentsync_connection_map'] : \Contentsync\Posts\Sync\get_post_connection_map( $post->ID );
+			$result         = \Contentsync\Posts\Sync\delete_connected_posts( $post->ID, $connection_map );
 
 			if ( $trash_synced_post_setting == 'trash' ) {
 				// search for trashed posts and delete them
-				\Contentsync\untrash_connected_posts( $post->ID, true );
+				\Contentsync\Posts\Sync\untrash_connected_posts( $post->ID, true );
 			} elseif ( $trash_synced_post_setting == 'delete' ) {
 				// do nothing, linked posts are already deleted
 			} elseif ( $trash_synced_post_setting == 'localize' ) {
 				// search for localized (unlinked) posts and delete them
-				\Contentsync\delete_unlinked_posts( $post );
+				\Contentsync\Posts\Sync\delete_unlinked_posts( $post );
 			}
 		}
 
@@ -805,11 +805,11 @@ class Trigger {
 		 * make local everywhere
 		 */
 		if ( $delete_synced_post_setting == 'localize' ) {
-			$result = \Contentsync\unlink_connected_posts( $post->ID );
+			$result = \Contentsync\Posts\Sync\unlink_connected_posts( $post->ID );
 
 			if ( $trash_synced_post_setting == 'trash' ) {
 				// search for trashed posts and untrash them
-				\Contentsync\untrash_connected_posts( $post->ID );
+				\Contentsync\Posts\Sync\untrash_connected_posts( $post->ID );
 			} elseif ( $trash_synced_post_setting == 'delete' ) {
 				// do nothing, linked posts are gone
 			} elseif ( $trash_synced_post_setting == 'localize' ) {

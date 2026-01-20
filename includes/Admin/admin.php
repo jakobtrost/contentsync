@@ -294,14 +294,14 @@ class Admin {
 
 		// check for error
 		if ( self::$error === null ) {
-			self::$error = \Contentsync\get_post_error( $post_id );
+			self::$error = get_post_error( $post_id );
 		}
 
 		// notice contents
-		if ( ! \Contentsync\is_error_repaired( self::$error ) ) {
+		if ( ! is_error_repaired( self::$error ) ) {
 			$notice = 'error';
 			$icon   = 'warning color_red';
-			$text   = \Contentsync\get_error_message( self::$error );
+			$text   = get_error_message( self::$error );
 			if ( \Contentsync\Admin\current_user_can_edit_synced_posts() ) {
 				$buttons = array(
 					array(
@@ -316,7 +316,7 @@ class Admin {
 
 			if ( $status === 'linked' ) {
 
-				$post_links = \Contentsync\get_post_links_by_gid( $gid );
+				$post_links = \Contentsync\Posts\Sync\get_post_links_by_gid( $gid );
 
 				$text = sprintf(
 					__( 'This post is synced from the site %s', 'contentsync' ),
@@ -339,7 +339,7 @@ class Admin {
 				}
 			} elseif ( $status === 'root' ) {
 
-				$connection_map = \Contentsync\get_post_connection_map( $post_id );
+				$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
 
 				/**
 				 * Review Status
@@ -713,11 +713,11 @@ class Admin {
 		// synced post
 		else {
 
-			list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\explode_gid( $gid );
+			list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 
 			// check for error
 			if ( self::$error === null ) {
-				self::$error = \Contentsync\get_post_error( $post_id );
+				self::$error = get_post_error( $post_id );
 			}
 
 			$return .= '<input type="hidden" name="_gid" value="' . $gid . '">';
@@ -725,8 +725,8 @@ class Admin {
 			/**
 			 * Error post
 			 */
-			if ( ! \Contentsync\is_error_repaired( self::$error ) ) {
-				$return .= make_admin_icon_status_box( 'error', \Contentsync\get_error_message( self::$error ) );
+			if ( ! is_error_repaired( self::$error ) ) {
+				$return .= make_admin_icon_status_box( 'error', get_error_message( self::$error ) );
 				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
 					// repair button
 					$return                  .= '<br><br><span class="button" onclick="contentsync.repairPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' . __( 'Repair', 'contentsync' ) . '</span>';
@@ -749,7 +749,7 @@ class Admin {
 			 */
 			elseif ( $status === 'root' ) {
 
-				$connection_map = \Contentsync\get_post_connection_map( $post_id );
+				$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
 				// debug( $connection_map, true );
 
 				// render status
@@ -760,7 +760,7 @@ class Admin {
 				 */
 				if ( \Contentsync\Admin\current_user_can_edit_synced_posts( $status ) ) {
 
-					$options          = \Contentsync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
+					$options          = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
 					$editable_options = self::get_contentsync_export_options_for_post( $post_id );
 					// debug( $options );
 
@@ -941,13 +941,13 @@ class Admin {
 			 */
 			elseif ( $status === 'linked' ) {
 
-				$post_links = \Contentsync\get_post_links_by_gid( $gid );
+				$post_links = \Contentsync\Posts\Sync\get_post_links_by_gid( $gid );
 
 				// status
 				$return .= make_admin_icon_status_box( $status, __( 'Linked post', 'contentsync' ) );
 
 				// options
-				$options = \Contentsync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
+				$options = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
 				if ( $options['whole_posttype'] && get_post_type( $post_id ) === 'tp_posttypes' ) {
 					$return .= make_admin_info_box(
 						array(
@@ -985,8 +985,8 @@ class Admin {
 			}
 
 			// display fix info
-			if ( self::$error && \Contentsync\is_error_repaired( self::$error ) ) {
-				$return .= make_admin_icon_status_box( 'info', \Contentsync\get_error_repaired_log( self::$error ) );
+			if ( self::$error && is_error_repaired( self::$error ) ) {
+				$return .= make_admin_icon_status_box( 'info', get_error_repaired_log( self::$error ) );
 			}
 		}
 
@@ -1168,7 +1168,7 @@ class Admin {
 
 			if ( ! empty( $status ) ) {
 				// don't check for errors on overview pages, as it costs performance with remote posts...
-				// $status = \Contentsync\get_post_error( $post_id ) ? 'error' : $status;
+				// $status = get_post_error( $post_id ) ? 'error' : $status;
 				echo make_admin_icon_status_box( $status );
 			} elseif ( \Contentsync\Admin\current_user_can_edit_synced_posts( 'root' ) ) {
 				// if the status is empty, the post is not a synced post and therefore we will render a button to make it global
@@ -1207,9 +1207,9 @@ class Admin {
 			return $redirect_to;
 		}
 
-		$export_args = \Contentsync\get_contentsync_default_export_options();
+		$export_args = \Contentsync\Posts\Sync\get_contentsync_default_export_options();
 		foreach ( $post_ids as $post_id ) {
-			$gid = \Contentsync\make_post_global( $post_id, $export_args );
+			$gid = \Contentsync\Posts\Sync\make_post_synced( $post_id, $export_args );
 
 		}
 
@@ -1276,7 +1276,7 @@ class Admin {
 		/**
 		 * Get connected posts
 		 */
-		$connection_map = \Contentsync\get_post_connection_map( $post_id );
+		$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
 		$post_list      = '';
 
 		if ( is_array( $connection_map ) && count( $connection_map ) > 0 ) {

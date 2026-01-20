@@ -216,7 +216,7 @@ class Synced_Post {
 
 		// set language
 		if ( $this->language === null && ! $this->network_url ) {
-			$this->language = get_post_language_code( $post );
+			$this->language = \Contentsync\Posts\get_post_language_code( $post );
 		}
 	}
 
@@ -241,7 +241,7 @@ class Synced_Post {
 	public function get_meta() {
 
 		// get default meta
-		$meta = \Contentsync\get_contentsync_meta_default_values();
+		$meta = get_contentsync_meta_default_values();
 
 		// if the post meta does already exist we make sure that all contentsync_meta infos are set
 		if ( ! empty( $this->meta ) ) {
@@ -323,13 +323,13 @@ class Synced_Post {
 			// contentsync_connection_map (add connection only for current site)
 			if ( isset( $gid ) && empty( $this->meta['contentsync_connection_map'] ) ) {
 
-				$imported_post = \Contentsync\get_local_post_by_gid( $gid );
+				$imported_post = get_local_post_by_gid( $gid );
 				if ( $imported_post && isset( $imported_post->ID ) ) {
 					$blog_id                            = get_current_blog_id();
 					$net_url                            = \Contentsync\Utils\get_network_url();
 					$meta['contentsync_connection_map'] = array(
 						$net_url => array(
-							$blog_id => \Contentsync\get_post_connection_map( $blog_id, $imported_post->ID ),
+							$blog_id => get_post_connection_map( $blog_id, $imported_post->ID ),
 						),
 					);
 				}
@@ -386,27 +386,4 @@ class Synced_Post {
 
 		return new Synced_Post( $_post );
 	}
-}
-
-/**
- * Create and return a new `Synced_Post` wrapper for a WordPress post.
- *
- * This convenience function instantiates the `Synced_Post` class using
- * either a `WP_Post` object or a post ID. Any exceptions thrown
- * during instantiation (for example if the post does not exist or
- * does not qualify as a synced post) are caught and the function
- * returns `false`. On success the new `Synced_Post` instance is
- * returned to the caller.
- *
- * @param WP_Post|object|int $post Post object or post ID to wrap.
- *
- * @return Synced_Post|false A `Synced_Post` on success, or `false` if instantiation fails.
- */
-function new_synced_post( $post ) {
-	try {
-		$synced_post = new Synced_Post( $post );
-	} catch ( Exception $e ) {
-		return false;
-	}
-	return $synced_post;
 }

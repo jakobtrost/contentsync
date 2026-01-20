@@ -79,14 +79,14 @@ function get_similar_synced_posts( $post ) {
 	$post_name = preg_replace( $regex, '', $post->post_name );
 
 	// find and list all similar posts
-	$all_posts = \Contentsync\get_all_synced_posts();
+	$all_posts = \Contentsync\Posts\Sync\get_all_synced_posts();
 
 	foreach ( $all_posts as $synced_post ) {
 
-		$synced_post = new_synced_post( $synced_post );
-		$gid         = get_contentsync_meta_values( $synced_post, 'synced_post_id' );
+		$synced_post = \Contentsync\Posts\Sync\new_synced_post( $synced_post );
+		$gid         = \Contentsync\Posts\Sync\get_contentsync_meta_values( $synced_post, 'synced_post_id' );
 
-		list( $_blog_id, $_post_id, $_net_url ) = explode_gid( $gid );
+		list( $_blog_id, $_post_id, $_net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 
 		// exclude posts from other posttypes
 		if ( $post->post_type !== $synced_post->post_type ) {
@@ -116,9 +116,9 @@ function get_similar_synced_posts( $post ) {
 
 				// retrieve the post including all post_links from url
 				if ( ! empty( $_net_url ) ) {
-					$synced_post = new_synced_post( \Contentsync\get_synced_post( $gid ) );
+					$synced_post = \Contentsync\Posts\Sync\new_synced_post( \Contentsync\Posts\Sync\get_synced_post( $gid ) );
 				} else {
-					$synced_post->post_links = get_local_post_links( $_blog_id, $_post_id );
+					$synced_post->post_links = \Contentsync\Posts\Sync\get_local_post_links( $_blog_id, $_post_id );
 				}
 			}
 

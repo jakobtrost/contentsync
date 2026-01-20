@@ -71,7 +71,7 @@ class Ajax {
 				$this->fail( 'post_id is not defined.' );
 			}
 
-			$args      = \Contentsync\get_contentsync_default_export_options();
+			$args      = \Contentsync\Posts\Sync\get_contentsync_default_export_options();
 			$form_data = isset( $data['form_data'] ) ? (array) $data['form_data'] : array();
 			foreach ( $args as $k => $v ) {
 				if ( isset( $form_data[ $k ] ) ) {
@@ -79,7 +79,7 @@ class Ajax {
 				}
 			}
 
-			$gid = \Contentsync\make_post_global( $post_id, $args );
+			$gid = \Contentsync\Posts\Sync\make_post_synced( $post_id, $args );
 
 			// failure
 			if ( ! $gid ) {
@@ -104,7 +104,7 @@ class Ajax {
 				$this->fail( 'global ID is not defined.' );
 			}
 
-			$result = \Contentsync\unlink_synced_root_post( $gid );
+			$result = \Contentsync\Posts\Sync\unlink_synced_root_post( $gid );
 
 			// failure
 			if ( ! $result ) {
@@ -129,7 +129,7 @@ class Ajax {
 				$this->fail( 'global ID is not defined.' );
 			}
 
-			$result = \Contentsync\check_synced_post_import( $gid );
+			$result = \Contentsync\Posts\Sync\check_synced_post_import( $gid );
 
 			// failure
 			if ( ! $result ) {
@@ -153,7 +153,7 @@ class Ajax {
 
 			$results = array();
 			foreach ( $posts as $post ) {
-				$conflict = \Contentsync\check_synced_post_import( $post['gid'] );
+				$conflict = \Contentsync\Posts\Sync\check_synced_post_import( $post['gid'] );
 				if ( $conflict ) {
 					$results[] = array(
 						'gid'      => $post['gid'],
@@ -189,7 +189,7 @@ class Ajax {
 			$conflicts        = isset( $data['form_data'] ) ? (array) $data['form_data'] : array();
 			$conflict_actions = Main_Helper::call_post_export_func( 'import_get_conflict_actions_from_backend_form', $conflicts );
 
-			$result = \Contentsync\import_synced_post( $gid, $conflict_actions );
+			$result = \Contentsync\Posts\Sync\import_synced_post( $gid, $conflict_actions );
 
 			// failure
 			if ( $result !== true ) {
@@ -215,7 +215,7 @@ class Ajax {
 			}
 
 			// get synced post
-			$result = \Contentsync\unlink_synced_post( $post_id );
+			$result = \Contentsync\Posts\Sync\unlink_synced_post( $post_id );
 
 			// failure
 			if ( ! $result ) {
@@ -242,7 +242,7 @@ class Ajax {
 			}
 
 			$current_posts = array();
-			$synced_post   = \Contentsync\get_synced_post( $gid );
+			$synced_post   = \Contentsync\Posts\Sync\get_synced_post( $gid );
 			if ( $synced_post ) {
 				$current_posts[ $synced_post->ID ] = array(
 					'post_id' => $post_id,
@@ -250,7 +250,7 @@ class Ajax {
 				);
 			}
 
-			$result = \Contentsync\import_synced_post( $gid, $current_posts );
+			$result = \Contentsync\Posts\Sync\import_synced_post( $gid, $current_posts );
 
 			// failure
 			if ( ! $result ) {
@@ -276,7 +276,7 @@ class Ajax {
 				$this->fail( 'post_id is not defined.' );
 			}
 
-			$error = \Contentsync\repair_post( $post_id, $blog_id, true );
+			$error = repair_post( $post_id, $blog_id, true );
 
 			// no error
 			if ( ! $error ) {
@@ -284,10 +284,10 @@ class Ajax {
 			}
 			// error found
 			else {
-				echo \Contentsync\get_error_repaired_log( $error );
+				echo get_error_repaired_log( $error );
 
 				// success
-				if ( \Contentsync\is_error_repaired( $error ) ) {
+				if ( is_error_repaired( $error ) ) {
 					$this->success( 'post was successfully repaired' );
 				} else {
 					$this->fail( $error->message );
@@ -340,7 +340,7 @@ class Ajax {
 				$this->fail( 'global ID is not defined.' );
 			}
 
-			$result = \Contentsync\delete_synced_post( $gid );
+			$result = \Contentsync\Posts\Sync\delete_synced_post( $gid );
 
 			// failure
 			if ( ! $result ) {
@@ -365,7 +365,7 @@ class Ajax {
 				$this->fail( 'post_id is not defined.' );
 			}
 
-			$result = \Contentsync\check_connection_map( $post_id );
+			$result = \Contentsync\Posts\Sync\check_connection_map( $post_id );
 
 			// failure
 			if ( ! $result ) {
@@ -441,16 +441,16 @@ class Ajax {
 			$post_type = isset( $data['post_type'] ) ? intval( $data['post_type'] ) : null;
 
 			if ( $mode === 'network' ) {
-				$posts = \Contentsync\get_network_synced_posts_with_errors( false, array( 'post_type' => $post_type ) );
+				$posts = get_network_synced_posts_with_errors( false, array( 'post_type' => $post_type ) );
 			} else {
-				$posts = \Contentsync\get_synced_posts_of_blog_with_errors( $blog_id, false, array( 'post_type' => $post_type ) );
+				$posts = get_synced_posts_of_blog_with_errors( $blog_id, false, array( 'post_type' => $post_type ) );
 			}
 
 			if ( count( $posts ) ) {
 				$return = array_filter(
 					$posts,
 					function ( $post ) {
-						return isset( $post->error ) && ! \Contentsync\is_error_repaired( $post->error );
+						return isset( $post->error ) && ! is_error_repaired( $post->error );
 					}
 				);
 				$this->success( json_encode( array_values( $return ) ) );
@@ -469,7 +469,7 @@ class Ajax {
 			$review_id = isset( $data['review_id'] ) ? intval( $data['review_id'] ) : 0;
 			$post_id   = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 
-			$result = \Contentsync\Reviews\approve_post_reviewt_review( $review_id, $post_id );
+			$result = \Contentsync\Reviews\approve_post_review( $review_id, $post_id );
 
 			if ( $result ) {
 				$this->success( 'review was approved.' );

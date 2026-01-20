@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Make a post global
+ * Make a post globally synced.
  *
  * @formerly contentsync_export_post
  *
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return string   $gid
  */
-function make_post_global( $post_id, $args ) {
+function make_post_synced( $post_id, $args ) {
 
 	$first_post  = null;
 	$post_export = new Post_Export( $post_id, $args );
@@ -381,7 +381,7 @@ function untrash_connected_posts( $post_id, $delete = false ) {
 		}
 
 		Multisite_Manager::switch_blog( $destination_id );
-		$trashed = get_unfiltered_posts(
+		$trashed = \Contentsync\Posts\get_unfiltered_posts(
 			array(
 				'numberposts' => -1,
 				'post_status' => 'trash',

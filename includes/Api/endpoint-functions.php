@@ -138,7 +138,7 @@ function get_all_remote_connected_posts( $connection_or_site_url, $gid ) {
 /**
  * Delete all connected posts of a synced post from a certain connection
  *
- * @see \Contentsync\delete_synced_post()
+ * @see \Contentsync\Posts\Sync\delete_synced_post()
  *
  * @param array|string $connection_or_site_url
  * @param string       $gid               Global ID of the root post with an appended network_url.
@@ -428,7 +428,7 @@ function handle_response( $response, $args = array() ) {
  * @return string Encoded GID safe for use in URLs.
  */
 function prepare_gid_for_url( $gid ) {
-	// list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $gid );
+	// list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 	// $_gid  = $blog_id . '-' . $post_id;
 	return urlencode( str_replace( '/', '-', $gid ) );
 }

@@ -78,7 +78,7 @@ class Posts_Meta extends Endpoint {
 		$result  = false;
 		$message = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $blog_id, $post_id, $net_url ) = \Contentsync\explode_gid( $request['gid'] );
+		list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
 
 			$meta_key = isset( $request['meta_key'] ) ? esc_attr( urldecode( $request['meta_key'] ) ) : null;
@@ -87,12 +87,12 @@ class Posts_Meta extends Endpoint {
 			// if no meta key set, we get all contentsync_meta
 			if ( empty( $meta_key ) ) {
 				$post_meta = array();
-				$meta_keys = \Contentsync\get_contentsync_meta_keys();
+				$meta_keys = \Contentsync\Posts\Sync\get_contentsync_meta_keys();
 				foreach ( $meta_keys as $meta_key ) {
-					$post_meta[ $meta_key ] = \Contentsync\get_contentsync_meta_values( $post_id, $meta_key );
+					$post_meta[ $meta_key ] = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, $meta_key );
 				}
 			} else {
-				$post_meta = \Contentsync\get_contentsync_meta_values( $post_id, $meta_key );
+				$post_meta = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, $meta_key );
 			}
 			Multisite_Manager::restore_blog();
 
@@ -144,7 +144,7 @@ class Posts_Meta extends Endpoint {
 
 		// if no meta key set, we delete all contentsync_meta
 		if ( empty( $meta_key ) ) {
-			\Contentsync\delete_contentsync_meta_values( $post_id );
+			\Contentsync\Posts\Sync\delete_contentsync_meta_values( $post_id );
 		} else {
 			delete_post_meta( $post_id, $meta_key );
 		}
@@ -202,7 +202,7 @@ class Posts_Meta extends Endpoint {
 	 * @return bool True if the key is part of the Contentsync meta set, false otherwise.
 	 */
 	public function is_contentsync_meta( $value ) {
-		$meta_keys = \Contentsync\get_contentsync_meta_keys();
+		$meta_keys = \Contentsync\Posts\Sync\get_contentsync_meta_keys();
 		return isset( array_flip( $meta_keys )[ $value ] );
 	}
 	/**

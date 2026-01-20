@@ -1150,9 +1150,9 @@ class Cluster_Admin {
 					Multisite_Manager::switch_blog( $blog_id );
 					foreach ( $posts as $post ) {
 						// make post static
-						$gid = \Contentsync\get_gid( $post->ID );
+						$gid = \Contentsync\Posts\Sync\get_gid( $post->ID );
 						if ( $gid ) {
-							$result = \Contentsync\unlink_synced_root_post( $gid );
+							$result = \Contentsync\Posts\Sync\unlink_synced_root_post( $gid );
 						}
 					}
 					Multisite_Manager::restore_blog();

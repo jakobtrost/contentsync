@@ -230,7 +230,7 @@ class Theme_Posts_Admin {
 
 			$post = get_post( $post_id );
 
-			$result = \Contentsync\set_wp_template_theme( $post, $switch_references_in_content );
+			$result = \Contentsync\Posts\set_wp_template_theme( $post, $switch_references_in_content );
 
 			if ( is_wp_error( $result ) ) {
 				\Contentsync\admin_ajax_return_error( $result->get_error_message() );
@@ -264,7 +264,7 @@ class Theme_Posts_Admin {
 
 			$post = get_post( $post_id );
 
-			$result = \Contentsync\set_wp_global_styles_theme( $post );
+			$result = \Contentsync\Posts\set_wp_global_styles_theme( $post );
 
 			if ( is_wp_error( $result ) ) {
 				\Contentsync\admin_ajax_return_error( $result->get_error_message() );

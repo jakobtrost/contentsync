@@ -101,29 +101,29 @@ class Global_List_Table extends \WP_List_Table {
 		$connections = is_network_admin() || ! is_multisite() ? \Contentsync\get_site_connections() : false;
 		$rel         = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'all';
 
-		$this->posts['all'] = \Contentsync\get_all_synced_posts( $query_args );
+		$this->posts['all'] = \Contentsync\Posts\Sync\get_all_synced_posts( $query_args );
 
 		// get posts in relation to this blog
 		if ( ! is_network_admin() ) {
-			$this->posts['export'] = \Contentsync\get_synced_posts_of_blog( $blog_id, 'root', $query_args );
-			$this->posts['import'] = \Contentsync\get_synced_posts_of_blog( $blog_id, 'linked', $query_args );
+			$this->posts['export'] = \Contentsync\Posts\Sync\get_synced_posts_of_blog( $blog_id, 'root', $query_args );
+			$this->posts['import'] = \Contentsync\Posts\Sync\get_synced_posts_of_blog( $blog_id, 'linked', $query_args );
 		}
 
 		if ( $connections && count( $connections ) > 0 ) {
 			if ( is_network_admin() ) {
-				$this->posts['here'] = \Contentsync\get_all_synced_posts( $query_args, 'here' );
+				$this->posts['here'] = \Contentsync\Posts\Sync\get_all_synced_posts( $query_args, 'here' );
 			}
 			foreach ( $connections as $key => $connection ) {
-				$this->posts[ $key ] = \Contentsync\get_all_synced_posts( $query_args, $key );
+				$this->posts[ $key ] = \Contentsync\Posts\Sync\get_all_synced_posts( $query_args, $key );
 			}
 		}
 
 		// post error view
 		if ( $rel === 'errors' ) {
 			if ( is_network_admin() ) {
-				$this->posts['errors'] = \Contentsync\get_network_synced_posts_with_errors( false, $query_args );
+				$this->posts['errors'] = \Contentsync\Admin\get_network_synced_posts_with_errors( false, $query_args );
 			} else {
-				$this->posts['errors'] = \Contentsync\get_synced_posts_of_blog_with_errors( $blog_id, false, $query_args );
+				$this->posts['errors'] = \Contentsync\Admin\get_synced_posts_of_blog_with_errors( $blog_id, false, $query_args );
 			}
 		}
 
@@ -427,8 +427,8 @@ class Global_List_Table extends \WP_List_Table {
 	public function single_row( $post ) {
 		// debug( $post );
 
-		$item = new_synced_post( $post );
-		$gid  = \Contentsync\get_contentsync_meta_values( $item, 'synced_post_id' );
+		$item = \Contentsync\Posts\Sync\new_synced_post( $post );
+		$gid  = \Contentsync\Posts\Sync\get_contentsync_meta_values( $item, 'synced_post_id' );
 
 		// return if not synced post
 		if ( ! isset( $item->meta ) || empty( $gid ) ) {
@@ -451,19 +451,19 @@ class Global_List_Table extends \WP_List_Table {
 		// save gid to prevent duplicates
 		$this->all_gids[ $gid ] = $post->ID;
 
-		list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\explode_gid( $gid );
+		list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 
 		// prepare the item
 		$item->gid            = $gid;
 		$item->relationship   = $this->get_contentsync_relationship( $item );
-		$item->local_post     = is_network_admin() ? false : \Contentsync\get_local_post_by_gid( $gid );
+		$item->local_post     = is_network_admin() ? false : \Contentsync\Posts\Sync\get_local_post_by_gid( $gid );
 		$item->post_type_name = post_type_exists( $item->post_type ) ? get_post_type_object( $item->post_type )->labels->singular_name : $item->post_type;
 		$item->blog_id        = ( $item->local_post || ! $post->blog_id ) ? get_current_blog_id() : $post->blog_id;
 
 		// if relationship == 'unused' but local_post is set, this is an error
 		if ( $item->relationship == 'unused' && $item->local_post ) {
 			$item->relationship = 'error';
-			$error              = \Contentsync\check_post_for_errors( $item );
+			$error              = \Contentsync\Admin\check_post_for_errors( $item );
 			if ( $error ) {
 				$item->error = $error;
 			}
@@ -485,7 +485,7 @@ class Global_List_Table extends \WP_List_Table {
 					$item->site_url = trailingslashit( esc_url( $_post->site_url ) );
 				}
 			} else {
-				$synced_post = \Contentsync\get_synced_post( $gid );
+				$synced_post = \Contentsync\Posts\Sync\get_synced_post( $gid );
 				if ( $synced_post && isset( $synced_post->post_links ) && isset( $synced_post->post_links->edit ) ) {
 					$item->site_url = trailingslashit( esc_url( $synced_post->post_links->blog ) );
 				} else {
@@ -676,7 +676,7 @@ class Global_List_Table extends \WP_List_Table {
 		$root_post_id = $item->ID;
 		$blog_id      = get_current_blog_id();
 
-		list( $root_blog_id, $_root_post_id, $root_net_url ) = \Contentsync\explode_gid( $gid );
+		list( $root_blog_id, $_root_post_id, $root_net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 
 		switch ( $column_name ) {
 
@@ -699,7 +699,7 @@ class Global_List_Table extends \WP_List_Table {
 				}
 
 				// Highlight Posttypes
-				$options = \Contentsync\get_contentsync_meta_values( $item, 'contentsync_export_options' );
+				$options = \Contentsync\Posts\Sync\get_contentsync_meta_values( $item, 'contentsync_export_options' );
 				if ( isset( $options['whole_posttype'] ) && $options['whole_posttype'] ) {
 					if ( $item->post_type == 'tp_posttypes' ) {
 						$title .= '<strong> — ' . __( 'Dynamic Post Type incl. posts', 'contentsync' ) . '</strong>';
@@ -710,8 +710,8 @@ class Global_List_Table extends \WP_List_Table {
 
 				if ( $item->error ) {
 					$actions = array( 'edit', 'root' );
-					$title  .= "<br><span class='color_red'>" . \Contentsync\get_error_message( $item->error ) . '</span>';
-					if ( ! \Contentsync\is_error_repaired( $item->error ) ) {
+					$title  .= "<br><span class='color_red'>" . \Contentsync\Admin\get_error_message( $item->error ) . '</span>';
+					if ( ! \Contentsync\Admin\is_error_repaired( $item->error ) ) {
 						$actions[] = 'repair';
 						$actions[] = 'trash';
 					}
@@ -722,7 +722,7 @@ class Global_List_Table extends \WP_List_Table {
 
 			case 'relationship':
 				if ( $item->error ) {
-					if ( \Contentsync\is_error_repaired( $item->error ) ) {
+					if ( \Contentsync\Admin\is_error_repaired( $item->error ) ) {
 						return \Contentsync\Admin\make_admin_icon_status_box( 'info', __( 'Error fixed', 'contentsync' ) );
 					} else {
 						return \Contentsync\Admin\make_admin_icon_status_box( 'error', __( 'Error', 'contentsync' ) );
@@ -761,9 +761,9 @@ class Global_List_Table extends \WP_List_Table {
 				}
 
 				if ( empty( $root_net_url ) ) {
-					$connections = \Contentsync\get_contentsync_meta_values( $item, 'contentsync_connection_map' );
+					$connections = \Contentsync\Posts\Sync\get_contentsync_meta_values( $item, 'contentsync_connection_map' );
 				} else {
-					$connections = \Contentsync\get_network_remote_connection_map_by_gid( $gid );
+					$connections = \Contentsync\Posts\Sync\get_network_remote_connection_map_by_gid( $gid );
 				}
 
 				// loop through connections
@@ -805,7 +805,7 @@ class Global_List_Table extends \WP_List_Table {
 
 			case 'options':
 				if ( empty( $root_net_url ) ) {
-					$options      = \Contentsync\get_contentsync_meta_values( $item, 'contentsync_export_options' );
+					$options      = \Contentsync\Posts\Sync\get_contentsync_meta_values( $item, 'contentsync_export_options' );
 					$option_infos = array(
 						'append_nested'  => array(
 							'icon'     => 'networking',
@@ -859,7 +859,7 @@ class Global_List_Table extends \WP_List_Table {
 	/**
 	 * Get the realtionship of a ppst to the current site
 	 *
-	 * @param Contentsync\Synced_Post $post
+	 * @param Synced_Post $post
 	 *
 	 * @return string
 	 */
@@ -872,7 +872,7 @@ class Global_List_Table extends \WP_List_Table {
 		$gid         = $post->meta['synced_post_id'];
 		$connections = isset( $post->meta['contentsync_connection_map'] ) ? $post->meta['contentsync_connection_map'] : array();
 		$blog_id     = get_current_blog_id();
-		list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\explode_gid( $gid );
+		list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 
 		$relationship = $blog_id == $root_blog_id && empty( $root_net_url ) ? 'export' : 'unused';
 
@@ -895,7 +895,7 @@ class Global_List_Table extends \WP_List_Table {
 			if ( $local_post ) {
 				$relationship = 'import';
 			} else {
-				$result = \Contentsync\remove_post_connection_from_connection_map( $gid, $blog_id, $local_post_id );
+				$result = \Contentsync\Posts\Sync\remove_post_connection_from_connection_map( $gid, $blog_id, $local_post_id );
 				if ( $result ) {
 					$relationship = 'unused';
 				} else {
@@ -1036,14 +1036,14 @@ class Global_List_Table extends \WP_List_Table {
 
 		foreach ( $gids as $gid ) {
 
-			list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\explode_gid( $gid );
+			list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 
 			// unlink (site)
 			if ( $bulk_action === 'unlink' ) {
 
 				// unlink error posts
 				if ( $gids_are_post_ids ) {
-					$result        = \Contentsync\unlink_synced_post( $root_post_id );
+					$result        = \Contentsync\Posts\Sync\unlink_synced_post( $root_post_id );
 					$post_titles[] = get_post( $root_post_id )->post_title;
 				}
 
@@ -1051,14 +1051,14 @@ class Global_List_Table extends \WP_List_Table {
 				elseif ( $root_blog_id === get_current_blog_id() && empty( $root_net_url ) ) {
 					$status = get_post_meta( $root_post_id, 'synced_post_status', true );
 					if ( $status === 'root' ) {
-						$result        = \Contentsync\unlink_synced_root_post( $gid );
+						$result        = \Contentsync\Posts\Sync\unlink_synced_root_post( $gid );
 						$post_titles[] = get_post( $root_post_id )->post_title;
 					}
 				}
 
 				// unimport linked posts from this stage
-				elseif ( $post = \Contentsync\get_local_post_by_gid( $gid ) ) {
-					$result        = \Contentsync\unlink_synced_post( $post->ID );
+				elseif ( $post = \Contentsync\Posts\Sync\get_local_post_by_gid( $gid ) ) {
+					$result        = \Contentsync\Posts\Sync\unlink_synced_post( $post->ID );
 					$post_titles[] = $post->post_title;
 				}
 			}
@@ -1069,7 +1069,7 @@ class Global_List_Table extends \WP_List_Table {
 					return false;
 				}
 
-				$result = \Contentsync\unlink_synced_root_post( $gid );
+				$result = \Contentsync\Posts\Sync\unlink_synced_root_post( $gid );
 			}
 
 			// import
@@ -1085,11 +1085,11 @@ class Global_List_Table extends \WP_List_Table {
 				// }
 
 				// // already imported
-				// if ( $post = \Contentsync\get_local_post_by_gid( $gid ) ) {
+				// if ( $post = \Contentsync\Posts\Sync\get_local_post_by_gid( $gid ) ) {
 				// continue;
 				// }
 
-				// $result = \Contentsync\import_synced_post( $gid );
+				// $result = \Contentsync\Posts\Sync\import_synced_post( $gid );
 				// if ( $result === true && $post = get_post( $result ) ) {
 				// $post_titles[] = $post->post_title;
 				// }
@@ -1110,7 +1110,7 @@ class Global_List_Table extends \WP_List_Table {
 						Multisite_Manager::restore_blog();
 					}
 				} else {
-					$post = \Contentsync\get_local_post_by_gid( $gid );
+					$post = \Contentsync\Posts\Sync\get_local_post_by_gid( $gid );
 					if ( $post ) {
 						$result = (bool) wp_trash_post( $post->ID );
 						if ( $result ) {
@@ -1128,7 +1128,7 @@ class Global_List_Table extends \WP_List_Table {
 					continue;
 				}
 
-				$post = \Contentsync\get_synced_post( $gid );
+				$post = \Contentsync\Posts\Sync\get_synced_post( $gid );
 				if ( $post ) {
 					$post_titles[] = $post->post_title;
 				}
@@ -1150,10 +1150,10 @@ class Global_List_Table extends \WP_List_Table {
 			// delete confirmed
 			elseif ( $bulk_action === 'delete_confirmed' ) {
 
-				$post = \Contentsync\get_synced_post( $gid );
+				$post = \Contentsync\Posts\Sync\get_synced_post( $gid );
 				if ( $post ) {
 					$post_title = $post->post_title;
-					$result     = (bool) \Contentsync\delete_synced_post( $gid );
+					$result     = (bool) \Contentsync\Posts\Sync\delete_synced_post( $gid );
 					if ( $result ) {
 						$post_titles[] = $post_title;
 					}
@@ -1163,15 +1163,15 @@ class Global_List_Table extends \WP_List_Table {
 			// repair
 			elseif ( $bulk_action === 'repair' ) {
 
-				$error = \Contentsync\repair_post( $root_post_id, $root_blog_id, true );
-				if ( \Contentsync\is_error_repaired( $error ) ) {
+				$error = \Contentsync\Admin\repair_post( $root_post_id, $root_blog_id, true );
+				if ( \Contentsync\Admin\is_error_repaired( $error ) ) {
 					if ( ! is_string( $result ) ) {
 						$result = true;
 					}
 				} elseif ( ! is_string( $result ) ) {
-						$result = \Contentsync\get_error_repaired_log( $error );
+						$result = \Contentsync\Admin\get_error_repaired_log( $error );
 				} else {
-					$result .= ' ' . \Contentsync\get_error_repaired_log( $error );
+					$result .= ' ' . \Contentsync\Admin\get_error_repaired_log( $error );
 				}
 			}
 		}
@@ -1265,14 +1265,14 @@ class Global_List_Table extends \WP_List_Table {
 
 		// get a
 		if ( isset( $a->meta ) ) {
-			list( $a_blog_id, $a_post_id, $a_net_url ) = \Contentsync\explode_gid( $a->meta['synced_post_id'] );
+			list( $a_blog_id, $a_post_id, $a_net_url ) = \Contentsync\Posts\Sync\explode_gid( $a->meta['synced_post_id'] );
 		} else {
 			$a_blog_id = $a->blog_id;
 			$a_net_url = $a->network_url;
 		}
 		// get b
 		if ( isset( $b->meta ) ) {
-			list( $b_blog_id, $b_post_id, $b_net_url ) = \Contentsync\explode_gid( $b->meta['synced_post_id'] );
+			list( $b_blog_id, $b_post_id, $b_net_url ) = \Contentsync\Posts\Sync\explode_gid( $b->meta['synced_post_id'] );
 		} else {
 			$b_blog_id = $b->blog_id;
 			$b_net_url = $b->network_url;

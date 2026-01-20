@@ -1111,11 +1111,11 @@ public static function set_meta( $post_id, $meta, $post = null ) {
 	foreach ( (array) $meta as $meta_key => $meta_values ) {
 
 		// don't import blacklisted meta
-		if ( in_array( $meta_key, \Contentsync\get_blacklisted_meta_for_export( 'import', $post_id ), true ) ) {
+		if ( in_array( $meta_key, \Contentsync\Posts\Sync\get_blacklisted_meta_for_export( 'import', $post_id ), true ) ) {
 			continue;
 		}
 		// skip certain meta keys
-		elseif ( \Contentsync\maybe_skip_meta_option( $meta_key, $meta_values, 'import', $post_id ) ) {
+		elseif ( \Contentsync\Posts\Sync\maybe_skip_meta_option( $meta_key, $meta_values, 'import', $post_id ) ) {
 			continue;
 		}
 

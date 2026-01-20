@@ -6,7 +6,7 @@
  * across multisite networks.
  */
 
-namespace Contentsync\Posts\Sync;
+namespace Contentsync\Admin;
 
 use Contentsync\Utils\Multisite_Manager;
 
@@ -74,7 +74,7 @@ function get_error_repaired_log( $error ) {
  */
 function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 
-	$post = new_synced_post( $post );
+	$post = \Contentsync\Posts\Sync\new_synced_post( $post );
 	if ( ! $post ) {
 		return false;
 	}
@@ -95,7 +95,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 	$blog_id      = $post->blog_id ? $post->blog_id : $current_blog;
 	$cur_net_url  = \Contentsync\Utils\get_network_url();
 
-	list( $root_blog_id, $root_post_id, $root_net_url ) = explode_gid( $gid );
+	list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 	if ( $root_post_id === null ) {
 		return false;
 	}
@@ -121,7 +121,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 				$update_gid = true;
 			}
 		} else {
-			$connection = get_site_connection( $root_net_url );
+			$connection = \Contentsync\Admin\get_site_connection( $root_net_url );
 
 			// connection doesn't exist
 			if ( ! $connection ) {
@@ -156,7 +156,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 			$error->message = __( 'The post is not originally from this page.', 'contentsync' );
 
 			if ( $repair ) {
-				if ( $root_post = \Contentsync\get_synced_post( $gid ) ) {
+				if ( $root_post = \Contentsync\Posts\Sync\get_synced_post( $gid ) ) {
 					$new_status         = 'linked';
 					$restore_connection = true;
 				} else {
@@ -167,7 +167,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 			$error->message = __( 'The synced post ID is linked incorrectly.', 'contentsync' );
 
 			if ( $repair ) {
-				if ( $root_post = \Contentsync\get_synced_post( $gid ) ) {
+				if ( $root_post = \Contentsync\Posts\Sync\get_synced_post( $gid ) ) {
 					$delete_meta = true;
 				} else {
 					$convert_to_root = true;
@@ -216,7 +216,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 					$convert_to_root = true;
 				}
 			} else {
-				$root_post = get_post( $root_post_id );
+				$root_post = \Contentsync\Posts\Sync\get_post( $root_post_id );
 
 				// root post found
 				if ( $root_post ) {
@@ -243,7 +243,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 		// root comes from another blog
 		else {
 
-			$root_post = \Contentsync\get_synced_post( $gid );
+			$root_post = \Contentsync\Posts\Sync\get_synced_post( $gid );
 
 			// root post found
 			if ( $root_post ) {
@@ -386,7 +386,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 
 	// delete meta
 	if ( $delete_meta ) {
-		$success = delete_contentsync_meta_values( $post_id );
+		$success = \Contentsync\Posts\Sync\delete_contentsync_meta_values( $post_id );
 
 		if ( $repaired === null ) {
 			$repaired = (bool) $success;
@@ -405,7 +405,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 	if ( count( $orphan_connections ) ) {
 
 		foreach ( $orphan_connections as $imported_blog_id => $imported_post_id ) {
-			$success = remove_post_connection_from_connection_map( $gid, $imported_blog_id, $imported_post_id );
+			$success = \Contentsync\Posts\Sync\remove_post_connection_from_connection_map( $gid, $imported_blog_id, $imported_post_id );
 
 			if ( $repaired === null ) {
 				$repaired = (bool) $success;
@@ -423,7 +423,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 
 	// restore the connection to the root post
 	if ( $restore_connection ) {
-		$success = add_post_connection_to_connection_map(
+		$success = \Contentsync\Posts\Sync\add_post_connection_to_connection_map(
 			$gid,
 			$blog_id,
 			$post_id,
@@ -445,7 +445,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 
 	// trash other linked post
 	if ( $trash_other_post && isset( $other_linked_post ) ) {
-		$success = delete_contentsync_meta_values( $other_linked_post->ID );
+		$success = \Contentsync\Posts\Sync\delete_contentsync_meta_values( $other_linked_post->ID );
 		$success = wp_trash_post( $other_linked_post->ID );
 		$success = true;
 
@@ -464,7 +464,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 
 	// trash post
 	if ( $trash_post ) {
-		$success = delete_contentsync_meta_values( $post_id );
+		$success = \Contentsync\Posts\Sync\delete_contentsync_meta_values( $post_id );
 		$success = wp_trash_post( $post_id );
 		$success = true;
 
@@ -523,7 +523,7 @@ function get_synced_posts_of_blog_with_errors( $blog_id = 0, $repair_posts = fal
 
 	Multisite_Manager::switch_blog( $blog_id );
 
-	$posts = \Contentsync\get_synced_posts_of_blog( '', '', $query_args );
+	$posts = \Contentsync\Posts\Sync\get_synced_posts_of_blog( '', '', $query_args );
 
 	foreach ( $posts as $post ) {
 		$error = check_post_for_errors( $post, true, $repair_posts );
@@ -575,11 +575,11 @@ function convert_post_to_root( $post_id, $old_gid ) {
 		'translations'   => true,
 	);
 
-	if ( ! function_exists( '\Contentsync\make_post_global' ) ) {
+	if ( ! function_exists( 'make_post_synced' ) ) {
 		return false;
 	}
 
-	$gid = \Contentsync\make_post_global( $post_id, $options );
+	$gid = \Contentsync\Posts\Sync\make_post_synced( $post_id, $options );
 
 	// loop through all blogs and change the gid
 	foreach ( Multisite_Manager::get_all_blogs() as $blog_id => $blog_args ) {
@@ -589,9 +589,9 @@ function convert_post_to_root( $post_id, $old_gid ) {
 		}
 
 		Multisite_Manager::switch_blog( $blog_id );
-		$post = \Contentsync\get_local_post_by_gid( $old_gid );
+		$post = \Contentsync\Posts\Sync\get_local_post_by_gid( $old_gid );
 		if ( $post ) {
-			$connection_map[ $blog_id ] = get_post_connection_map( $blog_id, $post->ID );
+			$connection_map[ $blog_id ] = \Contentsync\Posts\Sync\get_post_connection_map( $blog_id, $post->ID );
 			update_post_meta( $post->ID, 'synced_post_id', $gid );
 		}
 		Multisite_Manager::restore_blog();
