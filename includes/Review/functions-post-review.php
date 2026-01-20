@@ -12,7 +12,9 @@
  *
  * @since 2.17.0
  */
-namespace Contentsync;
+namespace Contentsync\Reviews;
+
+use Contentsync\Posts\Transfer\Post_Export;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -67,8 +69,9 @@ function create_post_review( $post_id, $post_before = null ) {
 	} else {
 
 		$post_before_id     = $post_before ? $post_before->ID : $post_id;
-		$post_before_export = Main_Helper::export_post( $post_before_id, array() );
-		if ( $post_before ) {
+		$post_before_export = ( new Post_Export( $post_before_id, array() ) )->get_first_post();
+
+		if ( $post_before && $post_before_export ) {
 			// loop through all keys of the $post_before object and compare them with the export
 			foreach ( $post_before as $key => $value ) {
 				if ( isset( $post_before_export->$key ) && $value !== $post_before_export->$key ) {
