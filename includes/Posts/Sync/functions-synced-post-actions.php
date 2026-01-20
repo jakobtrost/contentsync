@@ -507,7 +507,7 @@ function delete_unlinked_posts( $post ) {
 	}
 	Logger::log( 'destination_arrays', $destination_arrays );
 
-	$result = \Contentsync\distribute_single_post( $post, $destination_arrays );
+	$result = \Contentsync\Distribution\distribute_single_post( $post, $destination_arrays );
 
 	return $result;
 }
@@ -557,7 +557,7 @@ function delete_synced_post( $gid, $keep_root_post = false ) {
 	}
 	Logger::log( 'destination_arrays', $destination_arrays );
 
-	$result = \Contentsync\distribute_single_post( $post, $destination_arrays );
+	$result = \Contentsync\Distribution\distribute_single_post( $post, $destination_arrays );
 
 	// delete the root post
 	if ( ! $keep_root_post ) {

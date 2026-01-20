@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function save_distribution_item( $distribution_item ) {
 
-	if ( ! is_a( $distribution_item, 'Contentsync\Distribution_Item' ) ) {
+	if ( ! is_a( $distribution_item, 'Contentsync\Distribution\Distribution_Item' ) ) {
 		return new \WP_Error( 'invalid_data', __( 'Invalid data.', 'global-contents' ) );
 	}
 

@@ -785,7 +785,7 @@ function schedule_distribution_item_by_id( $distribution_item_id ) {
 	// get the distribution item from the database
 	$distribution_item = get_distribution_item( $distribution_item_id );
 
-	if ( ! is_a( $distribution_item, 'Contentsync\Distribution_Item' ) ) {
+	if ( ! is_a( $distribution_item, 'Contentsync\Distribution\Distribution_Item' ) ) {
 		return new WP_Error( 'invalid_distribution_item', __( 'Invalid distribution item.', 'global-contents' ) );
 	}
 
@@ -857,7 +857,7 @@ function distribute_item( $item_id ) {
 
 	$item = get_distribution_item( $item_id );
 
-	if ( ! is_a( $item, 'Contentsync\Distribution_Item' ) ) {
+	if ( ! is_a( $item, 'Contentsync\Distribution\Distribution_Item' ) ) {
 		return false;
 	}
 
@@ -870,7 +870,7 @@ function distribute_item( $item_id ) {
 	);
 
 	// Distribute to local blog.
-	if ( is_a( $item->destination, 'Contentsync\Destinations\Blog_Destination' ) ) {
+	if ( is_a( $item->destination, 'Contentsync\Distribution\Destinations\Blog_Destination' ) ) {
 
 		$result = distribute_to_blog( $item );
 
@@ -882,7 +882,7 @@ function distribute_item( $item_id ) {
 	}
 
 	// Distribute to remote site.
-	if ( is_a( $item->destination, 'Contentsync\Destinations\Remote_Destination' ) ) {
+	if ( is_a( $item->destination, 'Contentsync\Distribution\Destinations\Remote_Destination' ) ) {
 
 		$result = distribute_to_remote_site( $item );
 
@@ -1088,99 +1088,4 @@ function distribute_to_remote_site( &$item ) {
 	}
 
 	return (bool) $result;
-}
-
-/**
- * =================================================================
- *                          SANITIZATION
- * =================================================================
- */
-add_action( 'contentsync_before_import_synced_posts', __NAMESPACE__ . '\\before_import_synced_posts', 10, 2 );
-add_action( 'contentsync_after_import_synced_posts', __NAMESPACE__ . '\\after_import_synced_posts', 10, 2 );
-
-/**
- * Before import synced posts: Filter the HTML tags that are allowed for a given context.
- *
- * @param array $posts  The posts to import.
- * @param array $conflict_actions  The conflict actions.
- *
- * @return void
- */
-function before_import_synced_posts( $posts, $conflict_actions ) {
-	add_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\\filter_allowed_html_tags_during_distribution', 98, 2 );
-}
-
-/**
- * After import synced posts: Remove the filter for the HTML tags that are allowed for a given context.
- *
- * @param array $posts  The posts to import.
- * @param array $conflict_actions  The conflict actions.
- *
- * @return void
- */
-function after_import_synced_posts( $posts, $conflict_actions ) {
-	remove_filter( 'wp_kses_allowed_html', __NAMESPACE__ . '\\filter_allowed_html_tags_during_distribution', 98 );
-}
-
-/**
- * Filters the HTML tags that are allowed for a given context.
- *
- * HTML tags and attribute names are case-insensitive in HTML but must be
- * added to the KSES allow list in lowercase. An item added to the allow list
- * in upper or mixed case will not recognized as permitted by KSES.
- *
- * @param array[] $html    Allowed HTML tags.
- * @param string  $context Context name.
- */
-function filter_allowed_html_tags_during_distribution( $html, $context ) {
-
-	if ( $context !== 'post' ) {
-		return $html;
-	}
-
-	$default_attributes = array(
-		'id'            => true,
-		'class'         => true,
-		'href'          => true,
-		'name'          => true,
-		'target'        => true,
-		'download'      => true,
-		'data-*'        => true,
-		'style'         => true,
-		'title'         => true,
-		'role'          => true,
-		'onclick'       => true,
-		'aria-*'        => true,
-		'aria-expanded' => true,
-		'aria-controls' => true,
-		'aria-label'    => true,
-		'tabindex'      => true,
-	);
-
-	// iframe
-	$html['iframe'] = array_merge(
-		isset( $html['iframe'] ) ? $html['iframe'] : array(),
-		$default_attributes,
-		array(
-			'src'             => true,
-			'width'           => true,
-			'height'          => true,
-			'frameborder'     => true,
-			'allowfullscreen' => true,
-		)
-	);
-
-	// script
-	$html['script'] = array_merge(
-		isset( $html['script'] ) ? $html['script'] : array(),
-		$default_attributes,
-		array(
-			'src'   => true,
-			'type'  => true,
-			'async' => true,
-			'defer' => true,
-		)
-	);
-
-	return $html;
 }

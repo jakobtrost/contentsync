@@ -299,7 +299,7 @@ class Distribution_Endpoint extends Endpoint {
 	 *
 	 * @param array|object $destination  The remote destination object from the request, usually an array.
 	 *
-	 * @return Contentsync\Destinations\Remote_Destination|bool   The sanitized remote destination object or false.
+	 * @return Remote_Destination|bool   The sanitized remote destination object or false.
 	 */
 	public function sanitize_remote_destination( $destination ) {
 

@@ -147,7 +147,7 @@ function approve_post_review( $review_id, $post_id = null ) {
 		}
 
 		// distribute the post
-		$result = \Contentsync\distribute_single_post( $post_id, $destination_ids );
+		$result = \Contentsync\Distribution\distribute_single_post( $post_id, $destination_ids );
 	}
 
 	if ( ! $result ) {
@@ -271,7 +271,7 @@ function revert_post_review( $review_id, $post_id = null, $message_content = '' 
 		);
 
 		// distribute the post
-		$result = \Contentsync\distribute_single_post( $post_id, $destination_ids );
+		$result = \Contentsync\Distribution\distribute_single_post( $post_id, $destination_ids );
 	}
 
 	Mails\send_review_mail( $review_id, 'reverted', 'editor' );

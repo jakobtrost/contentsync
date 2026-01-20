@@ -216,7 +216,7 @@ class Admin {
 		}
 
 		// get items that are not completed and older than 5 minutes
-		$stuck_items = get_distribution_items(
+		$stuck_items = \Contentsync\Distribution\get_distribution_items(
 			array(
 				'status'  => array( 'init', 'started' ),
 				'time'    => array(
@@ -334,13 +334,13 @@ class Admin {
 		}
 
 		// Get the distribution item
-		$item = get_distribution_item( $item_id );
+		$item = \Contentsync\Distribution\get_distribution_item( $item_id );
 		if ( ! $item ) {
 			wp_send_json_error( array( 'message' => __( 'Distribution item not found', 'contentsync' ) ) );
 		}
 
 		// Run the distribution
-		$result = \Contentsync\distribute_item( $item_id );
+		$result = \Contentsync\Distribution\distribute_item( $item_id );
 
 		if ( $result !== false ) {
 			wp_send_json_success(

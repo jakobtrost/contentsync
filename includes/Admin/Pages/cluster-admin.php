@@ -402,7 +402,7 @@ class Cluster_Admin {
 				) {
 
 					// distribute posts
-					$distribute_result = \Contentsync\distribute_cluster_posts(
+					$distribute_result = \Contentsync\Distribution\distribute_cluster_posts(
 						new \Contentsync\Cluster\Cluster( (object) $cluster ),
 						array(
 							'posts'           => $cluster_posts_before,
@@ -1192,7 +1192,7 @@ class Cluster_Admin {
 				/**
 				 * Distribute posts to all destinations, step by step per blog.
 				 */
-				$result = \Contentsync\distribute_posts_per_blog( $cluster_posts, $destination_arrays );
+				$result = \Contentsync\Distribution\distribute_posts_per_blog( $cluster_posts, $destination_arrays );
 
 				// delete all conditions
 				foreach ( $cluster->content_conditions as $condition ) {

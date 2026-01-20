@@ -91,7 +91,7 @@ class Queue_List_Table extends \WP_List_Table {
 		$order   = isset( $_GET['order'] ) ? strtoupper( $_GET['order'] ) : 'DESC';
 		$view    = isset( $_GET['view'] ) && ! empty( $_GET['view'] ) ? esc_attr( $_GET['view'] ) : '';
 
-		$items = get_distribution_items(
+		$items = \Contentsync\Distribution\get_distribution_items(
 			array(
 				'orderby' => $orderby,
 				'order'   => $order,
@@ -224,7 +224,7 @@ class Queue_List_Table extends \WP_List_Table {
 
 		foreach ( $views as $type => $title ) {
 
-			$items = get_distribution_items( array( 'status' => $type ), 'ID' );
+			$items = \Contentsync\Distribution\get_distribution_items( array( 'status' => $type ), 'ID' );
 
 			$return[ $type ] = sprintf(
 				'<a href="%s" class="%s">%s <span class="count">(%s)</span></a>',
@@ -267,10 +267,10 @@ class Queue_List_Table extends \WP_List_Table {
 		$title           = '';
 		$connection      = null;
 
-		if ( is_a( $item->destination, 'Contentsync\Destinations\Blog_Destination' ) ) {
+		if ( is_a( $item->destination, 'Contentsync\Distribution\Destinations\Blog_Destination' ) ) {
 			$title           = get_blog_option( $item->destination->ID, 'blogname' );
 			$destination_url = get_blog_option( $item->destination->ID, 'siteurl' );
-		} elseif ( is_a( $item->destination, 'Contentsync\Destinations\Remote_Destination' ) ) {
+		} elseif ( is_a( $item->destination, 'Contentsync\Distribution\Destinations\Remote_Destination' ) ) {
 			$connection = \Contentsync\Posts\Sync\get_site_connection( $item->destination->ID );
 			if ( $connection ) {
 				$title           = $connection['site_name'];
@@ -530,7 +530,7 @@ class Queue_List_Table extends \WP_List_Table {
 		// Run now action
 		if ( isset( $_GET['run_now'] ) && check_admin_referer( 'contentsync_run_now' ) ) {
 			$item_id = intval( $_GET['run_now'] );
-			$result  = \Contentsync\distribute_item( $item_id );
+			$result  = \Contentsync\Distribution\distribute_item( $item_id );
 			if ( $result !== false ) {
 				$this->render_admin_notice( __( 'Distribution started successfully.', 'contentsync' ), 'success' );
 			} else {
@@ -541,7 +541,7 @@ class Queue_List_Table extends \WP_List_Table {
 		// Reschedule action
 		if ( isset( $_GET['reschedule'] ) && check_admin_referer( 'contentsync_reschedule' ) ) {
 			$item_id = intval( $_GET['reschedule'] );
-			$result  = \Contentsync\schedule_distribution_item_by_id( $item_id );
+			$result  = \Contentsync\Distribution\schedule_distribution_item_by_id( $item_id );
 			if ( ! is_wp_error( $result ) ) {
 				$this->render_admin_notice( __( 'Distribution rescheduled successfully.', 'contentsync' ), 'success' );
 			} else {
@@ -552,7 +552,7 @@ class Queue_List_Table extends \WP_List_Table {
 		// Delete action
 		if ( isset( $_GET['delete_queue'] ) && check_admin_referer( 'contentsync_delete_queue' ) ) {
 			$item_id = intval( $_GET['delete_queue'] );
-			$item    = get_distribution_item( $item_id );
+			$item    = \Contentsync\Distribution\get_distribution_item( $item_id );
 			if ( $item && $item->delete() ) {
 				$this->render_admin_notice( __( 'Distribution deleted successfully.', 'contentsync' ), 'success' );
 			} else {
@@ -562,7 +562,7 @@ class Queue_List_Table extends \WP_List_Table {
 
 		// Delete all queues action
 		if ( isset( $_GET['delete_all_queues'] ) && check_admin_referer( 'contentsync_delete_all_queues' ) ) {
-			$all_items     = get_distribution_items( array(), 'ID' );
+			$all_items     = \Contentsync\Distribution\get_distribution_items( array(), 'ID' );
 			$deleted_count = 0;
 			$failed_count  = 0;
 
@@ -661,9 +661,9 @@ class Queue_List_Table extends \WP_List_Table {
 		switch ( $bulk_action ) {
 			case 'run_now':
 				foreach ( $item_ids as $item_id ) {
-					$item = get_distribution_item( $item_id );
+					$item = \Contentsync\Distribution\get_distribution_item( $item_id );
 					if ( $item ) {
-						$result = \Contentsync\distribute_item( $item_id );
+						$result = \Contentsync\Distribution\distribute_item( $item_id );
 						if ( $result !== false ) {
 							$item_titles[] = $item_id;
 						} else {
@@ -678,9 +678,9 @@ class Queue_List_Table extends \WP_List_Table {
 
 			case 'reschedule':
 				foreach ( $item_ids as $item_id ) {
-					$item = get_distribution_item( $item_id );
+					$item = \Contentsync\Distribution\get_distribution_item( $item_id );
 					if ( $item ) {
-						$result = \Contentsync\schedule_distribution_item_by_id( $item_id );
+						$result = \Contentsync\Distribution\schedule_distribution_item_by_id( $item_id );
 						if ( ! is_wp_error( $result ) ) {
 							$item_titles[] = $item_id;
 						} else {
@@ -695,7 +695,7 @@ class Queue_List_Table extends \WP_List_Table {
 
 			case 'delete':
 				foreach ( $item_ids as $item_id ) {
-					$item = get_distribution_item( $item_id );
+					$item = \Contentsync\Distribution\get_distribution_item( $item_id );
 					if ( $item ) {
 						$result = $item->delete();
 						if ( $result ) {

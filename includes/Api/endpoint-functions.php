@@ -161,8 +161,8 @@ function delete_all_remote_connected_posts( $connection_or_site_url, $gid, $conn
  *
  * This function calles the endpoint 'distribution/distribute-item' on the remote site.
  *
- * @param array|string             $connection_or_site_url
- * @param Remote_Distribution_Item $remote_distribution_item
+ * @param array|string      $connection_or_site_url
+ * @param Distribution_Item $remote_distribution_item
  *
  * @return mixed Decoded response data on success, WP_Error on failure.
  */

@@ -100,9 +100,9 @@ class Distribution_Item {
 	/**
 	 * Destination sites and their status.
 	 *
-	 * @var Contentsync\Destinations\Blog_Destination|Contentsync\Destinations\Remote_Destination
+	 * @var Blog_Destination|Remote_Destination
 	 */
-	public $destination;
+	public $destination
 
 	/**
 	 * Prepared_Post Objects
