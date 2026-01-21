@@ -4,7 +4,6 @@
  *
  * Abstract base class for translation tool implementations.
  * Provides common utilities and defines the interface that all translation tools must implement.
- *
  */
 
 namespace Contentsync\Translations;

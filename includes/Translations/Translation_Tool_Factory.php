@@ -4,7 +4,6 @@
  *
  * Responsible for detecting which translation tool is active and
  * providing the appropriate translation tool instance.
- *
  */
 
 namespace Contentsync\Translations;
@@ -59,7 +58,6 @@ class Translation_Tool_Factory {
 	 * Reset the factory cache.
 	 *
 	 * Useful for testing or when the translation environment changes.
-	 *
 	 */
 	public static function reset() {
 		self::$instance  = null;

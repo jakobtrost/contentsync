@@ -4,7 +4,6 @@
  *
  * Handles all Polylang-specific translation operations.
  * Uses database-based access via taxonomies to avoid loading the plugin in multisite contexts.
- *
  */
 
 namespace Contentsync\Translations;
@@ -414,7 +413,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 	/**
 	 * Register Polylang language taxonomies.
-	 *
 	 */
 	private function register_taxonomies() {
 		// Get Polylang options from database
@@ -439,13 +437,12 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 
 	/**
 	 * Register standalone Polylang functions.
-	 *
 	 */
 	private function register_standalone_functions() {
 		/**
 		 * Load the functions from separate file to load them without Namespacing.
 		 */
-		require_once __DIR__ . '/translation-tool-polylang-functions.php';
+		require_once __DIR__ . '/functions/polyfill-functions-polylang.php';
 	}
 
 	// =====================================================================

@@ -16,7 +16,6 @@
  * - Translation_Tool_Base: Abstract base class defining the interface
  * - Translation_Tool_Polylang: Polylang-specific implementation
  * - Translation_Tool_WPML: WPML-specific implementation
- *
  */
 
 namespace Contentsync\Translations;
@@ -29,12 +28,6 @@ use Contentsync\Translations\Translation_Tool_WPML;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-// Load translation tool classes
-require_once __DIR__ . '/translation-tools/class-translation-tool-base.php';
-require_once __DIR__ . '/translation-tools/class-translation-tool-factory.php';
-require_once __DIR__ . '/translation-tools/class-translation-tool-polylang.php';
-require_once __DIR__ . '/translation-tools/class-translation-tool-wpml.php';
 
 class Translation_Manager {
 

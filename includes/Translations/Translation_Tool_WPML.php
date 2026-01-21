@@ -4,7 +4,6 @@
  *
  * Handles all WPML-specific translation operations.
  * Uses database queries to access WPML's custom tables.
- *
  */
 
 namespace Contentsync\Translations;
@@ -60,13 +59,12 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 
 	/**
 	 * Register standalone WPML functions.
-	 *
 	 */
 	private function register_standalone_functions() {
 		/**
 		 * Load the functions from separate file to load them without Namespacing.
 		 */
-		require_once __DIR__ . '/translation-tool-wpml-functions.php';
+		require_once __DIR__ . '/functions/polyfill-functions-wpml.php';
 	}
 
 	/**
