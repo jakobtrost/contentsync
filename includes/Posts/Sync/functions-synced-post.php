@@ -5,6 +5,7 @@ namespace Contentsync\Posts\Sync;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Posts\Theme_Assets;
 use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 
@@ -396,7 +397,7 @@ function get_synced_posts_of_blog( $blog_id = '', $filter_status = '', $query = 
 
 	$post_type = 'any';
 	if ( empty( $post_type ) || $post_type === 'any' ) {
-		$post_type = is_rest_request() ? 'any' : \Contentsync\get_export_post_types();
+		$post_type = is_rest_request() ? 'any' : Post_Transfer_Service::get_supported_post_types();
 	}
 
 	$args = array(
@@ -511,7 +512,7 @@ function get_local_post_by_gid( $gid, $post_type = 'any' ) {
 	$local_post = false;
 
 	if ( empty( $post_type ) || $post_type === 'any' ) {
-		$post_type = is_rest_request() ? 'any' : \Contentsync\get_export_post_types();
+		$post_type = is_rest_request() ? 'any' : Post_Transfer_Service::get_supported_post_types();
 	}
 
 	$result = Post_Query::get_unfiltered_posts(

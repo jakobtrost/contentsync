@@ -12,7 +12,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class used to implement the Prepared_Post object.
  *
- *
  * This class attaches all post meta options, taxonomy terms and
  * other post properties to a customized WP_Post object. It also gets
  * all nested templates, forms, images etc. inside the post content,
@@ -110,7 +109,7 @@ class Prepared_Post {
 	 *     @property string name           Post name (slug) of the media file (eg. 'my-image.jpg')
 	 *     @property string path           DIR path of the media file (eg. '/htdocs/www/public/wp-content/uploads/sites/9/2025/10/my-image.jpg').
 	 *     @property string url            URL to the media file (eg. 'https://jakobtrost.de/wp-content/uploads/sites/9/2025/10/my-image.jpg').
-	 *     @property string relative_path  Relative path to the wp upload basedir (eg. '/2025/10/my-image.jpg'). 
+	 *     @property string relative_path  Relative path to the wp upload basedir (eg. '/2025/10/my-image.jpg').
 	 */
 	public $media = array();
 
@@ -128,7 +127,6 @@ class Prepared_Post {
 	/**
 	 * The arguments used to export the post.
 	 *
-	 *
 	 * This takes precedence over the default arguments, passed to
 	 * the Class __construct() function: @param $export_arguments.
 	 *
@@ -145,7 +143,6 @@ class Prepared_Post {
 	/**
 	 * Conflict action: What to do if a conflicting post already exists.
 	 *
-	 *
 	 * A conflicting post is a post with the same post_name and post_type.
 	 *
 	 * @var string 'keep|replace|skip'
@@ -158,7 +155,6 @@ class Prepared_Post {
 	/**
 	 * Import action: What to do with the post on/after import.
 	 *
-	 *
 	 * @var string 'insert|draft|trash|delete'
 	 *    @default 'update'  Insert or update the post if it already exists.
 	 *    @value   'draft'   Set the post to draft.
@@ -169,7 +165,6 @@ class Prepared_Post {
 
 	/**
 	 * Post hierarchy: The hierarchy of the post.
-	 *
 	 *
 	 * @var array
 	 *    @property array $parent      Information about the parent post.
@@ -258,7 +253,7 @@ class Prepared_Post {
 		}
 
 		// get regex patterns
-		$replace_id_patterns = (array) get_nested_post_patterns( $this->ID, $this );
+		$replace_id_patterns = (array) Nested_Content_Patterns::get_post_patterns( $this->ID, $this );
 
 		foreach ( $replace_id_patterns as $key => $pattern ) {
 
@@ -303,7 +298,7 @@ class Prepared_Post {
 							$args = $name_or_id;
 						}
 						// get post
-						$nested_post = get_post_by_name_and_type( $args );
+						$nested_post = Post_Transfer_Service::get_post_by_name_and_type( $args );
 						if ( $nested_post ) {
 							$nested_id = $nested_post->ID;
 						}
@@ -328,7 +323,6 @@ class Prepared_Post {
 
 		/**
 		 * advancedFilter
-		 *
 		 */
 		preg_match_all( '/\"advancedFilter\":(\[.*\])/', $this->post_content, $matches );
 		if ( $matches ) {
@@ -426,7 +420,7 @@ class Prepared_Post {
 		}
 
 		// get patterns
-		$replace_id_patterns = (array) get_nested_term_patterns( $this->ID, $this );
+		$replace_id_patterns = (array) Nested_Content_Patterns::get_term_patterns( $this->ID, $this );
 
 		foreach ( $replace_id_patterns as $key => $pattern ) {
 
@@ -472,7 +466,6 @@ class Prepared_Post {
 
 		/**
 		 * taxQuery and advancedFilter
-		 *
 		 */
 		preg_match_all( '/\"taxQuery\":(\{.*?\})/', $this->post_content, $matches );
 		if ( $matches ) {
@@ -562,7 +555,7 @@ class Prepared_Post {
 		}
 
 		// get patterns
-		$replace_strings = (array) get_nested_string_patterns( $subject, $post_id );
+		$replace_strings = (array) Nested_Content_Patterns::get_string_patterns( $subject, $post_id );
 		foreach ( $replace_strings as $name => $string ) {
 			$subject = str_replace( $string, '{{' . $name . '}}', $subject );
 		}
@@ -710,7 +703,6 @@ class Prepared_Post {
 				);
 				/**
 				 * Nest parent terms.
-				 *
 				 */
 				$ids = array_map(
 					function ( $term ) {
@@ -788,9 +780,9 @@ class Prepared_Post {
 			$relative_path = str_replace( wp_upload_dir( null, true, true )['basedir'], '', $file_path );
 
 			$this->media = array(
-				'name'          => $file_name,     // my-image.jpg
-				'url'           => $file_url,      // https://jakobtrost.de/wp-content/uploads/sites/9/2025/10/my-image.jpg
-				'path'          => $file_path,     // /htdocs/www/public/wp-content/uploads/sites/9/2025/10/my-image.jpg
+				'name' => $file_name,     // my-image.jpg
+				'url'  => $file_url,      // https://jakobtrost.de/wp-content/uploads/sites/9/2025/10/my-image.jpg
+				'path' => $file_path,     // /htdocs/www/public/wp-content/uploads/sites/9/2025/10/my-image.jpg
 				// 'relative_path' => $relative_path, // /2025/10/my-image.jpg
 			);
 
@@ -800,7 +792,6 @@ class Prepared_Post {
 
 	/**
 	 * Get all necessary language information.
-	 *
 	 */
 	public function prepare_language() {
 
@@ -904,11 +895,11 @@ class Prepared_Post {
 	/**
 	 * Prepare the post hierarchy.
 	 *
-	 *
 	 * We collect the post hierarchy information in the Prepared_Post object. This contains
 	 * information about the parent post (if any) and all child posts (if any are found).
 	 * This information is used during the import process to try to restore the same hierarchy
 	 * based on the posts provided on the destination site.
+	 *
 	 * @see Post_Import::set_post_hierarchy()
 	 *
 	 * @var array $this->post_hierarchy Information about the post hierarchy.

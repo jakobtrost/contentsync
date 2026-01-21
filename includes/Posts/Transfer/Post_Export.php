@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Post_Export extends Post_Transfer {
+class Post_Export extends Post_Transfer_Base {
 
 	/**
 	 * Holds all WP_Media objects for a post transfer, keyed by post ID.
@@ -19,7 +19,6 @@ class Post_Export extends Post_Transfer {
 
 	/**
 	 * Export posts with all its meta, taxonomies, media etc.
-	 *
 	 *
 	 * @param int|object|int[]|object[] $post_or_posts  Post ID, post object, array of post IDs or array of post objects.
 	 * @param array                     $arguments            Export arguments.
@@ -184,7 +183,6 @@ class Post_Export extends Post_Transfer {
 
 	/**
 	 * Parse export arguments.
-	 *
 	 *
 	 * @param array $arguments The arguments to parse.
 	 *

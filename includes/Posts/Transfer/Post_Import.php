@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Post_Import extends Post_Transfer {
+class Post_Import extends Post_Transfer_Base {
 
 	/**
 	 * Collect strings during import to replace them later.
@@ -200,7 +200,7 @@ class Post_Import extends Post_Transfer {
 				$existing_post_id = $conflict_data['post_id'];
 				$conflict_action  = $conflict_data['action'];
 			} else {
-				$existing_post_id = $existing_post_id ? $existing_post_id : \Contentsync\get_existing_post_id( $post );
+				$existing_post_id = $existing_post_id ? $existing_post_id : Post_Transfer_Service::get_existing_post_id( $post );
 			}
 
 			/**
@@ -911,7 +911,7 @@ class Post_Import extends Post_Transfer {
 			$replace_string = $nested_id;
 		}
 		// post exists: use existing post-ID
-		elseif ( $existing_post = \Contentsync\get_post_by_name_and_type( (object) $nested_postarr ) ) {
+		elseif ( $existing_post = Post_Transfer_Service::get_post_by_name_and_type( (object) $nested_postarr ) ) {
 			$replace_string = $existing_post->ID;
 		}
 		// attachments: use the frontend url
@@ -1014,7 +1014,7 @@ class Post_Import extends Post_Transfer {
 		}
 
 		// get patterns
-		$replace_strings = (array) get_nested_string_patterns( $subject, $post_id );
+		$replace_strings = (array) Nested_Content_Patterns::get_string_patterns( $subject, $post_id );
 		foreach ( $replace_strings as $name => $string ) {
 			$subject = str_replace( '{{' . $name . '}}', $string, $subject );
 			if ( $log ) {

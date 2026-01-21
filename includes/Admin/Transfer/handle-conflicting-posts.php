@@ -2,6 +2,7 @@
 
 namespace Contentsync\Admin\Transfer;
 
+use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -93,7 +94,7 @@ function get_conflicting_posts( $posts ) {
 
 	$conflicts = array();
 	foreach ( $posts as $post_id => $post ) {
-		if ( $existing_post = \Contentsync\Posts\Sync\get_post_by_name_and_type( $post ) ) {
+		if ( $existing_post = Post_Transfer_Service::get_post_by_name_and_type( $post ) ) {
 			$conflicts[ $post_id ] = $existing_post;
 		}
 	}

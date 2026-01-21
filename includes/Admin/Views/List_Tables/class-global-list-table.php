@@ -9,6 +9,7 @@
 namespace Contentsync\Admin\Pages\List_Tables;
 
 use Contentsync\Posts\Theme_Assets;
+use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
@@ -258,7 +259,7 @@ class Global_List_Table extends \WP_List_Table {
 			array_merge(
 				$builtin,
 				$greyd,
-				array_flip( \Contentsync\get_export_post_types() )
+				array_flip( Post_Transfer_Service::get_supported_post_types() )
 			)
 		);
 

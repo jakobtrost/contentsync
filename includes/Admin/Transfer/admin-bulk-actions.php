@@ -4,6 +4,7 @@ namespace Contentsync\Admin;
 
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Posts\Transfer\File_Handler;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +19,7 @@ add_action( 'admin_init', __NAMESPACE__ . '\add_bulk_actions' );
 function add_bulk_actions() {
 
 	// bulk actions for posttypes
-	foreach ( \Contentsync\get_export_post_types() as $posttype ) {
+	foreach ( Post_Transfer_Service::get_supported_post_types() as $posttype ) {
 		add_filter( 'bulk_actions-edit-' . $posttype, __NAMESPACE__ . '\add_post_export_bulk_action' );
 		add_filter( 'handle_bulk_actions-edit-' . $posttype, __NAMESPACE__ . '\handle_post_export_bulk_action', 10, 3 );
 	}

@@ -225,7 +225,7 @@ function trash_connected_posts( $post_id, $connection_map = null ) {
 	}
 	Logger::add( 'destination_arrays', $destination_arrays );
 
-	if ( is_object( $post_id ) && is_a( $post_id, 'Contentsync\Prepared_Post' ) ) {
+	if ( is_object( $post_id ) && is_a( $post_id, 'Contentsync\Posts\Transfer\Prepared_Post' ) ) {
 		$post_id->import_action = 'trash';
 	}
 

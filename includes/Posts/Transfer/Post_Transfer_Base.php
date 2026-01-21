@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Post_Transfer {
+abstract class Post_Transfer_Base {
 
 	/**
 	 * Holds all Prepared_Post objects for a post transfer, keyed by post ID.

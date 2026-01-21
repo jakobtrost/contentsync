@@ -4,6 +4,8 @@
  */
 namespace Contentsync\Admin\Pages;
 
+use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Translations\Translation_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -47,7 +49,7 @@ class Post_Export_Admin {
 		$screen = get_current_screen();
 		if ( is_object( $screen ) && isset( $screen->base ) ) {
 			if ( $screen->base === 'edit' ) {
-				$post_types = array_flip( \Contentsync\get_export_post_types() );
+				$post_types = array_flip( Post_Transfer_Service::get_supported_post_types() );
 				if ( isset( $post_types[ $screen->post_type ] ) ) {
 					$supported = true;
 				}

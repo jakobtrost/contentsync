@@ -14,6 +14,7 @@
 
 namespace Contentsync\Admin;
 
+use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Translations\Translation_Manager;
 
@@ -625,7 +626,7 @@ class Admin {
 			return false;
 		}
 
-		$posttypes = \Contentsync\get_export_post_types();
+		$posttypes = Post_Transfer_Service::get_supported_post_types();
 
 		add_meta_box(
 			/* ID       */            'global_content_box',
@@ -1092,7 +1093,7 @@ class Admin {
 	 * Setup custom columns for all supported post types
 	 */
 	public function setup_columns() {
-		$post_types = (array) \Contentsync\get_export_post_types();
+		$post_types = (array) Post_Transfer_Service::get_supported_post_types();
 
 		foreach ( $post_types as $post_type ) {
 			add_filter( 'manage_' . $post_type . '_posts_columns', array( $this, 'add_column' ) );
@@ -1151,7 +1152,7 @@ class Admin {
 
 			$posttype = get_post_type( $post_id );
 
-			$supported_post_types = \Contentsync\get_export_post_types();
+			$supported_post_types = Post_Transfer_Service::get_supported_post_types();
 
 			if ( ! in_array( $posttype, $supported_post_types ) ) {
 				return;
