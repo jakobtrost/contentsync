@@ -22,7 +22,7 @@ class Post_Review_Hooks extends Hooks_Base {
 	 *
 	 * @return void
 	 */
-	public function register(): void {
+	public function register() {
 		add_filter( 'contentsync_prepared_posts_for_distribution', array( $this, 'replace_posts_with_previous_version_before_distribution' ), 10, 3 );
 	}
 

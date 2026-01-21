@@ -9,6 +9,7 @@
 namespace Contentsync\Posts\Sync;
 
 use Exception;
+use Contentsync\Distribution\Distributor;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Import;
@@ -235,7 +236,7 @@ class Synced_Post_Service {
 			$post_id->import_action = 'trash';
 		}
 
-		$result = \Contentsync\Distribution\distribute_single_post( $post_id, $destination_arrays );
+		$result = Distributor::distribute_single_post( $post_id, $destination_arrays );
 
 		return $result;
 	}
@@ -336,7 +337,7 @@ class Synced_Post_Service {
 		}
 		Logger::log( 'destination_arrays', $destination_arrays );
 
-		$result = \Contentsync\Distribution\distribute_single_post( $post_id, $destination_arrays );
+		$result = Distributor::distribute_single_post( $post_id, $destination_arrays );
 
 		return true;
 	}
@@ -396,7 +397,7 @@ class Synced_Post_Service {
 		}
 		Logger::log( 'destination_arrays', $destination_arrays );
 
-		$result = \Contentsync\Distribution\distribute_single_post( $post, $destination_arrays );
+		$result = Distributor::distribute_single_post( $post, $destination_arrays );
 
 		return $result;
 	}
@@ -447,7 +448,7 @@ class Synced_Post_Service {
 		}
 		Logger::log( 'destination_arrays', $destination_arrays );
 
-		$result = \Contentsync\Distribution\distribute_single_post( $post, $destination_arrays );
+		$result = Distributor::distribute_single_post( $post, $destination_arrays );
 
 		// delete the root post
 		if ( ! $keep_root_post ) {

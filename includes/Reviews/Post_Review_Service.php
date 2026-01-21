@@ -11,6 +11,7 @@
 
 namespace Contentsync\Reviews;
 
+use Contentsync\Distribution\Distributor;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Import;
@@ -147,7 +148,7 @@ class Post_Review_Service {
 			}
 
 			// distribute the post
-			$result = \Contentsync\Distribution\distribute_single_post( $post_id, $destination_ids );
+			$result = Distributor::distribute_single_post( $post_id, $destination_ids );
 		}
 
 		if ( ! $result ) {
@@ -273,7 +274,7 @@ class Post_Review_Service {
 			$import_result = $post_import->import_posts();
 
 			// distribute the post
-			$result = \Contentsync\Distribution\distribute_single_post( $post_id, $destination_ids );
+			$result = Distributor::distribute_single_post( $post_id, $destination_ids );
 		}
 
 		Review_Mail::send_review_mail( $review_id, 'reverted', 'editor' );

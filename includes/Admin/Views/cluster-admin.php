@@ -13,6 +13,7 @@
  */
 namespace Contentsync\Admin;
 
+use Contentsync\Distribution\Distributor;
 use Contentsync\Posts\Sync\Synced_Post_Service;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Translations\Translation_Manager;
@@ -401,7 +402,7 @@ class Cluster_Admin {
 				) {
 
 					// distribute posts
-					$distribute_result = \Contentsync\Distribution\distribute_cluster_posts(
+					$distribute_result = Distributor::distribute_cluster_posts(
 						new Cluster( (object) $cluster ),
 						array(
 							'posts'           => $cluster_posts_before,
@@ -1191,7 +1192,7 @@ class Cluster_Admin {
 				/**
 				 * Distribute posts to all destinations, step by step per blog.
 				 */
-				$result = \Contentsync\Distribution\distribute_posts_per_blog( $cluster_posts, $destination_arrays );
+				$result = Distributor::distribute_posts_per_blog( $cluster_posts, $destination_arrays );
 
 				// delete all conditions
 				foreach ( $cluster->content_conditions as $condition ) {

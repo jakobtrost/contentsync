@@ -14,6 +14,7 @@
 
 namespace Contentsync\Admin;
 
+use Contentsync\Distribution\Distributor;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Post_Meta;
 use Contentsync\Posts\Sync\Synced_Post_Service;
@@ -332,7 +333,7 @@ class Trigger {
 			// included yet.
 			if ( $condition_has_count_filter ) {
 				// Logger::add( 'distributing condition (removed post id: '.$post_id.'): ', $condition );
-				\Contentsync\Distribution\distribute_cluster_content_condition_posts( $condition, $posts_before );
+				Distributor::distribute_cluster_content_condition_posts( $condition, $posts_before );
 			}
 		}
 
@@ -375,7 +376,7 @@ class Trigger {
 			// included before, but now needs to be removed from the condition.
 			if ( $condition_has_count_filter ) {
 				// Logger::add( 'distributing condition (added post id: '.$post_id.'): ', $condition );
-				\Contentsync\Distribution\distribute_cluster_content_condition_posts( $condition, $posts_before );
+				Distributor::distribute_cluster_content_condition_posts( $condition, $posts_before );
 			}
 		}
 	}
@@ -436,7 +437,7 @@ class Trigger {
 		 * Distribute the post to all connections
 		 */
 		else {
-			\Contentsync\Distribution\distribute_single_post( $post_id, $destination_ids );
+			Distributor::distribute_single_post( $post_id, $destination_ids );
 		}
 	}
 
@@ -536,7 +537,7 @@ class Trigger {
 				}
 			}
 
-			$result = \Contentsync\Distribution\distribute_single_post( $post_id, $destination_ids );
+			$result = Distributor::distribute_single_post( $post_id, $destination_ids );
 		}
 	}
 

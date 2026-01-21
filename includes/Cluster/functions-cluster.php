@@ -9,10 +9,10 @@
  * objects. These functions complement the `Cluster` class and are
  * intended to be used from templates or other procedural code without
  * needing to instantiate classes directly.
- *
  */
 namespace Contentsync\Cluster;
 
+use Contentsync\Distribution\Distributor;
 use Contentsync\Utils\Multisite_Manager;
 
 /**
@@ -421,7 +421,7 @@ function check_clusters_on_date_change( $clusters_with_date_condition_before ) {
 
 			// -> if post_ids are different, distribute posts
 			if ( $flattened_post_ids !== $flattened_post_ids_before ) {
-				\Contentsync\Distribution\distribute_cluster_posts( $cluster_id, $before );
+				Distributor::distribute_cluster_posts( $cluster_id, $before );
 			}
 		}
 	}

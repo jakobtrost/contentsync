@@ -22,7 +22,6 @@
  * constraints on these values, derived classes or the distribution process will update
  * them as appropriate. Remember to instantiate this class or its subclasses within a
  * defined `ABSPATH` context to prevent execution outside of WordPress.
- *
  */
 namespace Contentsync\Distribution\Destinations;
 
@@ -31,7 +30,7 @@ use Contentsync\Utils\Logger;
 defined( 'ABSPATH' ) || exit;
 
 #[AllowDynamicProperties]
-class Destination {
+abstract class Destination {
 
 	/**
 	 * ID.

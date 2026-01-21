@@ -3,7 +3,6 @@
 /**
  * Endpoints for 'distribution'.
  *
- *
  * @link {{your-domain}}/wp-json/contentsync/v1/distribution
  *
  * This class has the following endpoints in it:
@@ -28,14 +27,16 @@
  * Related files:
  * @see inc/distribution/classes/class-distribution-queue.php
  * @see inc/distribution/classes/class-distribution-item.php
- * @see inc/distribution/classes/class-remote-destination.php
- * @see inc/distribution/classes/class-blog-destination.php
+ * @see includes/Distribution/Destinations/Remote_Destination.php
+ * @see includes/Distribution/Destinations/Blog_Destination.php
  */
 namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
+use Contentsync\Distribution\Distributor;
+use Contentsync\Distribution\Distributor_Item_Service;
 use Contentsync\Utils\Logger;
-use Contentsync\Distribution\Distribution_Item;
+use Contentsync\Distribution\Distributor_Item;
 use Contentsync\Distribution\Destinations\Remote_Destination;
 use Contentsync\Distribution\Destinations\Blog_Destination;
 use Contentsync\Utils\Urls;
@@ -164,7 +165,7 @@ class Distribution_Endpoint extends Endpoint {
 				'origin_id'   => $distribution_item_id,
 			);
 
-			$distribution_item = \Contentsync\Distribution\schedule_distribution_item( $distribution_item_properties );
+			$distribution_item = Distributor::schedule_distribution_item( $distribution_item_properties );
 
 			Logger::add( 'Distribution to destination scheduled: ' . $distribution_item->destination->ID );
 		}
@@ -447,7 +448,7 @@ class Distribution_Endpoint extends Endpoint {
 			 *         '4-20'
 			 *     On this network we need to keep it this way:
 			 *         '4-20'
-			 *     This happends 
+			 *     This happends
 			 *
 			 * (2) The post comes from the request origin network:
 			 *     The meta-value for the gid in the request currently is:
@@ -526,7 +527,7 @@ class Distribution_Endpoint extends Endpoint {
 			return $this->respond( $response, 'The remote blog destination does not have an ID.' );
 		}
 
-		$distribution_item = \Contentsync\Distribution\get_distribution_item( $distribution_item_id );
+		$distribution_item = Distribution_Item_Service::get( $distribution_item_id );
 
 		if ( ! $distribution_item ) {
 			return $this->respond( $response, 'The distribution item could not be found.' );

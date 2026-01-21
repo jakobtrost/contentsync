@@ -14,6 +14,9 @@
 
 namespace Contentsync\Admin\Pages;
 
+use Contentsync\Distribution\Distributor;
+use Contentsync\Distribution\Distributor_Item_Service;
+
 defined( 'ABSPATH' ) || exit;
 
 new Admin();
@@ -212,7 +215,7 @@ class Admin {
 		}
 
 		// get items that are not completed and older than 5 minutes
-		$stuck_items = \Contentsync\Distribution\get_distribution_items(
+		$stuck_items = Distribution_Item_Service::get_items(
 			array(
 				'status'  => array( 'init', 'started' ),
 				'time'    => array(
@@ -330,13 +333,13 @@ class Admin {
 		}
 
 		// Get the distribution item
-		$item = \Contentsync\Distribution\get_distribution_item( $item_id );
+		$item = Distribution_Item_Service::get( $item_id );
 		if ( ! $item ) {
 			wp_send_json_error( array( 'message' => __( 'Distribution item not found', 'contentsync' ) ) );
 		}
 
 		// Run the distribution
-		$result = \Contentsync\Distribution\distribute_item( $item_id );
+		$result = Distributor::distribute_item( $item_id );
 
 		if ( $result !== false ) {
 			wp_send_json_success(

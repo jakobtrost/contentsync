@@ -25,9 +25,9 @@
  *
  * Accessor and mutator methods `get` and `set` provide simple access to properties by
  * key. The `save` method sets the `$time` to the current time in SQL format and then
- * calls `save_distribution_item` to persist the item. If the save succeeds it stores
+ * calls `Distribution_Item_Service::save()` to persist the item. If the save succeeds it stores
  * the returned ID. The `delete` method removes the record by calling
- * `delete_distribution_item`. The `update` method merges provided properties into the
+ * `Distribution_Item_Service::delete()`. The `update` method merges provided properties into the
  * current instance, updates the timestamp, and then saves the record. It includes a
  * mechanism to inform an origin site about updates using
  * `\Contentsync\Api\update_distribution_item`, although the comment notes that this
@@ -99,7 +99,7 @@ class Distribution_Item {
 	 *
 	 * @var Blog_Destination|Remote_Destination
 	 */
-	public $destination
+	public $destination;
 
 	/**
 	 * Prepared_Post Objects
@@ -166,7 +166,7 @@ class Distribution_Item {
 		$this->time = current_time( 'mysql' );
 
 		// attempt to save the item to the database
-		$ID = save_distribution_item( $this );
+		$ID = Distribution_Item_Service::save( $this );
 
 		if ( is_wp_error( $ID ) ) {
 			return $ID;
@@ -179,7 +179,7 @@ class Distribution_Item {
 	}
 
 	public function delete() {
-		return delete_distribution_item( $this->ID );
+		return Distribution_Item_Service::delete( $this->ID );
 	}
 
 	/**
@@ -200,7 +200,7 @@ class Distribution_Item {
 		// current time in sql format
 		$this->time = current_time( 'mysql' );
 
-		$result = save_distribution_item( $this );
+		$result = Distribution_Item_Service::save( $this );
 
 		if ( is_wp_error( $result ) ) {
 			return $result;
