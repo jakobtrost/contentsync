@@ -30,7 +30,6 @@
  * is useful when you want consistent export or import behaviour across all blogs in
  * a network. Always verify that the inherited properties are appropriate for all
  * posts to avoid unexpected results.
- *
  */
 namespace Contentsync\Distribution\Destinations;
 
@@ -41,7 +40,7 @@ use Contentsync\Distribution\Destinations\Blog_Destination;
 defined( 'ABSPATH' ) || exit;
 
 #[AllowDynamicProperties]
-class Remote_Destination extends Destination {
+class Remote_Destination extends Destination_Base {
 
 	/**
 	 * Remote network URL.

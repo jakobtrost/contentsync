@@ -30,7 +30,6 @@
  * arguments, conflict actions or import actions after the object has been created.
  * Since this class inherits from `Destination` it also gains the basic properties
  * of ID, timestamp and status, although only the ID is explicitly defined here.
- *
  */
 namespace Contentsync\Distribution\Destinations;
 
@@ -40,7 +39,7 @@ use Contentsync\Distribution\Destinations\Destination;
 defined( 'ABSPATH' ) || exit;
 
 #[AllowDynamicProperties]
-class Post_Destination extends Destination {
+class Post_Destination extends Destination_Base {
 
 	/**
 	 * Post ID.

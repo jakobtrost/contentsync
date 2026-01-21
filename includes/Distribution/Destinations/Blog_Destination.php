@@ -24,7 +24,6 @@
  * properties via `set_properties`. Use this method to propagate common configuration
  * options across all posts. You should ensure that the properties you inherit are
  * appropriate for every post to avoid unintended overrides.
- *
  */
 namespace Contentsync\Distribution\Destinations;
 
@@ -34,7 +33,7 @@ use Contentsync\Distribution\Destinations\Post_Destination;
 defined( 'ABSPATH' ) || exit;
 
 #[AllowDynamicProperties]
-class Blog_Destination extends Destination {
+class Blog_Destination extends Destination_Base {
 
 	/**
 	 * Blog ID.

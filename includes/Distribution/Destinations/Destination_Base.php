@@ -30,7 +30,7 @@ use Contentsync\Utils\Logger;
 defined( 'ABSPATH' ) || exit;
 
 #[AllowDynamicProperties]
-abstract class Destination {
+abstract class Destination_Base {
 
 	/**
 	 * ID.
