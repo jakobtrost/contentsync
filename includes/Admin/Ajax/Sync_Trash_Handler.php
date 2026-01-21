@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Sync Trash Handler Class
  */
-class Sync_Trash_Handler extends Contentsync_Ajax_Handler {
+class Sync_Trash_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor

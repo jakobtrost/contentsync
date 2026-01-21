@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
  * All AJAX handlers should extend this class and implement the handle() method.
  * The constructor automatically registers the handler with WordPress.
  */
-abstract class Contentsync_Ajax_Handler {
+abstract class Ajax_Base {
 
 	/**
 	 * Action name (e.g., 'post_export', 'contentsync_export')

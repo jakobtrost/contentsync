@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Sync Unimport Handler Class
  */
-class Sync_Unimport_Handler extends Contentsync_Ajax_Handler {
+class Sync_Unimport_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor

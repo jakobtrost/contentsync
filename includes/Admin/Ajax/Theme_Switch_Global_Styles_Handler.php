@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Theme Switch Global Styles Handler Class
  */
-class Theme_Switch_Global_Styles_Handler extends Contentsync_Ajax_Handler {
+class Theme_Switch_Global_Styles_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor

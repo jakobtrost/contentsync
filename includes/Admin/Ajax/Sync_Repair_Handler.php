@@ -10,12 +10,14 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Sync\Post_Error_Handler;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Sync Repair Handler Class
  */
-class Sync_Repair_Handler extends Contentsync_Ajax_Handler {
+class Sync_Repair_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor
@@ -38,7 +40,7 @@ class Sync_Repair_Handler extends Contentsync_Ajax_Handler {
 			return;
 		}
 
-		$error = \Contentsync\Admin\repair_post( $post_id, $blog_id, true );
+		$error = Post_Error_Handler::repair_post( $post_id, $blog_id, true );
 
 		if ( ! $error ) {
 			$this->send_fail( __( 'post has no error.', 'contentsync' ) );
@@ -46,9 +48,9 @@ class Sync_Repair_Handler extends Contentsync_Ajax_Handler {
 		}
 
 		// Output repair log
-		echo \Contentsync\Admin\get_error_repaired_log( $error );
+		echo Post_Error_Handler::get_error_repaired_log( $error );
 
-		if ( \Contentsync\Admin\is_error_repaired( $error ) ) {
+		if ( Post_Error_Handler::is_error_repaired( $error ) ) {
 			$this->send_success( __( 'post was successfully repaired', 'contentsync' ) );
 		} else {
 			$this->send_fail( $error->message );

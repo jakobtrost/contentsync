@@ -10,6 +10,7 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Admin\Transfer\Post_Conflict_Handler;
 use Contentsync\Posts\Transfer;
 use Contentsync\Utils\Files;
 
@@ -18,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Post Import Check Handler Class
  */
-class Post_Import_Check_Handler extends Contentsync_Ajax_Handler {
+class Post_Import_Check_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor
@@ -84,9 +85,7 @@ class Post_Import_Check_Handler extends Contentsync_Ajax_Handler {
 		}
 
 		// Get post data from ZIP
-		// Note: This function is in handle-import-actions.php and uses self:: which is broken
-		// We'll need to call it via the namespace or fix the class structure
-		$post_data = \Contentsync\Posts\Transfer\get_zip_posts_file_contents( $new_file );
+		$post_data = Files::get_posts_json_file_contents_from_zip( $new_file );
 
 		if ( ! is_array( $post_data ) ) {
 			$this->send_fail( $post_data );
@@ -94,7 +93,7 @@ class Post_Import_Check_Handler extends Contentsync_Ajax_Handler {
 		}
 
 		// Get conflicting posts
-		$conflicts = \Contentsync\Admin\Transfer\get_conflicting_post_options( $post_data );
+		$conflicts = Post_Conflict_Handler::get_conflicting_post_options( $post_data );
 
 		if ( $conflicts ) {
 			$return = $conflicts;

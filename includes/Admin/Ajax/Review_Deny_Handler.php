@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Review Deny Handler Class
  */
-class Review_Deny_Handler extends Contentsync_Ajax_Handler {
+class Review_Deny_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor

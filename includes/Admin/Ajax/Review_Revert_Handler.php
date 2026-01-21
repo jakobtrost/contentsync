@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Review Revert Handler Class
  */
-class Review_Revert_Handler extends Contentsync_Ajax_Handler {
+class Review_Revert_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor

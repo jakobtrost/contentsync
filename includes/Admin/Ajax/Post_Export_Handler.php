@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Post Export Handler Class
  */
-class Post_Export_Handler extends Contentsync_Ajax_Handler {
+class Post_Export_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor
@@ -41,11 +41,9 @@ class Post_Export_Handler extends Contentsync_Ajax_Handler {
 
 		// Build export arguments
 		$args = array(
-			'append_nested'  => isset( $data['nested'] ) || isset( $data['append_nested'] ) ? true : false,
-			'whole_posttype' => isset( $data['whole_posttype'] ) ? true : false,
-			'all_terms'      => isset( $data['all_terms'] ) ? true : false,
-			'resolve_menus'  => isset( $data['resolve_menus'] ) ? true : false,
-			'translations'   => isset( $data['translations'] ) ? true : false,
+			'append_nested' => isset( $data['nested'] ) || isset( $data['append_nested'] ) ? true : false,
+			'resolve_menus' => isset( $data['resolve_menus'] ) ? true : false,
+			'translations'  => isset( $data['translations'] ) ? true : false,
 		);
 
 		// Export post

@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Theme Rename Template Handler Class
  */
-class Theme_Rename_Template_Handler extends Contentsync_Ajax_Handler {
+class Theme_Rename_Template_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor

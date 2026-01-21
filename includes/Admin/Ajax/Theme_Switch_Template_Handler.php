@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Theme Switch Template Handler Class
  */
-class Theme_Switch_Template_Handler extends Contentsync_Ajax_Handler {
+class Theme_Switch_Template_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor

@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Sync Similar Posts Handler Class
  */
-class Sync_Similar_Posts_Handler extends Contentsync_Ajax_Handler {
+class Sync_Similar_Posts_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor

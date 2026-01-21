@@ -10,12 +10,14 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Sync\Post_Error_Handler;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Sync Error Posts Handler Class
  */
-class Sync_Error_Posts_Handler extends Contentsync_Ajax_Handler {
+class Sync_Error_Posts_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor
@@ -35,9 +37,9 @@ class Sync_Error_Posts_Handler extends Contentsync_Ajax_Handler {
 		$post_type = isset( $data['post_type'] ) ? intval( $data['post_type'] ) : null;
 
 		if ( $mode === 'network' ) {
-			$posts = \Contentsync\Admin\get_network_synced_posts_with_errors( false, array( 'post_type' => $post_type ) );
+			$posts = Post_Error_Handler::get_network_synced_posts_with_errors( false, array( 'post_type' => $post_type ) );
 		} else {
-			$posts = \Contentsync\Admin\get_synced_posts_of_blog_with_errors( $blog_id, false, array( 'post_type' => $post_type ) );
+			$posts = Post_Error_Handler::get_synced_posts_of_blog_with_errors( $blog_id, false, array( 'post_type' => $post_type ) );
 		}
 
 		if ( empty( $posts ) ) {
@@ -48,7 +50,7 @@ class Sync_Error_Posts_Handler extends Contentsync_Ajax_Handler {
 		$return = array_filter(
 			$posts,
 			function ( $post ) {
-				return isset( $post->error ) && ! \Contentsync\Admin\is_error_repaired( $post->error );
+				return isset( $post->error ) && ! Post_Error_Handler::is_error_repaired( $post->error );
 			}
 		);
 

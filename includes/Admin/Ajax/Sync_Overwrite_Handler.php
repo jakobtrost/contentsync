@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Sync Overwrite Handler Class
  */
-class Sync_Overwrite_Handler extends Contentsync_Ajax_Handler {
+class Sync_Overwrite_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor

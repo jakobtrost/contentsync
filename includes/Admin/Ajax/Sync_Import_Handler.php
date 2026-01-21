@@ -10,6 +10,7 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Admin\Transfer\Post_Conflict_Handler;
 use Contentsync\Posts\Sync\Synced_Post_Service;
 
 defined( 'ABSPATH' ) || exit;
@@ -17,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Sync Import Handler Class
  */
-class Sync_Import_Handler extends Contentsync_Ajax_Handler {
+class Sync_Import_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor
@@ -41,7 +42,7 @@ class Sync_Import_Handler extends Contentsync_Ajax_Handler {
 
 		// Get conflicts with current posts
 		$conflicts        = isset( $data['form_data'] ) ? (array) $data['form_data'] : array();
-		$conflict_actions = \Contentsync\Admin\Main_Helper::call_post_export_func( 'get_conflicting_post_selections', $conflicts );
+		$conflict_actions = Post_Conflict_Handler::get_conflicting_post_selections( $conflicts );
 
 		$result = Synced_Post_Service::import_synced_post( $gid, $conflict_actions );
 

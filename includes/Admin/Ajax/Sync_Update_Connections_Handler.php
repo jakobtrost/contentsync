@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Sync Update Connections Handler Class
  */
-class Sync_Update_Connections_Handler extends Contentsync_Ajax_Handler {
+class Sync_Update_Connections_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor

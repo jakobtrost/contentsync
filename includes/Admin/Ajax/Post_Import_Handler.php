@@ -10,6 +10,7 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Admin\Transfer\Post_Conflict_Handler;
 use WP_Error;
 use Contentsync\Posts\Transfer\Post_Import;
 use Contentsync\Utils\Files;
@@ -19,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Post Import Handler Class
  */
-class Post_Import_Handler extends Contentsync_Ajax_Handler {
+class Post_Import_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor
@@ -45,7 +46,7 @@ class Post_Import_Handler extends Contentsync_Ajax_Handler {
 
 		// Get post data from ZIP file
 		$zip_file  = Files::get_wp_content_folder_path( 'tmp' ) . $filename;
-		$post_data = \Contentsync\Posts\Transfer\get_zip_posts_file_contents( $zip_file );
+		$post_data = Files::get_posts_json_file_contents_from_zip( $zip_file );
 
 		// Error checking
 		if ( ! is_array( $post_data ) ) {
@@ -55,7 +56,7 @@ class Post_Import_Handler extends Contentsync_Ajax_Handler {
 
 		// Get conflicts with current posts
 		$conflicts        = isset( $data['conflicts'] ) ? (array) $data['conflicts'] : array();
-		$conflict_actions = \Contentsync\Posts\Transfer\get_conflicting_post_selections( $conflicts );
+		$conflict_actions = Post_Conflict_Handler::get_conflicting_post_selections( $conflicts );
 
 		// Import posts
 		$post_import   = new Post_Import(

@@ -10,12 +10,14 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Admin\Transfer\Post_Conflict_Handler;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Sync Check Import Bulk Handler Class
  */
-class Sync_Check_Import_Bulk_Handler extends Contentsync_Ajax_Handler {
+class Sync_Check_Import_Bulk_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor
@@ -42,7 +44,7 @@ class Sync_Check_Import_Bulk_Handler extends Contentsync_Ajax_Handler {
 			if ( ! isset( $post['gid'] ) ) {
 				continue;
 			}
-			$conflict = \Contentsync\Admin\Transfer\check_synced_post_import( $post['gid'] );
+			$conflict = Post_Conflict_Handler::check_synced_post_import( $post['gid'] );
 			if ( $conflict ) {
 				$results[] = array(
 					'gid'      => $post['gid'],

@@ -1,8 +1,8 @@
 <?php
 /**
- * Sync Delete AJAX Handler
+ * Sync Check Import AJAX Handler
  *
- * Handles AJAX requests for deleting synced posts.
+ * Handles AJAX requests for checking synced posts before import.
  *
  * @package Contentsync
  * @subpackage Admin\Ajax
@@ -10,20 +10,20 @@
 
 namespace Contentsync\Admin\Ajax;
 
-use Contentsync\Posts\Sync\Synced_Post_Service;
+use Contentsync\Admin\Transfer\Post_Conflict_Handler;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Sync Delete Handler Class
+ * Sync Check Import Handler Class
  */
-class Sync_Delete_Handler extends Contentsync_Ajax_Handler {
+class Sync_Check_Import_Handler extends Ajax_Base {
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct( 'contentsync_delete' );
+		parent::__construct( 'contentsync_check_synced_post_import' );
 	}
 
 	/**
@@ -39,15 +39,15 @@ class Sync_Delete_Handler extends Contentsync_Ajax_Handler {
 			return;
 		}
 
-		$result = Synced_Post_Service::delete_root_post_and_connected_posts( $gid );
+		$result = Post_Conflict_Handler::check_synced_post_import( $gid );
 
 		if ( ! $result ) {
-			$this->send_fail( __( 'post could not be deleted...', 'contentsync' ) );
+			$this->send_fail( __( 'post could not be checked for conflicts.', 'contentsync' ) );
 			return;
 		}
 
-		$this->send_success( __( 'post was successfully deleted', 'contentsync' ) );
+		$this->send_success( $result );
 	}
 }
 
-new Sync_Delete_Handler();
+new Sync_Check_Import_Handler();
