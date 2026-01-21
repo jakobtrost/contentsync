@@ -10,6 +10,8 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Reviews\Post_Review_Service;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -36,7 +38,7 @@ class Review_Revert_Handler extends Contentsync_Ajax_Handler {
 		$post_id   = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 		$message   = isset( $data['message'] ) ? sanitize_textarea_field( $data['message'] ) : '';
 
-		$result = \Contentsync\Reviews\revert_post_review( $review_id, $post_id, $message );
+		$result = Post_Review_Service::revert_post_review( $review_id, $post_id, $message );
 
 		if ( ! $result ) {
 			$this->send_fail( __( 'review could not be reverted.', 'contentsync' ) );

@@ -10,6 +10,8 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Reviews\Post_Review_Service;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -35,7 +37,7 @@ class Review_Approve_Handler extends Contentsync_Ajax_Handler {
 		$review_id = isset( $data['review_id'] ) ? intval( $data['review_id'] ) : 0;
 		$post_id   = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 
-		$result = \Contentsync\Reviews\approve_post_review( $review_id, $post_id );
+		$result = Post_Review_Service::approve_post_review( $review_id, $post_id );
 
 		if ( ! $result ) {
 			$this->send_fail( __( 'review could not be approved.', 'contentsync' ) );

@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Reviews\Mails\Templates;
+namespace Contentsync\Reviews\Mails;
 
 use Contentsync\Utils\Urls;
 

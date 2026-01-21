@@ -14,6 +14,7 @@
 
 namespace Contentsync\Admin;
 
+use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Translations\Translation_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -346,7 +347,7 @@ class Admin {
 				 *
 				 * The post can have different statuses: live, in review, denied, empty (new post)
 				 */
-				$review                = \Contentsync\Reviews\get_post_review_by_post( $post_id, get_current_blog_id() );
+				$review                = Post_Review_Service::get_post_review_by_post( $post_id, get_current_blog_id() );
 				$default_review_status = empty( self::get_clusters_including_this_post( $post_id ) ) && empty( $connection_map ) ? 'new' : 'live';
 				$review_status         = $review && $review->state ? $review->state : $default_review_status;
 
@@ -357,7 +358,7 @@ class Admin {
 				$reviewer_message         = '';
 				$reviewer_message_content = '';
 				if ( $review && $review->ID ) {
-					$reviewer_message = \Contentsync\Reviews\get_latest_message_by_post_review_id( $review->ID );
+					$reviewer_message = Post_Review_Service::get_latest_message_by_post_review_id( $review->ID );
 					if ( $reviewer_message && ! empty( $reviewer_message->content ) && $reviewer_message->action === 'denied' ) {
 						$reviewer_message_content = $reviewer_message->get_content( true );
 						$reviewer                 = $reviewer_message->get_reviewer();
@@ -876,7 +877,7 @@ class Admin {
 						$return .= '<input type="checkbox" class="hidden _contentsync_export_options_toggle" id="_contentsync_export_options_toggle2"/>';
 						$return .= '<label class="contentsync_export_options_toggle button" for="_contentsync_export_options_toggle2">' . __( 'Toggle review history', 'contentsync' ) . '</label>';
 						$return .= '<ul class="editable_contentsync_export_options contentsync_box_list">';
-						$reviews = \Contentsync\Reviews\get_all_post_reviews_by_post( $post_id, get_current_blog_id() );
+						$reviews = Post_Review_Service::get_all_post_reviews_by_post( $post_id, get_current_blog_id() );
 						// debug($reviews);
 						foreach ( $reviews as $review ) {
 							$details  = '';

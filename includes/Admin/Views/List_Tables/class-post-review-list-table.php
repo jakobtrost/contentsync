@@ -8,8 +8,9 @@
 
 namespace Contentsync\Admin\Pages\List_Tables;
 
-use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Reviews\Post_Review;
+use Contentsync\Reviews\Post_Review_Service;
+use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -60,7 +61,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
 		$rel   = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'open';
-		$items = \Contentsync\Reviews\get_post_reviews( $rel == 'open' ? null : $rel );
+		$items = Post_Review_Service::get_post_reviews( $rel == 'open' ? null : $rel );
 		// debug($items);
 
 		// sort
@@ -140,10 +141,10 @@ class Post_Review_List_Table extends \WP_List_Table {
 			if ( $type == 'open' ) {
 				$items_count = 0;
 				foreach ( array( 'new', 'in_review', 'denied' ) as $state ) {
-					$items_count += count( \Contentsync\Reviews\get_post_reviews( $state ) );
+					$items_count += count( Post_Review_Service::get_post_reviews( $state ) );
 				}
 			} else {
-				$items_count = count( \Contentsync\Reviews\get_post_reviews( $type ) );
+				$items_count = count( Post_Review_Service::get_post_reviews( $type ) );
 			}
 			$query = remove_query_arg( array( 'rel', 'paged', 'action', 'post', '_wpnonce' ) );
 
@@ -348,7 +349,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		if ( in_array( $post->state, array( 'approved', 'denied', 'reverted' ) ) ) {
 			$reviewer         = 'N/A';
 			$info             = ' ';
-			$reviewer_message = \Contentsync\Reviews\get_latest_message_by_post_review_id( $post->ID );
+			$reviewer_message = Post_Review_Service::get_latest_message_by_post_review_id( $post->ID );
 			if ( $reviewer_message && $reviewer_message->action === $post->state ) {
 				$reviewer = $reviewer_message->get_reviewer();
 				if ( $post->state != 'approved' ) {
@@ -514,7 +515,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 
 		if ( count( $post_ids ) > 0 ) {
 			foreach ( $post_ids as $post_id ) {
-				$post = \Contentsync\Reviews\get_post_review_by_id( $post_id );
+				$post = Post_Review_Service::get_post_review_by_id( $post_id );
 				if ( $post ) {
 					// get root post
 					$root_post = is_multisite() ? get_blog_post( $post->blog_id, $post->post_id ) : get_post( $post->post_id );
@@ -526,21 +527,21 @@ class Post_Review_List_Table extends \WP_List_Table {
 					switch ( $bulk_action ) {
 						case 'approve':
 							Multisite_Manager::switch_blog( $post->blog_id );
-							$result = (bool) \Contentsync\Reviews\approve_post_review( $post_id );
+							$result = (bool) Post_Review_Service::approve_post_review( $post_id );
 							Multisite_Manager::restore_blog();
 							break;
 						case 'deny':
 							Multisite_Manager::switch_blog( $post->blog_id );
-							$result = (bool) \Contentsync\Reviews\deny_post_review( $post_id );
+							$result = (bool) Post_Review_Service::deny_post_review( $post_id );
 							Multisite_Manager::restore_blog();
 							break;
 						case 'revert':
 							Multisite_Manager::switch_blog( $post->blog_id );
-							$result = (bool) \Contentsync\Reviews\revert_post_review( $post_id, $root_post->ID );
+							$result = (bool) Post_Review_Service::revert_post_review( $post_id, $root_post->ID );
 							Multisite_Manager::restore_blog();
 							break;
 						case 'delete':
-							$result = (bool) \Contentsync\Reviews\delete_post_review( $post_id );
+							$result = (bool) Post_Review_Service::delete_post_review( $post_id );
 							break;
 						default:
 							break;

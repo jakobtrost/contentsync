@@ -1,7 +1,8 @@
 <?php
 
-namespace Contentsync\Reviews\Mails\Templates;
+namespace Contentsync\Reviews\Mails;
 
+use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Utils\Urls;
 
 /**
@@ -22,7 +23,7 @@ use Contentsync\Utils\Urls;
 function get_mail_content_for_reviews_editor_reverted( $review, $post ) {
 	$subject = __( 'Your review has been reverted', 'contentsync' );
 
-	$reviewer_message = \Contentsync\Reviews\get_latest_message_by_post_review_id( $review->ID );
+	$reviewer_message = Post_Review_Service::get_latest_message_by_post_review_id( $review->ID );
 
 	if ( ! $reviewer_message ) {
 		// If no reviewer message is found, use a default message
