@@ -10,7 +10,7 @@
 
 namespace Contentsync\Admin\Ajax;
 
-use Contentsync\Distribution\Site_Connection;
+use Contentsync\Api\Site_Connection;
 
 defined( 'ABSPATH' ) || exit;
 

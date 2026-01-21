@@ -4,8 +4,9 @@
  */
 namespace Contentsync\Admin\Pages;
 
-use Contentsync\Distribution\Site_Connection;
+use Contentsync\Api\Site_Connection;
 use Contentsync\Utils\Urls;
+use Contentsync\Api\Remote_Request;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -177,7 +178,7 @@ class Connections_Page {
 		$site_url   = esc_attr( $_GET['site_url'] );
 		$nice_url   = Urls::get_nice_url( $site_url );
 		$connection = array(
-			'site_name'  => \Contentsync\Api\get_site_name( $site_url ),
+			'site_name'  => Remote_Request::get_site_name( $site_url ),
 			'user_login' => esc_attr( $_GET['user_login'] ),
 			'password'   => str_rot13( esc_attr( $_GET['password'] ) ),
 			'site_url'   => $site_url,
@@ -275,7 +276,7 @@ class Connections_Page {
 			}
 
 			// get current state
-			$response = \Contentsync\Api\check_connection_authentication( $connection['site_url'] );
+			$response = Remote_Request::check_connection_authentication( $connection['site_url'] );
 
 			// display an error if necessary
 			if ( $response !== true ) {

@@ -301,7 +301,7 @@ class Synced_Post {
 			 *
 			 * We use them to calculate some required meta infos, like the global ID.
 			 *
-			 * @see \Contentsync\Api\Posts->get_synced_posts_for_endpoint() for details
+			 * @see \Contentsync\Api\Endpoints\Posts->get_synced_posts_for_endpoint() for details
 			 */
 
 			// synced_post_status

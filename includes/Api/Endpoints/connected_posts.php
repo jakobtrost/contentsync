@@ -15,7 +15,6 @@
  */
 namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Api\Endpoint;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Synced_Post_Service;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
@@ -26,7 +25,7 @@ use Contentsync\Utils\Urls;
 defined( 'ABSPATH' ) || exit;
 
 new Connected_Posts();
-class Connected_Posts extends Endpoint {
+class Connected_Posts extends Endpoint_Base {
 
 	/**
 	 * Class constructor
@@ -364,7 +363,7 @@ class Connected_Posts extends Endpoint {
 			 *         '4-20'
 			 *     On this network we need to keep it this way:
 			 *         '4-20'
-			 *     This happends 
+			 *     This happends
 			 *
 			 * (2) The post comes from the request origin network:
 			 *     The meta-value for the gid in the request currently is:
@@ -410,7 +409,6 @@ class Connected_Posts extends Endpoint {
 	/**
 	 * Allow requests from the same origin.
 	 * This is needed to allow requests from the same network.
-	 *
 	 *
 	 * @param WP_REST_Request $request
 	 *

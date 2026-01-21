@@ -1,12 +1,10 @@
 <?php
 
-namespace Contentsync\Distribution;
+namespace Contentsync\Api;
 
 use Contentsync\Utils\Hooks_Base;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Site_Connection_Hooks extends Hooks_Base {
 

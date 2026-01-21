@@ -13,7 +13,7 @@ use Contentsync\Posts\Sync\Post_Meta;
 use Contentsync\Posts\Sync\Synced_Post_Service;
 use Contentsync\Posts\Sync\Synced_Post_Query;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
-use Contentsync\Distribution\Site_Connection;
+use Contentsync\Api\Site_Connection;
 use Contentsync\Posts\Theme_Assets;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Translations\Translation_Manager;

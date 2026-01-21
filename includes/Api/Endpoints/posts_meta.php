@@ -11,7 +11,6 @@
  */
 namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Api\Endpoint;
 use Contentsync\Posts\Sync\Post_Meta;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Utils\Multisite_Manager;
@@ -19,7 +18,7 @@ use Contentsync\Utils\Multisite_Manager;
 defined( 'ABSPATH' ) || exit;
 
 new Posts_Meta();
-class Posts_Meta extends Endpoint {
+class Posts_Meta extends Endpoint_Base {
 
 	/**
 	 * Class constructor

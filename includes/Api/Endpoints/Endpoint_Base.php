@@ -6,9 +6,11 @@
  * @see     WP_REST_Controller
  * @source  /wp-includes/rest-api/endpoints/class-wp-rest-controller.php
  */
-namespace Contentsync\Api;
+namespace Contentsync\Api\Endpoints;
 
-class Endpoint {
+use Contentsync\Api\Remote_Request;
+
+abstract class Endpoint_Base {
 
 	/**
 	 * The namespace.
@@ -113,10 +115,10 @@ class Endpoint {
 	/**
 	 * Send response
 	 *
-	 * @see \Contentsync\Api\send_response() for details.
+	 * @see \Contentsync\Api\Remote_Request::send_response() for details.
 	 */
 	public function respond( $data, $message = '', $success = null, $status = null ) {
-		return \Contentsync\Api\send_response( $data, $message, $success, $status );
+		return Remote_Request::send_response( $data, $message, $success, $status );
 	}
 
 

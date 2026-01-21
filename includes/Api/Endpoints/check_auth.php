@@ -6,14 +6,13 @@
  */
 namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Api\Endpoint;
-use Contentsync\Distribution\Site_Connection;
+use Contentsync\Api\Site_Connection;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
 new Check_Auth();
-class Check_Auth extends Endpoint {
+class Check_Auth extends Endpoint_Base {
 
 	/**
 	 * Class constructor

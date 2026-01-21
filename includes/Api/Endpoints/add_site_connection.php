@@ -6,14 +6,13 @@
  */
 namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Api\Endpoint;
-use Contentsync\Distribution\Site_Connection;
+use Contentsync\Api\Site_Connection;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-new Add_Connection();
-class Add_Connection extends Endpoint {
+new Add_Site_Connection();
+class Add_Site_Connection extends Endpoint_Base {
 
 	/**
 	 * Class constructor

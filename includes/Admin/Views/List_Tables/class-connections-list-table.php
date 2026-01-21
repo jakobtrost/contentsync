@@ -7,8 +7,9 @@
  */
 namespace Contentsync\Admin\Pages\List_Tables;
 
-use Contentsync\Distribution\Site_Connection;
+use Contentsync\Api\Site_Connection;
 use Contentsync\Utils\Urls;
+use Contentsync\Api\Remote_Request;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -135,7 +136,7 @@ class Connections_List_Table extends \WP_List_Table {
 				$site_url  = isset( $item['site_url'] ) ? esc_attr( $item['site_url'] ) : null;
 				$site_name = isset( $item['site_name'] ) ? esc_attr( $item['site_name'] ) : null;
 				if ( ! $site_name ) {
-					$site_name = \Contentsync\Api\get_site_name( $site_url ) ?? $site_url;
+					$site_name = Remote_Request::get_site_name( $site_url ) ?? $site_url;
 				}
 				$network_url = Urls::get_nice_url( $site_url );
 				$delete_url  = remove_query_arg( array( 'user_login', 'password', 'site_url', 'success' ), add_query_arg( 'delete', $network_url ) );

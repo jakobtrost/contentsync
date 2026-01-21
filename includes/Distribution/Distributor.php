@@ -15,7 +15,9 @@ namespace Contentsync\Distribution;
 
 use WP_Error;
 use Contentsync\Cluster\Cluster;
+use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Cluster\Content_Condition;
+use Contentsync\Cluster\Content_Condition_Service;
 use Contentsync\Distribution\Destinations\Blog_Destination;
 use Contentsync\Distribution\Destinations\Remote_Destination;
 use Contentsync\Posts\Sync\Post_Connection_Map;
@@ -26,11 +28,10 @@ use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Import;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Api\Remote_Request;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Distribution helper class.
@@ -217,7 +218,7 @@ class Distributor {
 		// Logger::add( "Before:", $before );
 
 		if ( ! $cluster_or_cluster_id instanceof \Contentsync\Cluster\Cluster ) {
-			$cluster = \Contentsync\Cluster\get_cluster_by_id( $cluster_or_cluster_id );
+			$cluster = Cluster_Service::get_cluster_by_id( $cluster_or_cluster_id );
 			if ( ! $cluster ) {
 				return false;
 			}
@@ -234,7 +235,7 @@ class Distributor {
 			$destination_arrays[ $destination_id ] = array();
 		}
 
-		$cluster_posts = \Contentsync\Cluster\get_cluster_posts_per_blog( $cluster );
+		$cluster_posts = Cluster_Service::get_cluster_posts_per_blog( $cluster );
 
 		// Logger::add( 'Cluster:', $cluster );
 		// Logger::add( 'Cluster posts:', $cluster_posts );
@@ -305,7 +306,7 @@ class Distributor {
 		Logger::add( 'distribute_cluster_content_condition_posts' );
 
 		if ( ! $condition_or_condition_id instanceof \Contentsync\Cluster\Content_Condition ) {
-			$condition = \Contentsync\Cluster\get_cluster_content_condition_by_id( $condition_or_condition_id );
+			$condition = Content_Condition_Service::get_cluster_content_condition_by_id( $condition_or_condition_id );
 			if ( ! $condition ) {
 				return false;
 			}
@@ -313,7 +314,7 @@ class Distributor {
 			$condition = $condition_or_condition_id;
 		}
 
-		$cluster = \Contentsync\Cluster\get_cluster_by_id( $condition->contentsync_cluster_id );
+		$cluster = Cluster_Service::get_cluster_by_id( $condition->contentsync_cluster_id );
 		if ( ! $cluster ) {
 			return false;
 		}
@@ -328,7 +329,7 @@ class Distributor {
 		}
 
 		// get posts for this condition
-		$condition_posts = \Contentsync\Cluster\get_posts_by_cluster_content_condition( $condition );
+		$condition_posts = Content_Condition_Service::get_posts_by_cluster_content_condition( $condition );
 
 		// export arguments
 		$export_arguments = isset( $condition->export_arguments ) ? wp_parse_args(
@@ -1070,7 +1071,7 @@ class Distributor {
 	public static function distribute_to_remote_site( &$item ) {
 		Logger::add( 'Distributing to remote site:', $item->destination->ID );
 
-		$result = \Contentsync\Api\distribute_item_to_remote_site( $item->destination->ID, $item );
+		$result = Remote_Request::distribute_item_to_remote_site( $item->destination->ID, $item );
 
 		Logger::add( 'Result: ', $result );
 
@@ -1093,7 +1094,7 @@ class Distributor {
 		}
 
 		if ( ! $result ) {
-			Logger::add( 'Not identified error distributing to remote site. The method "\Contentsync\Api\distribute_item_to_remote_site" returned NULL. This could be a timeout or a network error, or the connection feature or license is not enabled an the remote site.' );
+			Logger::add( 'Not identified error distributing to remote site. The method "Remote_Request::distribute_item_to_remote_site" returned NULL. This could be a timeout or a network error, or the connection feature or license is not enabled an the remote site.' );
 			$item->destination->error = new \WP_Error( 'distribute_to_remote_site', __( 'Unknown error', 'global-contents' ) );
 			return false;
 		}

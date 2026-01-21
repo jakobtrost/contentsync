@@ -2,13 +2,12 @@
 
 namespace Contentsync\Posts\Sync;
 
-use Contentsync\Distribution\Site_Connection;
+use Contentsync\Api\Site_Connection;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
+use Contentsync\Api\Remote_Request;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Post_Connection_Map {
 
@@ -117,7 +116,7 @@ class Post_Connection_Map {
 		else {
 			// the network url is the current network, as we just imported a post here
 			$post_site_url = Urls::get_network_url();
-			$result        = \Contentsync\Api\update_remote_post_connection( $site_url, $gid, $args, $add, $post_site_url );
+			$result        = Remote_Request::update_remote_post_connection( $site_url, $gid, $args, $add, $post_site_url );
 		}
 
 		return (bool) $result;
@@ -398,7 +397,6 @@ class Post_Connection_Map {
 
 		/**
 		 * get local connected posts
-		 *
 		 */
 		$local_connected_posts = self::get_all_local_connections( $gid );
 		if ( ! empty( $local_connected_posts ) ) {
@@ -407,11 +405,10 @@ class Post_Connection_Map {
 
 		/**
 		 * get remote connected posts
-		 *
 		 */
 		$remote_connected_posts = array();
 		foreach ( Site_Connection::get_all() as $site_url => $connected_site ) {
-			$remote_connected_posts = \Contentsync\Api\get_all_remote_connected_posts( $connected_site, $gid );
+			$remote_connected_posts = Remote_Request::get_all_remote_connected_posts( $connected_site, $gid );
 			if ( ! empty( $remote_connected_posts ) ) {
 				$remote_connected_posts                   = (array) $remote_connected_posts;
 				$updated_post_connection_map[ $site_url ] = array_map(
@@ -450,7 +447,6 @@ class Post_Connection_Map {
 					 * around for now. Otherwise we would have to delete all posts from
 					 * this remote connection, even if the connection maybe only went
 					 * down for a short time.
-					 *
 					 */
 					if ( ! isset( $updated_post_connection_map[ $rem_net_url ] ) ) {
 						$updated_post_connection_map[ $rem_net_url ] = $_post_con;
@@ -463,7 +459,6 @@ class Post_Connection_Map {
 					 * If posts from this remote connection are found, we check if the
 					 * post is still connected to the root post. If not, we delete the
 					 * connection.
-					 *
 					 */
 					else {
 						$rem_gid = get_current_blog_id() . '-' . $post_id . '-' . $cur_net_url;
@@ -504,7 +499,6 @@ class Post_Connection_Map {
 	 * Get all connected posts of a synced post on this network
 	 * by using a multisite query.
 	 *
-	 *
 	 * @param string $gid
 	 *
 	 * @return array[] Array of post connections, similar to Synced_Post, has:
@@ -533,7 +527,6 @@ class Post_Connection_Map {
 	/**
 	 * Get all connected posts of a synced post on this network
 	 * by using a multisite query.
-	 *
 	 *
 	 * @param string $gid
 	 *
@@ -590,7 +583,6 @@ class Post_Connection_Map {
 
 	/**
 	 * Convert the raw $wpdb result into a post connection array.
-	 *
 	 *
 	 * @param Synced_Post needs to have:
 	 *               $result->ID

@@ -9,13 +9,14 @@
 
 namespace Contentsync\Posts\Sync;
 
-use Contentsync\Distribution\Site_Connection;
+use Contentsync\Api\Site_Connection;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Posts\Theme_Assets;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
+use Contentsync\Api\Remote_Request;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -71,7 +72,7 @@ class Synced_Post_Query {
 		}
 		// remote post
 		else {
-			$response = \Contentsync\Api\get_remote_synced_post( $site_url, $gid );
+			$response = Remote_Request::get_remote_synced_post( $site_url, $gid );
 			if ( $response ) {
 				$post = Synced_Post_Service::new_synced_post( $response );
 
@@ -146,7 +147,7 @@ class Synced_Post_Query {
 		}
 		// remote post
 		else {
-			$posts = \Contentsync\Api\prepare_remote_synced_post( $site_url, $gid );
+			$posts = Remote_Request::prepare_remote_synced_post( $site_url, $gid );
 		}
 
 		return $posts ? (array) $posts : null;
@@ -191,7 +192,7 @@ class Synced_Post_Query {
 			}
 			// load new
 			else {
-				$posts = \Contentsync\Api\get_remote_synced_posts( $connection, $query );
+				$posts = Remote_Request::get_remote_synced_posts( $connection, $query );
 				if ( is_array( $posts ) && count( $posts ) ) {
 
 					// set persistent cache

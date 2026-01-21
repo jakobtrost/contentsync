@@ -30,14 +30,14 @@
  * `Distribution_Item_Service::delete()`. The `update` method merges provided properties into the
  * current instance, updates the timestamp, and then saves the record. It includes a
  * mechanism to inform an origin site about updates using
- * `\Contentsync\Api\update_distribution_item`, although the comment notes that this
+ * `\Contentsync\Api\Remote_Request::update_distribution_item`, although the comment notes that this
  * code path is currently unused. These methods abstract the persistence logic and let
  * higher-level code focus on distribution workflows.
- *
  */
 namespace Contentsync\Distribution;
 
 use Contentsync\Utils\Logger;
+use Contentsync\Api\Remote_Request;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -214,10 +214,10 @@ class Distribution_Item {
 		 * unused, but we leave it here for future use.
 		 *
 		 * @see Distribution_Endpoint->handle_distribute_item_request()
-		 * @see \Contentsync\Api\update_distribution_item()
+		 * @see \Contentsync\Api\Remote_Request::update_distribution_item()
 		 */
 		if ( ! empty( $this->origin ) && ! empty( $this->origin_id ) ) {
-			$result = \Contentsync\Api\update_distribution_item(
+			$result = Remote_Request::update_distribution_item(
 				$this->origin,
 				$this->origin_id,
 				$this->status,

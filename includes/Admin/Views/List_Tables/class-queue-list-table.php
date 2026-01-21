@@ -9,7 +9,7 @@ namespace Contentsync\Admin\Pages\List_Tables;
 
 use Contentsync\Distribution\Distributor;
 use Contentsync\Distribution\Distributor_Item_Service;
-use Contentsync\Distribution\Site_Connection;
+use Contentsync\Api\Site_Connection;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;

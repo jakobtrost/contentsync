@@ -7,14 +7,12 @@
  *
  * @see https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
  */
-namespace Contentsync\Distribution;
+namespace Contentsync\Api;
 
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Site_Connection {
 

@@ -14,7 +14,6 @@
  */
 namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Api\Endpoint;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Synced_Post_Query;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
@@ -24,7 +23,7 @@ use Contentsync\Utils\Urls;
 defined( 'ABSPATH' ) || exit;
 
 new Posts();
-class Posts extends Endpoint {
+class Posts extends Endpoint_Base {
 
 	/**
 	 * Class constructor

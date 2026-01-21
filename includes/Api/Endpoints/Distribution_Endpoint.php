@@ -32,7 +32,6 @@
  */
 namespace Contentsync\Api\Endpoints;
 
-use Contentsync\Api\Endpoint;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Distribution\Distributor_Item_Service;
 use Contentsync\Utils\Logger;
@@ -44,7 +43,7 @@ use Contentsync\Utils\Urls;
 defined( 'ABSPATH' ) || exit;
 
 new Distribution_Endpoint();
-class Distribution_Endpoint extends Endpoint {
+class Distribution_Endpoint extends Endpoint_Base {
 
 	/**
 	 * Store the current request origin in the class
