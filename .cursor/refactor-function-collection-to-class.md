@@ -347,20 +347,20 @@ use Contentsync\Utils\Hooks_Base;
 
 class Distribution_Item_Hooks extends Hooks_Base {
 
-    public function register(): void {
+    public function register() {
         add_action( 'init', [ $this, 'schedule_daily_cleanup' ] );
         add_action( 'contentsync_daily_cleanup', [ $this, 'delete_old_items' ] );
     }
 
     // Moved here — only used by the hook
-    public function schedule_daily_cleanup(): void {
+    public function schedule_daily_cleanup() {
         if ( ! wp_next_scheduled( 'contentsync_daily_cleanup' ) ) {
             wp_schedule_event( time(), 'daily', 'contentsync_daily_cleanup' );
         }
     }
 
     // Moved here — only used by the hook
-    public function delete_old_items(): void {
+    public function delete_old_items() {
         // deletes old items
     }
 }

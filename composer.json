@@ -5,7 +5,10 @@
 	"autoload": {
 		"psr-4": {
 			"Contentsync\\": "includes/"
-		}
+		},
+		"files": [
+			"libraries/action-scheduler/action-scheduler.php"
+		]
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "^3.7",

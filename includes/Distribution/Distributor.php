@@ -32,8 +32,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once CONTENTSYNC_PLUGIN_PATH . '/libs/action-scheduler/action-scheduler.php';
-
 /**
  * Distribution helper class.
  *
