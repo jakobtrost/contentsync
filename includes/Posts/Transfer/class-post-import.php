@@ -23,7 +23,6 @@ class Post_Import extends Post_Transfer {
 	/**
 	 * Import posts with all its meta, taxonomies, media etc.
 	 *
-	 *
 	 * @param int[]|object[] $post_ids_or_objects  Array of post IDs or post objects.
 	 * @param array          $arguments            Import arguments.
 	 *
@@ -368,7 +367,6 @@ class Post_Import extends Post_Transfer {
 
 				/**
 				 * Set the new post id for all unsupported translations of this post as well
-				 *
 				 */
 				if ( isset( $unsupported_translations ) && ! empty( $unsupported_translations ) ) {
 					foreach ( $unsupported_translations as $lang_code ) {
@@ -567,7 +565,6 @@ class Post_Import extends Post_Transfer {
 	/**
 	 * Parse import arguments.
 	 *
-	 *
 	 * @param array $arguments The arguments to parse.
 	 *
 	 * @return array The parsed arguments.
@@ -651,7 +648,7 @@ class Post_Import extends Post_Transfer {
 	 *     @property string name           Post name (slug) of the media file.
 	 *     @property string path           DIR path of the media file.
 	 *     @property string url            URL to the media file.
-	 *     @property string relative_path  Relative path to the wp upload basedir. 
+	 *     @property string relative_path  Relative path to the wp upload basedir.
 	 *
 	 * @return int|WP_Error              Post-ID on success. WP_Error on failure.
 	 */
@@ -776,7 +773,7 @@ class Post_Import extends Post_Transfer {
 	 *     @property string name           Name of the media file (eg. 'my-image.jpg').
 	 *     @property string path           DIR path of the media file (eg. '/htdocs/www/public/wp-content/uploads/sites/9/2025/10/my-image.jpg').
 	 *     @property string url            URL to the media file (eg. 'https://jakobtrost.de/wp-content/uploads/sites/9/2025/10/my-image.jpg').
-	 *     @property string relative_path  Relative path to the wp upload basedir (eg. '/2025/10/my-image.jpg'). 
+	 *     @property string relative_path  Relative path to the wp upload basedir (eg. '/2025/10/my-image.jpg').
 	 * @param string $new_file             The entire path to the new file (eg. '/other-server/wp-content/uploads/my-image.jpg').
 	 */
 	private function add_attachment_files_to_replace_strings( $media_file_info, $new_file ) {
@@ -1420,11 +1417,11 @@ class Post_Import extends Post_Transfer {
 	/**
 	 * Set the post hierarchy.
 	 *
-	 *
 	 * During export, we collected data about the previous post hierarchy. This contains
 	 * information about the parent post (if any) and all child posts (if any are found).
 	 * This information is used now to try to restore the same hierarchy based on the posts
 	 * that exist on the destination site or are part of the posts that are being imported.
+	 *
 	 * @see Prepared_Post::prepare_post_hierarchy()
 	 *
 	 * @param int           $post_id      Post ID on this stage.

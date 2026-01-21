@@ -36,6 +36,28 @@ if ( ! defined( 'CONTENTSYNC_REST_NAMESPACE' ) ) {
 }
 
 /**
+ * Fallback functions for single site installations
+ */
+if ( ! is_multisite() ) {
+	if ( ! function_exists( 'switch_to_blog' ) ) {
+		function switch_to_blog( $blog_id = '' ) { }
+	}
+	if ( ! function_exists( 'restore_current_blog' ) ) {
+		function restore_current_blog() { }
+	}
+	if ( ! function_exists( 'network_site_url' ) ) {
+		function network_site_url() {
+			return site_url();
+		}
+	}
+	if ( ! function_exists( 'get_blog_permalink' ) ) {
+		function get_blog_permalink( $blog_id, $post_id ) {
+			return get_permalink( $post_id );
+		}
+	}
+}
+
+/**
  * Run on plugin activation.
  *
  * This eagerly provisions the custom database tables used by the plugin
@@ -43,14 +65,7 @@ if ( ! defined( 'CONTENTSYNC_REST_NAMESPACE' ) ) {
  * will only create missing tables.
  */
 function contentsync_plugin_activated() {
-	// Ensure DB table helpers are available.
-	require_once CONTENTSYNC_PLUGIN_PATH . '/includes/DB/database-tables.php';
-
-	// Call DB helpers in their namespace.
-	\DB\maybe_add_cluster_table();
-	\DB\maybe_add_post_reviews_table();
-	\DB\maybe_add_cluster_content_conditions_table();
-	\DB\maybe_add_queue_distribution_items_table();
+	( new \Contentsync\DB\Database_Tables_Hooks() )->maybe_add_tables();
 }
 
 \register_activation_hook( CONTENTSYNC_PLUGIN_FILE, __NAMESPACE__ . '\contentsync_plugin_activated' );
