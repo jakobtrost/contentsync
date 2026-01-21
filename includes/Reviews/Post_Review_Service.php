@@ -14,6 +14,7 @@ namespace Contentsync\Reviews;
 use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Posts\Sync\Post_Connection_Map;
+use Contentsync\Posts\Sync\Trigger_Hooks;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Import;
 use Contentsync\Utils\Logger;
@@ -137,11 +138,11 @@ class Post_Review_Service {
 		self::set_post_review_state( $review_id, 'approved' );
 
 		if ( ! $post ) {
-			$result = Trigger::on_delete_root_post_and_connected_posts( $post_review->previous_post );
+			$result = Trigger_Hooks::on_delete_root_post_and_connected_posts( $post_review->previous_post );
 		} elseif ( $post->post_status == 'trash' ) {
-			$result = Trigger::on_trash_synced_post( $post_review->previous_post );
+			$result = Trigger_Hooks::on_trash_synced_post( $post_review->previous_post );
 		} elseif ( $post_review->previous_post->post_status == 'trash' ) {
-			$result = Trigger::on_untrash_synced_post( $post_id );
+			$result = Trigger_Hooks::on_untrash_synced_post( $post_id );
 		} else {
 			$destination_ids = array();
 			foreach ( Cluster_Service::get_clusters_including_post( $post ) as $cluster ) {

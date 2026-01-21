@@ -1,39 +1,43 @@
 <?php
 /**
- * Content Syncs Trigger.
+ * Content Syncs Trigger Hooks.
  *
  * Handles all the triggers on update, import, export, delete and trash posts.
  *
- * This file defines the `Trigger` class, which hooks into a variety of
- * WordPress actions and filters to respond when posts are inserted,
+ * This class hooks into a variety of WordPress actions and filters to respond when posts are inserted,
  * updated, trashed or untrashed, attachments are replaced, and other
  * events occur. It performs pre‑ and post‑update tasks such as saving
  * cluster conditions, updating global metadata and dispatching
  * distribution or review workflows.
  */
 
-namespace Contentsync\Admin;
+namespace Contentsync\Posts\Sync;
 
 use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Cluster\Content_Condition_Service;
 use Contentsync\Distribution\Distributor;
-use Contentsync\Posts\Sync\Post_Connection_Map;
-use Contentsync\Posts\Sync\Post_Meta;
-use Contentsync\Posts\Sync\Synced_Post_Service;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Reviews\Post_Review_Service;
+use Contentsync\Utils\Hooks_Base;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Multisite_Manager;
 
 defined( 'ABSPATH' ) || exit;
 
-new Trigger();
-class Trigger {
+class Trigger_Hooks extends Hooks_Base {
 
 	/**
-	 * Class constructor
+	 * How many seconds to keep the transients for the post update.
+	 *
+	 * This is intentionally short to allow legitimate rapid updates
+	 * while preventing duplicate processing.
 	 */
-	public function __construct() {
+	const TRANSIENT_LIFETIME = 2;
+
+	/**
+	 * Register hooks that run everywhere (both frontend and admin).
+	 */
+	public function register() {
 
 		// update post
 		// before
@@ -51,7 +55,6 @@ class Trigger {
 		// add_action( 'before_delete_post', array( $this, 'on_delete_post' ), 10, 2 );
 		// add_action( 'delete_attachment', array( $this, 'on_delete_post' ), 10, 2 );
 	}
-
 
 	/**
 	 * =================================================================
@@ -133,7 +136,7 @@ class Trigger {
 
 		// abort if the current user is not allowed to edit synced posts
 		if ( ! empty( $contentsync_status ) ) {
-			$current_user_can_edit = \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $contentsync_status );
+			$current_user_can_edit = Synced_Post_Service::current_user_can_edit_synced_posts( $contentsync_status );
 			if ( ! $current_user_can_edit ) {
 				wp_die(
 					__( 'You are not allowed to edit synced posts.', 'global-contents' ),
@@ -146,11 +149,11 @@ class Trigger {
 		if ( ! empty( $_POST ) && is_array( $_POST ) ) {
 
 			if ( isset( $_POST['editable_contentsync_export_options'] ) ) {
-				\Contentsync\Admin\Sync\update_contentsync_post_export_options( $post_id, $_POST['editable_contentsync_export_options'] );
+				Post_Meta::update_export_options( $post_id, $_POST['editable_contentsync_export_options'] );
 			}
 
 			if ( isset( $_POST['contentsync_canonical_url'] ) ) {
-				\Contentsync\Admin\Sync\update_contentsync_post_canonical_url( $post_id, $_POST['contentsync_canonical_url'] );
+				Post_Meta::update_canonical_url( $post_id, $_POST['contentsync_canonical_url'] );
 			}
 		}
 
@@ -392,7 +395,7 @@ class Trigger {
 	 * @param WP_Post $post
 	 * @param WP_Post $post_before
 	 */
-	public function after_update_local_post( $post_id, $post, $post_before = null ) {
+	public static function after_update_local_post( $post_id, $post, $post_before = null ) {
 
 		// we only distribute posts once they are published
 		if ( $post->post_status !== 'publish' && $post->post_status !== 'inherit' ) {
@@ -453,7 +456,7 @@ class Trigger {
 	 * @param WP_Post $post
 	 * @param WP_Post $post_before
 	 */
-	public function after_update_synced_post( $post_id, $post, $post_before = null ) {
+	public static function after_update_synced_post( $post_id, $post, $post_before = null ) {
 
 		$post_needs_review = false;
 		$destination_ids   = array();
@@ -481,7 +484,7 @@ class Trigger {
 
 			// get the destinations the post is removed from
 			$destinations_to_be_removed_from      = array();
-			$cluster_ids_the_post_is_removed_from = $this->get_cluster_ids_the_post_is_removed_from( $post_id );
+			$cluster_ids_the_post_is_removed_from = self::get_cluster_ids_the_post_is_removed_from( $post_id );
 			if ( ! empty( $cluster_ids_the_post_is_removed_from ) ) {
 				foreach ( $cluster_ids_the_post_is_removed_from as $cluster_id ) {
 					$cluster = Cluster_Service::get_cluster_by_id( $cluster_id );
@@ -618,7 +621,7 @@ class Trigger {
 			/**
 			 * Check if the current user can trash synced posts.
 			 */
-			$current_user_can_trash = \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status );
+			$current_user_can_trash = Synced_Post_Service::current_user_can_edit_synced_posts( $status );
 			if ( ! $current_user_can_trash ) {
 				wp_die(
 					__( 'You are not allowed to trash synced posts.', 'global-contents' ),
@@ -856,14 +859,6 @@ class Trigger {
 	 */
 
 	/**
-	 * How many seconds to keep the transients for the post update.
-	 *
-	 * This is intentionally short to allow legitimate rapid updates
-	 * while preventing duplicate processing.
-	 */
-	const TRANSIENT_LIFETIME = 2;
-
-	/**
 	 * Check if an action has already been processed in the last 2 seconds for the same post.
 	 *
 	 * @param string $action The action that has been processed.
@@ -1031,7 +1026,7 @@ class Trigger {
 	 * @param int $post_id The ID of the post being updated.
 	 * @return array The cluster ids the post is removed from.
 	 */
-	public function get_cluster_ids_the_post_is_removed_from( $post_id, $use_cache = true ) {
+	public static function get_cluster_ids_the_post_is_removed_from( $post_id, $use_cache = true ) {
 		if ( $use_cache ) {
 			$transient = get_transient( 'synced_post_update_cluster_ids_the_post_is_removed_from_' . $post_id );
 			if ( $transient ) {
@@ -1048,7 +1043,7 @@ class Trigger {
 	 * @param int $cluster_id The ID of the cluster the post is removed from.
 	 */
 	public function add_cluster_id_the_post_is_removed_from( $post_id, $cluster_id ) {
-		$cluster_ids   = $this->get_cluster_ids_the_post_is_removed_from( $post_id );
+		$cluster_ids   = self::get_cluster_ids_the_post_is_removed_from( $post_id );
 		$cluster_ids[] = $cluster_id;
 		$cluster_ids   = array_unique( $cluster_ids );
 		set_transient( 'synced_post_update_cluster_ids_the_post_is_removed_from_' . $post_id, $cluster_ids, self::TRANSIENT_LIFETIME );

@@ -127,18 +127,6 @@ class Synced_Post_Query {
 				if ( $post ) {
 					$args = array_merge( Post_Meta::get_values( $post, 'contentsync_export_options' ), $args );
 
-					if ( $post->post_type === 'tp_posttypes' && $args['whole_posttype'] ) {
-						$args['query_args'] = array(
-							'meta_query' => array(
-								array(
-									'key'     => 'synced_post_status',
-									'value'   => 'root',
-									'compare' => 'LIKE',
-								),
-							),
-						);
-					}
-
 					$posts = ( new Post_Export( $post_id, $args ) )->get_posts();
 				}
 			}

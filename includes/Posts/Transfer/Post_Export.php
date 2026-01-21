@@ -169,12 +169,10 @@ class Post_Export extends Post_Transfer_Base {
 		return apply_filters(
 			'contentsync_export_default_arguments',
 			array(
-				'append_nested'  => true,
-				'whole_posttype' => false,
-				'all_terms'      => false,
-				'resolve_menus'  => true,
-				'translations'   => false,
-				'query_args'     => array(),
+				'append_nested' => true,
+				'resolve_menus' => true,
+				'translations'  => false,
+				'query_args'    => array(),
 			)
 		);
 	}

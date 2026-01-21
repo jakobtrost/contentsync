@@ -131,8 +131,6 @@ class Prepared_Post {
 	 *
 	 * @var array
 	 *    @property bool  append_nested   Append nested posts to the export.
-	 *    @property bool  whole_posttype  Export the whole post type.
-	 *    @property bool  all_terms       Export all terms of the post.
 	 *    @property bool  resolve_menus   Resolve navigation links to custom links.
 	 *    @property bool  translations    Include translations of the post.
 	 *    @property array query_args      Additional query arguments.

@@ -335,11 +335,9 @@ class Distributor {
 		$export_arguments = isset( $condition->export_arguments ) ? wp_parse_args(
 			(array) $condition->export_arguments,
 			array(
-				'append_nested'  => false,
-				'whole_posttype' => false,
-				'all_terms'      => false,
-				'resolve_menus'  => false,
-				'translations'   => false,
+				'append_nested' => false,
+				'resolve_menus' => false,
+				'translations'  => false,
 			)
 		) : array();
 

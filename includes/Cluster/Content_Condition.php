@@ -11,7 +11,6 @@
  * condition from the database and a constructor that assigns
  * properties. Use this class to inspect or manipulate content
  * conditions within your own code.
- *
  */
 namespace Contentsync\Cluster;
 
@@ -72,11 +71,8 @@ final class Content_Condition {
 	/**
 	 * The arguments used to export the posts.
 	 *
-	 *
 	 * @var array
 	 *    @property bool  append_nested   Append nested posts to the export.
-	 *    @property bool  whole_posttype  Export the whole post type.
-	 *    @property bool  all_terms       Export all terms of the post.
 	 *    @property bool  resolve_menus   Resolve navigation links to custom links.
 	 *    @property bool  translations    Include translations of the post.
 	 */
@@ -109,7 +105,6 @@ final class Content_Condition {
 
 	/**
 	 * Constructor.
-	 *
 	 *
 	 * @param Content_Condition|object $content_condition Content Condition object.
 	 */
