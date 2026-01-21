@@ -13,6 +13,8 @@
 
 namespace Contentsync\Reviews;
 
+use Contentsync\Cluster\Cluster_Service;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -260,7 +262,7 @@ class Review_Mail {
 
 		$reviewer_ids = array();
 
-		foreach ( \Contentsync\Cluster\get_clusters_including_post( $post_id ) as $cluster ) {
+		foreach ( Cluster_Service::get_clusters_including_post( $post_id ) as $cluster ) {
 			if ( $cluster->enable_reviews ) {
 				$reviewer_ids = array_merge( $reviewer_ids, $cluster->reviewer_ids );
 			}

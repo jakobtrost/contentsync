@@ -14,6 +14,8 @@
 
 namespace Contentsync\Admin;
 
+use Contentsync\Cluster\Cluster_Service;
+use Contentsync\Cluster\Content_Condition_Service;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Post_Meta;
@@ -259,7 +261,7 @@ class Trigger {
 		$condition_ids_including_this_post_before = $this->get_condition_ids_including_this_post_before( $post_id );
 
 		// get the conditions right now (after the post update)
-		$content_conditions_including_post = \Contentsync\Cluster\get_cluster_content_conditions_including_post( $post_id );
+		$content_conditions_including_post = Content_Condition_Service::get_cluster_content_conditions_including_post( $post_id );
 		if ( ! empty( $content_conditions_including_post ) ) {
 			$condition_ids_including_this_post = array_keys( $content_conditions_including_post );
 		} else {
@@ -298,13 +300,13 @@ class Trigger {
 			$posts_before = $all_conditions[ $condition_id ]['posts'];
 
 			// check if cluster has reviews enabled
-			$cluster = \Contentsync\Cluster\get_cluster_by_id( $condition->contentsync_cluster_id );
+			$cluster = Cluster_Service::get_cluster_by_id( $condition->contentsync_cluster_id );
 			if ( $cluster->enable_reviews ) {
 				Post_Review_Service::create_post_review( $post_id, $post_before );
 			}
 
 			// check if the post is still in this cluster.
-			if ( ! \Contentsync\Cluster\is_post_in_cluster( $post_id, $condition->contentsync_cluster_id ) ) {
+			if ( ! Cluster_Service::is_post_in_cluster( $post_id, $condition->contentsync_cluster_id ) ) {
 				Logger::add( 'post is removed from cluster: ', $condition->contentsync_cluster_id );
 				$this->add_cluster_id_the_post_is_removed_from( $post_id, $condition->contentsync_cluster_id );
 			}
@@ -347,7 +349,7 @@ class Trigger {
 			}
 
 			// check if cluster has reviews enabled
-			$cluster = \Contentsync\Cluster\get_cluster_by_id( $condition->contentsync_cluster_id );
+			$cluster = Cluster_Service::get_cluster_by_id( $condition->contentsync_cluster_id );
 			if ( $cluster->enable_reviews ) {
 				Post_Review_Service::create_post_review( $post_id, $post_before );
 			}
@@ -405,7 +407,7 @@ class Trigger {
 		/**
 		 * Check if the post is inside a cluster with reviews enabled
 		 */
-		foreach ( \Contentsync\Cluster\get_clusters_including_post( $post ) as $cluster ) {
+		foreach ( Cluster_Service::get_clusters_including_post( $post ) as $cluster ) {
 			if ( $cluster->enable_reviews ) {
 				$post_needs_review = true;
 				break;
@@ -459,7 +461,7 @@ class Trigger {
 		/**
 		 * Check if the post is inside a cluster with reviews enabled
 		 */
-		foreach ( \Contentsync\Cluster\get_clusters_including_post( $post ) as $cluster ) {
+		foreach ( Cluster_Service::get_clusters_including_post( $post ) as $cluster ) {
 			if ( $cluster->enable_reviews ) {
 				$post_needs_review = true;
 				break;
@@ -482,7 +484,7 @@ class Trigger {
 			$cluster_ids_the_post_is_removed_from = $this->get_cluster_ids_the_post_is_removed_from( $post_id );
 			if ( ! empty( $cluster_ids_the_post_is_removed_from ) ) {
 				foreach ( $cluster_ids_the_post_is_removed_from as $cluster_id ) {
-					$cluster = \Contentsync\Cluster\get_cluster_by_id( $cluster_id );
+					$cluster = Cluster_Service::get_cluster_by_id( $cluster_id );
 					if ( $cluster ) {
 						if ( $cluster->destination_ids && ! empty( $cluster->destination_ids ) ) {
 							foreach ( $cluster->destination_ids as $destination_id ) {
@@ -584,7 +586,7 @@ class Trigger {
 	 */
 	public static function post_needs_review( $post_id ) {
 		$post_needs_review = false;
-		foreach ( \Contentsync\Cluster\get_clusters_including_post( $post_id ) as $cluster ) {
+		foreach ( Cluster_Service::get_clusters_including_post( $post_id ) as $cluster ) {
 			if ( $cluster->enable_reviews ) {
 				$post_needs_review = true;
 			}
@@ -673,7 +675,7 @@ class Trigger {
 		if ( $status === 'linked' ) {
 			Synced_Post_Service::unlink_synced_post( $post_id );
 			// delete also all connected cluster posts
-			foreach ( \Contentsync\Cluster\get_clusters_including_post( $post ) as $cluster ) {
+			foreach ( Cluster_Service::get_clusters_including_post( $post ) as $cluster ) {
 				foreach ( $cluster->destination_ids as $blog_id ) {
 					/**
 					 * @todo REWORK delete post from destinations
@@ -903,7 +905,7 @@ class Trigger {
 		}
 
 		// get content conditions including this post
-		$content_conditions_including_post = \Contentsync\Cluster\get_cluster_content_conditions_including_post( $post_id );
+		$content_conditions_including_post = Content_Condition_Service::get_cluster_content_conditions_including_post( $post_id );
 
 		if ( ! empty( $content_conditions_including_post ) ) {
 			$content_conditions_including_post = array_keys( $content_conditions_including_post );
@@ -959,7 +961,7 @@ class Trigger {
 		}
 
 		$conditions_with_this_posttype_before = array();
-		$content_conditions_with_posttype     = \Contentsync\Cluster\get_cluster_content_conditions_including_posttype( $post_type );
+		$content_conditions_with_posttype     = Content_Condition_Service::get_cluster_content_conditions_including_posttype( $post_type );
 
 		if ( ! empty( $content_conditions_with_posttype ) ) {
 
@@ -967,7 +969,7 @@ class Trigger {
 
 				$conditions_with_this_posttype_before[ $condition_id ] = array(
 					'condition' => $condition,
-					'posts'     => \Contentsync\Cluster\get_posts_by_cluster_content_condition( $condition ),
+					'posts'     => Content_Condition_Service::get_posts_by_cluster_content_condition( $condition ),
 				);
 			}
 		}

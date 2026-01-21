@@ -11,6 +11,7 @@
 
 namespace Contentsync\Reviews;
 
+use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Transfer\Post_Export;
@@ -143,7 +144,7 @@ class Post_Review_Service {
 			$result = Trigger::on_untrash_synced_post( $post_id );
 		} else {
 			$destination_ids = array();
-			foreach ( \Contentsync\Cluster\get_clusters_including_post( $post ) as $cluster ) {
+			foreach ( Cluster_Service::get_clusters_including_post( $post ) as $cluster ) {
 				$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
 			}
 
@@ -250,7 +251,7 @@ class Post_Review_Service {
 
 		// get the destination ids
 		$destination_ids = array();
-		foreach ( \Contentsync\Cluster\get_clusters_including_post( $post_id ) as $cluster ) {
+		foreach ( Cluster_Service::get_clusters_including_post( $post_id ) as $cluster ) {
 			$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
 		}
 

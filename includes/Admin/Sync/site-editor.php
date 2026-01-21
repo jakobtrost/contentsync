@@ -15,6 +15,7 @@
 
 namespace Contentsync\Admin;
 
+use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Theme_Assets;
@@ -184,7 +185,7 @@ class Site_Editor {
 								}
 								return $cluster;
 							},
-							\Contentsync\Cluster\get_clusters_including_post( $post_id )
+							Cluster_Service::get_clusters_including_post( $post_id )
 						),
 						'error'            => get_post_error( $post_id ),
 					) : array() ),

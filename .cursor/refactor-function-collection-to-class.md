@@ -57,6 +57,7 @@ Refactor **one function or utils collection file** (typically named with prefixe
 
 3. **Choose class and file name** (for the static helper class)
    - Derive the namespace from its folder under `includes/`.
+   - **Check for existing classes**: Before choosing a class name, search the namespace directory for existing classes with the same name. If a class with that name already exists, append `_Service` to avoid conflicts (e.g., if `Cluster` exists, use `Cluster_Service`).
    - Choose a class name that:
      - Describes the logical group (e.g. `Theme_Assets`, `Post_Query`, `Utils_Urls`).
      - Uses capitalized words with underscores.

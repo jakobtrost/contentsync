@@ -14,6 +14,7 @@
 
 namespace Contentsync\Admin;
 
+use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Post_Meta;
 use Contentsync\Posts\Sync\Synced_Post_Service;
@@ -1054,7 +1055,7 @@ class Admin {
 
 	public static function get_clusters_including_this_post( $post_id ) {
 		if ( self::$clusters_including_this_post === null ) {
-			self::$clusters_including_this_post = \Contentsync\Cluster\get_clusters_including_post( $post_id );
+			self::$clusters_including_this_post = Cluster_Service::get_clusters_including_post( $post_id );
 		}
 		return self::$clusters_including_this_post;
 	}

@@ -9,6 +9,7 @@
 namespace Contentsync\Posts\Sync;
 
 use Exception;
+use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Posts\Transfer\Post_Export;
@@ -260,7 +261,7 @@ class Synced_Post_Service {
 
 		// debug("untrash linked posts");
 		$destination_ids = array();
-		foreach ( \Contentsync\Cluster\get_clusters_including_post( $post_id ) as $cluster ) {
+		foreach ( Cluster_Service::get_clusters_including_post( $post_id ) as $cluster ) {
 			$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
 		}
 		$destination_ids = array_unique( $destination_ids );
@@ -356,7 +357,7 @@ class Synced_Post_Service {
 		$root_gid = Post_Meta::get_values( $post_id, 'synced_post_id' );
 
 		$destination_ids = array();
-		foreach ( \Contentsync\Cluster\get_clusters_including_post( $post_id ) as $cluster ) {
+		foreach ( Cluster_Service::get_clusters_including_post( $post_id ) as $cluster ) {
 			$destination_ids = array_merge( $destination_ids, $cluster->destination_ids );
 		}
 		$destination_ids = array_unique( $destination_ids );

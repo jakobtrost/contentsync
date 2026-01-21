@@ -16,6 +16,8 @@
  */
 namespace Contentsync\Cluster;
 
+use Contentsync\Cluster\Content_Condition_Service;
+
 defined( 'ABSPATH' ) || exit;
 
 final class Cluster {
@@ -100,7 +102,7 @@ final class Cluster {
 				$this->$key = empty( $value ) ? array() : explode( ',', $value );
 				continue;
 			} elseif ( 'content_conditions' === $key ) {
-				$this->$key = empty( $value ) ? array() : array_map( '\Contentsync\Cluster\get_cluster_content_condition_by_id', (array) unserialize( $value ) );
+				$this->$key = empty( $value ) ? array() : array_map( array( Content_Condition_Service::class, 'get_cluster_content_condition_by_id' ), (array) unserialize( $value ) );
 				continue;
 			}
 
