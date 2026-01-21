@@ -10,7 +10,6 @@
  * functions during plugin initialisation to provision the cluster
  * database tables before any data is written.
  *
- * @since 2.17.0
  */
 
 namespace Contentsync\DB;

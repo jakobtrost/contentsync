@@ -5,7 +5,6 @@
  * Responsible for detecting which translation tool is active and
  * providing the appropriate translation tool instance.
  *
- * @since 2.19.0
  */
 
 namespace Contentsync\Translations;
@@ -33,7 +32,6 @@ class Translation_Tool_Factory {
 	/**
 	 * Get the active translation tool instance.
 	 *
-	 * @since 2.19.0
 	 * @return Translation_Tool_Base|null Translation tool instance or null if none detected.
 	 */
 	public static function get_instance() {
@@ -47,7 +45,6 @@ class Translation_Tool_Factory {
 	/**
 	 * Get the name of the active translation tool.
 	 *
-	 * @since 2.19.0
 	 * @return string|null Tool name ('wpml', 'polylang') or null if none detected.
 	 */
 	public static function get_tool_name() {
@@ -63,7 +60,6 @@ class Translation_Tool_Factory {
 	 *
 	 * Useful for testing or when the translation environment changes.
 	 *
-	 * @since 2.19.0
 	 */
 	public static function reset() {
 		self::$instance  = null;
@@ -73,7 +69,6 @@ class Translation_Tool_Factory {
 	/**
 	 * Create a translation tool instance based on the active tool.
 	 *
-	 * @since 2.19.0
 	 * @return Translation_Tool_Base|null
 	 */
 	private static function create_instance() {
@@ -98,7 +93,6 @@ class Translation_Tool_Factory {
 	/**
 	 * Detect which translation tool is active.
 	 *
-	 * @since 2.19.0
 	 * @return string|null Tool name or null if none detected.
 	 */
 	private static function detect_tool() {
@@ -158,7 +152,6 @@ class Translation_Tool_Factory {
 	 * This checks if the plugin code is loaded, which can be different from
 	 * whether it's active/configured for the current blog in multisite.
 	 *
-	 * @since 2.19.0
 	 * @param string|null $tool_name Tool name ('wpml', 'polylang') or null to detect automatically.
 	 * @return bool True if the plugin is loaded, false otherwise.
 	 */
@@ -187,7 +180,6 @@ class Translation_Tool_Factory {
 	 * for the current blog. This method checks all known tools to see if
 	 * any of them are loaded in memory.
 	 *
-	 * @since 2.19.0
 	 * @return string|null Tool name if loaded, null if none found.
 	 */
 	public static function get_loaded_tool_name() {
@@ -208,7 +200,6 @@ class Translation_Tool_Factory {
 	 * This is a generic method that detects if any translation plugin is loaded
 	 * but not active for the current blog, then unloads its hooks.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if hooks were unloaded, false otherwise.
 	 */
 	public static function unload_inactive_tool_hooks() {
@@ -239,7 +230,6 @@ class Translation_Tool_Factory {
 	 * This should be called after switching back to a blog where the translation
 	 * tool should be active.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if hooks were reloaded, false otherwise.
 	 */
 	public static function reload_active_tool_hooks() {
@@ -255,7 +245,6 @@ class Translation_Tool_Factory {
 	/**
 	 * Create a translation tool instance by name.
 	 *
-	 * @since 2.19.0
 	 * @param string $tool_name Tool name ('wpml', 'polylang').
 	 * @return Translation_Tool_Base|null
 	 */

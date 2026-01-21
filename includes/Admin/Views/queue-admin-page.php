@@ -10,8 +10,6 @@
  * filters for setting screen options, enqueueing scripts, handling
  * notices and processing AJAX requests. Use this class to add new
  * controls or diagnostics to the distribution queue admin page.
- *
- * @since 2.17.0
  */
 
 namespace Contentsync\Admin\Pages;

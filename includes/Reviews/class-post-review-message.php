@@ -10,7 +10,6 @@
  * retrieve the reviewer’s display name. Use this class when storing
  * or presenting comments and notes in the post review workflow.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Reviews;
 
@@ -61,7 +60,6 @@ final class Post_Review_Message {
 	/**
 	 * Constructor.
 	 *
-	 * @since 3.5.0
 	 *
 	 * @param int   $post_review_id The post review ID
 	 * @param array $args              The message arguments

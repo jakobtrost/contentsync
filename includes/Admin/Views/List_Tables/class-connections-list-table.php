@@ -84,7 +84,6 @@ class Connections_List_Table extends \WP_List_Table {
 	/**
 	 * Generates the table navigation above or below the table
 	 *
-	 * @since 3.1.0
 	 * @param string $which
 	 */
 	protected function display_tablenav( $which ) {

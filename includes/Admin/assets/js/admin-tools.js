@@ -609,7 +609,7 @@ var contentsync = new function () {
 	 * Repair post
 	 * 
 	 * @param {DOMElement} elem event target
-	 * @param {int} postId @deprecated
+	 * @param {int} postId
 	 */
 	this.repairPost = function ( elem, postId ) {
 

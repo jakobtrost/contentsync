@@ -18,7 +18,6 @@ class Post_Export extends Post_Transfer {
 	/**
 	 * Export posts with all its meta, taxonomies, media etc.
 	 *
-	 * @since 2.18.0
 	 *
 	 * @param int|object|int[]|object[] $post_or_posts  Post ID, post object, array of post IDs or array of post objects.
 	 * @param array                     $arguments            Export arguments.
@@ -184,7 +183,6 @@ class Post_Export extends Post_Transfer {
 	/**
 	 * Parse export arguments.
 	 *
-	 * @since 2.18.0
 	 *
 	 * @param array $arguments The arguments to parse.
 	 *

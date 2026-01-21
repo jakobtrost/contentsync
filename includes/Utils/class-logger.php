@@ -29,7 +29,6 @@
  * in production environments to avoid exposing sensitive information. Always check
  * whether logging is appropriate in your context.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Utils;
 

@@ -1,7 +1,5 @@
 /**
  * Admin features for the 'distribution' feature
- *
- * @since 2.17.0
  */
 var greyd = greyd || {};
 

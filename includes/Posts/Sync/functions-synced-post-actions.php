@@ -66,7 +66,6 @@ function make_post_synced( $post_id, $args ) {
 		update_post_meta( $_post_id, 'contentsync_connection_map', $connection_map );
 
 		/**
-		 * @since 2.3.0 set 'contentsync_canonical_url' to permalink
 		 */
 		update_post_meta( $_post_id, 'contentsync_canonical_url', get_permalink( $_post_id ) );
 	}
@@ -80,7 +79,6 @@ function make_post_synced( $post_id, $args ) {
 	update_post_meta( $post_id, 'contentsync_connection_map', $connection_map );
 
 	/**
-	 * @since 2.3.0 set 'contentsync_canonical_url' to permalink
 	 */
 	update_post_meta( $post_id, 'contentsync_canonical_url', get_permalink( $post_id ) );
 

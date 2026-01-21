@@ -13,7 +13,6 @@
  * `insert` method to update its persistent data. Use this class when
  * managing clusters programmatically.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Cluster;
 

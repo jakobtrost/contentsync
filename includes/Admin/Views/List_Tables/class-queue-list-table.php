@@ -4,7 +4,6 @@
  *
  * @extends WP_List_Table ( wp-admin/includes/class-wp-list-table.php )
  *
- * @since 2.17.0
  */
 
 namespace Contentsync\Admin\Pages\List_Tables;
@@ -150,7 +149,6 @@ class Queue_List_Table extends \WP_List_Table {
 	/**
 	 * Generates the table navigation above or below the table
 	 *
-	 * @since 3.1.0
 	 * @param string $which
 	 */
 	protected function display_tablenav( $which ) {
@@ -204,7 +202,6 @@ class Queue_List_Table extends \WP_List_Table {
 	 * The format is an associative array:
 	 * - `'id' => 'link'`
 	 *
-	 * @since 3.1.0
 	 *
 	 * @return array
 	 */

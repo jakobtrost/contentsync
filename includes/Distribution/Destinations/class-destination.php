@@ -23,7 +23,6 @@
  * them as appropriate. Remember to instantiate this class or its subclasses within a
  * defined `ABSPATH` context to prevent execution outside of WordPress.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Distribution\Destinations;
 

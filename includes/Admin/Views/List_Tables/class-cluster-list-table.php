@@ -2,7 +2,6 @@
 /**
  * Displays all clusters in a table.
  *
- * @since 2.17.0
  * @extends WP_List_Table ( wp-admin/includes/class-wp-list-table.php )
  */
 
@@ -125,7 +124,6 @@ class Cluster_List_Table extends \WP_List_Table {
 	/**
 	 * Generates the table navigation above or below the table
 	 *
-	 * @since 3.1.0
 	 * @param string $which
 	 */
 	protected function display_tablenav( $which ) {

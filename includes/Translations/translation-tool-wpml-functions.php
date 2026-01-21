@@ -10,7 +10,6 @@
  * to set post languages and translation relationships without requiring the
  * global $sitepress object.
  *
- * @since 2.19.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,7 +20,6 @@ if ( ! function_exists( 'contentsync_wpml_get_element_language_details' ) ) {
 	/**
 	 * Get language details for an element from the icl_translations table.
 	 *
-	 * @since 2.19.0
 	 *
 	 * @param int    $element_id   The element ID (post ID for posts).
 	 * @param string $element_type The element type (e.g., 'post_post', 'post_page').
@@ -60,7 +58,6 @@ if ( ! function_exists( 'contentsync_wpml_get_element_trid' ) ) {
 	/**
 	 * Get the translation group ID (trid) for an element.
 	 *
-	 * @since 2.19.0
 	 *
 	 * @param int    $element_id   The element ID (post ID for posts).
 	 * @param string $element_type The element type (e.g., 'post_post', 'post_page').
@@ -79,7 +76,6 @@ if ( ! function_exists( 'contentsync_wpml_get_source_language_by_trid' ) ) {
 	 *
 	 * The source language is the one where source_language_code is NULL.
 	 *
-	 * @since 2.19.0
 	 *
 	 * @param int $trid The translation group ID.
 	 *
@@ -116,7 +112,6 @@ if ( ! function_exists( 'contentsync_wpml_get_next_trid' ) ) {
 	/**
 	 * Get the next available trid value.
 	 *
-	 * @since 2.19.0
 	 *
 	 * @return int The next available trid.
 	 */
@@ -142,7 +137,6 @@ if ( ! function_exists( 'contentsync_wpml_set_element_language_details' ) ) {
 	 * This is a standalone implementation of WPML's wpml_set_element_language_details action
 	 * that works without the global $sitepress object being loaded.
 	 *
-	 * @since 2.19.0
 	 *
 	 * @param array $args {
 	 *     Arguments for setting element language details.
@@ -343,7 +337,6 @@ if ( ! function_exists( 'contentsync_wpml_delete_element_translation' ) ) {
 	/**
 	 * Delete translation entry for an element.
 	 *
-	 * @since 2.19.0
 	 *
 	 * @param int    $element_id   The element ID.
 	 * @param string $element_type The element type.
@@ -381,7 +374,6 @@ if ( ! function_exists( 'contentsync_wpml_get_translations_by_trid' ) ) {
 	/**
 	 * Get all translations in a translation group.
 	 *
-	 * @since 2.19.0
 	 *
 	 * @param int    $trid         The translation group ID.
 	 * @param string $element_type Optional. Filter by element type.
@@ -431,7 +423,6 @@ if ( ! function_exists( 'contentsync_wpml_get_active_languages' ) ) {
 	/**
 	 * Get active language codes from WPML.
 	 *
-	 * @since 2.19.0
 	 *
 	 * @return array Array of active language codes.
 	 */

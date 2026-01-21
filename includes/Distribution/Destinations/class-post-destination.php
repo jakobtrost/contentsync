@@ -31,7 +31,6 @@
  * Since this class inherits from `Destination` it also gains the basic properties
  * of ID, timestamp and status, although only the ID is explicitly defined here.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Distribution\Destinations;
 

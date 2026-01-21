@@ -179,14 +179,14 @@ function get_post_connection_map( $post_id ) {
 	// array(
 	// old way, deprecated but still supported
 	// $blog_id => $post_id,
-	// new way, @since 2.0
+	// new way, 
 	// $blog_id => array(
 	// 'post_id' => $post_id,
 	// 'edit'    => $edit_url,
 	// 'blog'    => $blog_url,
 	// 'nice'    => $nice_url,
 	// ),
-	// remote connections, @since 2.0
+	// remote connections, 
 	// $network_url => array(
 	// $blog_id => array(
 	// 'post_id' => $post_id,
@@ -418,7 +418,6 @@ function check_connection_map( $post_id ) {
 	/**
 	 * get local connected posts
 	 *
-	 * @since 1.7.5
 	 */
 	$local_connected_posts = get_all_local_post_connections( $gid );
 	if ( ! empty( $local_connected_posts ) ) {
@@ -428,7 +427,6 @@ function check_connection_map( $post_id ) {
 	/**
 	 * get remote connected posts
 	 *
-	 * @since 1.7.5
 	 */
 	$remote_connected_posts = array();
 	foreach ( get_site_connections() as $site_url => $connected_site ) {
@@ -455,7 +453,6 @@ function check_connection_map( $post_id ) {
 			if ( is_numeric( $_blog_id ) ) {
 
 				/**
-				 * @since 1.7.5
 				 */
 				if ( ! isset( $local_connected_posts[ intval( $_blog_id ) ] ) ) {
 					$return[] = sprintf(
@@ -473,7 +470,6 @@ function check_connection_map( $post_id ) {
 				 * this remote connection, even if the connection maybe only went
 				 * down for a short time.
 				 *
-				 * @since 1.7.5
 				 */
 				if ( ! isset( $updated_post_connection_map[ $rem_net_url ] ) ) {
 					$updated_post_connection_map[ $rem_net_url ] = $_post_con;
@@ -487,7 +483,6 @@ function check_connection_map( $post_id ) {
 				 * post is still connected to the root post. If not, we delete the
 				 * connection.
 				 *
-				 * @since 1.7.5
 				 */
 				else {
 					$rem_gid = get_current_blog_id() . '-' . $post_id . '-' . $cur_net_url;
@@ -528,7 +523,6 @@ function check_connection_map( $post_id ) {
  * Get all connected posts of a synced post on this network
  * by using a multisite query.
  *
- * @since 1.7.5
  *
  * @param string $gid
  *
@@ -559,7 +553,6 @@ function get_all_local_post_connections( $gid ) {
  * Get all connected posts of a synced post on this network
  * by using a multisite query.
  *
- * @since 1.7.5
  *
  * @param string $gid
  *
@@ -617,7 +610,6 @@ function get_all_local_linked_posts( $gid ) {
 /**
  * Convert the raw $wpdb result into a post connection array.
  *
- * @since 1.7.5
  *
  * @param Synced_Post needs to have:
  *               $result->ID

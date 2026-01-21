@@ -13,7 +13,6 @@
  * format the review date. Use this class to inspect or modify post
  * reviews in your own logic.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Reviews;
 
@@ -94,7 +93,6 @@ final class Post_Review {
 	/**
 	 * Constructor.
 	 *
-	 * @since 3.5.0
 	 *
 	 * @param Post_Review|object $post_review Post Review object.
 	 */

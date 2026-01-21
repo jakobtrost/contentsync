@@ -30,7 +30,6 @@
  * wraps the class construction in a try/catch block and returns `false` on failure.
  * Together these utilities provide a reliable interface for working with synced posts.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Posts\Sync;
 
@@ -117,7 +116,6 @@ class Synced_Post {
 	/**
 	 * The post's type, like post or page.
 	 *
-	 * @since 1.2.0
 	 * @var string
 	 */
 	public $post_type = 'any';

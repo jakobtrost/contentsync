@@ -362,7 +362,7 @@ class Connected_Posts extends Endpoint {
 			 *         '4-20'
 			 *     On this network we need to keep it this way:
 			 *         '4-20'
-			 *     This happends @since 1.7.5 when a root post is updated.
+			 *     This happends 
 			 *
 			 * (2) The post comes from the request origin network:
 			 *     The meta-value for the gid in the request currently is:
@@ -409,7 +409,6 @@ class Connected_Posts extends Endpoint {
 	 * Allow requests from the same origin.
 	 * This is needed to allow requests from the same network.
 	 *
-	 * @since 1.7.5
 	 *
 	 * @param WP_REST_Request $request
 	 *

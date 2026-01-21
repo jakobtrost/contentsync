@@ -5,7 +5,6 @@
  * Handles all WPML-specific translation operations.
  * Uses database queries to access WPML's custom tables.
  *
- * @since 2.19.0
  */
 
 namespace Contentsync\Translations;
@@ -19,7 +18,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	/**
 	 * Get the tool name identifier.
 	 *
-	 * @since 2.19.0
 	 * @return string
 	 */
 	public function get_tool_name() {
@@ -29,7 +27,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	/**
 	 * Check if WPML plugin is loaded in memory.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if WPML is loaded, false otherwise.
 	 */
 	public function is_plugin_loaded() {
@@ -42,7 +39,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 * Registers standalone functions that provide database-based access
 	 * to WPML translation data when the plugin is not loaded.
 	 *
-	 * @since 2.19.0
 	 * @return bool True on success.
 	 */
 	public function init_environment() {
@@ -65,7 +61,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	/**
 	 * Register standalone WPML functions.
 	 *
-	 * @since 2.19.0
 	 */
 	private function register_standalone_functions() {
 		/**
@@ -77,7 +72,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	/**
 	 * Get language information for a post.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array|null Language info array or null.
 	 */
@@ -117,7 +111,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	/**
 	 * Get all active language codes.
 	 *
-	 * @since 2.19.0
 	 * @return array Language codes.
 	 */
 	public function get_language_codes() {
@@ -158,7 +151,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 * a post's language is not supported on the target site - we assign the
 	 * default language to ensure the post is visible in the admin area.
 	 *
-	 * @since 2.19.0
 	 * @return string Default language code.
 	 */
 	public function get_wpml_default_language() {
@@ -189,7 +181,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	/**
 	 * Get post translations.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array Translation array.
 	 */
@@ -250,7 +241,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	/**
 	 * Set the language for a post.
 	 *
-	 * @since 2.19.0
 	 * @param int    $post_id Post ID.
 	 * @param string $language_code Language code.
 	 * @return bool True on success, false on failure.
@@ -310,7 +300,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	/**
 	 * Set translation relationships for a post during import.
 	 *
-	 * @since 2.19.0
 	 * @param int    $post_id Current post ID.
 	 * @param string $language_code Language code.
 	 * @param array  $original_post_ids Original post IDs from export (lang => id).
@@ -435,7 +424,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 *
 	 * Helper method that works with both native WPML and standalone functions.
 	 *
-	 * @since 2.19.0
 	 * @param int    $element_id   The element ID (post ID for posts).
 	 * @param string $element_type The element type (e.g., 'post_post', 'post_page').
 	 * @return int|null The trid or null if not found.
@@ -459,7 +447,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 *
 	 * Helper method that works with both native WPML and standalone functions.
 	 *
-	 * @since 2.19.0
 	 * @param int $trid The translation group ID.
 	 * @return string|null The source language code or null if not found.
 	 */
@@ -494,7 +481,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 *
 	 * Helper method that works with both native WPML and standalone functions.
 	 *
-	 * @since 2.19.0
 	 * @return int The next available trid.
 	 */
 	private function get_next_trid() {
@@ -519,7 +505,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	/**
 	 * Prepare complete language data for a post.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @param bool                      $include_translations Whether to include translation post IDs.
 	 * @return array Language data structure.
@@ -574,7 +559,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	/**
 	 * Analyze whether a post translation should be imported.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @param array                $already_imported_posts Map of original post IDs to new post IDs.
 	 * @return array Analysis result.
@@ -663,7 +647,6 @@ class Translation_Tool_WPML extends Translation_Tool_Base {
 	 * With standalone functions, we no longer need to switch language context
 	 * as we can directly set the language in the database.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @return mixed null if no language info, false if language not supported, true if switched.
 	 */

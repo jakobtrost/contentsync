@@ -10,8 +10,6 @@
  * cluster‑specific scripts and styles. When extending this class, you
  * can add new UI components for cluster management or customise the
  * existing ones.
- *
- * @since 2.17.0
  */
 namespace Contentsync\Admin;
 
@@ -1441,8 +1439,6 @@ class Cluster_Admin {
 			/**
 			 * Check if polylang is active on the blog, but function pll_get_language_code is not available.
 			 * this happens when the plugin is not active on the main blog, but on a sub-blog.
-			 *
-			 * @since 2.18.0
 			 */
 			$translation_tool = Translation_Manager::get_translation_tool();
 			if ( $translation_tool == 'polylang' && ! function_exists( 'pll_get_language_code' ) ) {

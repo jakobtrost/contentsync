@@ -117,7 +117,6 @@ function update_remote_post_connection( $connection_or_site_url, $gid, $args, $a
 /**
  * Get connected posts to a root post from an entire remote network.
  *
- * @since 1.7.5
  *
  * @param array|string $connection_or_site_url
  * @param string       $gid               Global ID of the root post.
@@ -274,7 +273,6 @@ function send_request( $connection_or_site_url, $rest_base, $body = array(), $me
 	/**
 	 * Handle arguments.
 	 *
-	 * @since 1.7.0
 	 */
 	if ( empty( $args ) ) {
 		$args = array(

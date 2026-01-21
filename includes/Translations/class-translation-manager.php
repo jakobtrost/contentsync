@@ -17,7 +17,6 @@
  * - Translation_Tool_Polylang: Polylang-specific implementation
  * - Translation_Tool_WPML: WPML-specific implementation
  *
- * @since 2.19.0
  */
 
 namespace Contentsync\Translations;
@@ -42,7 +41,6 @@ class Translation_Manager {
 	/**
 	 * Get the active translation tool name.
 	 *
-	 * @since 2.19.0
 	 * @return string|null 'wpml', 'polylang', or null if none detected.
 	 */
 	public static function get_translation_tool() {
@@ -52,7 +50,6 @@ class Translation_Manager {
 	/**
 	 * Check if a translation tool is active.
 	 *
-	 * @since 2.19.0
 	 * @return bool
 	 */
 	public static function is_translation_tool_active() {
@@ -65,7 +62,6 @@ class Translation_Manager {
 	 * This should be called when switching between blogs in a multisite environment
 	 * to ensure the correct translation tool is detected for each blog.
 	 *
-	 * @since 2.19.0
 	 * @return void
 	 */
 	public static function reset_translation_tool() {
@@ -81,7 +77,6 @@ class Translation_Manager {
 	 * This is useful in multisite environments when a translation plugin is
 	 * network-activated but not configured for the current blog.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if hooks were unloaded, false otherwise.
 	 */
 	public static function unload_translation_tool_hooks() {
@@ -94,7 +89,6 @@ class Translation_Manager {
 	 * This should be called after restoring to a blog where the translation
 	 * tool should be active.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if hooks were reloaded, false otherwise.
 	 */
 	public static function reload_translation_tool_hooks() {
@@ -109,7 +103,6 @@ class Translation_Manager {
 	 * plugins might not be loaded or still be loaded while not being active on
 	 * the current blog.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if initialized successfully, false otherwise.
 	 */
 	public static function init_translation_environment() {
@@ -133,7 +126,6 @@ class Translation_Manager {
 	 * - Polylang: ['language_code' => 'en']
 	 * - WPML: ['language_code' => 'en', 'element_id' => 123, 'trid' => 456, 'source_language_code' => null]
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array|null Language info array or null if not found.
 	 */
@@ -150,7 +142,6 @@ class Translation_Manager {
 	/**
 	 * Get all active language codes on the current site.
 	 *
-	 * @since 2.19.0
 	 * @return array Array of language codes (e.g., ['en', 'de', 'fr']).
 	 */
 	public static function get_language_codes() {
@@ -171,7 +162,6 @@ class Translation_Manager {
 	 * Returns an associative array mapping language codes to post IDs.
 	 * Example: ['en' => 123, 'de' => 456, 'fr' => 789]
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|\WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array Associative array of translations (language_code => post_id).
 	 */
@@ -188,7 +178,6 @@ class Translation_Manager {
 	/**
 	 * Set the language for a post.
 	 *
-	 * @since 2.19.0
 	 * @param int    $post_id Post ID.
 	 * @param string $language_code Language code (e.g., 'en', 'de').
 	 * @return bool True on success, false on failure.
@@ -214,7 +203,6 @@ class Translation_Manager {
 	 * - 'language': The language data structure for export
 	 * - 'log_message': Optional log message (or empty string)
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post $post The Prepared_Post instance.
 	 * @param bool          $include_translations Whether to include translation post IDs.
 	 * @return array Array with language data.
@@ -250,7 +238,6 @@ class Translation_Manager {
 	 *
 	 * @see https://developer.wordpress.org/reference/functions/get_locale/
 	 *
-	 * @since 2.19.0
 	 * @return string Language code (e.g., 'en', 'de').
 	 */
 	public static function get_wp_language() {
@@ -312,7 +299,6 @@ class Translation_Manager {
 	 * - 'reuse_imported': Another translation was already imported, reuse it
 	 * - 'import_fallback': No better option exists, import as fallback
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @param array                $already_imported_posts Map of original post IDs to new post IDs.
 	 * @return array Analysis result array.
@@ -335,7 +321,6 @@ class Translation_Manager {
 	 * the best version to import, even though no translation plugin is active on
 	 * the target site.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @param array                $already_imported_posts Map of original post IDs to new post IDs.
 	 * @return array Analysis result.
@@ -427,7 +412,6 @@ class Translation_Manager {
 	 * This method handles the complete process of setting translations during import,
 	 * including validation, tool detection, and delegation to the appropriate tool handler.
 	 *
-	 * @since 2.19.0
 	 * @param int          $post_id The newly imported post ID on this site.
 	 * @param array|object $language_data Language data from the export.
 	 * @param array        $imported_post_map Map of original post IDs to new post IDs.
@@ -470,7 +454,6 @@ class Translation_Manager {
 	 * Attempts to switch the translation plugin's current language context to
 	 * match the post's language. This is useful during import operations.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @return mixed null if no language info, false if language not supported, true if switched.
 	 */
@@ -491,7 +474,6 @@ class Translation_Manager {
 	/**
 	 * Get the active translation tool instance.
 	 *
-	 * @since 2.19.0
 	 * @return Translation_Tool_Base|null
 	 */
 	private static function get_tool_instance() {

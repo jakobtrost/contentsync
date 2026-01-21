@@ -3,7 +3,6 @@
 /**
  * Endpoints for 'distribution'.
  *
- * @since 2.17.0
  *
  * @link {{your-domain}}/wp-json/contentsync/v1/distribution
  *
@@ -449,7 +448,7 @@ class Distribution_Endpoint extends Endpoint {
 			 *         '4-20'
 			 *     On this network we need to keep it this way:
 			 *         '4-20'
-			 *     This happends @since 1.7.5 when a root post is updated.
+			 *     This happends 
 			 *
 			 * (2) The post comes from the request origin network:
 			 *     The meta-value for the gid in the request currently is:

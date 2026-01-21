@@ -169,7 +169,6 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	/**
 	 * Generates the table navigation above or below the table
 	 *
-	 * @since 3.1.0
 	 * @param string $which
 	 */
 	protected function display_tablenav( $which ) {
@@ -587,7 +586,6 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		/**
 		 * Filters the status text of the post.
 		 *
-		 * @since 4.8.0
 		 *
 		 * @param string  $status      The status text.
 		 * @param WP_Post $post        Post object.
@@ -603,8 +601,6 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		/**
 		 * Filters the published, scheduled, or unpublished time of the post.
 		 *
-		 * @since 2.5.1
-		 * @since 5.5.0 Removed the difference between 'excerpt' and 'list' modes.
 		 *              The published time and date are both displayed now,
 		 *              which is equivalent to the previous 'excerpt' mode.
 		 *

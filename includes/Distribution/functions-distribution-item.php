@@ -4,7 +4,6 @@
  *
  * This file contains functions used to interact with the distribution queue and to persist distribution items.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Distribution;
 

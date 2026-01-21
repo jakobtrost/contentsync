@@ -6,7 +6,6 @@
  * This file only gets loaded if Polylang is not loaded in memory but is active on
  * the current site. This happens in multisite contexts after a blog switch.
  *
- * @since 2.19.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

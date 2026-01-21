@@ -10,8 +10,6 @@
  * events occur. It performs pre‑ and post‑update tasks such as saving
  * cluster conditions, updating global metadata and dispatching
  * distribution or review workflows.
- *
- * @since 2.17.0
  */
 
 namespace Contentsync\Admin;
@@ -168,8 +166,6 @@ class Trigger {
 		 *
 		 * We prevent that by identifying the correct scenario and only triggering
 		 * the actions when necessary.
-		 *
-		 * @since 2.18.0
 		 */
 		if ( $this->maybe_ignore_this_post_update_action( $post_id ) ) {
 			return;
@@ -566,8 +562,6 @@ class Trigger {
 	 * @see EnableMediaReplace\Replacer->removeCurrent()
 	 * @link https://github.com/short-pixel-optimizer/enable-media-replace/blob/master/classes/replacer.php
 	 *
-	 * @since 1.0.9
-	 *
 	 * @param string $target_url    New file path.
 	 * @param string $source_url    Old file path.
 	 * @param int    $post_id       The attachment WP_Post ID.
@@ -854,8 +848,6 @@ class Trigger {
 	 * But in order to do so, we need to be sure, that a second action is about to
 	 * fire. Take a look at the comment @see maybe_ignore_this_post_update_action()
 	 * to understand how we achieve and evaluate that.
-	 *
-	 * @since 2.18.0
 	 */
 
 	/**
@@ -863,8 +855,6 @@ class Trigger {
 	 *
 	 * This is intentionally short to allow legitimate rapid updates
 	 * while preventing duplicate processing.
-	 *
-	 * @since 2.18.0
 	 */
 	const TRANSIENT_LIFETIME = 2;
 
@@ -1160,7 +1150,6 @@ class Trigger {
 	 * - error_log( ' --- IGNORED - because it has already been processed ---' );
 	 * - error_log( ' --- VALID ---' );
 	 *
-	 * @since 2.18.0
 	 * @param int $post_id The ID of the post being updated.
 	 * @return bool True if the update should be ignored, false if it should be processed.
 	 */

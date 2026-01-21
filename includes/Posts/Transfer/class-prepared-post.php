@@ -11,7 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class used to implement the Prepared_Post object.
  *
- * @since 2.17.0
  *
  * This class attaches all post meta options, taxonomy terms and
  * other post properties to a customized WP_Post object. It also gets
@@ -28,7 +27,6 @@ class Prepared_Post {
 	/**
 	 * Post ID.
 	 *
-	 * @since 3.5.0
 	 * @var int
 	 */
 	public $ID;
@@ -36,7 +34,6 @@ class Prepared_Post {
 	/**
 	 * The post's slug.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_name = '';
@@ -44,7 +41,6 @@ class Prepared_Post {
 	/**
 	 * The post's title.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_title = '';
@@ -52,7 +48,6 @@ class Prepared_Post {
 	/**
 	 * The post's type, like post or page.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_type = 'post';
@@ -60,7 +55,6 @@ class Prepared_Post {
 	/**
 	 * The post's local publication time.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_date = '0000-00-00 00:00:00';
@@ -68,7 +62,6 @@ class Prepared_Post {
 	/**
 	 * The post's GMT publication time.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_date_gmt = '0000-00-00 00:00:00';
@@ -116,7 +109,7 @@ class Prepared_Post {
 	 *     @property string name           Post name (slug) of the media file (eg. 'my-image.jpg')
 	 *     @property string path           DIR path of the media file (eg. '/htdocs/www/public/wp-content/uploads/sites/9/2025/10/my-image.jpg').
 	 *     @property string url            URL to the media file (eg. 'https://jakobtrost.de/wp-content/uploads/sites/9/2025/10/my-image.jpg').
-	 *     @property string relative_path  Relative path to the wp upload basedir (eg. '/2025/10/my-image.jpg'). @since 2.18.0
+	 *     @property string relative_path  Relative path to the wp upload basedir (eg. '/2025/10/my-image.jpg'). 
 	 */
 	public $media = array();
 
@@ -134,7 +127,6 @@ class Prepared_Post {
 	/**
 	 * The arguments used to export the post.
 	 *
-	 * @since new
 	 *
 	 * This takes precedence over the default arguments, passed to
 	 * the Class __construct() function: @param $export_arguments.
@@ -152,7 +144,6 @@ class Prepared_Post {
 	/**
 	 * Conflict action: What to do if a conflicting post already exists.
 	 *
-	 * @since new
 	 *
 	 * A conflicting post is a post with the same post_name and post_type.
 	 *
@@ -166,7 +157,6 @@ class Prepared_Post {
 	/**
 	 * Import action: What to do with the post on/after import.
 	 *
-	 * @since new
 	 *
 	 * @var string 'insert|draft|trash|delete'
 	 *    @default 'update'  Insert or update the post if it already exists.
@@ -179,7 +169,6 @@ class Prepared_Post {
 	/**
 	 * Post hierarchy: The hierarchy of the post.
 	 *
-	 * @since 2.18.0
 	 *
 	 * @var array
 	 *    @property array $parent      Information about the parent post.
@@ -250,7 +239,7 @@ class Prepared_Post {
 		$this->prepare_media();
 		$this->prepare_language();
 		$this->prepare_menus();
-		$this->prepare_post_hierarchy(); /** @since 2.18.0 */
+		$this->prepare_post_hierarchy();
 	}
 
 	/**
@@ -339,7 +328,6 @@ class Prepared_Post {
 		/**
 		 * advancedFilter
 		 *
-		 * @since 2.8.0
 		 */
 		preg_match_all( '/\"advancedFilter\":(\[.*\])/', $this->post_content, $matches );
 		if ( $matches ) {
@@ -484,7 +472,6 @@ class Prepared_Post {
 		/**
 		 * taxQuery and advancedFilter
 		 *
-		 * @since 2.8.0
 		 */
 		preg_match_all( '/\"taxQuery\":(\{.*?\})/', $this->post_content, $matches );
 		if ( $matches ) {
@@ -723,7 +710,6 @@ class Prepared_Post {
 				/**
 				 * Nest parent terms.
 				 *
-				 * @since 1.2.8
 				 */
 				$ids = array_map(
 					function ( $term ) {
@@ -791,7 +777,6 @@ class Prepared_Post {
 			$file_url  = str_replace( '-scaled.', '.', wp_get_attachment_url( $this->ID ) );
 
 			/**
-			 * @since 2.18.0 Get the relative path to the uploads basedir.
 			 * - default: /2025/10/my-image.jpg
 			 * - option 'uploads_use_yearmonth_folders' set to false: /my-image.jpg
 			 *
@@ -805,8 +790,7 @@ class Prepared_Post {
 				'name'          => $file_name,     // my-image.jpg
 				'url'           => $file_url,      // https://jakobtrost.de/wp-content/uploads/sites/9/2025/10/my-image.jpg
 				'path'          => $file_path,     // /htdocs/www/public/wp-content/uploads/sites/9/2025/10/my-image.jpg
-				/** @since 2.18.0 */
-				'relative_path' => $relative_path, // /2025/10/my-image.jpg
+				// 'relative_path' => $relative_path, // /2025/10/my-image.jpg
 			);
 
 			Logger::add( sprintf( "The file '%s' was added to the post.", $file_name ) );
@@ -816,7 +800,6 @@ class Prepared_Post {
 	/**
 	 * Get all necessary language information.
 	 *
-	 * @since 2.19.0 Refactored to use Translation_Manager::prepare_post_language_data()
 	 */
 	public function prepare_language() {
 
@@ -920,7 +903,6 @@ class Prepared_Post {
 	/**
 	 * Prepare the post hierarchy.
 	 *
-	 * @since 2.18.0
 	 *
 	 * We collect the post hierarchy information in the Prepared_Post object. This contains
 	 * information about the parent post (if any) and all child posts (if any are found).
@@ -994,7 +976,6 @@ class Prepared_Post {
 	/**
 	 * The post's content.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_content = '';
@@ -1002,7 +983,6 @@ class Prepared_Post {
 	/**
 	 * The unique identifier for a post, not necessarily a URL, used as the feed GUID.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $guid = '';
@@ -1012,7 +992,6 @@ class Prepared_Post {
 	 *
 	 * A numeric string, for compatibility reasons.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_author = 0;
@@ -1020,7 +999,6 @@ class Prepared_Post {
 	/**
 	 * The post's excerpt.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_excerpt = '';
@@ -1028,7 +1006,6 @@ class Prepared_Post {
 	/**
 	 * The post's status.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_status = 'publish';
@@ -1036,7 +1013,6 @@ class Prepared_Post {
 	/**
 	 * Whether comments are allowed.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $comment_status = 'open';
@@ -1044,7 +1020,6 @@ class Prepared_Post {
 	/**
 	 * Whether pings are allowed.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $ping_status = 'open';
@@ -1052,7 +1027,6 @@ class Prepared_Post {
 	/**
 	 * The post's password in plain text.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_password = '';
@@ -1060,7 +1034,6 @@ class Prepared_Post {
 	/**
 	 * URLs queued to be pinged.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $to_ping = '';
@@ -1068,7 +1041,6 @@ class Prepared_Post {
 	/**
 	 * URLs that have been pinged.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $pinged = '';
@@ -1076,7 +1048,6 @@ class Prepared_Post {
 	/**
 	 * The post's local modified time.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_modified = '0000-00-00 00:00:00';
@@ -1084,7 +1055,6 @@ class Prepared_Post {
 	/**
 	 * The post's GMT modified time.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_modified_gmt = '0000-00-00 00:00:00';
@@ -1092,7 +1062,6 @@ class Prepared_Post {
 	/**
 	 * A utility DB field for post content.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_content_filtered = '';
@@ -1100,7 +1069,6 @@ class Prepared_Post {
 	/**
 	 * ID of a post's parent post.
 	 *
-	 * @since 3.5.0
 	 * @var int
 	 */
 	public $post_parent = 0;
@@ -1108,7 +1076,6 @@ class Prepared_Post {
 	/**
 	 * A field used for ordering posts.
 	 *
-	 * @since 3.5.0
 	 * @var int
 	 */
 	public $menu_order = 0;
@@ -1116,7 +1083,6 @@ class Prepared_Post {
 	/**
 	 * An attachment's mime type.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $post_mime_type = '';
@@ -1126,7 +1092,6 @@ class Prepared_Post {
 	 *
 	 * A numeric string, for compatibility reasons.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $comment_count = 0;
@@ -1136,7 +1101,6 @@ class Prepared_Post {
 	 *
 	 * Does not correspond to a DB field.
 	 *
-	 * @since 3.5.0
 	 * @var string
 	 */
 	public $filter;

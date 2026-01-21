@@ -169,7 +169,6 @@ class Global_List_Table extends \WP_List_Table {
 		/**
 		 * display message if translation tool is not active on the main site
 		 *
-		 * @since 2.3.0 support wpml and polylang
 		 */
 		if ( is_multisite() && is_network_admin() ) {
 			Multisite_Manager::switch_blog( get_main_site_id() );
@@ -294,7 +293,6 @@ class Global_List_Table extends \WP_List_Table {
 	 * The format is an associative array:
 	 * - `'id' => 'link'`
 	 *
-	 * @since 3.1.0
 	 *
 	 * @return array
 	 */
@@ -390,7 +388,6 @@ class Global_List_Table extends \WP_List_Table {
 	/**
 	 * Generates the table navigation above or below the table
 	 *
-	 * @since 3.1.0
 	 * @param string $which
 	 */
 	protected function display_tablenav( $which ) {
@@ -419,7 +416,6 @@ class Global_List_Table extends \WP_List_Table {
 	/**
 	 * Generates content for a single row of the table.
 	 *
-	 * @since 3.1.0
 	 *
 	 * @param object $post The current item (still a post)
 	 */

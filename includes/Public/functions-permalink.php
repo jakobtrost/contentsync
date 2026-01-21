@@ -29,7 +29,6 @@ function get_global_permalink( $permalink, $post, $leavename = false, $sample = 
 	if ( $synced_post_status !== 'linked' ) {
 
 		/**
-		 * @since 1.7.0 If the post is not linked, we don't need to do anything.
 		 *
 		 * @filter contentsync_get_global_permalink
 		 *

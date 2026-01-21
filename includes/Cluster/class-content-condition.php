@@ -12,7 +12,6 @@
  * properties. Use this class to inspect or manipulate content
  * conditions within your own code.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Cluster;
 
@@ -75,7 +74,6 @@ final class Content_Condition {
 	/**
 	 * The arguments used to export the posts.
 	 *
-	 * @since new
 	 *
 	 * @var array
 	 *    @property bool  append_nested   Append nested posts to the export.
@@ -114,7 +112,6 @@ final class Content_Condition {
 	/**
 	 * Constructor.
 	 *
-	 * @since 3.5.0
 	 *
 	 * @param Content_Condition|object $content_condition Content Condition object.
 	 */

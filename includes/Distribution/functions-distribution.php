@@ -10,7 +10,6 @@
  * scheduling and execution logic in these functions, the plugin ensures that
  * distribution happens reliably even on large multisite installations.
  *
- * @since 2.17.0
  */
 
 namespace Contentsync\Distribution;
@@ -593,7 +592,6 @@ function prepare_posts_for_distribution( $post_ids_or_objects, $export_args = ar
 			/**
 			 * We now manually set the global meta infos.
 			 *
-			 * @since 1.2
 			 *
 			 * This way, newly imported posts are automatically linked to the correct posts.
 			 * If a post already exists on a blog (= the gid exists), it is skipped anyway

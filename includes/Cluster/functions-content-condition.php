@@ -11,7 +11,6 @@
  * underlying database interactions so that other parts of the plugin
  * can work with content conditions more conveniently.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Cluster;
 

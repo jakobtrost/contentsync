@@ -25,7 +25,6 @@
  * options across all posts. You should ensure that the properties you inherit are
  * appropriate for every post to avoid unintended overrides.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Distribution\Destinations;
 

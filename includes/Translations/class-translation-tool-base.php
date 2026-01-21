@@ -5,7 +5,6 @@
  * Abstract base class for translation tool implementations.
  * Provides common utilities and defines the interface that all translation tools must implement.
  *
- * @since 2.19.0
  */
 
 namespace Contentsync\Translations;
@@ -19,7 +18,6 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Get the tool name identifier.
 	 *
-	 * @since 2.19.0
 	 * @return string Tool name (e.g., 'wpml', 'polylang')
 	 */
 	abstract public function get_tool_name();
@@ -30,7 +28,6 @@ abstract class Translation_Tool_Base {
 	 * This checks if the plugin code is loaded, which can be different from
 	 * whether it's active/configured for the current blog in multisite.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if the plugin is loaded, false otherwise.
 	 */
 	abstract public function is_plugin_loaded();
@@ -41,7 +38,6 @@ abstract class Translation_Tool_Base {
 	 * Ensures the translation environment is ready for use. This is especially
 	 * important in multisite contexts after switch_to_blog().
 	 *
-	 * @since 2.19.0
 	 * @return bool True if initialized successfully, false otherwise.
 	 */
 	abstract public function init_environment();
@@ -49,7 +45,6 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Get language information for a post.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array|null Array with language info, or null if not found.
 	 */
@@ -58,7 +53,6 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Get all active language codes.
 	 *
-	 * @since 2.19.0
 	 * @return array Array of language codes (e.g., ['en', 'de', 'fr']).
 	 */
 	abstract public function get_language_codes();
@@ -66,7 +60,6 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Get post translations.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array Associative array (e.g., ['en' => 123, 'de' => 456]).
 	 */
@@ -75,7 +68,6 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Set the language for a post.
 	 *
-	 * @since 2.19.0
 	 * @param int    $post_id Post ID.
 	 * @param string $language_code Language code.
 	 * @return bool True on success, false on failure.
@@ -85,7 +77,6 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Set translation relationships for a post during import.
 	 *
-	 * @since 2.19.0
 	 * @param int    $post_id Current post ID on this site.
 	 * @param string $language_code Language code for this post.
 	 * @param array  $original_post_ids Original post IDs from export (lang => id).
@@ -98,7 +89,6 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Prepare complete language data for a post.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @param bool                      $include_translations Whether to include translation post IDs.
 	 * @return array Language data structure.
@@ -108,7 +98,6 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Analyze whether a post translation should be imported.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @param array                $already_imported_posts Map of original post IDs to new post IDs.
 	 * @return array Analysis result.
@@ -118,7 +107,6 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Switch to a specific language context.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @return mixed null if no language info, false if language not supported, true if switched.
 	 */
@@ -133,7 +121,6 @@ abstract class Translation_Tool_Base {
 	 *
 	 * Accepts either a post ID or post object and ensures we have a valid WP_Post object.
 	 *
-	 * @since 2.19.0
 	 * @param WP_Post|int $post Post object or ID.
 	 * @return WP_Post|null Post object if valid, null otherwise.
 	 */
@@ -154,7 +141,6 @@ abstract class Translation_Tool_Base {
 	 *
 	 * Extracts the 2-character language code from WordPress locale.
 	 *
-	 * @since 2.19.0
 	 * @return string Language code (e.g., 'en', 'de').
 	 */
 	protected function get_wp_default_language() {
@@ -165,7 +151,6 @@ abstract class Translation_Tool_Base {
 	/**
 	 * Check if a language is supported on this site.
 	 *
-	 * @since 2.19.0
 	 * @param string $language_code Language code to check.
 	 * @return bool True if supported, false otherwise.
 	 */
@@ -184,7 +169,6 @@ abstract class Translation_Tool_Base {
 	 * This is optional - tools can override this if they need to handle
 	 * scenarios where the plugin is loaded but not active on the current blog.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if hooks were unloaded, false otherwise.
 	 */
 	public function unload_hooks() {
@@ -197,7 +181,6 @@ abstract class Translation_Tool_Base {
 	 *
 	 * This is optional - tools can override this if they implement unload_hooks().
 	 *
-	 * @since 2.19.0
 	 * @return bool True if hooks were reloaded, false otherwise.
 	 */
 	public function reload_hooks() {

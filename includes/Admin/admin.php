@@ -755,9 +755,6 @@ class Admin {
 				// render status
 				$return .= \Contentsync\Admin\Utils\make_admin_icon_status_box( $status, __( 'Root post', 'contentsync' ) );
 
-				/**
-				 * @since 1.7 'contentsync_export_options' can now be edited.
-				 */
 				if ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status ) ) {
 
 					$options          = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
@@ -783,9 +780,6 @@ class Admin {
 						);
 					}
 
-					/**
-					 * @since 1.8 Add a canonical url
-					 */
 					$contentsync_canonical_url = esc_attr( get_post_meta( $post_id, 'contentsync_canonical_url', true ) );
 					if ( empty( $contentsync_canonical_url ) ) {
 						$contentsync_canonical_url = get_permalink( $post_id );
@@ -1105,16 +1099,12 @@ class Admin {
 
 			/**
 			 * Add bulk action to make posts global
-			 *
-			 * @since 2.6.0 [version has to be edited again]
 			 */
 			add_filter( 'bulk_actions-edit-' . $post_type, array( $this, 'bulk_action_make_global' ) );
 			add_filter( 'handle_bulk_actions-edit-' . $post_type, array( $this, 'handle_bulk_action_make_global' ), 10, 3 );
 
 			/**
 			 * Add custom column to attachment overview
-			 *
-			 * @since 1.2
 			 */
 			if ( $post_type === 'attachment' ) {
 				add_filter( 'manage_media_columns', array( $this, 'add_column' ) );
@@ -1689,8 +1679,6 @@ class Admin {
 
 			/**
 			 * add option to include translations when translation tool is active
-			 *
-			 * @since 2.3.0 support wpml and polylang
 			 */
 			if ( ! empty( Translation_Manager::get_translation_tool() ) ) {
 				$contentsync_export_options['translations'] = array(

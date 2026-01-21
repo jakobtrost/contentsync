@@ -51,7 +51,6 @@ function get_unfiltered_posts( $args ) {
 /**
  * Retrieves the terms of the taxonomy that are attached to the post.
  *
- * @since 1.3.0 (contentsync_suite)
  * Usually we would use the core function get_the_terms(). However it sometimes returns
  * terms of completely different taxonomies - without returning an error. To retrieve the
  * terms directly from the database seems to work more consistent in those cases.

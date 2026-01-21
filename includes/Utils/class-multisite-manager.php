@@ -14,7 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Manages multisite operations including blog switching, origin site URL tracking,
  * and upload directory filtering.
  *
- * @since 2.17.0
  */
 class Multisite_Manager {
 

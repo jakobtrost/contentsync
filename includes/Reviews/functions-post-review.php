@@ -10,7 +10,6 @@
  * them from your templates or controllers to interact with post review
  * data without directly writing SQL.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Reviews;
 

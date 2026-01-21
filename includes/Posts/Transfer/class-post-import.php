@@ -22,7 +22,6 @@ class Post_Import extends Post_Transfer {
 	/**
 	 * Import posts with all its meta, taxonomies, media etc.
 	 *
-	 * @since 2.18.0
 	 *
 	 * @param int[]|object[] $post_ids_or_objects  Array of post IDs or post objects.
 	 * @param array          $arguments            Import arguments.
@@ -211,7 +210,6 @@ class Post_Import extends Post_Transfer {
 			 * including whether to insert, update, set as draft, trash, or delete existing posts.
 			 * It's useful for implementing custom import strategies or business logic.
 			 *
-			 * @since 1.7.0
 			 * @filter contentsync_import_action
 			 *
 			 * @param string $import_action    The import action to be taken. ('insert'|'draft'|'trash'|'delete')
@@ -262,7 +260,6 @@ class Post_Import extends Post_Transfer {
 			 * posts during import. It's useful for implementing custom conflict resolution logic
 			 * or overriding default conflict handling behavior on a per-post basis.
 			 *
-			 * @since new
 			 * @filter contentsync_import_conflict_action
 			 *
 			 * @param string $conflict_action    The conflict action to be taken ('replace'|'skip'|'keep').
@@ -371,7 +368,6 @@ class Post_Import extends Post_Transfer {
 				/**
 				 * Set the new post id for all unsupported translations of this post as well
 				 *
-				 * @since 1.0.9
 				 */
 				if ( isset( $unsupported_translations ) && ! empty( $unsupported_translations ) ) {
 					foreach ( $unsupported_translations as $lang_code ) {
@@ -386,7 +382,6 @@ class Post_Import extends Post_Transfer {
 				/**
 				 * Set the post language after the post was inserted.
 				 *
-				 * @since 2.15.0 In tools like polylang this is essential to setup the
 				 * post correctly and in order for actions and filters to work as expected,
 				 * like setting taxonomy terms.
 				 */
@@ -475,7 +470,6 @@ class Post_Import extends Post_Transfer {
 			}
 
 			/**
-			 * @since 2.18.0 Set post hierarchy.
 			 * This needs to be done before additional actions, as we call 'wp_update_post'
 			 * to update the post-content.
 			 */
@@ -572,7 +566,6 @@ class Post_Import extends Post_Transfer {
 	/**
 	 * Parse import arguments.
 	 *
-	 * @since 2.18.0
 	 *
 	 * @param array $arguments The arguments to parse.
 	 *
@@ -657,7 +650,7 @@ class Post_Import extends Post_Transfer {
 	 *     @property string name           Post name (slug) of the media file.
 	 *     @property string path           DIR path of the media file.
 	 *     @property string url            URL to the media file.
-	 *     @property string relative_path  Relative path to the wp upload basedir. @since 2.18.0
+	 *     @property string relative_path  Relative path to the wp upload basedir. 
 	 *
 	 * @return int|WP_Error              Post-ID on success. WP_Error on failure.
 	 */
@@ -782,7 +775,7 @@ class Post_Import extends Post_Transfer {
 	 *     @property string name           Name of the media file (eg. 'my-image.jpg').
 	 *     @property string path           DIR path of the media file (eg. '/htdocs/www/public/wp-content/uploads/sites/9/2025/10/my-image.jpg').
 	 *     @property string url            URL to the media file (eg. 'https://jakobtrost.de/wp-content/uploads/sites/9/2025/10/my-image.jpg').
-	 *     @property string relative_path  Relative path to the wp upload basedir (eg. '/2025/10/my-image.jpg'). @since 2.18.0
+	 *     @property string relative_path  Relative path to the wp upload basedir (eg. '/2025/10/my-image.jpg'). 
 	 * @param string $new_file             The entire path to the new file (eg. '/other-server/wp-content/uploads/my-image.jpg').
 	 */
 	private function add_attachment_files_to_replace_strings( $media_file_info, $new_file ) {
@@ -794,7 +787,6 @@ class Post_Import extends Post_Transfer {
 		}
 
 		/**
-		 * @since 2.18.0 Use the 'relative_path' of the old file if present.
 		 *
 		 * We need to use this path to replace the relative part of the old url with the new
 		 * relative path of the uploaded file here, as the upload directory and the option
@@ -1128,7 +1120,6 @@ class Post_Import extends Post_Transfer {
 		Logger::add( 'Set taxonomy terms.' );
 
 		/**
-		 * @since 2.10.0
 		 * If the post is a dynamic taxonomy, insert the terms without assigning them to the post.
 		 */
 		if (
@@ -1153,7 +1144,6 @@ class Post_Import extends Post_Transfer {
 				/**
 				 * Skip this taxonomy during import.
 				 *
-				 * @since 2.19.0
 				 * @filter contentsync_import_skip_taxonomy
 				 *
 				 * @param bool $skip            Whether to skip the taxonomy.
@@ -1172,7 +1162,6 @@ class Post_Import extends Post_Transfer {
 				/**
 				 * Filter the terms to be inserted before inserting them.
 				 *
-				 * @since 2.19.0
 				 * @filter contentsync_import_terms_before_insert
 				 *
 				 * @param array $terms          The terms to be inserted.
@@ -1231,7 +1220,6 @@ class Post_Import extends Post_Transfer {
 			/**
 			 * Skip this term during import.
 			 *
-			 * @since 2.19.0
 			 * @filter contentsync_import_skip_term
 			 *
 			 * @param bool $skip         Whether to skip the term.
@@ -1290,7 +1278,6 @@ class Post_Import extends Post_Transfer {
 			/**
 			 * Skip this term during import.
 			 *
-			 * @since 2.19.0
 			 * @filter contentsync_import_skip_term
 			 *
 			 * @param bool $skip         Whether to skip the term.
@@ -1403,7 +1390,6 @@ class Post_Import extends Post_Transfer {
 	/**
 	 * Set the language of a post and link it to it's source post if possible.
 	 *
-	 * @since 2.19.0 Fully refactored to delegate all translation logic to Translation_Manager.
 	 * @param int           $post_id      Post ID on this stage.
 	 * @param Prepared_Post $post         Old Prepared_Post object (Post ID might differ).
 	 *
@@ -1433,7 +1419,6 @@ class Post_Import extends Post_Transfer {
 	/**
 	 * Set the post hierarchy.
 	 *
-	 * @since 2.18.0
 	 *
 	 * During export, we collected data about the previous post hierarchy. This contains
 	 * information about the parent post (if any) and all child posts (if any are found).
@@ -1450,7 +1435,6 @@ class Post_Import extends Post_Transfer {
 		Logger::add( 'Set post hierarchy.' );
 
 		/**
-		 * @since 2.18.0 Post hierarchy information.
 		 * @see Prepared_Post->post_hierarchy property.
 		 *
 		 * @var array $post->post_hierarchy Information about the post hierarchy.

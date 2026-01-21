@@ -2,7 +2,6 @@
 /**
  * Nested content patterns helper functions.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Posts\Transfer;
 
@@ -171,7 +170,6 @@ function get_nested_string_patterns( $subject, $post_id ) {
 	$upload_url_enc = urlencode( $upload_url );
 
 	/**
-	 * @since 2.18.0
 	 * If either upload url or site url does not have 'https://' protocol, but the other
 	 * does, add the protocol to the one that does not have it.
 	 */
@@ -243,7 +241,6 @@ function get_nested_term_patterns( $post_id, $post ) {
 			/**
 			 * The taxQuery regex did not work.
 			 *
-			 * @since 2.8.0 taxQuery terms are processed in Post_Export::prepare_nested_terms()
 			 */
 			// 'taxQuery' => array(
 			// 'search'    => array( '\"taxQuery\":\{([^\}]+)(\[|,)', '(\]|,)' ),

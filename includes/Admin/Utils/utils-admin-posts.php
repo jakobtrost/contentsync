@@ -87,8 +87,6 @@ function get_delete_post_link( $post = 0, $deprecated = '', $force_delete = fals
 	/**
 	 * Filters the post delete link.
 	 *
-	 * @since 2.9.0
-	 *
 	 * @param string $link         The delete link.
 	 * @param int    $post_id      Post ID.
 	 * @param bool   $force_delete Whether to bypass the Trash and force deletion. Default false.
@@ -196,8 +194,6 @@ function get_permanent_delete_post_link( $post = 0 ) {
 
 	/**
 	 * Filters the post permanent delete link.
-	 *
-	 * @since 3.0.0
 	 *
 	 * @param string $link    The delete link.
 	 * @param int    $post_id Post ID.

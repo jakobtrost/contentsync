@@ -10,7 +10,6 @@
  * intended to be used from templates or other procedural code without
  * needing to instantiate classes directly.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Cluster;
 

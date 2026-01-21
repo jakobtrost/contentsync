@@ -493,7 +493,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
  * Repair possible errors
  *
  * @param int  $post_id
- * @param int  $blog_id          Optional. @since global Hub
+ * @param int  $blog_id          Optional.
  * @param bool $return_error    Whether to return the error object.
  *
  * @return bool|object          True|False or Error-object.

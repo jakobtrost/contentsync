@@ -5,7 +5,6 @@
  * Handles all Polylang-specific translation operations.
  * Uses database-based access via taxonomies to avoid loading the plugin in multisite contexts.
  *
- * @since 2.19.0
  */
 
 namespace Contentsync\Translations;
@@ -26,7 +25,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Get the tool name identifier.
 	 *
-	 * @since 2.19.0
 	 * @return string
 	 */
 	public function get_tool_name() {
@@ -39,7 +37,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 * Registers the language taxonomy and standalone dummy functions that
 	 * provide database-based access to translation data.
 	 *
-	 * @since 2.19.0
 	 * @return bool True on success, false on failure.
 	 */
 	public function init_environment() {
@@ -64,7 +61,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Get language information for a post.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array|null Language info array or null.
 	 */
@@ -91,7 +87,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Get all active language codes.
 	 *
-	 * @since 2.19.0
 	 * @return array Language codes.
 	 */
 	public function get_language_codes() {
@@ -110,7 +105,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Get post translations.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @return array Translation array.
 	 */
@@ -133,7 +127,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 * a post's language is not supported on the target site - we assign the
 	 * default language to ensure the post is visible in the admin area.
 	 *
-	 * @since 2.19.0
 	 * @return string Default language code.
 	 */
 	public function get_polylang_default_language() {
@@ -164,7 +157,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Set the language for a post.
 	 *
-	 * @since 2.19.0
 	 * @param int    $post_id Post ID.
 	 * @param string $language_code Language code.
 	 * @return bool True on success, false on failure.
@@ -199,7 +191,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Set translation relationships for a post during import.
 	 *
-	 * @since 2.19.0
 	 * @param int    $post_id Current post ID.
 	 * @param string $language_code Language code.
 	 * @param array  $original_post_ids Original post IDs from export (lang => id).
@@ -270,7 +261,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Prepare complete language data for a post.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|WP_Post|int $post Prepared_Post object, WP_Post object, or post ID.
 	 * @param bool                      $include_translations Whether to include translation post IDs.
 	 * @return array Language data structure.
@@ -325,7 +315,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Analyze whether a post translation should be imported.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @param array                $already_imported_posts Map of original post IDs to new post IDs.
 	 * @return array Analysis result.
@@ -410,7 +399,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Switch to a specific language context.
 	 *
-	 * @since 2.19.0
 	 * @param Prepared_Post|object $post Prepared_Post object with language property.
 	 * @return mixed null if no language info, false if language not supported, true if switched.
 	 */
@@ -427,7 +415,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Register Polylang language taxonomies.
 	 *
-	 * @since 2.19.0
 	 */
 	private function register_taxonomies() {
 		// Get Polylang options from database
@@ -453,7 +440,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Register standalone Polylang functions.
 	 *
-	 * @since 2.19.0
 	 */
 	private function register_standalone_functions() {
 		/**
@@ -472,7 +458,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 * This checks if the Polylang plugin code is loaded, which can be different
 	 * from whether it's active/configured for the current blog in multisite.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if Polylang is loaded, false otherwise.
 	 */
 	public function is_plugin_loaded() {
@@ -488,7 +473,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 * Also adds a filter to clean up Polylang taxonomies that might still be
 	 * registered after a blog switch.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if hooks were removed, false if nothing was done.
 	 */
 	public function unload_hooks() {
@@ -580,7 +564,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 *
 	 * Also removes the taxonomy cleanup filter.
 	 *
-	 * @since 2.19.0
 	 * @return bool True if hooks were restored, false if nothing was done.
 	 */
 	public function reload_hooks() {
@@ -613,7 +596,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	/**
 	 * Helper method to remove a hook if it exists and store it for later restoration.
 	 *
-	 * @since 2.19.0
 	 * @param string   $hook Hook name.
 	 * @param callable $callback Callback function.
 	 * @param int      $args Number of arguments.
@@ -647,7 +629,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 	 *
 	 * This method is used as a filter callback when Polylang is loaded but not active.
 	 *
-	 * @since 2.19.0
 	 * @param array $taxonomies The taxonomies to be prepared.
 	 * @return array The filtered taxonomies.
 	 */
@@ -664,7 +645,6 @@ class Translation_Tool_Polylang extends Translation_Tool_Base {
 /**
  * Skip Polylang taxonomies during import.
  *
- * @since 2.19.0
  * @filter contentsync_import_skip_taxonomy
  *
  * @param bool          $skip            Whether to skip the taxonomy.
@@ -691,7 +671,6 @@ add_filter( 'contentsync_import_skip_taxonomy', __NAMESPACE__ . '\skip_post_tran
 /**
  * Skip language terms before inserting them during import.
  *
- * @since 2.19.0
  * @filter contentsync_import_terms_before_insert
  *
  * @param array         $terms          The terms to be inserted.

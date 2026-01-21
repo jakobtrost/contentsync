@@ -32,7 +32,6 @@ add_action( 'wp_head', __NAMESPACE__ . '\maybe_mark_as_duplicate', 1 );
  * we filter the post permalink and the canonical url to use the
  * canonical url as permalink.
  *
- * @since 1.7.6
  */
 if ( defined( 'USE_CANONICAL_URL_AS_PERMALINK' ) && constant( 'USE_CANONICAL_URL_AS_PERMALINK' ) ) {
 	// filter post permalink
@@ -77,7 +76,6 @@ function filter_canonical_url( $permalink, $post ) {
 /**
  * Filter the canonical URL for Yoast SEO.
  *
- * @since 1.7.0
  *
  * @param string $permalink The canonical URL from Yoast SEO.
  * @return string The filtered canonical URL.

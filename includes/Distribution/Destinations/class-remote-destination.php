@@ -31,7 +31,6 @@
  * a network. Always verify that the inherited properties are appropriate for all
  * posts to avoid unexpected results.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Distribution\Destinations;
 

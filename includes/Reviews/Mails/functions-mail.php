@@ -12,7 +12,6 @@
  * can customise the mail recipients. Extend the included mail templates
  * to add new notification types or modify the email content.
  *
- * @since 2.17.0
  */
 
 namespace Contentsync\Reviews\Mails;

@@ -34,7 +34,6 @@
  * code path is currently unused. These methods abstract the persistence logic and let
  * higher-level code focus on distribution workflows.
  *
- * @since 2.17.0
  */
 namespace Contentsync\Distribution;
 
