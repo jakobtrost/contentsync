@@ -8,6 +8,7 @@
 
 namespace Contentsync\Admin\Pages\List_Tables;
 
+use Contentsync\Distribution\Site_Connection;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -266,7 +267,7 @@ class Queue_List_Table extends \WP_List_Table {
 			$title           = get_blog_option( $item->destination->ID, 'blogname' );
 			$destination_url = get_blog_option( $item->destination->ID, 'siteurl' );
 		} elseif ( is_a( $item->destination, 'Contentsync\Distribution\Destinations\Remote_Destination' ) ) {
-			$connection = \Contentsync\Posts\Sync\get_site_connection( $item->destination->ID );
+			$connection = Site_Connection::get( $item->destination->ID );
 			if ( $connection ) {
 				$title           = $connection['site_name'];
 				$destination_url = $connection['site_url'];

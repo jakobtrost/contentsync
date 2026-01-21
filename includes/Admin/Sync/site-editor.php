@@ -16,6 +16,7 @@
 namespace Contentsync\Admin;
 
 use Contentsync\Posts\Post_Query;
+use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Theme_Assets;
 
 defined( 'ABSPATH' ) || exit;
@@ -116,7 +117,7 @@ class Site_Editor {
 			$post_id        = self::get_numeric_post_id( $postReference );
 			$status         = get_post_meta( $post_id, 'synced_post_status', true );
 			$gid            = get_post_meta( $post_id, 'synced_post_id', true );
-			$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
+			$connection_map = Post_Connection_Map::get( $post_id );
 
 			// Get Contentsync options and canonical URL
 			$contentsync_export_options = get_post_meta( $post_id, 'contentsync_export_options', true );
@@ -189,7 +190,7 @@ class Site_Editor {
 					) : array() ),
 					// linked posts
 					( $status === 'linked' ? array(
-						'links'     => \Contentsync\Posts\Sync\get_post_links_by_gid( $gid ),
+						'links'     => Post_Connection_Map::get_links_by_gid( $gid ),
 						'canonical' => esc_attr( get_post_meta( $post_id, 'contentsync_canonical_url', true ) ),
 						'error'     => get_post_error( $post_id ),
 					) : array() ),

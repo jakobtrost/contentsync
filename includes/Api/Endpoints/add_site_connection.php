@@ -7,6 +7,7 @@
 namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
+use Contentsync\Distribution\Site_Connection;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
@@ -60,7 +61,7 @@ class Add_Connection extends Endpoint {
 		}
 
 		// If the connection to the current site doesn't exist, create it.
-		$result = \Contentsync\Posts\Sync\add_site_connection( $new_connection );
+		$result = Site_Connection::add( $new_connection );
 
 		if ( $result === null ) {
 			return new \WP_Error( 'connection_not_added', 'Connection already exists', array( 'status' => 400 ) );

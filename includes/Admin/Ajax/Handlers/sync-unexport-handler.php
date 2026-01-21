@@ -10,6 +10,8 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Sync\Synced_Post_Service;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -37,7 +39,7 @@ class Sync_Unexport_Handler extends Contentsync_Ajax_Handler {
 			return;
 		}
 
-		$result = \Contentsync\Posts\Sync\unlink_synced_root_post( $gid );
+		$result = Synced_Post_Service::unlink_root_post( $gid );
 
 		if ( ! $result ) {
 			$this->send_fail( __( 'exported post could not be unlinked globally...', 'contentsync' ) );

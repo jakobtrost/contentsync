@@ -239,7 +239,7 @@ class Synced_Post {
 	public function get_meta() {
 
 		// get default meta
-		$meta = get_contentsync_meta_default_values();
+		$meta = Post_Meta::get_default_values();
 
 		// if the post meta does already exist we make sure that all contentsync_meta infos are set
 		if ( ! empty( $this->meta ) ) {
@@ -321,13 +321,13 @@ class Synced_Post {
 			// contentsync_connection_map (add connection only for current site)
 			if ( isset( $gid ) && empty( $this->meta['contentsync_connection_map'] ) ) {
 
-				$imported_post = get_local_post_by_gid( $gid );
+				$imported_post = Synced_Post_Query::get_local_post_by_gid( $gid );
 				if ( $imported_post && isset( $imported_post->ID ) ) {
 					$blog_id                            = get_current_blog_id();
 					$net_url                            = Urls::get_network_url();
 					$meta['contentsync_connection_map'] = array(
 						$net_url => array(
-							$blog_id => get_post_connection_map( $blog_id, $imported_post->ID ),
+							$blog_id => Post_Connection_Map::get( $imported_post->ID ),
 						),
 					);
 				}

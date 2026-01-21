@@ -3,6 +3,7 @@
 namespace Contentsync\Posts\Transfer;
 
 use WP_Error;
+use Contentsync\Posts\Sync\Post_Meta_Hooks;
 use Contentsync\Utils\Files;
 use Contentsync\Utils\Logger;
 use Contentsync\Translations\Translation_Manager;
@@ -1055,11 +1056,11 @@ class Post_Import extends Post_Transfer_Base {
 		foreach ( (array) $meta as $meta_key => $meta_values ) {
 
 			// don't import blacklisted meta
-			if ( in_array( $meta_key, \Contentsync\Posts\Sync\get_blacklisted_meta_for_export( 'import', $post_id ), true ) ) {
+			if ( in_array( $meta_key, Post_Meta_Hooks::get_blacklisted_meta_for_export( 'import', $post_id ), true ) ) {
 				continue;
 			}
 			// skip certain meta keys
-			elseif ( \Contentsync\Posts\Sync\maybe_skip_meta_option( $meta_key, $meta_values, 'import', $post_id ) ) {
+			elseif ( Post_Meta_Hooks::maybe_skip_meta_option( $meta_key, $meta_values, 'import', $post_id ) ) {
 				continue;
 			}
 

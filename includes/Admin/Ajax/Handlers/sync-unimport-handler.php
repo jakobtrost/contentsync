@@ -10,6 +10,8 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Sync\Synced_Post_Service;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -37,7 +39,7 @@ class Sync_Unimport_Handler extends Contentsync_Ajax_Handler {
 			return;
 		}
 
-		$result = \Contentsync\Posts\Sync\unlink_synced_post( $post_id );
+		$result = Synced_Post_Service::unlink_synced_post( $post_id );
 
 		if ( ! $result ) {
 			$this->send_fail( __( 'post could not be made static...', 'contentsync' ) );

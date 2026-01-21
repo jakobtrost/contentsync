@@ -2,6 +2,7 @@
 
 namespace Contentsync\Admin\Sync;
 
+use Contentsync\Posts\Sync\Post_Meta;
 use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
@@ -22,7 +23,7 @@ function update_contentsync_post_export_options( $post_id, $new_values ) {
 
 	Logger::add( 'Update "contentsync_export_options".' );
 
-	$old_values = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
+	$old_values = Post_Meta::get_values( $post_id, 'contentsync_export_options' );
 	if ( $old_values == $new_values ) {
 		return false;
 	}

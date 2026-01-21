@@ -15,6 +15,9 @@
 namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
+use Contentsync\Posts\Sync\Post_Connection_Map;
+use Contentsync\Posts\Sync\Synced_Post_Query;
+use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 
@@ -119,16 +122,16 @@ class Posts extends Endpoint {
 		$post    = false;
 		$message = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $request['gid'] );
+		list( $blog_id, $post_id, $net_url ) = Synced_Post_Utils::explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
 
 			$gid  = $blog_id . '-' . $post_id;
-			$post = \Contentsync\Posts\Sync\get_synced_post( $gid );
+			$post = Synced_Post_Query::get_synced_post( $gid );
 
 			if ( $post ) {
 				$message = "Synced post '$gid' found on this site ($net_url).";
 				// append urls
-				$post->post_links = \Contentsync\Posts\Sync\get_local_post_links( $blog_id, $post_id );
+				$post->post_links = Post_Connection_Map::get_local_post_links( $blog_id, $post_id );
 			} else {
 				$message = "Synced post '$gid' could not be found [$net_url]";
 			}
@@ -152,14 +155,14 @@ class Posts extends Endpoint {
 		$post    = false;
 		$message = "The global ID was set incorrectly (input: {$request['gid']}).";
 
-		list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $request['gid'] );
+		list( $blog_id, $post_id, $net_url ) = Synced_Post_Utils::explode_gid( $request['gid'] );
 		if ( $post_id !== null ) {
 
 			// add filter to modify gid before export
 			add_filter( 'contentsync_export_post_meta-synced_post_id', array( $this, 'maybe_append_network_url_to_gid_on_export' ), 10, 2 );
 
 			$gid  = $blog_id . '-' . $post_id;
-			$post = \Contentsync\Posts\Sync\prepare_synced_post_for_import( $gid );
+			$post = Synced_Post_Query::prepare_synced_post_for_import( $gid );
 
 			// remove filter
 			remove_filter( 'contentsync_export_post_meta-synced_post_id', array( $this, 'maybe_append_network_url_to_gid_on_export' ) );
@@ -185,7 +188,7 @@ class Posts extends Endpoint {
 	 */
 	public function maybe_append_network_url_to_gid_on_export( $gid, $post_id ) {
 
-		list( $_blog_id, $_post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
+		list( $_blog_id, $_post_id, $net_url ) = Synced_Post_Utils::explode_gid( $gid );
 		if ( $post_id === null || ! empty( $net_url ) ) {
 			return $gid;
 		}

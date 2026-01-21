@@ -9,20 +9,23 @@
  * distribute single posts or batches of posts. By centralising the
  * scheduling and execution logic in these functions, the plugin ensures that
  * distribution happens reliably even on large multisite installations.
- *
  */
 
 namespace Contentsync\Distribution;
 
 use WP_Error;
-use Contentsync\Utils\Logger;
-use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Cluster\Cluster;
 use Contentsync\Cluster\Content_Condition;
-use Contentsync\Utils\Multisite_Manager;
-use Contentsync\Distribution\Destinations\Remote_Destination
 use Contentsync\Distribution\Destinations\Blog_Destination;
+use Contentsync\Distribution\Destinations\Remote_Destination;
+use Contentsync\Posts\Sync\Post_Connection_Map;
+use Contentsync\Posts\Sync\Post_Meta;
+use Contentsync\Posts\Sync\Synced_Post_Service;
+use Contentsync\Posts\Sync\Synced_Post_Query;
+use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Import;
+use Contentsync\Utils\Logger;
+use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 
 require_once CONTENTSYNC_PLUGIN_PATH . '/libs/action-scheduler/action-scheduler.php';
@@ -56,7 +59,7 @@ function distribute_single_post( $root_post, $destination_ids_or_arrays = array(
 	}
 
 	// Check if post is a root post.
-	$root_post_status = \Contentsync\Posts\Sync\get_contentsync_meta_values( $root_post, 'synced_post_status' );
+	$root_post_status = Post_Meta::get_values( $root_post, 'synced_post_status' );
 	if ( $root_post_status !== 'root' ) {
 		return new WP_Error( 'post_not_root', __( 'Post is not a root post.', 'global-contents' ) );
 	}
@@ -71,7 +74,7 @@ function distribute_single_post( $root_post, $destination_ids_or_arrays = array(
 	// Prepare posts for distribution.
 	$prepared_posts = prepare_posts_for_distribution(
 		$post_ids,
-		! empty( $export_args ) ? $export_args : \Contentsync\Posts\Sync\get_contentsync_meta_values( $root_post, 'contentsync_export_options' ),
+		! empty( $export_args ) ? $export_args : Post_Meta::get_values( $root_post, 'contentsync_export_options' ),
 		$root_post_id
 	);
 
@@ -462,7 +465,7 @@ function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 	}
 
 	if ( $root_post_id ) {
-		$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $root_post_id );
+		$connection_map = Post_Connection_Map::get( $root_post_id );
 
 		// Logger::add( 'root post connection_map', $connection_map );
 		// Logger::add( 'destinations so far:', $destinations );
@@ -588,11 +591,10 @@ function prepare_posts_for_distribution( $post_ids_or_objects, $export_args = ar
 		 * export of the root post yet. So we need to make it a synced post.
 		 */
 		if ( empty( $gid ) ) {
-			$gid = \Contentsync\Posts\Sync\make_post_synced( $post_id, $export_args );
+			$gid = Synced_Post_Service::make_root_post( $post_id, $export_args );
 
 			/**
 			 * We now manually set the global meta infos.
-			 *
 			 *
 			 * This way, newly imported posts are automatically linked to the correct posts.
 			 * If a post already exists on a blog (= the gid exists), it is skipped anyway
@@ -1025,7 +1027,7 @@ function delete_posts_from_blog( &$item ) {
 		// Logger::add( 'Deleting post with gid: ' . $gid );
 		if ( $gid ) {
 			$posttype   = $prepared_post->post_type;
-			$local_post = \Contentsync\Posts\Sync\get_local_post_by_gid( $gid, $posttype );
+			$local_post = Synced_Post_Query::get_local_post_by_gid( $gid, $posttype );
 			if ( $local_post ) {
 				// Logger::add( 'Deleting local post with id: ' . $local_post->ID );
 				$result = wp_delete_post( $local_post->ID, true );

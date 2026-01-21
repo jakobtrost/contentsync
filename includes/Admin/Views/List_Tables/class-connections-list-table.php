@@ -7,6 +7,7 @@
  */
 namespace Contentsync\Admin\Pages\List_Tables;
 
+use Contentsync\Distribution\Site_Connection;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
@@ -56,7 +57,7 @@ class Connections_List_Table extends \WP_List_Table {
 		);
 
 		// set items
-		$this->items = \Contentsync\Posts\Sync\get_site_connections();
+		$this->items = Site_Connection::get_all();
 		// debug($this->items);
 	}
 
@@ -224,7 +225,7 @@ class Connections_List_Table extends \WP_List_Table {
 		// delete GET request
 		if ( isset( $_GET['delete'] ) ) {
 			$delete_site_url = urldecode( $_GET['delete'] );
-			$deleted         = \Contentsync\Posts\Sync\delete_site_connection( $delete_site_url );
+			$deleted         = Site_Connection::delete( $delete_site_url );
 			// successfull
 			if ( $deleted ) {
 				\Contentsync\Admin\Utils\render_admin_notice(

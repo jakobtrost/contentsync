@@ -435,7 +435,7 @@ class Distribution_Endpoint extends Endpoint {
 		$origin  = $this->origin;
 		$current = Urls::get_network_url();
 
-		list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
+		list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\Synced_Post_Utils::explode_gid( $gid );
 
 		if ( ! empty( $post_id ) && ! empty( $origin ) ) {
 

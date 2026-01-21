@@ -14,6 +14,7 @@
 
 namespace Contentsync\Api;
 
+use Contentsync\Distribution\Site_Connection;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Urls;
 
@@ -116,7 +117,6 @@ function update_remote_post_connection( $connection_or_site_url, $gid, $args, $a
 /**
  * Get connected posts to a root post from an entire remote network.
  *
- *
  * @param array|string $connection_or_site_url
  * @param string       $gid               Global ID of the root post.
  *
@@ -136,7 +136,7 @@ function get_all_remote_connected_posts( $connection_or_site_url, $gid ) {
 /**
  * Delete all connected posts of a synced post from a certain connection
  *
- * @see \Contentsync\Posts\Sync\delete_synced_post()
+ * @see \Contentsync\Posts\Sync\delete_root_post_and_connected_posts()
  *
  * @param array|string $connection_or_site_url
  * @param string       $gid               Global ID of the root post with an appended network_url.
@@ -235,7 +235,7 @@ function send_request( $connection_or_site_url, $rest_base, $body = array(), $me
 	if ( is_array( $connection_or_site_url ) ) {
 		$connection = $connection_or_site_url;
 	} else {
-		$connection = \Contentsync\Posts\Sync\get_site_connection( $connection_or_site_url );
+		$connection = Site_Connection::get( $connection_or_site_url );
 	}
 
 	// set user auth
@@ -271,7 +271,6 @@ function send_request( $connection_or_site_url, $rest_base, $body = array(), $me
 
 	/**
 	 * Handle arguments.
-	 *
 	 */
 	if ( empty( $args ) ) {
 		$args = array(

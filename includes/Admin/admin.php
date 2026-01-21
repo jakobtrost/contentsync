@@ -14,6 +14,10 @@
 
 namespace Contentsync\Admin;
 
+use Contentsync\Posts\Sync\Post_Connection_Map;
+use Contentsync\Posts\Sync\Post_Meta;
+use Contentsync\Posts\Sync\Synced_Post_Service;
+use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Translations\Translation_Manager;
@@ -316,7 +320,7 @@ class Admin {
 
 			if ( $status === 'linked' ) {
 
-				$post_links = \Contentsync\Posts\Sync\get_post_links_by_gid( $gid );
+				$post_links = Post_Connection_Map::get_links_by_gid( $gid );
 
 				$text = sprintf(
 					__( 'This post is synced from the site %s', 'contentsync' ),
@@ -339,7 +343,7 @@ class Admin {
 				}
 			} elseif ( $status === 'root' ) {
 
-				$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
+				$connection_map = Post_Connection_Map::get( $post_id );
 
 				/**
 				 * Review Status
@@ -713,7 +717,7 @@ class Admin {
 		// synced post
 		else {
 
-			list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
+			list( $root_blog_id, $root_post_id, $root_net_url ) = Synced_Post_Utils::explode_gid( $gid );
 
 			// check for error
 			if ( self::$error === null ) {
@@ -749,7 +753,7 @@ class Admin {
 			 */
 			elseif ( $status === 'root' ) {
 
-				$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
+				$connection_map = Post_Connection_Map::get( $post_id );
 				// debug( $connection_map, true );
 
 				// render status
@@ -757,7 +761,7 @@ class Admin {
 
 				if ( \Contentsync\Admin\Sync\current_user_can_edit_synced_posts( $status ) ) {
 
-					$options          = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
+					$options          = Post_Meta::get_values( $post_id, 'contentsync_export_options' );
 					$editable_options = self::get_contentsync_export_options_for_post( $post_id );
 					// debug( $options );
 
@@ -935,13 +939,13 @@ class Admin {
 			 */
 			elseif ( $status === 'linked' ) {
 
-				$post_links = \Contentsync\Posts\Sync\get_post_links_by_gid( $gid );
+				$post_links = Post_Connection_Map::get_links_by_gid( $gid );
 
 				// status
 				$return .= \Contentsync\Admin\Utils\make_admin_icon_status_box( $status, __( 'Linked post', 'contentsync' ) );
 
 				// options
-				$options = \Contentsync\Posts\Sync\get_contentsync_meta_values( $post_id, 'contentsync_export_options' );
+				$options = Post_Meta::get_values( $post_id, 'contentsync_export_options' );
 				if ( $options['whole_posttype'] && get_post_type( $post_id ) === 'tp_posttypes' ) {
 					$return .= \Contentsync\Admin\Utils\make_admin_info_box(
 						array(
@@ -1197,9 +1201,9 @@ class Admin {
 			return $redirect_to;
 		}
 
-		$export_args = \Contentsync\Posts\Sync\get_contentsync_default_export_options();
+		$export_args = Post_Meta::get_default_export_options();
 		foreach ( $post_ids as $post_id ) {
-			$gid = \Contentsync\Posts\Sync\make_post_synced( $post_id, $export_args );
+			$gid = Synced_Post_Service::make_root_post( $post_id, $export_args );
 
 		}
 
@@ -1266,7 +1270,7 @@ class Admin {
 		/**
 		 * Get connected posts
 		 */
-		$connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
+		$connection_map = Post_Connection_Map::get( $post_id );
 		$post_list      = '';
 
 		if ( is_array( $connection_map ) && count( $connection_map ) > 0 ) {

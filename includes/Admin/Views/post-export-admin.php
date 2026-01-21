@@ -4,6 +4,7 @@
  */
 namespace Contentsync\Admin\Pages;
 
+use Contentsync\Posts\Sync\Synced_Post_Query;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Translations\Translation_Manager;
@@ -349,7 +350,7 @@ class Post_Export_Admin {
 			}
 			echo "<hr>\r\n\r\n=== R E S P O N S E ===\r\n\r\n";
 		} else {
-			$posts = \Contentsync\Posts\Sync\prepare_synced_post_for_import( strval( $_GET['contentsync_export_debug'] ) );
+			$posts = Synced_Post_Query::prepare_synced_post_for_import( strval( $_GET['contentsync_export_debug'] ) );
 			debug( $posts );
 		}
 

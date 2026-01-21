@@ -13,6 +13,8 @@
  */
 namespace Contentsync\Admin;
 
+use Contentsync\Posts\Sync\Synced_Post_Service;
+use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Cluster\Cluster;
@@ -1147,9 +1149,9 @@ class Cluster_Admin {
 					Multisite_Manager::switch_blog( $blog_id );
 					foreach ( $posts as $post ) {
 						// make post static
-						$gid = \Contentsync\Posts\Sync\get_gid( $post->ID );
+						$gid = Synced_Post_Utils::get_gid( $post->ID );
 						if ( $gid ) {
-							$result = \Contentsync\Posts\Sync\unlink_synced_root_post( $gid );
+							$result = Synced_Post_Service::unlink_root_post( $gid );
 						}
 					}
 					Multisite_Manager::restore_blog();

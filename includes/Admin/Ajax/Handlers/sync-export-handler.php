@@ -10,6 +10,9 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Sync\Post_Meta;
+use Contentsync\Posts\Sync\Synced_Post_Service;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -37,16 +40,16 @@ class Sync_Export_Handler extends Contentsync_Ajax_Handler {
 			return;
 		}
 
-		$args      = \Contentsync\Posts\Sync\get_contentsync_default_export_options();
+		$args      = Post_Meta::get_default_export_options();
 		$form_data = isset( $data['form_data'] ) ? (array) $data['form_data'] : array();
-		
+
 		foreach ( $args as $k => $v ) {
 			if ( isset( $form_data[ $k ] ) ) {
 				$args[ $k ] = true;
 			}
 		}
 
-		$gid = \Contentsync\Posts\Sync\make_post_synced( $post_id, $args );
+		$gid = Synced_Post_Service::make_root_post( $post_id, $args );
 
 		if ( ! $gid ) {
 			$this->send_fail( __( 'post could not be exported globally...', 'contentsync' ) );

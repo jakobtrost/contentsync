@@ -10,6 +10,8 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Sync\Post_Connection_Map;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -37,7 +39,7 @@ class Sync_Check_Connections_Handler extends Contentsync_Ajax_Handler {
 			return;
 		}
 
-		$result = \Contentsync\Posts\Sync\check_connection_map( $post_id );
+		$result = Post_Connection_Map::check( $post_id );
 
 		if ( ! $result ) {
 			$this->send_fail( __( 'some corrupted connections were detected and fixed.', 'contentsync' ) );

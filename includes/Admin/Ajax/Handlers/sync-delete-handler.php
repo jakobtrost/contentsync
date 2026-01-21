@@ -10,6 +10,8 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Sync\Synced_Post_Service;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -37,7 +39,7 @@ class Sync_Delete_Handler extends Contentsync_Ajax_Handler {
 			return;
 		}
 
-		$result = \Contentsync\Posts\Sync\delete_synced_post( $gid );
+		$result = Synced_Post_Service::delete_root_post_and_connected_posts( $gid );
 
 		if ( ! $result ) {
 			$this->send_fail( __( 'post could not be deleted...', 'contentsync' ) );

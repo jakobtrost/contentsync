@@ -10,6 +10,9 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Sync\Synced_Post_Service;
+use Contentsync\Posts\Sync\Synced_Post_Query;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -39,7 +42,7 @@ class Sync_Overwrite_Handler extends Contentsync_Ajax_Handler {
 		}
 
 		$current_posts = array();
-		$synced_post   = \Contentsync\Posts\Sync\get_synced_post( $gid );
+		$synced_post   = Synced_Post_Query::get_synced_post( $gid );
 		
 		if ( $synced_post ) {
 			$current_posts[ $synced_post->ID ] = array(
@@ -48,7 +51,7 @@ class Sync_Overwrite_Handler extends Contentsync_Ajax_Handler {
 			);
 		}
 
-		$result = \Contentsync\Posts\Sync\import_synced_post( $gid, $current_posts );
+		$result = Synced_Post_Service::import_synced_post( $gid, $current_posts );
 
 		if ( ! $result ) {
 			$this->send_fail( __( 'post could not be overwritten...', 'contentsync' ) );

@@ -11,9 +11,10 @@
 
 namespace Contentsync\Reviews;
 
-use Contentsync\Utils\Logger;
+use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Import;
+use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -41,7 +42,7 @@ class Post_Review_Service {
 		$send_mail = true;
 
 		// check if the post has been distributed yet
-		$post_connection_map = \Contentsync\Posts\Sync\get_post_connection_map( $post_id );
+		$post_connection_map = Post_Connection_Map::get( $post_id );
 		$state               = empty( $post_connection_map ) ? 'new' : 'in_review';
 
 		// is there an active review?
@@ -134,7 +135,7 @@ class Post_Review_Service {
 		self::set_post_review_state( $review_id, 'approved' );
 
 		if ( ! $post ) {
-			$result = Trigger::on_delete_synced_post( $post_review->previous_post );
+			$result = Trigger::on_delete_root_post_and_connected_posts( $post_review->previous_post );
 		} elseif ( $post->post_status == 'trash' ) {
 			$result = Trigger::on_trash_synced_post( $post_review->previous_post );
 		} elseif ( $post_review->previous_post->post_status == 'trash' ) {

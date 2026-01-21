@@ -10,6 +10,11 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Sync\Post_Connection_Map;
+use Contentsync\Posts\Sync\Post_Meta;
+use Contentsync\Posts\Sync\Synced_Post_Service;
+use Contentsync\Posts\Sync\Synced_Post_Query;
+use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
@@ -82,14 +87,14 @@ class Sync_Similar_Posts_Handler extends Contentsync_Ajax_Handler {
 		$post_name = preg_replace( $regex, '', $post->post_name );
 
 		// find and list all similar posts
-		$all_posts = \Contentsync\Posts\Sync\get_all_synced_posts();
+		$all_posts = Synced_Post_Query::get_all_synced_posts();
 
 		foreach ( $all_posts as $synced_post ) {
 
-			$synced_post = \Contentsync\Posts\Sync\new_synced_post( $synced_post );
-			$gid         = \Contentsync\Posts\Sync\get_contentsync_meta_values( $synced_post, 'synced_post_id' );
+			$synced_post = Synced_Post_Service::new_synced_post( $synced_post );
+			$gid         = Post_Meta::get_values( $synced_post, 'synced_post_id' );
 
-			list( $_blog_id, $_post_id, $_net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
+			list( $_blog_id, $_post_id, $_net_url ) = Synced_Post_Utils::explode_gid( $gid );
 
 			// exclude posts from other posttypes
 			if ( $post->post_type !== $synced_post->post_type ) {
@@ -119,9 +124,9 @@ class Sync_Similar_Posts_Handler extends Contentsync_Ajax_Handler {
 
 					// retrieve the post including all post_links from url
 					if ( ! empty( $_net_url ) ) {
-						$synced_post = \Contentsync\Posts\Sync\new_synced_post( \Contentsync\Posts\Sync\get_synced_post( $gid ) );
+						$synced_post = Synced_Post_Service::new_synced_post( Synced_Post_Query::get_synced_post( $gid ) );
 					} else {
-						$synced_post->post_links = \Contentsync\Posts\Sync\get_local_post_links( $_blog_id, $_post_id );
+						$synced_post->post_links = Post_Connection_Map::get_local_post_links( $_blog_id, $_post_id );
 					}
 				}
 

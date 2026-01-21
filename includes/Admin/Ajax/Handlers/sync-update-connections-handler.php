@@ -10,6 +10,8 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Distribution\Site_Connection;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -39,7 +41,7 @@ class Sync_Update_Connections_Handler extends Contentsync_Ajax_Handler {
 			return;
 		}
 
-		$connection = \Contentsync\Posts\Sync\get_site_connection( $site_url );
+		$connection = Site_Connection::get( $site_url );
 
 		if ( ! $connection ) {
 			$this->send_fail( __( 'connection options could not be saved.', 'contentsync' ) );
@@ -48,7 +50,7 @@ class Sync_Update_Connections_Handler extends Contentsync_Ajax_Handler {
 
 		$connection['contents'] = $contents;
 		$connection['search']   = $search;
-		$result                 = \Contentsync\Posts\Sync\update_site_connection( $connection );
+		$result                 = Site_Connection::update( $connection );
 
 		if ( ! $result ) {
 			$this->send_fail( __( 'connection options could not be saved.', 'contentsync' ) );
