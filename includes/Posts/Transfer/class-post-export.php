@@ -2,6 +2,8 @@
 
 namespace Contentsync\Posts\Transfer;
 
+use Contentsync\Utils\Files;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -275,7 +277,7 @@ class Post_Export extends Post_Transfer {
 
 		// set monthly folder
 		$folder = date( 'y-m' );
-		$path   = \Contentsync\Utils\get_wp_content_folder_path( $folder );
+		$path   = Files::get_wp_content_folder_path( $folder );
 
 		// write the temporary posts.json file
 		$json_name = 'posts.json';

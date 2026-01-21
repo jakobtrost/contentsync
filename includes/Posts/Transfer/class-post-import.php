@@ -3,6 +3,7 @@
 namespace Contentsync\Posts\Transfer;
 
 use WP_Error;
+use Contentsync\Utils\Files;
 use Contentsync\Utils\Logger;
 use Contentsync\Translations\Translation_Manager;
 
@@ -673,7 +674,7 @@ class Post_Import extends Post_Transfer {
 		}
 		// get the file from the remote url
 		elseif ( isset( $media_file_info['url'] ) && ! empty( $media_file_info['url'] ) ) {
-			$file_data = \Contentsync\Utils\get_remote_file_contents( $media_file_info['url'] );
+			$file_data = Files::get_remote_file_contents( $media_file_info['url'] );
 		}
 
 		// get the post date
@@ -1638,7 +1639,7 @@ class Post_Import extends Post_Transfer {
 	 * usually called after a successfull import
 	 */
 	private function delete_tmp_files() {
-		$path = \Contentsync\Utils\get_wp_content_folder_path( 'tmp' );
+		$path = Files::get_wp_content_folder_path( 'tmp' );
 		$dir  = substr( $path, -1 ) === '/' ? substr( $path, 0, -1 ) : $path;
 
 		foreach ( scandir( $dir ) as $item ) {

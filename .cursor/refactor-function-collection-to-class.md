@@ -4,6 +4,14 @@ You are working inside the **Contentsync** WordPress plugin.
 
 Refactor **one function or utils collection file** (typically named with prefixes like `functions-` or `utils-`) into a **static helper class** that follows the conventions in `DEVELOPMENT.md`, and update all usages across the plugin.
 
+> ⚠️ **COMMON MISTAKE — READ THIS FIRST:**
+> 
+> When refactoring, you MUST do TWO things for EVERY file that uses the old functions:
+> 1. Add a `use` statement for the new class
+> 2. **Actually replace the function calls** — change `\Contentsync\...\function_name()` to `ClassName::method_name()`
+> 
+> Adding `use` statements alone is NOT enough! The old function calls will break because the functions no longer exist. You must search for and replace EVERY call to EVERY function in the file you're refactoring.
+
 > **Important**: If the file contains **root-level WordPress hook registrations** (`add_action`, `add_filter` called when the file is loaded), these must be **extracted** into a separate hooks provider class. Hooks registered *inside* functions (conditional/modular registrations) do **not** need extraction. See the [Hooks Extraction](#hooks-extraction) section below and follow the detailed guidelines in `.cursor/refactor-hooks-to-hook-class.md`.
 
 ### Conventions (must follow)
@@ -67,15 +75,30 @@ Refactor **one function or utils collection file** (typically named with prefixe
    - Replace any calls to local functions like `some_helper()` with `self::some_helper()` (or `static::` if needed).
    - Keep behavior identical.
 
-6. **Update all usage across the plugin**
-   - Search the entire plugin for calls to the old functions:
-     - Direct calls: `function_name(...)`.
-     - Namespaced calls: `\Contentsync\Something\function_name(...)`.
-     - Hook callbacks: `'function_name'`, `'Contentsync\Something\function_name'`.
+6. **Update all usage across the plugin** ⚠️ MANDATORY — DO NOT SKIP
 
-   **CRITICAL: You MUST follow this two-step pattern for EVERY file that uses the new class:**
+   > **CRITICAL**: This step is NOT optional. You MUST search for and replace ALL calls to the old functions across the ENTIRE plugin. Failing to do this will break the plugin because the old functions no longer exist.
 
-   **Step A — Add a `use` statement at the top of the file:**
+   **Step 1 — Search for ALL usages of the old functions:**
+   
+   For EACH function in the file you refactored, search the entire plugin for:
+   - Direct calls: `function_name(...)`
+   - Namespaced calls: `\Contentsync\Something\function_name(...)`
+   - Hook callbacks: `'function_name'`, `'Contentsync\Something\function_name'`, `__NAMESPACE__ . '\function_name'`
+   
+   Use grep/search to find ALL occurrences. Example search patterns:
+   ```
+   # Search for each function by name
+   get_remote_file_contents
+   url_to_abspath
+   abspath_to_url
+   ```
+   
+   **Make a list of every file that needs updating before proceeding.**
+
+   **Step 2 — For EACH file found, apply BOTH of these changes:**
+
+   **Step 2A — Add a `use` statement at the top of the file:**
    ```php
    namespace Contentsync\SomeFeature;
 
@@ -89,12 +112,17 @@ Refactor **one function or utils collection file** (typically named with prefixe
    - If other `use` statements exist, add the new one with them (alphabetically or grouped logically).
    - If no `use` statements exist yet, add one after the namespace line (before the `if ( ! defined( 'ABSPATH' ) )` check).
 
-   **Step B — Replace ALL method calls to use the short class name:**
+   **Step 2B — Replace EVERY function call in that file:**
+   
+   You MUST replace the actual function call syntax. Examples:
    ```php
-   // ❌ WRONG — Do NOT use fully qualified names in method calls:
-   \Contentsync\Utils\Urls::get_network_url()
-
-   // ✅ CORRECT — Use the short class name (enabled by the use statement):
+   // ❌ OLD (will break — function no longer exists):
+   \Contentsync\Utils\get_network_url()
+   
+   // ❌ STILL WRONG — you only added use statement but didn't change the call:
+   \Contentsync\Utils\get_network_url()  // This is STILL the old broken call!
+   
+   // ✅ CORRECT — actually replace the call to use the new class method:
    Urls::get_network_url()
    ```
 
@@ -104,21 +132,46 @@ Refactor **one function or utils collection file** (typically named with prefixe
 
    **The goal:** At the top of every file, you can see which helper classes are used via `use` statements, making dependencies explicit. Method calls throughout the file then use clean, short class names like `Urls::method()` instead of long fully-qualified paths.
 
+   > **WARNING**: Adding a `use` statement is NOT enough! You MUST also change every `\Contentsync\...\function_name()` call to `ClassName::method_name()`. The `use` statement only imports the class — it does NOT automatically rewrite your function calls.
+
 7. **Preserve behavior**
    - Do **not** change what the functions do.
    - Do not change parameters or return types except when absolutely necessary to make methods static-safe.
-   - Ensure all call sites are updated; there should be **no remaining** references to the old standalone functions.
+   - **CRITICAL:** Ensure ALL call sites are updated. After step 6, there should be **ZERO remaining** references to the old standalone functions anywhere in the plugin. The old functions no longer exist — any remaining calls WILL cause fatal errors.
 
-8. **Final checks**
+8. **Final checks** ⚠️ MANDATORY VERIFICATION
+
    - The refactored file:
      - Resides under `includes/…`.
      - Uses a `Contentsync\…` namespace matching its path.
      - Contains one `Class_Name` with static methods.
    - All previous functions are now methods of this class.
+   
+   **MANDATORY: Run these searches to verify NO old function calls remain:**
+   
+   For EACH function that was in the original file, search the entire plugin:
+   ```bash
+   # Example: if you refactored utils-files.php which had these functions:
+   grep -r "get_remote_file_contents" includes/
+   grep -r "url_to_abspath" includes/
+   grep -r "abspath_to_url" includes/
+   grep -r "get_wp_content_folder_path" includes/
+   ```
+   
+   **Expected result:** The ONLY matches should be:
+   - The new class file itself (where the methods are defined)
+   - Calls using the new pattern: `ClassName::method_name()`
+   
+   **If you find ANY of these patterns, the refactor is INCOMPLETE:**
+   - `\Contentsync\...\function_name(...)` — old namespaced function call
+   - `__NAMESPACE__ . '\function_name'` — old hook callback
+   - Bare `function_name(...)` calls that relied on namespace imports
+   
+   **Go back and fix them before considering this task complete.**
+   
    - **VERIFY:** Every file that calls the new class has:
      - A `use Contentsync\Full\Namespace\Class_Name;` statement at the top.
      - Method calls using the **short** class name: `Class_Name::method()` (NOT `\Contentsync\...\Class_Name::method()`).
-   - Search for any remaining fully-qualified calls like `\Contentsync\...\Class_Name::` — there should be **none**.
    - If hooks were extracted: verify the new hooks class is registered in the plugin loader.
 
 ---

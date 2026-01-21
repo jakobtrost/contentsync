@@ -12,6 +12,7 @@ namespace Contentsync\Admin\Ajax;
 
 use WP_Error;
 use Contentsync\Posts\Transfer\Post_Import;
+use Contentsync\Utils\Files;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -45,7 +46,7 @@ class Post_Import_Handler extends Contentsync_Ajax_Handler {
 		}
 
 		// Get post data from ZIP file
-		$zip_file  = \Contentsync\Utils\get_wp_content_folder_path( 'tmp' ) . $filename;
+		$zip_file  = Files::get_wp_content_folder_path( 'tmp' ) . $filename;
 		$post_data = \Contentsync\Posts\Transfer\get_zip_posts_file_contents( $zip_file );
 
 		// Error checking

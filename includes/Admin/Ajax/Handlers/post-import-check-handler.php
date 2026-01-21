@@ -11,6 +11,7 @@
 namespace Contentsync\Admin\Ajax;
 
 use Contentsync\Posts\Transfer;
+use Contentsync\Utils\Files;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -76,7 +77,7 @@ class Post_Import_Check_Handler extends Contentsync_Ajax_Handler {
 		}
 
 		// Create tmp zip
-		$new_file = \Contentsync\Utils\get_wp_content_folder_path( 'tmp' ) . $filename;
+		$new_file = Files::get_wp_content_folder_path( 'tmp' ) . $filename;
 		$result   = move_uploaded_file( $filepath, $new_file );
 
 		if ( ! $result ) {
