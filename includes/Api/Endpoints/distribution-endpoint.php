@@ -38,6 +38,7 @@ use Contentsync\Utils\Logger;
 use Contentsync\Distribution\Distribution_Item;
 use Contentsync\Distribution\Destinations\Remote_Destination;
 use Contentsync\Distribution\Destinations\Blog_Destination;
+use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -434,7 +435,7 @@ class Distribution_Endpoint extends Endpoint {
 	public function match_gid_before_import( $gid ) {
 
 		$origin  = $this->origin;
-		$current = \Contentsync\Utils\get_network_url();
+		$current = Urls::get_network_url();
 
 		list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 

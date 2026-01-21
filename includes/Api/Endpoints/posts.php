@@ -16,6 +16,7 @@ namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -191,7 +192,7 @@ class Posts extends Endpoint {
 			return $gid;
 		}
 
-		$gid = $_blog_id . '-' . $_post_id . '-' . \Contentsync\Utils\get_network_url();
+		$gid = $_blog_id . '-' . $_post_id . '-' . Urls::get_network_url();
 
 		return $gid;
 	}
@@ -245,7 +246,7 @@ class Posts extends Endpoint {
 			}
 		}
 
-		$network_url = \Contentsync\Utils\get_network_url();
+		$network_url = Urls::get_network_url();
 
 		// build sql query
 		$results = array();

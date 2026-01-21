@@ -7,6 +7,7 @@
 namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
+use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -53,7 +54,7 @@ class Add_Connection extends Endpoint {
 	public function add_site_connection( $request ) {
 
 		$request_url    = $request->get_header( 'Origin' );
-		$current_url    = \Contentsync\Utils\get_network_url();
+		$current_url    = Urls::get_network_url();
 		$new_connection = $request->get_param( 'connection' );
 
 		if ( ! $new_connection ) {

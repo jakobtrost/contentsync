@@ -10,6 +10,8 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Utils\Urls;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -71,7 +73,7 @@ class Sync_Similar_Posts_Handler extends Contentsync_Ajax_Handler {
 
 		$found   = array();
 		$blog_id = get_current_blog_id();
-		$net_url = \Contentsync\Utils\get_network_url();
+		$net_url = Urls::get_network_url();
 
 		if ( ! isset( $post->post_name ) ) {
 			return $found;

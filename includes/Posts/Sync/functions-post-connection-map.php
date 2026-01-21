@@ -3,6 +3,7 @@
 namespace Contentsync\Posts\Sync;
 
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -113,7 +114,7 @@ function add_or_remove_post_connection_from_connection_map( $gid, $args, $add = 
 	// remote post
 	else {
 		// the network url is the current network, as we just imported a post here
-		$post_site_url = \Contentsync\Utils\get_network_url();
+		$post_site_url = Urls::get_network_url();
 		$result        = \Contentsync\Api\update_remote_post_connection( $site_url, $gid, $args, $add, $post_site_url );
 	}
 
@@ -310,7 +311,7 @@ function convert_connection_map_to_destination_ids( $connection_map ) {
 function get_local_post_links( $blog_id, $post_id ) {
 
 	Multisite_Manager::switch_blog( $blog_id );
-	$edit_url = \Contentsync\Utils\get_edit_post_link( $post_id );
+	$edit_url = Urls::get_edit_post_link( $post_id );
 	Multisite_Manager::restore_blog();
 
 	$blog_url = get_site_url( $blog_id );
@@ -380,7 +381,7 @@ function get_network_remote_connection_map_by_gid( $gid ) {
 	}
 
 	return array(
-		\Contentsync\Utils\get_network_url() => $connection_map,
+		Urls::get_network_url() => $connection_map,
 	);
 }
 
@@ -410,7 +411,7 @@ function check_connection_map( $post_id ) {
 
 	$gid            = get_gid( $post_id );
 	$connection_map = get_post_connection_map( $post_id );
-	$cur_net_url    = \Contentsync\Utils\get_network_url();
+	$cur_net_url    = Urls::get_network_url();
 	$return         = array();
 
 	$updated_post_connection_map = array();
@@ -567,7 +568,7 @@ function get_all_local_linked_posts( $gid ) {
 
 	list( $root_blog_id, $root_post_id, $root_site_url ) = explode_gid( $gid );
 
-	$network_url = \Contentsync\Utils\get_network_url();
+	$network_url = Urls::get_network_url();
 
 	// build sql query
 	$results = array();

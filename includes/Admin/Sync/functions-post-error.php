@@ -9,6 +9,7 @@
 namespace Contentsync\Admin;
 
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -93,7 +94,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 	$status       = $post->meta['synced_post_status'];
 	$current_blog = get_current_blog_id();
 	$blog_id      = $post->blog_id ? $post->blog_id : $current_blog;
-	$cur_net_url  = \Contentsync\Utils\get_network_url();
+	$cur_net_url  = Urls::get_network_url();
 
 	list( $root_blog_id, $root_post_id, $root_net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 	if ( $root_post_id === null ) {
@@ -223,7 +224,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 
 					$error->message = sprintf(
 						__( 'The source post is on the same page: %s', 'contentsync' ),
-						"<a href='" . \Contentsync\Utils\get_edit_post_link( $root_post->ID ) . "' target='_blank'>{$root_post->post_title} (#{$root_post->ID})</a>"
+						"<a href='" . Urls::get_edit_post_link( $root_post->ID ) . "' target='_blank'>{$root_post->post_title} (#{$root_post->ID})</a>"
 					);
 
 					if ( $repair ) {
@@ -279,7 +280,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 						if ( $other_linked_post->post_status === 'trash' ) {
 							$error->message = sprintf(
 								__( 'The source post was linked to a deleted post on this page: %s', 'contentsync' ),
-								"<a href='" . \Contentsync\Utils\get_edit_post_link( $connected_post_id_from_this_blog ) . "' target='_blank'>{$other_linked_post->post_title} (#{$other_linked_post->ID})</a>"
+								"<a href='" . Urls::get_edit_post_link( $connected_post_id_from_this_blog ) . "' target='_blank'>{$other_linked_post->post_title} (#{$other_linked_post->ID})</a>"
 							);
 
 							if ( $autorepair || $repair ) {
@@ -288,7 +289,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 						} elseif ( $post->post_status === 'publish' && $other_linked_post->post_status !== 'publish' ) {
 							$error->message = sprintf(
 								__( 'The source post is linked to another (unpublished) post on this page: %s', 'contentsync' ),
-								"<a href='" . \Contentsync\Utils\get_edit_post_link( $connected_post_id_from_this_blog ) . "' target='_blank'>{$other_linked_post->post_title} (#{$other_linked_post->ID})</a>"
+								"<a href='" . Urls::get_edit_post_link( $connected_post_id_from_this_blog ) . "' target='_blank'>{$other_linked_post->post_title} (#{$other_linked_post->ID})</a>"
 							);
 
 							if ( $repair ) {
@@ -298,7 +299,7 @@ function check_post_for_errors( $post, $autorepair = true, $repair = false ) {
 						} else {
 							$error->message = sprintf(
 								__( 'The source post is linked to another post on this page: %s', 'contentsync' ),
-								"<a href='" . \Contentsync\Utils\get_edit_post_link( $connected_post_id_from_this_blog ) . "' target='_blank'>{$other_linked_post->post_title} (#{$other_linked_post->ID})</a>"
+								"<a href='" . Urls::get_edit_post_link( $connected_post_id_from_this_blog ) . "' target='_blank'>{$other_linked_post->post_title} (#{$other_linked_post->ID})</a>"
 							);
 
 							if ( $repair ) {

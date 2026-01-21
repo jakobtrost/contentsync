@@ -15,6 +15,7 @@
 namespace Contentsync\Api;
 
 use Contentsync\Utils\Logger;
+use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -171,7 +172,7 @@ function distribute_item_to_remote_site( $connection_or_site_url, $remote_distri
 		'distribution/distribute-item',
 		array(
 			'distribution_item' => json_encode( $remote_distribution_item ),
-			'origin'            => \Contentsync\Utils\get_network_url(),
+			'origin'            => Urls::get_network_url(),
 		),
 		'POST',
 		array(
@@ -244,14 +245,14 @@ function send_request( $connection_or_site_url, $rest_base, $body = array(), $me
 		$request_url = untrailingslashit( esc_url( $connection['site_url'] ) );
 		$headers     = array(
 			'Authorization' => 'Basic ' . base64_encode( $connection['user_login'] . ':' . str_rot13( $connection['password'] ) ),
-			'Origin'        => \Contentsync\Utils\get_network_url(),
+			'Origin'        => Urls::get_network_url(),
 		);
 	}
 	// try to get data from public endpoint
 	else {
 		$request_url = untrailingslashit( esc_url( $connection_or_site_url ) );
 		$headers     = array(
-			'Origin' => \Contentsync\Utils\get_network_url(),
+			'Origin' => Urls::get_network_url(),
 		);
 	}
 

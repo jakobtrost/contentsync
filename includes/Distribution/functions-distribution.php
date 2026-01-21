@@ -23,6 +23,7 @@ use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Distribution\Destinations\Remote_Destination
 use Contentsync\Distribution\Destinations\Blog_Destination;
 use Contentsync\Posts\Transfer\Post_Import;
+use Contentsync\Utils\Urls;
 
 require_once CONTENTSYNC_PLUGIN_PATH . '/libs/action-scheduler/action-scheduler.php';
 
@@ -420,7 +421,7 @@ function get_destinations( $destination_ids_or_arrays, $root_post_id = 0 ) {
 		if ( strpos( $destination_id, '|' ) !== false ) {
 			list( $remote_blog_id, $remote_network_url ) = explode( '|', $destination_id );
 
-			$remote_network_url = \Contentsync\Utils\get_nice_url( $remote_network_url );
+			$remote_network_url = Urls::get_nice_url( $remote_network_url );
 
 			if ( ! isset( $destinations[ $remote_network_url ] ) ) {
 				$destinations[ $remote_network_url ] = new Remote_Destination( $remote_network_url );
@@ -988,7 +989,7 @@ function import_posts_to_blog( &$item ) {
 				$imported_post_id,
 				array(
 					'status' => 'success',
-					'url'    => \Contentsync\Utils\get_edit_post_link( $imported_post_id ),
+					'url'    => Urls::get_edit_post_link( $imported_post_id ),
 				)
 			);
 		}

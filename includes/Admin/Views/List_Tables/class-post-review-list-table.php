@@ -10,6 +10,7 @@ namespace Contentsync\Admin\Pages\List_Tables;
 
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Reviews\Post_Review;
+use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -617,7 +618,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 */
 	public function get_root_post_edit_link( $blog_id, $post_id ) {
 		Multisite_Manager::switch_blog( $blog_id );
-		$edit_post_link = \Contentsync\Utils\get_edit_post_link( $post_id );
+		$edit_post_link = Urls::get_edit_post_link( $post_id );
 		Multisite_Manager::restore_blog();
 		return $edit_post_link;
 	}

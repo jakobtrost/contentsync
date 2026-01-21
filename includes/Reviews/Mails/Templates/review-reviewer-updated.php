@@ -2,6 +2,8 @@
 
 namespace Contentsync\Reviews\Mails\Templates;
 
+use Contentsync\Utils\Urls;
+
 /**
  * Generate the subject and body for a review updated notification email.
  *
@@ -27,7 +29,7 @@ function get_mail_content_for_reviews_reviewer_updated( $review, $post ) {
 
 	$mail_note = sprintf( __( 'Please review the %s and let the editor know if any changes need to be made.', 'contentsync' ) . '<br><br>', $post->post_type );
 
-	$links  = "<a href='" . \Contentsync\Utils\get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
+	$links  = "<a href='" . Urls::get_edit_post_link( $post->ID ) . "'>" . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
 	$links .= " | <a href='" . network_admin_url( 'admin.php?page=contentsync-post-reviews' ) . "'>" . __( 'View all reviews', 'contentsync' ) . '</a>';
 
 	$message = $mail_title . $mail_note . $links;

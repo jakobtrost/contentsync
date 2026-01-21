@@ -18,6 +18,7 @@ namespace Contentsync\Api\Endpoints;
 use Contentsync\Api\Endpoint;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Posts\Transfer\Post_Import;
+use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -349,7 +350,7 @@ class Connected_Posts extends Endpoint {
 		// echo "\r\n".sprintf( "Match gid before import: %s", $gid );
 
 		$origin  = $this->origin;
-		$current = \Contentsync\Utils\get_network_url();
+		$current = Urls::get_network_url();
 
 		list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
 		if ( ! empty( $post_id ) && ! empty( $origin ) ) {
@@ -417,7 +418,7 @@ class Connected_Posts extends Endpoint {
 	public function allow_request_from_same_origin( $request ) {
 
 		$origin  = $request->get_header( 'Origin' );
-		$current = \Contentsync\Utils\get_network_url();
+		$current = Urls::get_network_url();
 
 		if ( $current == $origin ) {
 			return true;

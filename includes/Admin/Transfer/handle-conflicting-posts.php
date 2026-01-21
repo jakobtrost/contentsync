@@ -2,6 +2,8 @@
 
 namespace Contentsync\Admin\Transfer;
 
+use Contentsync\Utils\Urls;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -134,7 +136,7 @@ function get_post_link_html( $post ) {
 	} else {
 		$post_title = $post->post_title;
 		$post_type  = get_post_type_object( $post->post_type )->labels->singular_name;
-		$post_url   = \Contentsync\Utils\get_edit_post_link( $post );
+		$post_url   = Urls::get_edit_post_link( $post );
 	}
 	$post_title = empty( $post_title ) ? '<i>' . __( 'Unknown post', 'contentsync_hub' ) . '</i>' : $post_title;
 	$post_type  = empty( $post_type ) ? '<i>' . __( 'Unknown post type', 'contentsync_hub' ) . '</i>' : $post_type;

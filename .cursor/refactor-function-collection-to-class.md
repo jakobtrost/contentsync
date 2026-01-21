@@ -72,15 +72,37 @@ Refactor **one function or utils collection file** (typically named with prefixe
      - Direct calls: `function_name(...)`.
      - Namespaced calls: `\Contentsync\Something\function_name(...)`.
      - Hook callbacks: `'function_name'`, `'Contentsync\Something\function_name'`.
-   - For **normal calls**:
-     - Add `use Contentsync\Full\Namespace\Class_Name;` at the top of each file that uses these helpers.
-     - Replace calls: `function_name(...)` → `Class_Name::function_name(...)`.
-   - For **hook callbacks**:
-     - Prefer using either:
-       - `[ Class_Name::class, 'function_name' ]`, or
-       - `'Contentsync\Full\Namespace\Class_Name::function_name'`.
-     - Ensure the chosen pattern is consistent within the file.
-   - The goal: at the top of every file, you can see which helper classes are used via `use` statements, and function calls become clearly scoped static method calls.
+
+   **CRITICAL: You MUST follow this two-step pattern for EVERY file that uses the new class:**
+
+   **Step A — Add a `use` statement at the top of the file:**
+   ```php
+   namespace Contentsync\SomeFeature;
+
+   use Contentsync\Utils\Urls;  // <-- ADD THIS after namespace, with other use statements
+
+   if ( ! defined( 'ABSPATH' ) ) {
+       exit;
+   }
+   ```
+   - Place the `use` statement **after** the `namespace` declaration.
+   - If other `use` statements exist, add the new one with them (alphabetically or grouped logically).
+   - If no `use` statements exist yet, add one after the namespace line (before the `if ( ! defined( 'ABSPATH' ) )` check).
+
+   **Step B — Replace ALL method calls to use the short class name:**
+   ```php
+   // ❌ WRONG — Do NOT use fully qualified names in method calls:
+   \Contentsync\Utils\Urls::get_network_url()
+
+   // ✅ CORRECT — Use the short class name (enabled by the use statement):
+   Urls::get_network_url()
+   ```
+
+   **For hook callbacks**, use one of these patterns:
+   - `[ Urls::class, 'method_name' ]` (preferred), or
+   - `[ \Contentsync\Utils\Urls::class, 'method_name' ]` (if no `use` statement).
+
+   **The goal:** At the top of every file, you can see which helper classes are used via `use` statements, making dependencies explicit. Method calls throughout the file then use clean, short class names like `Urls::method()` instead of long fully-qualified paths.
 
 7. **Preserve behavior**
    - Do **not** change what the functions do.
@@ -93,8 +115,62 @@ Refactor **one function or utils collection file** (typically named with prefixe
      - Uses a `Contentsync\…` namespace matching its path.
      - Contains one `Class_Name` with static methods.
    - All previous functions are now methods of this class.
-   - All references in the plugin use `use Class_Name;` + `Class_Name::method()` or appropriate static callbacks.
+   - **VERIFY:** Every file that calls the new class has:
+     - A `use Contentsync\Full\Namespace\Class_Name;` statement at the top.
+     - Method calls using the **short** class name: `Class_Name::method()` (NOT `\Contentsync\...\Class_Name::method()`).
+   - Search for any remaining fully-qualified calls like `\Contentsync\...\Class_Name::` — there should be **none**.
    - If hooks were extracted: verify the new hooks class is registered in the plugin loader.
+
+---
+
+### Example: Updating a File That Uses the New Class
+
+When you refactor `utils-urls.php` into `Urls.php`, you must update every file that previously called `\Contentsync\Utils\get_network_url()`.
+
+**Before (old pattern):**
+```php
+<?php
+namespace Contentsync\Api;
+
+use Contentsync\Utils\Logger;
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+function send_request() {
+    $origin = \Contentsync\Utils\get_network_url();  // Old function call
+    // ...
+}
+```
+
+**After (correct pattern):**
+```php
+<?php
+namespace Contentsync\Api;
+
+use Contentsync\Utils\Logger;
+use Contentsync\Utils\Urls;  // <-- ADD the use statement
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+function send_request() {
+    $origin = Urls::get_network_url();  // <-- Short class name, NOT \Contentsync\Utils\Urls::
+    // ...
+}
+```
+
+**WRONG (do NOT do this):**
+```php
+// ❌ This is WRONG — no use statement, fully-qualified call
+function send_request() {
+    $origin = \Contentsync\Utils\Urls::get_network_url();
+}
+```
+
+The `use` statement makes dependencies visible at the top of the file, and the short class name keeps the code clean and readable.
 
 ---
 

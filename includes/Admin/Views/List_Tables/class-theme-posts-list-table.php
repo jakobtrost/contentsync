@@ -8,6 +8,8 @@
 
 namespace Contentsync\Admin\Pages\List_Tables;
 
+use Contentsync\Utils\Urls;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -378,7 +380,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	 */
 	public function column_title( $post ) {
 
-		$edit_post_link  = \Contentsync\Utils\get_edit_post_link( $post );
+		$edit_post_link  = Urls::get_edit_post_link( $post );
 		$trash_post_link = \Contentsync\Admin\Utils\get_delete_post_link( $post );
 
 		$is_trash    = ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' );

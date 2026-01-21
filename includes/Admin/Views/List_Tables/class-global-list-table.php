@@ -10,6 +10,7 @@ namespace Contentsync\Admin\Pages\List_Tables;
 
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -164,7 +165,7 @@ class Global_List_Table extends \WP_List_Table {
 		);
 
 		// set class vars
-		$this->network_url = \Contentsync\Utils\get_network_url();
+		$this->network_url = Urls::get_network_url();
 
 		/**
 		 * display message if translation tool is not active on the main site

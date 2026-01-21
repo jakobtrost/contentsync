@@ -2,6 +2,8 @@
 
 namespace Contentsync\Reviews\Mails\Templates;
 
+use Contentsync\Utils\Urls;
+
 /**
  * Generate the subject and body for a review denied email.
  *
@@ -40,7 +42,7 @@ function get_mail_content_for_reviews_editor_denied( $review, $post ) {
 
 	$mail_note .= __( 'Please review the requested modifications and make the necessary changes.', 'contentsync' ) . '<br><br>';
 
-	$links = '<a href="' . \Contentsync\Utils\get_edit_post_link( $post->ID ) . '">' . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
+	$links = '<a href="' . Urls::get_edit_post_link( $post->ID ) . '">' . sprintf( __( 'View %s', 'contentsync' ), $post->post_type ) . '</a>';
 
 	$message = $mail_title . $mail_note . $links;
 

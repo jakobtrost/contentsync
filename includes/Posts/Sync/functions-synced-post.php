@@ -4,6 +4,7 @@ namespace Contentsync\Posts\Sync;
 
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -274,7 +275,7 @@ function prepare_synced_post_for_import( $gid, $args = array() ) {
 function get_all_synced_posts( $query = null, $network_url = null ) {
 
 	$all_synced_posts = array();
-	$current_network  = \Contentsync\Utils\get_network_url();
+	$current_network  = Urls::get_network_url();
 
 	// get network posts
 	if ( empty( $network_url ) || $network_url === 'here' || $network_url === $current_network ) {
@@ -290,7 +291,7 @@ function get_all_synced_posts( $query = null, $network_url = null ) {
 		}
 
 		// don't add posts from the same network
-		if ( \Contentsync\Utils\get_nice_url( $site_url ) === $current_network ) {
+		if ( Urls::get_nice_url( $site_url ) === $current_network ) {
 			continue;
 		}
 
