@@ -2,6 +2,11 @@
 	"name": "contentsync/contentsync",
 	"description": "Content Sync WordPress Plugin",
 	"type": "wordpress-plugin",
+	"autoload": {
+		"psr-4": {
+			"ContentSync\\": "includes/"
+		}
+	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "^3.7",
 		"wp-coding-standards/wpcs": "^3.0",

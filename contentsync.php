@@ -66,3 +66,6 @@ function contentsync_plugin_deactivated() {
 }
 
 \register_deactivation_hook( CONTENTSYNC_PLUGIN_FILE, __NAMESPACE__ . '\contentsync_plugin_deactivated' );
+
+// Load Composer autoloader for PSR-4 autoloading.
+require_once CONTENTSYNC_PLUGIN_PATH . '/vendor/autoload.php';
