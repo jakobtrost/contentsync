@@ -4,7 +4,7 @@
 	"type": "wordpress-plugin",
 	"autoload": {
 		"psr-4": {
-			"ContentSync\\": "includes/"
+			"Contentsync\\": "includes/"
 		}
 	},
 	"require-dev": {
