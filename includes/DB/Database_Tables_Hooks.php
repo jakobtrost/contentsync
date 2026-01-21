@@ -15,9 +15,7 @@ namespace Contentsync\DB;
 
 use Contentsync\Utils\Hooks_Base;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Database_Tables_Hooks extends Hooks_Base {
 

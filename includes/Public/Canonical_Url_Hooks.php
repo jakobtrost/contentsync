@@ -14,9 +14,7 @@ namespace Contentsync\Public;
 
 use Contentsync\Utils\Hooks_Base;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Canonical_Url_Hooks extends Hooks_Base {
 

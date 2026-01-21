@@ -18,9 +18,7 @@ use Contentsync\Posts\Transfer\Post_Import;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Multisite_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Make a post globally synced.

@@ -14,9 +14,7 @@ namespace Contentsync\Api\Endpoints;
 use Contentsync\Api\Endpoint;
 use Contentsync\Utils\Multisite_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Posts_Meta();
 class Posts_Meta extends Endpoint {

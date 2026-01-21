@@ -12,9 +12,7 @@ namespace Contentsync\Admin\Ajax;
 
 use WP_Error;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Theme Rename Template Handler Class

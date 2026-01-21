@@ -14,9 +14,7 @@ use WP_Error;
 use Contentsync\Posts\Transfer\Post_Import;
 use Contentsync\Utils\Files;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Post Import Handler Class

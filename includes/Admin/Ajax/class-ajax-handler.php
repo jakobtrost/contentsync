@@ -13,9 +13,7 @@ namespace Contentsync\Admin\Ajax;
 
 use Contentsync\Utils\Logger;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Abstract AJAX Handler Class

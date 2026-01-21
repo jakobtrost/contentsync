@@ -17,9 +17,7 @@ namespace Contentsync\Api;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Check if a connection is still active

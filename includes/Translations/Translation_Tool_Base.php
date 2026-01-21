@@ -8,9 +8,7 @@
 
 namespace Contentsync\Translations;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 abstract class Translation_Tool_Base {
 

@@ -40,9 +40,7 @@ use Contentsync\Distribution\Destinations\Remote_Destination;
 use Contentsync\Distribution\Destinations\Blog_Destination;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Distribution_Endpoint();
 class Distribution_Endpoint extends Endpoint {

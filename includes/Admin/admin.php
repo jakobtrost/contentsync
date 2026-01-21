@@ -18,9 +18,7 @@ use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Translations\Translation_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Admin();
 class Admin {

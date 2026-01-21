@@ -16,9 +16,7 @@
  */
 namespace Contentsync\Reviews;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 final class Post_Review {
 

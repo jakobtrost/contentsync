@@ -13,9 +13,7 @@ namespace Contentsync\Admin\Ajax;
 use Contentsync\Posts\Transfer;
 use Contentsync\Utils\Files;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Post Import Check Handler Class

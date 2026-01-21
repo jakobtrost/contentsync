@@ -8,9 +8,7 @@
  *
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 if ( ! function_exists( 'pll_get_post_language' ) ) {
 	/**

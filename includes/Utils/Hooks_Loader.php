@@ -2,9 +2,7 @@
 
 namespace Contentsync\Utils;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Automatically discovers and loads all hook provider classes.

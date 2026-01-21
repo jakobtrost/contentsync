@@ -2,9 +2,7 @@
 
 namespace Contentsync\Posts\Sync;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Adjust synced post status after post was imported.

@@ -15,9 +15,7 @@
  */
 namespace Contentsync\Cluster;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 final class Content_Condition {
 

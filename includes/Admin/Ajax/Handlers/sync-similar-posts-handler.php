@@ -12,9 +12,7 @@ namespace Contentsync\Admin\Ajax;
 
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Sync Similar Posts Handler Class

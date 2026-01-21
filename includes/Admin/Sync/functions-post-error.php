@@ -11,9 +11,7 @@ namespace Contentsync\Admin;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Check if a synced post has an error

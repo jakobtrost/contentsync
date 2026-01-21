@@ -2,9 +2,7 @@
 
 namespace Contentsync\Admin\Sync;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Function to check if current user is allowed to edit global contents.

@@ -14,9 +14,7 @@ use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 // include the parent class
 if ( ! class_exists( 'WP_List_Table' ) ) {

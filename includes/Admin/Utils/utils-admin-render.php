@@ -2,9 +2,7 @@
 
 namespace Contentsync\Admin\Utils;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Show WordPress style notice in top of page.

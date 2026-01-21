@@ -7,9 +7,7 @@
 
 namespace Contentsync\Admin\Pages\List_Tables;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 // include the parent class
 if ( ! class_exists( 'WP_List_Table' ) ) {

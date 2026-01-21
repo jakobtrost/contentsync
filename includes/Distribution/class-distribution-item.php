@@ -39,9 +39,7 @@ namespace Contentsync\Distribution;
 
 use Contentsync\Utils\Logger;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Distribution Item.

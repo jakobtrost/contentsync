@@ -4,9 +4,7 @@ namespace Contentsync\Admin\Sync;
 
 use Contentsync\Utils\Logger;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Update contentsync post export options.

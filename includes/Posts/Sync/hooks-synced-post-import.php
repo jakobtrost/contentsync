@@ -4,9 +4,7 @@ namespace Contentsync\Posts\Sync;
 
 use Contentsync\Utils\Logger;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Filter the conflict actions before every import, so all global

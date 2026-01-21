@@ -9,9 +9,7 @@ namespace Contentsync\Posts;
 
 use Contentsync\Translations\Translation_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Post_Query utility helpers.

@@ -4,9 +4,7 @@ namespace Contentsync\Posts\Transfer;
 
 use Contentsync\Utils\Files;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Post_Export extends Post_Transfer_Base {
 

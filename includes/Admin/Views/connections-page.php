@@ -6,9 +6,7 @@ namespace Contentsync\Admin\Pages;
 
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Connections_Page();
 class Connections_Page {

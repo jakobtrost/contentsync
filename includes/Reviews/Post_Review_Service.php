@@ -15,9 +15,7 @@ use Contentsync\Utils\Logger;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Import;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Post review service class with static helper methods.

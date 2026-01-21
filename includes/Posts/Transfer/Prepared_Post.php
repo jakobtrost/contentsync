@@ -5,9 +5,7 @@ namespace Contentsync\Posts\Transfer;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Translations\Translation_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Class used to implement the Prepared_Post object.

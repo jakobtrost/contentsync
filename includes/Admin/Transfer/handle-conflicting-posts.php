@@ -5,9 +5,7 @@ namespace Contentsync\Admin\Transfer;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Check synced posts for conflicts on this page

@@ -4,9 +4,7 @@ namespace Contentsync\Utils;
 
 use Contentsync\Posts\Theme_Assets;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * URL utility helpers.

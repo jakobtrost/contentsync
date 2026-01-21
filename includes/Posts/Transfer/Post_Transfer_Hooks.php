@@ -4,9 +4,7 @@ namespace Contentsync\Posts\Transfer;
 
 use Contentsync\Utils\Hooks_Base;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Hook provider for post transfer/import operations.

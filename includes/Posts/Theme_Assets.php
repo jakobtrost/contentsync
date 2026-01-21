@@ -6,9 +6,7 @@
  */
 namespace Contentsync\Posts;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Theme_Assets utility helpers.

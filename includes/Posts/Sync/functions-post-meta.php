@@ -2,9 +2,7 @@
 
 namespace Contentsync\Posts\Sync;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Returns list of contentsync meta keys

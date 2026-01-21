@@ -19,9 +19,7 @@ use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Multisite_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Trigger();
 class Trigger {

@@ -12,9 +12,7 @@ namespace Contentsync\Admin\Ajax;
 
 use Contentsync\Posts\Transfer\Post_Export;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Post Export Handler Class

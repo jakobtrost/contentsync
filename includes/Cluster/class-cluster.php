@@ -16,9 +16,7 @@
  */
 namespace Contentsync\Cluster;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 final class Cluster {
 

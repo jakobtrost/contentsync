@@ -12,9 +12,7 @@
  *
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 if ( ! function_exists( 'contentsync_wpml_get_element_language_details' ) ) {
 	/**

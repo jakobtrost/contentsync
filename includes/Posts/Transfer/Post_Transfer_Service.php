@@ -5,9 +5,7 @@ namespace Contentsync\Posts\Transfer;
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Logger;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Helper class for post transfer operations.

@@ -9,9 +9,7 @@ namespace Contentsync\Api\Endpoints;
 use Contentsync\Api\Endpoint;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Check_Auth();
 class Check_Auth extends Endpoint {

@@ -17,9 +17,7 @@ use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Cluster\Cluster;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 
 new Cluster_Admin();

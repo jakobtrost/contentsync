@@ -25,9 +25,7 @@ use Contentsync\Translations\Translation_Tool_Base;
 use Contentsync\Translations\Translation_Tool_Polylang;
 use Contentsync\Translations\Translation_Tool_WPML;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Translation_Manager {
 

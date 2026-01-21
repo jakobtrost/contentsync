@@ -8,9 +8,7 @@ namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Api\Endpoint;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Site_Name();
 class Site_Name extends Endpoint {

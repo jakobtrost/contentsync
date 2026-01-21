@@ -13,9 +13,7 @@
 
 namespace Contentsync\Reviews;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Review mail helper class with static methods.

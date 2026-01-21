@@ -14,9 +14,7 @@
 
 namespace Contentsync\Admin\Pages;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Admin();
 class Admin {

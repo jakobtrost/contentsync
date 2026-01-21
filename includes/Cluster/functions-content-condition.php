@@ -17,9 +17,7 @@ namespace Contentsync\Cluster;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Utils\Multisite_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Get a content condition by its ID

@@ -12,9 +12,7 @@ namespace Contentsync\Posts\Sync;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Activate the application password extension

@@ -2,9 +2,7 @@
 
 namespace Contentsync\Api;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Initialize endpoints by loading endpoint files.

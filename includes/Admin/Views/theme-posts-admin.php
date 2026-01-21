@@ -4,9 +4,7 @@
  */
 namespace Contentsync\Admin\Pages;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Theme_Assets_Admin();
 

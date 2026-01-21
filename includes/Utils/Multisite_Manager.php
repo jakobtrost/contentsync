@@ -5,9 +5,7 @@ namespace Contentsync\Utils;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Translations\Translation_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Multisite Manager

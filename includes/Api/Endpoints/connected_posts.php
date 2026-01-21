@@ -20,9 +20,7 @@ use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Posts\Transfer\Post_Import;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Connected_Posts();
 class Connected_Posts extends Endpoint {

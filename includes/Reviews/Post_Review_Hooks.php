@@ -10,9 +10,7 @@ namespace Contentsync\Reviews;
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Utils\Logger;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Post review hooks provider class.

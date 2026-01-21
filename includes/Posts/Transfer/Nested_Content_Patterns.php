@@ -5,9 +5,7 @@
 
 namespace Contentsync\Posts\Transfer;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Helper class for nested content pattern operations.

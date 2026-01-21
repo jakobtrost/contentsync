@@ -18,9 +18,7 @@ namespace Contentsync\Admin;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Posts\Theme_Assets;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Site_Editor();
 class Site_Editor {

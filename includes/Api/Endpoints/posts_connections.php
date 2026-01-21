@@ -17,9 +17,7 @@ namespace Contentsync\Api\Endpoints;
 use Contentsync\Api\Endpoint;
 use Contentsync\Utils\Multisite_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Posts_Connections();
 class Posts_Connections extends Endpoint {

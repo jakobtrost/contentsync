@@ -7,9 +7,7 @@ use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Posts\Transfer\File_Handler;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 add_action( 'admin_init', __NAMESPACE__ . '\add_bulk_actions' );
 

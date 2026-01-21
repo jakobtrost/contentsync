@@ -4,9 +4,7 @@ namespace Contentsync\Admin\Transfer;
 
 use Contentsync\Utils\Logger;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Get the „posts.json“ file contents inside an imported zip archive

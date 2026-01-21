@@ -2,9 +2,7 @@
 
 namespace Contentsync\Admin\Utils;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Retrieves the delete posts link for post.

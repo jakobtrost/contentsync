@@ -7,9 +7,7 @@ use Contentsync\Utils\Files;
 use Contentsync\Utils\Logger;
 use Contentsync\Translations\Translation_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Post_Import extends Post_Transfer_Base {
 

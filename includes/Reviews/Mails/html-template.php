@@ -10,9 +10,7 @@
  * @var string $footer The footer content.
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 ?>
 <!doctype html>
 <html>

@@ -12,9 +12,7 @@ namespace Contentsync\Admin\Ajax;
 
 use Contentsync\Utils\Multisite_Manager;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Sync Trash Handler Class

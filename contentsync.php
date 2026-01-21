@@ -11,9 +11,7 @@ Domain Path:    /languages/
 */
 namespace Contentsync;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'CONTENTSYNC_VERSION' ) ) {
 	define( 'CONTENTSYNC_VERSION', '2.17.4' );

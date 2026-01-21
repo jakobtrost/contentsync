@@ -31,9 +31,7 @@ namespace Contentsync\Distribution\Destinations;
 use Contentsync\Utils\Logger;
 use Contentsync\Distribution\Destinations\Post_Destination;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 #[AllowDynamicProperties]
 class Blog_Destination extends Destination {

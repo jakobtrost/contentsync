@@ -37,9 +37,7 @@ use Contentsync\Posts\Post_Query;
 use Contentsync\Utils\Urls;
 use Exception;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Class used to implement the Synced_Post object.

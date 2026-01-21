@@ -9,9 +9,7 @@ namespace Contentsync\Distribution;
 
 use Contentsync\Utils\Logger;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Save a distribution item to the database.

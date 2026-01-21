@@ -28,9 +28,7 @@ namespace Contentsync\Distribution\Destinations;
 
 use Contentsync\Utils\Logger;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 #[AllowDynamicProperties]
 class Destination {

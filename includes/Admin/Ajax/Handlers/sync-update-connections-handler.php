@@ -10,9 +10,7 @@
 
 namespace Contentsync\Admin\Ajax;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Sync Update Connections Handler Class

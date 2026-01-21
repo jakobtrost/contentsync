@@ -31,9 +31,7 @@
  */
 namespace Contentsync\Utils;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 new Logger();
 

@@ -13,9 +13,7 @@ namespace Contentsync\Admin\Ajax;
 use Contentsync\Posts\Theme_Assets;
 use WP_Error;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Theme Switch Template Handler Class

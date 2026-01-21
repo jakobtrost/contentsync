@@ -9,9 +9,7 @@ use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Create and return a new `Synced_Post` wrapper for a WordPress post.

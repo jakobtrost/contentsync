@@ -2,9 +2,7 @@
 
 namespace Contentsync\Posts\Transfer;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 abstract class Post_Transfer_Base {
 

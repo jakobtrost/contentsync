@@ -19,9 +19,7 @@ use Contentsync\Utils\Multisite_Manager;
  * Global Cluster Functions
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Get a cluster by ID.

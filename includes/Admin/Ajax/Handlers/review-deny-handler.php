@@ -12,9 +12,7 @@ namespace Contentsync\Admin\Ajax;
 
 use Contentsync\Reviews\Post_Review_Service;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Review Deny Handler Class
