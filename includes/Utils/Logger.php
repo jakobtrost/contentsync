@@ -28,7 +28,6 @@
  * empties the `debug.log` file in the content directory. Use these methods carefully
  * in production environments to avoid exposing sensitive information. Always check
  * whether logging is appropriate in your context.
- *
  */
 namespace Contentsync\Utils;
 

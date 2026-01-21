@@ -63,3 +63,9 @@ Refactor **one existing class file** so that its file name, class name, and name
      - `namespace` matches folder structure from `includes/`.
      - File name matches class name exactly.
      - No references to the old class name remain in the plugin.
+
+### Important notes
+
+- **Don't investigate autoloading**: How files are loaded (PSR-4, manual requires, etc.) is not relevant to this task. Just rename and update references.
+- **Don't search for require/include statements**: Focus only on class usage references (`use` statements, `ClassName::method()`, `new ClassName()`).
+- **Keep it simple**: This is a mechanical rename operation. Read the file, determine the correct names based on conventions, rename, and update usages.
