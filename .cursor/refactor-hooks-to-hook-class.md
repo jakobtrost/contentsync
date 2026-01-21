@@ -65,9 +65,7 @@ namespace Contentsync\Some\Subnamespace;
 
 use Contentsync\Utils\Hooks_Base;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Some_Module_Hooks extends Hooks_Base {
 

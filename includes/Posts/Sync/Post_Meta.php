@@ -2,9 +2,7 @@
 
 namespace Contentsync\Posts\Sync;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Post_Meta {
 

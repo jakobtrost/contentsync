@@ -9,9 +9,7 @@ namespace Contentsync\Distribution;
 
 use Contentsync\Utils\Hooks_Base;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Distribution hooks provider class.

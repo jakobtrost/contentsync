@@ -5,9 +5,7 @@ namespace Contentsync\Posts\Sync;
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Utils\Logger;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Post_Meta_Hooks extends Hooks_Base {
 
