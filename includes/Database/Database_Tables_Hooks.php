@@ -11,7 +11,7 @@
  * database tables before any data is written.
  */
 
-namespace Contentsync\DB;
+namespace Contentsync\Database;
 
 use Contentsync\Utils\Hooks_Base;
 

@@ -63,7 +63,7 @@ if ( ! is_multisite() ) {
  * will only create missing tables.
  */
 function contentsync_plugin_activated() {
-	( new \Contentsync\DB\Database_Tables_Hooks() )->maybe_add_tables();
+	( new \Contentsync\Database\Database_Tables_Hooks() )->maybe_add_tables();
 }
 
 \register_activation_hook( CONTENTSYNC_PLUGIN_FILE, __NAMESPACE__ . '\contentsync_plugin_activated' );
