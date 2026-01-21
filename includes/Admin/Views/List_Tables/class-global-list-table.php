@@ -8,6 +8,7 @@
 
 namespace Contentsync\Admin\Pages\List_Tables;
 
+use Contentsync\Posts\Theme_Assets;
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
@@ -169,7 +170,6 @@ class Global_List_Table extends \WP_List_Table {
 
 		/**
 		 * display message if translation tool is not active on the main site
-		 *
 		 */
 		if ( is_multisite() && is_network_admin() ) {
 			Multisite_Manager::switch_blog( get_main_site_id() );
@@ -294,7 +294,6 @@ class Global_List_Table extends \WP_List_Table {
 	 * The format is an associative array:
 	 * - `'id' => 'link'`
 	 *
-	 *
 	 * @return array
 	 */
 	protected function get_views() {
@@ -417,7 +416,6 @@ class Global_List_Table extends \WP_List_Table {
 	/**
 	 * Generates content for a single row of the table.
 	 *
-	 *
 	 * @param object $post The current item (still a post)
 	 */
 	public function single_row( $post ) {
@@ -512,7 +510,7 @@ class Global_List_Table extends \WP_List_Table {
 			// because the theme will automatically be switched to the theme of the destination blog
 			// during import.
 			if ( $item->local_post ) {
-				$blog_theme = \Contentsync\Posts\get_wp_template_theme( $item->local_post );
+				$blog_theme = Theme_Assets::get_wp_template_theme( $item->local_post );
 			}
 			// debug( $item, true );
 			$item->post_links = array(

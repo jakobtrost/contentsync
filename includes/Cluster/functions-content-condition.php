@@ -14,6 +14,7 @@
  */
 namespace Contentsync\Cluster;
 
+use Contentsync\Posts\Post_Query;
 use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -242,7 +243,7 @@ function get_posts_by_cluster_content_condition( $condition ) {
 	$query_args = get_query_args_for_cluster_content_condition( $condition );
 	// Logger::add( "Query args:", $query_args );
 
-	$posts = \Contentsync\Posts\get_unfiltered_posts( $query_args );
+	$posts = Post_Query::get_unfiltered_posts( $query_args );
 	// Logger::add( "Posts:", $posts );
 
 	$cluster_posts = array();
@@ -306,7 +307,7 @@ function post_meets_cluster_content_condition( $post_or_post_id, $condition_or_c
 		$query_args['post__in'] = array( $post_id );
 	}
 
-	$posts = \Contentsync\Posts\get_unfiltered_posts( $query_args );
+	$posts = Post_Query::get_unfiltered_posts( $query_args );
 
 	// ... so we have to check manually
 	if ( ! isset( $query_args['post__in'] ) ) {

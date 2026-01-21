@@ -12,10 +12,11 @@
 
 namespace Contentsync\Posts\Sync;
 
+use Contentsync\Posts\Post_Query;
 use Contentsync\Posts\Transfer\Post_Export;
-use Contentsync\Utils\Multisite_Manager;
-use Contentsync\Utils\Logger;
 use Contentsync\Posts\Transfer\Post_Import;
+use Contentsync\Utils\Logger;
+use Contentsync\Utils\Multisite_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -263,7 +264,7 @@ function untrash_connected_posts( $post_id, $delete = false ) {
 		}
 
 		Multisite_Manager::switch_blog( $destination_id );
-		$trashed = \Contentsync\Posts\get_unfiltered_posts(
+		$trashed = Post_Query::get_unfiltered_posts(
 			array(
 				'numberposts' => -1,
 				'post_status' => 'trash',

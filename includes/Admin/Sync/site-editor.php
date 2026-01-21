@@ -15,6 +15,9 @@
 
 namespace Contentsync\Admin;
 
+use Contentsync\Posts\Post_Query;
+use Contentsync\Posts\Theme_Assets;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -293,7 +296,7 @@ class Site_Editor {
 		$parts = explode( '//', $site_editor_post_id );
 		if ( count( $parts ) === 2 ) {
 
-			$posts = \Contentsync\Posts\get_unfiltered_posts(
+			$posts = Post_Query::get_unfiltered_posts(
 				array(
 					'name'        => $parts[1],
 					'post_type'   => array( 'wp_template', 'wp_template_part' ),
@@ -340,7 +343,7 @@ class Site_Editor {
 			case 'wp_template':
 			case 'wp_template_part':
 				// greyd-theme//footer, greyd-theme//404 ...
-				return \Contentsync\Posts\get_wp_template_theme( $post ) . '//' . $post->post_name;
+				return Theme_Assets::get_wp_template_theme( $post ) . '//' . $post->post_name;
 
 			case 'wp_navigation':
 			case 'wp_block':

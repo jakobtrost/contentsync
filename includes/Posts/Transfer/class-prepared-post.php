@@ -2,6 +2,7 @@
 
 namespace Contentsync\Posts\Transfer;
 
+use Contentsync\Posts\Post_Query;
 use Contentsync\Translations\Translation_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -683,7 +684,7 @@ class Prepared_Post {
 			 * in terms of the wrong language beeing attached to a post export. This function performs
 			 * way more consistent in all tests. Therefore it completely replaced it in this class.
 			 */
-			$terms = \Contentsync\Posts\get_post_taxonomy_terms( $this->ID, $taxonomy );
+			$terms = Post_Query::get_post_taxonomy_terms( $this->ID, $taxonomy );
 
 			if ( empty( $terms ) ) {
 				$prepared_terms[ $taxonomy ] = array();

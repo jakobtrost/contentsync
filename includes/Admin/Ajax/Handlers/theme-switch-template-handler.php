@@ -10,6 +10,7 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Theme_Assets;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -34,7 +35,7 @@ class Theme_Switch_Template_Handler extends Contentsync_Ajax_Handler {
 	 * @param array $data Request data containing post_id and switch_references_in_content.
 	 */
 	protected function handle( $data ) {
-		$post_id = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
+		$post_id                      = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 		$switch_references_in_content = isset( $data['switch_references_in_content'] ) ? (bool) $data['switch_references_in_content'] : false;
 
 		if ( empty( $post_id ) ) {
@@ -49,7 +50,7 @@ class Theme_Switch_Template_Handler extends Contentsync_Ajax_Handler {
 			return;
 		}
 
-		$result = \Contentsync\Posts\set_wp_template_theme( $post, $switch_references_in_content );
+		$result = Theme_Assets::set_wp_template_theme( $post, $switch_references_in_content );
 
 		if ( is_wp_error( $result ) ) {
 			$this->send_fail( $result->get_error_message() );

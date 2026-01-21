@@ -2,8 +2,10 @@
 
 namespace Contentsync\Posts\Sync;
 
-use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Posts\Post_Query;
+use Contentsync\Posts\Theme_Assets;
 use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -430,7 +432,7 @@ function get_synced_posts_of_blog( $blog_id = '', $filter_status = '', $query = 
 		);
 	}
 
-	$posts = extend_post_object( \Contentsync\Posts\get_unfiltered_posts( $args ) );
+	$posts = extend_post_object( Post_Query::get_unfiltered_posts( $args ) );
 
 	Multisite_Manager::restore_blog();
 
@@ -482,13 +484,13 @@ function extend_post_object( $post, $current_blog = 0 ) {
 		$post->meta = $meta;
 
 		// attach language
-		$post->language = \Contentsync\Posts\get_post_language_code( $post );
+		$post->language = Post_Query::get_post_language_code( $post );
 
 		// attach blog id
 		$post->blog_id = $current_blog ? $current_blog : get_current_blog_id();
 
 		// attach theme used in blog
-		$post->blog_theme = \Contentsync\Posts\get_wp_template_theme( $post );
+		$post->blog_theme = Theme_Assets::get_wp_template_theme( $post );
 	}
 	return $post;
 }
@@ -512,7 +514,7 @@ function get_local_post_by_gid( $gid, $post_type = 'any' ) {
 		$post_type = is_rest_request() ? 'any' : \Contentsync\get_export_post_types();
 	}
 
-	$result = \Contentsync\Posts\get_unfiltered_posts(
+	$result = Post_Query::get_unfiltered_posts(
 		array(
 			'posts_per_page' => 1,
 			'post_type'      => $post_type,

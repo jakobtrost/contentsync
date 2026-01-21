@@ -2,6 +2,7 @@
 
 namespace Contentsync\Utils;
 
+use Contentsync\Posts\Post_Query;
 use Contentsync\Translations\Translation_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -89,8 +90,8 @@ class Multisite_Manager {
 		Translation_Manager::init_translation_environment();
 
 		// remove filters from the query args within the export process
-		if ( ! has_filter( 'contentsync_export_post_query_args', '\Contentsync\Posts\remove_filters_from_query_args' ) ) {
-			add_filter( 'contentsync_export_post_query_args', '\Contentsync\Posts\remove_filters_from_query_args' );
+		if ( ! has_filter( 'contentsync_export_post_query_args', [ Post_Query::class, 'remove_filters_from_query_args' ] ) ) {
+			add_filter( 'contentsync_export_post_query_args', [ Post_Query::class, 'remove_filters_from_query_args' ] );
 		}
 
 		// Register the filter hook if not already registered

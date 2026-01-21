@@ -8,14 +8,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-new Theme_Posts_Admin();
+new Theme_Assets_Admin();
 
-class Theme_Posts_Admin {
+class Theme_Assets_Admin {
 
 	/**
-	 * The Theme_Posts_List_Table instance.
+	 * The Theme_Assets_List_Table instance.
 	 */
-	public $Theme_Posts_List_Table = null;
+	public $Theme_Assets_List_Table = null;
 
 	/**
 	 * Constructor.
@@ -66,11 +66,11 @@ class Theme_Posts_Admin {
 
 		add_screen_option( 'per_page', $args );
 
-		if ( ! class_exists( 'Theme_Posts_List_Table' ) ) {
+		if ( ! class_exists( 'Theme_Assets_List_Table' ) ) {
 			require_once __DIR__ . '/class-theme-posts-list-table.php';
 		}
 
-		$this->Theme_Posts_List_Table = new Theme_Posts_List_Table();
+		$this->Theme_Assets_List_Table = new Theme_Assets_List_Table();
 	}
 
 	/**
@@ -90,16 +90,16 @@ class Theme_Posts_Admin {
 	 */
 	function render_theme_export_admin_page() {
 
-		if ( ! class_exists( 'Theme_Posts_List_Table' ) ) {
+		if ( ! class_exists( 'Theme_Assets_List_Table' ) ) {
 			require_once __DIR__ . '/class-theme-posts-list-table.php';
 		}
 
-		if ( ! $this->Theme_Posts_List_Table ) {
-			$this->Theme_Posts_List_Table = new Theme_Posts_List_Table();
+		if ( ! $this->Theme_Assets_List_Table ) {
+			$this->Theme_Assets_List_Table = new Theme_Assets_List_Table();
 		}
 
-		$this->Theme_Posts_List_Table->prepare_items();
-		$this->Theme_Posts_List_Table->render();
+		$this->Theme_Assets_List_Table->prepare_items();
+		$this->Theme_Assets_List_Table->render();
 	}
 
 	/**

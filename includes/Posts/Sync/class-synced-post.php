@@ -33,8 +33,9 @@
  */
 namespace Contentsync\Posts\Sync;
 
-use Exception;
+use Contentsync\Posts\Post_Query;
 use Contentsync\Utils\Urls;
+use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -215,7 +216,7 @@ class Synced_Post {
 
 		// set language
 		if ( $this->language === null && ! $this->network_url ) {
-			$this->language = \Contentsync\Posts\get_post_language_code( $post );
+			$this->language = Post_Query::get_post_language_code( $post );
 		}
 	}
 

@@ -10,6 +10,7 @@
 
 namespace Contentsync\Admin\Ajax;
 
+use Contentsync\Posts\Theme_Assets;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -48,7 +49,7 @@ class Theme_Switch_Global_Styles_Handler extends Contentsync_Ajax_Handler {
 			return;
 		}
 
-		$result = \Contentsync\Posts\set_wp_global_styles_theme( $post );
+		$result = Theme_Assets::set_wp_global_styles_theme( $post );
 
 		if ( is_wp_error( $result ) ) {
 			$this->send_fail( $result->get_error_message() );
