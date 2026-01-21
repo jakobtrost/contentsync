@@ -9,7 +9,6 @@
  * plugin’s schema is up to date when activated or updated. Call these
  * functions during plugin initialisation to provision the cluster
  * database tables before any data is written.
- *
  */
 
 namespace Contentsync\DB;
@@ -160,7 +159,18 @@ function maybe_add_queue_distribution_items_table() {
 	return true;
 }
 
-add_action( 'init', __NAMESPACE__ . '\maybe_add_cluster_table' );
-add_action( 'init', __NAMESPACE__ . '\maybe_add_post_reviews_table' );
-add_action( 'init', __NAMESPACE__ . '\maybe_add_cluster_content_conditions_table' );
-add_action( 'init', __NAMESPACE__ . '\maybe_add_queue_distribution_items_table' );
+/**
+ * Hook the table-creation helpers into `init` as a safety net.
+ *
+ * The plugin’s activation routine eagerly calls the `maybe_add_*`
+ * functions so that tables are provisioned when the plugin is
+ * activated or updated. These `init` hooks remain to recover from
+ * edge cases where activation did not run (for example on some
+ * multisite scenarios) or tables were manually dropped.
+ */
+if ( is_admin() ) {
+	add_action( 'init', __NAMESPACE__ . '\maybe_add_cluster_table' );
+	add_action( 'init', __NAMESPACE__ . '\maybe_add_post_reviews_table' );
+	add_action( 'init', __NAMESPACE__ . '\maybe_add_cluster_content_conditions_table' );
+	add_action( 'init', __NAMESPACE__ . '\maybe_add_queue_distribution_items_table' );
+}

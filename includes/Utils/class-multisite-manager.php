@@ -13,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Manages multisite operations including blog switching, origin site URL tracking,
  * and upload directory filtering.
- *
  */
 class Multisite_Manager {
 
@@ -90,7 +89,14 @@ class Multisite_Manager {
 		Translation_Manager::init_translation_environment();
 
 		// remove filters from the query args within the export process
-		add_filter( 'contentsync_export_post_query_args', '\Contentsync\Posts\remove_filters_from_query_args' );
+		if ( ! has_filter( 'contentsync_export_post_query_args', '\Contentsync\Posts\remove_filters_from_query_args' ) ) {
+			add_filter( 'contentsync_export_post_query_args', '\Contentsync\Posts\remove_filters_from_query_args' );
+		}
+
+		// Register the filter hook if not already registered
+		if ( ! has_filter( 'upload_dir', array( __CLASS__, 'filter_wp_upload_dir' ) ) ) {
+			add_filter( 'upload_dir', array( __CLASS__, 'filter_wp_upload_dir' ), 98, 1 );
+		}
 
 		return true;
 	}
@@ -181,6 +187,3 @@ class Multisite_Manager {
 		return $all_blogs;
 	}
 }
-
-// Register the filter hook
-add_filter( 'upload_dir', array( Multisite_Manager::class, 'filter_wp_upload_dir' ), 98, 1 );
