@@ -69,3 +69,6 @@ function contentsync_plugin_deactivated() {
 
 // Load Composer autoloader for PSR-4 autoloading.
 require_once CONTENTSYNC_PLUGIN_PATH . '/vendor/autoload.php';
+
+// Load all hook providers.
+new \Contentsync\Utils\Hooks_Loader();

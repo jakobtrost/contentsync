@@ -2,11 +2,25 @@
 
 You are working inside the **Contentsync** WordPress plugin.
 
-Refactor **one hooks-containing file** into a **hook provider class** that follows the conventions in `DEVELOPMENT.md` and uses a shared hooks base class. Update the plugin so the new hook provider is registered appropriately.
+Refactor **one hooks-containing file** into a **hook provider class** that follows the conventions below and uses a shared hooks base class.
 
 This applies to:
 - Files already named like `hooks-*.php`.
 - Files where hooks (`add_action`, `add_filter`) are mixed into a functions file.
+
+---
+
+### DO NOT (critical)
+
+- **DO NOT search for `require`, `include`, or autoload statements.** They don't exist and are not relevant.
+- **DO NOT modify the main plugin file** (`contentsync.php`) or any loader/bootstrap file.
+- **DO NOT add instantiation** (`new ClassName()`) anywhere. Hook classes are auto-discovered.
+- **DO NOT investigate how files are loaded.** Just create the class file and delete the old file.
+
+**Why no instantiation?** The plugin has a `Hooks_Loader` (`includes/Utils/Hooks_Loader.php`) that automatically discovers all `*_Hooks.php` files in `includes/` and instantiates them. Just create the file with the correct naming convention and it will be loaded automatically.
+
+
+---
 
 ### Conventions (must follow)
 
@@ -14,40 +28,42 @@ This applies to:
 - **All code under `includes/`** is inside the `Contentsync\…` namespace.
 - **Namespace = folder structure under `includes/`**.
 - **Class and file naming**:
-  - Hook classes end in `_Hooks` (e.g. `Post_Import_Hooks`, `Reviews_Mails_Hooks`).
+  - Hook classes end in `_Hooks` (e.g. `Post_Transfer_Hooks`, `Reviews_Mails_Hooks`).
   - Remove any `hooks-` prefix from the file name.
   - Use `Word1_Word2_Hooks` style with capitalized words and underscores.
-  - File name equals the class name: `Post_Import_Hooks.php` defines `class Post_Import_Hooks`.
+  - File name equals the class name: `Post_Transfer_Hooks.php` defines `class Post_Transfer_Hooks`.
 - **Base class**:
-  - Hook provider classes extend the shared base: `Contentsync\Utils\Hooks_Base`.
-  - The base class exposes:
-    - `public function register(): void`
-    - `public function register_frontend(): void`
-    - `public function register_admin(): void`
-  - Concrete hook classes override these as needed.
+  - Hook provider classes extend: `Contentsync\Utils\Hooks_Base`.
+  - Override these methods as needed:
+    - `public function register()` — hooks that run everywhere
+    - `public function register_frontend()` — frontend-only hooks
+    - `public function register_admin()` — admin-only hooks
+
+---
 
 ### Steps
 
-1. **Identify hooks and their context**
-   - Read the target file.
-   - Collect all `add_action()` and `add_filter()` calls that belong to this logical area (e.g. “post import hooks”).
-   - If hooks are mixed into a larger functions file:
-     - Separate pure helpers from hooks.
-     - Only the hooks and their callback methods go into the new hook class.
-     - Keep existing helper logic in helper/service classes as per the function-refactor guidelines.
+1. **Read the target file**
+   - Identify all `add_action()` and `add_filter()` calls.
+   - Identify the callback functions for each hook.
 
 2. **Create the hook provider class**
-   - Determine the namespace from the folder under `includes/`.
-   - Choose a class name ending in `_Hooks` that describes the area, e.g.:
-     - `Post_Import_Hooks` for `includes/Posts/Transfer/…`.
-   - Create a file named `Class_Name.php` (e.g. `Post_Import_Hooks.php`) and define:
+   - Use the class name provided by the user (or derive one ending in `_Hooks`).
+   - Create the file in the same directory as the old file.
+   - Namespace matches the folder path under `includes/`.
 
 ```php
+<?php
+
 namespace Contentsync\Some\Subnamespace;
 
 use Contentsync\Utils\Hooks_Base;
 
-class Subnamespace_Module_Hooks extends Hooks_Base {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+class Some_Module_Hooks extends Hooks_Base {
 
 	public function register() {
 		// Common actions/filters (optional)
@@ -66,45 +82,27 @@ class Subnamespace_Module_Hooks extends Hooks_Base {
    - If the plugin’s base hooks class uses a different namespace or method signatures, adapt accordingly.
 
 3. **Move hook registrations into the class**
-   - Move each `add_action` / `add_filter` from the old file into the appropriate method:
-     - Hooks that should run on both sides: stay in `register()`.
-     - Frontend-only hooks: in `register_frontend()`.
-     - Admin-only hooks: in `register_admin()`.
-   - Hook callbacks should be methods on this class or on another appropriate class:
-     - For callbacks defined here, use `[ $this, 'method_name' ]`.
-     - For callbacks on other classes, follow the class-based patterns from the function refactor.
+   - Put hooks in the appropriate method:
+     - `register()` — hooks that run on both frontend and admin (most common)
+     - `register_frontend()` — frontend-only hooks
+     - `register_admin()` — admin-only hooks
+   - Convert callbacks from `__NAMESPACE__ . '\function_name'` to `array( $this, 'method_name' )`.
 
-4. **Adjust or create helper classes if needed**
-   - If some hook callbacks were previously standalone functions in this file:
-     - Move those helpers into a separate helper/service class (static or instance) following the function-refactor conventions.
-     - In the hook provider, call those helpers via `Helper_Class::method()` or injected services, rather than keeping large logic bodies in the hook methods.
+4. **Convert callback functions to class methods**
+   - Move each callback function into the class as a public method.
+   - Keep the same logic and parameters.
 
-5. **Update plugin bootstrap/loader**
-   - Identify where these hooks were previously registered/loaded (often just by including the old file).
-   - Replace that with explicit registration of the new hook class:
-     - Import the class at the top: `use Contentsync\Some\Subnamespace\Post_Import_Hooks;`
-     - Instantiate and register in the appropriate context:
-       - For example, in a module loader or main loader:
+5. **Delete the original file**
+   - Delete the old `hooks-*.php` file entirely.
 
-```php
-new Post_Import_Hooks();
-```
+6. **Done** — Do not modify any other files.
 
-6. **Clean up the original file**
-   - If the old file was only hooks:
-   		- It should now be replaced entirely by the new hook provider class file with proper naming.
-   - If hooks were mixed with other functions:
-   		- Remove the hook registrations from the original file.
-   		- Ensure any remaining helpers there are refactored later according to the function-collection guidelines.
+---
 
-7. **Preserve behavior**
-   - Do not change which hooks are registered or when they run (admin vs frontend), except to make the context boundaries explicit.
-   - Ensure all previous add_action/add_filter calls still exist, just moved and possibly restructured.
+### Summary
 
-8. **Final checks**
-   - New hook class:
-   		- Extends the common hooks base class.
-   		- Lives in the correct Contentsync\… namespace.
-   		- Resides in a file that matches its class name.
-   - No old, unused hook registrations remain in the former file.
-   - All context-sensitive hooks are correctly grouped into register_frontend() / register_admin() and wired from the loader.
+This is a simple, mechanical refactor:
+1. Read the old hooks file.
+2. Create the new class file with the hooks and callbacks as methods.
+3. Delete the old file.
+4. That's it. No other changes needed.
