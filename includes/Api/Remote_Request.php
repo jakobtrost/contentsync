@@ -54,6 +54,24 @@ class Remote_Request {
 	}
 
 	/**
+	 * Get all remote blogs
+	 *
+	 * @param array|string $connection_or_site_url
+	 *
+	 * @return mixed
+	 */
+	public static function get_remote_blogs( $connection_or_site_url ) {
+		$cache_key = 'contentsync_remote_blogs_' . $connection_or_site_url;
+		$cache     = wp_cache_get( $cache_key );
+		if ( $cache ) {
+			return $cache;
+		}
+		$blogs = self::send_request( $connection_or_site_url, 'remote_blogs' );
+		wp_cache_set( $cache_key, $blogs );
+		return $blogs;
+	}
+
+	/**
 	 * Get all remote synced posts
 	 *
 	 * @param array|string $connection_or_site_url

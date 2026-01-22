@@ -14,6 +14,8 @@ defined( 'ABSPATH' ) || exit;
 
 class Connections_Page_Hooks extends Hooks_Base {
 
+	const CONNECTIONS_PAGE_POSITION = 70;
+
 	/**
 	 * Holds errors
 	 */
@@ -24,7 +26,8 @@ class Connections_Page_Hooks extends Hooks_Base {
 	 */
 	public function register_admin() {
 		// add the menu items & pages
-		add_action( ( is_multisite() ? 'network_admin_menu' : 'admin_menu' ), array( $this, 'add_submenu' ), 99 );
+		add_action( 'admin_menu', array( $this, 'add_submenu_item' ), self::CONNECTIONS_PAGE_POSITION );
+		add_action( 'network_admin_menu', array( $this, 'add_submenu_item' ), self::CONNECTIONS_PAGE_POSITION );
 
 		// add the redirect actions
 		add_action( 'admin_init', array( $this, 'maybe_redirect_to_auth_page' ), 99 );
@@ -41,16 +44,20 @@ class Connections_Page_Hooks extends Hooks_Base {
 	/**
 	 * Add the menu
 	 */
-	public function add_submenu() {
+	public function add_submenu_item() {
+
+		if ( is_multisite() && ! is_super_admin() ) {
+			return;
+		}
 
 		$page_slug = add_submenu_page(
-			'contentsync', // Admin::$args['slug'], // parent slug
+			'contentsync', // parent slug
 			__( 'Connections', 'contentsync_hub' ),  // page title
-			__( 'Connections', 'contentsync_hub' ), // menu title
+			( is_network_admin() ? '' : '→ ' ) . __( 'Connections', 'contentsync_hub' ), // menu title
 			'manage_options', // capability
-			'gc_connections', // slug
-			array( $this, 'render_admin_page' ), // function
-			60 // position
+			is_network_admin() ? 'site_connections' : network_admin_url( 'admin.php?page=site_connections' ), // slug
+			is_network_admin() ? array( $this, 'render_admin_page' ) : '', // function
+			self::CONNECTIONS_PAGE_POSITION // position
 		);
 	}
 
@@ -115,7 +122,7 @@ class Connections_Page_Hooks extends Hooks_Base {
 		}
 
 		// only on this page
-		if ( $_GET['page'] === 'gc_connections' || ( $_GET['page'] === 'contentsync_hub' && isset( $_GET['tab'] ) && $_GET['tab'] === 'connections' ) ) {
+		if ( $_GET['page'] === 'site_connections' || ( $_GET['page'] === 'contentsync_hub' && isset( $_GET['tab'] ) && $_GET['tab'] === 'connections' ) ) {
 			// I think it's better to read this way...
 		} else {
 			return;
@@ -142,7 +149,7 @@ class Connections_Page_Hooks extends Hooks_Base {
 
 		// generate the final request url
 		$input_auth_url = preg_replace( '/\/$/', '', $input_url ) . '/wp-admin/authorize-application.php';
-		$success_path   = $_GET['page'] === 'gc_connections' ? 'admin.php?page=gc_connections' : 'admin.php?page=contentsync_hub&tab=connections';
+		$success_path   = $_GET['page'] === 'site_connections' ? 'admin.php?page=site_connections' : 'admin.php?page=contentsync_hub&tab=connections';
 		$success_url    = is_network_admin() ? network_admin_url( $success_path ) : admin_url( $success_path );
 
 		$app_name   = urlencode( sprintf( __( 'Connection for %s', 'contentsync_hub' ), Urls::get_network_url() ) );
@@ -224,7 +231,7 @@ class Connections_Page_Hooks extends Hooks_Base {
 	public function check_connections( $current_screen ) {
 
 		// only execute on connections admin sub page
-		if ( strpos( $current_screen->base, 'gc_connections' ) === false &&
+		if ( strpos( $current_screen->base, 'site_connections' ) === false &&
 			strpos( $current_screen->base, 'global-content' ) !== 0 &&
 			strpos( $current_screen->base, 'contentsync' ) === false &&
 			strpos( $current_screen->base, 'contentsync_hub' ) === false

@@ -3,7 +3,6 @@
  * Displays all cluster post reviews in a table.
  *
  * @extends WP_List_Table ( wp-admin/includes/class-wp-list-table.php )
- *
  */
 
 namespace Contentsync\Admin\Views\Reviews;
@@ -117,7 +116,6 @@ class Post_Review_List_Table extends \WP_List_Table {
 	 *
 	 * The format is an associative array:
 	 * - `'id' => 'link'`
-	 *
 	 *
 	 * @return array
 	 */
@@ -320,7 +318,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 			$content = sprintf(
 				'<strong><span class="row-title">%s</span> %s</strong>',
 				$title,
-				Admin_Render::make_admin_info_popup( $msg, 'right' )
+				Admin_Render::make_admin_tooltip_popup( $msg, 'right' )
 			);
 		}
 
@@ -354,11 +352,11 @@ class Post_Review_List_Table extends \WP_List_Table {
 				if ( $post->state != 'approved' ) {
 					$reviewer_message_content = $reviewer_message->get_content( true );
 					if ( empty( $reviewer_message_content ) ) {
-						$info .= Admin_Render::make_admin_info_popup(
+						$info .= Admin_Render::make_admin_tooltip_popup(
 							"<div class='log_title'>" . sprintf( __( 'The reviewer (%s) left no message.', 'contentsync' ), $reviewer ) . '</div>'
 						);
 					} else {
-						$info .= Admin_Render::make_admin_info_popup(
+						$info .= Admin_Render::make_admin_tooltip_popup(
 							"<div class='log_title'>" . sprintf( __( 'The reviewer (%s) left the following message:', 'contentsync' ), $reviewer ) . '</div>' .
 							"<div class='log_items'><b>" . $reviewer_message_content . '</b></div>'
 						);

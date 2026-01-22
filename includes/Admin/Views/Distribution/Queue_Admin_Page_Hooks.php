@@ -14,12 +14,14 @@ namespace Contentsync\Admin\Views\Distribution;
 
 use Contentsync\Admin\Views\Distribution\Queue_List_Table;
 use Contentsync\Distribution\Distributor;
-use Contentsync\Distribution\Distributor_Item_Service;
+use Contentsync\Distribution\Distribution_Item_Service;
 use Contentsync\Utils\Hooks_Base;
 
 defined( 'ABSPATH' ) || exit;
 
 class Queue_Admin_Page_Hooks extends Hooks_Base {
+
+	const QUEUE_PAGE_POSITION = 40;
 
 	/**
 	 * Holds instance of the class 'List_Table'
@@ -33,10 +35,10 @@ class Queue_Admin_Page_Hooks extends Hooks_Base {
 
 	public function register_admin() {
 
-		$admin_menu_hook = is_multisite() ? 'network_admin_menu' : 'admin_menu';
-
 		// add the menu items & pages
-		add_action( $admin_menu_hook, array( $this, 'add_admin_page' ), 9 );
+		add_action( 'admin_menu', array( $this, 'add_submenu_item' ) );
+		add_action( 'network_admin_menu', array( $this, 'add_submenu_item' ) );
+
 		add_filter( 'set-screen-option', array( $this, 'queue_save_screen_options' ), 10, 3 );
 
 		// Enqueue scripts for the queue page
@@ -53,7 +55,11 @@ class Queue_Admin_Page_Hooks extends Hooks_Base {
 	/**
 	 * Add a menu item to the WordPress admin menu
 	 */
-	public function add_admin_page() {
+	public function add_submenu_item() {
+
+		if ( is_multisite() && ! is_super_admin() ) {
+			return;
+		}
 
 		$hook = add_submenu_page(
 			'contentsync',
@@ -61,7 +67,8 @@ class Queue_Admin_Page_Hooks extends Hooks_Base {
 			__( 'Queue', 'contentsync' ), // menu title
 			'manage_options',
 			'contentsync_queue',
-			array( $this, 'render_queue_admin_page' )
+			array( $this, 'render_queue_admin_page' ),
+			self::QUEUE_PAGE_POSITION // position
 		);
 
 		add_action( "load-$hook", array( $this, 'queue_add_screen_options' ) );

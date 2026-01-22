@@ -10,6 +10,7 @@ namespace Contentsync\Admin\Views\Cluster;
 use Contentsync\Admin\Utils\Admin_Posts;
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Cluster\Cluster_Service;
+use Contentsync\Api\Site_Connection;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -77,7 +78,7 @@ class Cluster_List_Table extends \WP_List_Table {
 		// set items
 		$this->items = array_slice( $items, ( $current_page - 1 ) * $per_page, $per_page );
 
-		$this->all_destination_blogs = \Contentsync\Connections\Connections_Helper::get_all_networks();
+		$this->all_destination_blogs = Site_Connection::get_all_local_and_remote_blogs();
 	}
 
 	/**
@@ -223,7 +224,7 @@ class Cluster_List_Table extends \WP_List_Table {
 				'<strong><span class="row-title">%s</span>%s&nbsp;%s</strong>',
 				$post->title,
 				$post_status,
-				Admin_Render::make_admin_info_popup( $error, 'right' )
+				Admin_Render::make_admin_tooltip_popup( $error, 'right' )
 			);
 		}
 

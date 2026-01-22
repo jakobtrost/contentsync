@@ -8,78 +8,50 @@ class Menu_Hooks extends Hooks_Base {
 
 	public function register() {
 
-		add_action( 'admin_menu', array( $this, 'add_menu_pages' ), 3 );
-		add_action( 'network_admin_menu', array( $this, 'add_menu_pages' ), 3 );
+		add_action( 'admin_menu', array( $this, 'add_main_plugin_menu_item' ), 3 );
+		add_action( 'network_admin_menu', array( $this, 'add_main_plugin_menu_item' ), 3 );
+
 		add_action( 'admin_bar_menu', array( $this, 'add_network_adminbar_items' ), 11 );
+
+		// enqueue css
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_css' ) );
 	}
 
 	/**
-	 * Add the menu pages
+	 * Add the main plugin menu item
 	 */
-	public function add_menu_pages() {
-
-		$args = array(
-			'slug'           => 'contentsync',
-			'title'          => __( 'Content Sync', 'contentsync' ),
-			'singular'       => __( 'Content Sync', 'contentsync' ),
-			'plural'         => __( 'Content Sync', 'contentsync' ),
-			'admin_url'      => admin_url( 'admin.php?page=contentsync' ),
-			'network_url'    => network_admin_url( 'admin.php?page=contentsync' ),
-			'posts_per_page' => 20,
-		);
+	public function add_main_plugin_menu_item() {
 
 		/**
 		 * add the main page
 		 */
 		$hook = add_menu_page(
-			$args['title'], // page title
-			$args['title'], // menu title
+			__( 'Content Sync', 'contentsync' ), // page title
+			__( 'Content Sync', 'contentsync' ), // menu title
 			'manage_options', // capability
-			$args['slug'], // slug
+			'contentsync', // slug
 			array( $this, 'render_main_plugin_page' ), // function
 			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Menu/assets/contentsync-menu-icon.svg', // icon url
 			72 // position
 		);
-		// add_action( 'load-' . $hook, array( $this, 'add_overview_screen_options' ) );
-
-		/**
-		 * add the ghost submenu item
-		 */
-		add_submenu_page(
-			$args['slug'], // parent slug
-			$args['title'],  // page title
-			__( 'Dashboard', 'contentsync' ),
-			'manage_options', // capability
-			$args['slug'], // slug
-			'', // function
-			1 // position
-		);
-
-		if ( is_multisite() && is_super_admin() ) {
-
-			/**
-			 * add the network link
-			 */
-			if ( ! is_network_admin() ) {
-				add_submenu_page(
-					$args['slug'], // parent slug
-					__( 'Network Content', 'contentsync' ),  // page title
-					__( 'Network Content', 'contentsync' ), // menu title
-					'manage_options', // capability
-					$args['network_url'], // slug
-					'', // function
-					50 // position
-				);
-			}
-		}
 	}
 
+	/**
+	 * Render the main plugin page
+	 */
 	public function render_main_plugin_page() {
 		do_action( 'contentsync_render_main_plugin_page' );
 	}
 
 	/**
-	 * Network adminbar
+	 * Screen options for the admin pages
+	 */
+	public function add_screen_options() {
+		do_action( 'contentsync_add_main_plugin_page_screen_options' );
+	}
+
+	/**
+	 * Add item to network adminbar
 	 */
 	public function add_network_adminbar_items( $wp_admin_bar ) {
 		$wp_admin_bar->add_node(
@@ -89,6 +61,18 @@ class Menu_Hooks extends Hooks_Base {
 				'parent' => 'network-admin',
 				'href'   => network_admin_url( 'admin.php?page=contentsync' ),
 			)
+		);
+	}
+
+	/**
+	 * Enqueue css
+	 */
+	public function enqueue_css() {
+		wp_enqueue_style(
+			'contentsync-menu',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Menu/assets/admin-menu.css',
+			array(),
+			CONTENTSYNC_VERSION
 		);
 	}
 }

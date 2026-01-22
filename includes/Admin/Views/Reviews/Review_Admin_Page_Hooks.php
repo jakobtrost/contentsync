@@ -21,6 +21,8 @@ defined( 'ABSPATH' ) || exit;
 
 class Review_Admin_Page_Hooks extends Hooks_Base {
 
+	const REVIEW_PAGE_POSITION = 61;
+
 	/**
 	 * The Post_Review_List_Table instance.
 	 */
@@ -30,24 +32,26 @@ class Review_Admin_Page_Hooks extends Hooks_Base {
 	 * Register admin-only hooks.
 	 */
 	public function register_admin() {
-		$admin_menu_hook = is_multisite() ? 'network_admin_menu' : 'admin_menu';
+		// add the menu items & pages
+		add_action( 'admin_menu', array( $this, 'add_submenu_item' ), self::REVIEW_PAGE_POSITION );
+		add_action( 'network_admin_menu', array( $this, 'add_submenu_item' ), self::REVIEW_PAGE_POSITION );
 
-		add_action( $admin_menu_hook, array( $this, 'add_admin_page' ), 4 );
 		add_filter( 'set-screen-option', array( $this, 'save_screen_options' ), 10, 3 );
 	}
 
 	/**
 	 * Add a menu item to the WordPress admin menu
 	 */
-	function add_admin_page() {
+	function add_submenu_item() {
 
 		$hook = add_submenu_page(
 			'contentsync',
-			__( 'Post Reviews', 'contentsync' ), // page title
-			__( 'Post Reviews', 'contentsync' ), // menu title
+			__( 'Reviews', 'contentsync' ), // page title
+			( is_network_admin() ? '' : '→ ' ) . __( 'Reviews', 'contentsync' ), // menu title
 			'manage_options',
-			'contentsync-post-reviews',
-			array( $this, 'render_admin_page' )
+			is_network_admin() ? 'contentsync-post-reviews' : network_admin_url( 'admin.php?page=contentsync-post-reviews' ),
+			is_network_admin() ? array( $this, 'render_admin_page' ) : '',
+			self::REVIEW_PAGE_POSITION // position
 		);
 
 		add_action( "load-$hook", array( $this, 'add_screen_options' ) );

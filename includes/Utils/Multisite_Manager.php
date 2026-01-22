@@ -2,8 +2,10 @@
 
 namespace Contentsync\Utils;
 
+use Contentsync\Utils\Urls;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Translations\Translation_Manager;
+use Contentsync\Utils\Blog_Reference;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -163,27 +165,27 @@ class Multisite_Manager {
 	/**
 	 * Get all blogs of a multisite
 	 *
-	 * @return array ID => [site_url, prefix]
+	 * @return Blog_Reference[] $all_blogs  Array of Blog_Reference objects keyed by blog_id
+	 *      @property int blog_id
+	 *      @property string db_prefix
+	 *      @property string name
+	 *      @property string domain
+	 *      @property string protocol
+	 *      @property string site_url
 	 */
 	public static function get_all_blogs() {
 		global $wpdb;
 
 		if ( ! is_multisite() ) {
 			$all_blogs = array(
-				get_current_blog_id() => array(
-					'site_url' => get_site_url(),
-					'prefix'   => $wpdb->get_blog_prefix(),
-				),
+				1 => new Blog_Reference( 1 ),
 			);
 		} else {
 			$all_blogs = array();
 			$sites     = get_sites( array( 'number' => 999 ) );
 			if ( $sites ) {
 				foreach ( $sites as $blog ) {
-					$all_blogs[ $blog->blog_id ] = array(
-						'site_url' => $blog->domain . $blog->path,
-						'prefix'   => $wpdb->get_blog_prefix( $blog->blog_id ),
-					);
+					$all_blogs[ $blog->blog_id ] = new Blog_Reference( $blog->blog_id );
 				}
 			}
 		}

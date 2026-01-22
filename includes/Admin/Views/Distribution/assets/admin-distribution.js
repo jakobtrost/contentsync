@@ -211,16 +211,16 @@ contentsync.distribution = new ( function () {
 			if ( !row ) return;
 
 			// Find the status cell
-			const statusCell = row.querySelector( 'td.status.column-status .contentsync_status' );
+			const statusCell = row.querySelector( 'td.status.column-status .contentsync-status' );
 			if ( !statusCell ) return;
 
 			// Update the status span
 			if ( status === 'success' ) {
-				statusCell.className = 'contentsync_info_box green contentsync_status';
+				statusCell.className = 'contentsync-info-box green contentsync-status';
 				statusCell.setAttribute( 'data-title', 'success' );
 				statusCell.innerHTML = '<span>' + ( distributionData.i18n.completed || 'Completed' ) + '</span>';
 			} else if ( status === 'failed' ) {
-				statusCell.className = 'contentsync_info_box red contentsync_status';
+				statusCell.className = 'contentsync-info-box red contentsync-status';
 				statusCell.setAttribute( 'data-title', 'failed' );
 				statusCell.innerHTML = '<span>' + ( distributionData.i18n.failed || 'Failed' ) + '</span>';
 			}

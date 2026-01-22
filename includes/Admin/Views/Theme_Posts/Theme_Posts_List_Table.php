@@ -503,7 +503,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				'<strong><span class="row-title">%s</span>%s&nbsp;%s</strong>',
 				$post->post_title,
 				$post_status,
-				Admin_Render::make_admin_info_popup( $error, 'right' )
+				Admin_Render::make_admin_tooltip_popup( $error, 'right' )
 			);
 		}
 

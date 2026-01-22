@@ -14,7 +14,7 @@ contentsync.overlay = new function() {
 		} );
 
 		// greyd info popup
-		$( '.contentsync_popup_wrapper' ).on( 'click', function( e ){
+		$( '.contentsync-tooltip-wrapper' ).on( 'click', function( e ){
 			contentsync.overlay.togglePopup( e, $( this ) );
 		} );
 

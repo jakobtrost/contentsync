@@ -11,6 +11,8 @@ namespace Contentsync\Api;
 
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Urls;
+use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Api\Remote_Request;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -209,5 +211,43 @@ class Site_Connection {
 		$result = self::update_all( $connections );
 
 		return (bool) $result;
+	}
+
+	/**
+	 * Get all blogs from all networks.
+	 *
+	 * @see Multisite_Manager::get_all_blogs()
+	 * @see Remote_Request::get_remote_blogs()
+	 *
+	 * @return array  $blogs  All Blogs.
+	 *      @property Blog_Reference[] local      All local Blogs keyed by blog_id.
+	 *          @property int $blog_id
+	 *          @property string $db_prefix
+	 *          @property string $name
+	 *          @property string $domain
+	 *          @property string $protocol
+	 *          @property string $site_url
+	 *      @property Blog_Reference[][] remote     All remote networks keyed by network URL. (optional)
+	 *          @property Blog_Reference[] $blogs  All remote Blogs by network keyed by blog_id.
+	 *              @property int $blog_id
+	 *              @property string $db_prefix
+	 *              @property string $name
+	 *              @property string $domain
+	 *              @property string $protocol
+	 *              @property string $site_url
+	 */
+	public static function get_all_local_and_remote_blogs() {
+
+		$blogs = array(
+			'local' => Multisite_Manager::get_all_blogs(),
+		);
+		if ( self::get_all() ) {
+			$blogs['remote'] = array();
+			foreach ( self::get_all() as $network_url => $connection ) {
+				$blogs['remote'][ $network_url ] = Remote_Request::get_remote_blogs( $connection );
+			}
+		}
+
+		return $blogs;
 	}
 }

@@ -254,41 +254,41 @@ class Global_List_Table extends WP_List_Table {
 
 		$current = isset( $_GET['post_type'] ) ? esc_attr( $_GET['post_type'] ) : '';
 		$builtin = array_flip( array( 'post', 'page', 'attachment' ) );
-		$greyd   = array_flip( array( 'dynamic_template', 'tp_posttypes', 'contentsync_popup', 'tp_forms' ) );
 
 		// re-sort supported post types
 		$post_types = array_keys(
 			array_merge(
 				$builtin,
-				$greyd,
 				array_flip( Post_Transfer_Service::get_supported_post_types() )
 			)
 		);
 
-		echo "<div id='global_tabs' class='contentsync_tabs'>";
-		printf(
-			"<a href='%s' class='tab %s'>%s</a>",
-			remove_query_arg( 'post_type' ),
-			empty( $current ) ? 'active' : '',
-			__( 'All', 'contentsync' )
+		$tabs = array(
+			'all' => array(
+				'label' => __( 'All', 'contentsync' ),
+				'url'   => remove_query_arg( 'post_type' ),
+				'class' => empty( $current ) ? 'active' : '',
+			),
 		);
 		foreach ( $post_types as $post_type ) {
 			$post_type_obj = get_post_type_object( $post_type );
+			$classNames    = '';
+			if ( isset( $builtin[ $post_type ] ) ) {
+				$classNames .= 'blue';
+			}
+			if ( $current == $post_type ) {
+				$classNames .= 'active';
+			}
 			if ( $post_type_obj ) {
-				printf(
-					"<a href='%s' class='tab %s %s'>%s</a>",
-					add_query_arg(
-						'post_type',
-						$post_type,
-						remove_query_arg( array( 'paged' ) )
-					),
-					isset( $builtin[ $post_type ] ) ? 'blue' : ( isset( $greyd[ $post_type ] ) ? 'greyd' : '' ),
-					$current == $post_type ? 'active' : '',
-					$post_type_obj->labels->name
+				$tabs[ $post_type ] = array(
+					'label' => $post_type_obj->labels->name,
+					'url'   => add_query_arg( 'post_type', $post_type, remove_query_arg( array( 'paged' ) ) ),
+					'class' => $classNames,
 				);
 			}
 		}
-		echo '</div>';
+
+		echo Admin_Render::make_tabs( $tabs, 'global_tabs' );
 	}
 
 	/**

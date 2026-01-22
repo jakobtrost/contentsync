@@ -33,7 +33,7 @@
 namespace Contentsync\Api\Endpoints;
 
 use Contentsync\Distribution\Distributor;
-use Contentsync\Distribution\Distributor_Item_Service;
+use Contentsync\Distribution\Distribution_Item_Service;
 use Contentsync\Utils\Logger;
 use Contentsync\Distribution\Distributor_Item;
 use Contentsync\Distribution\Destinations\Remote_Destination;

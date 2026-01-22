@@ -23,10 +23,13 @@ use Contentsync\Posts\Sync\Synced_Post_Service;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Admin\Views\Cluster\Cluster_List_Table;
+use Contentsync\Api\Site_Connection;
 
 defined( 'ABSPATH' ) || exit;
 
-class Cluster_Admin_Hooks extends Hooks_Base {
+class Cluster_Page_Hooks extends Hooks_Base {
+
+	const CLUSTER_PAGE_POSITION = 60;
 
 	/**
 	 * The Cluster_List_Table instance.
@@ -42,9 +45,11 @@ class Cluster_Admin_Hooks extends Hooks_Base {
 	 * Register admin-only hooks.
 	 */
 	public function register_admin() {
-		$admin_menu_hook = is_multisite() ? 'network_admin_menu' : 'admin_menu';
 
-		add_action( $admin_menu_hook, array( $this, 'add_cluster_admin_page' ), 4 );
+		// add the menu items & pages
+		add_action( 'admin_menu', array( $this, 'add_submenu_item' ), self::CLUSTER_PAGE_POSITION );
+		add_action( 'network_admin_menu', array( $this, 'add_submenu_item' ), self::CLUSTER_PAGE_POSITION );
+
 		add_filter( 'set-screen-option', array( $this, 'cluster_save_screen_options' ), 10, 3 );
 
 		// add wizard
@@ -61,6 +66,86 @@ class Cluster_Admin_Hooks extends Hooks_Base {
 		// Add enqueues for cluster-specific assets
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 98 );
 	}
+
+	/**
+	 * ***************************************************************
+	 * Cluster Admin Page
+	 * ***************************************************************
+	 */
+
+	/**
+	 * Add a menu item to the WordPress admin menu
+	 */
+	function add_submenu_item() {
+
+		if ( is_multisite() && ! is_super_admin() ) {
+			return;
+		}
+
+		$hook = add_submenu_page(
+			'contentsync',
+			( isset( $_GET['cluster_id'] ) && is_numeric( $_GET['cluster_id'] ) ) ? __( 'Edit Cluster', 'contentsync' ) : __( 'Cluster', 'contentsync' ), // page title
+			( is_network_admin() ? '' : '→ ' ) . __( 'Cluster', 'contentsync' ), // menu title
+			'manage_options',
+			is_network_admin() ? 'contentsync_clusters' : network_admin_url( 'admin.php?page=contentsync_clusters' ),
+			is_network_admin() ? array( $this, 'render_clusters_admin_page' ) : '',
+			self::CLUSTER_PAGE_POSITION // position
+		);
+
+		add_action( "load-$hook", array( $this, 'clusters_add_screen_options' ) );
+	}
+
+	/**
+	 * Set screen options for the admin pages
+	 */
+	public function clusters_add_screen_options() {
+		$args = array(
+			'label'   => __( 'Cluster per page:', 'contentsync' ),
+			'default' => 20,
+			'option'  => 'clusters_per_page',
+		);
+
+		add_screen_option( 'per_page', $args );
+
+		$this->Cluster_List_Table = new Cluster_List_Table();
+	}
+
+	/**
+	 * Save the admin screen option
+	 */
+	public function cluster_save_screen_options( $status, $option, $value ) {
+
+		if ( 'clusters_per_page' == $option ) {
+			return $value;
+		}
+
+		return $status;
+	}
+
+	/**
+	 * Display the custom admin list page
+	 */
+	function render_clusters_admin_page() {
+
+		// check if set and is numeric
+		if ( isset( $_GET['cluster_id'] ) && is_numeric( $_GET['cluster_id'] ) ) {
+			$this->render_cluster_edit_page();
+		} else {
+
+			if ( ! $this->Cluster_List_Table ) {
+				$this->Cluster_List_Table = new Cluster_List_Table();
+			}
+
+			$this->Cluster_List_Table->prepare_items();
+			$this->Cluster_List_Table->render();
+		}
+	}
+
+	/**
+	 * ***************************************************************
+	 * Enqueue
+	 * ***************************************************************
+	 */
 
 	/**
 	 * Enqueue cluster-specific admin scripts and styles
@@ -100,75 +185,6 @@ class Cluster_Admin_Hooks extends Hooks_Base {
 				'admin_url_base' => is_multisite() ? 'wp-admin/network/admin.php' : 'wp-admin/admin.php',
 			)
 		);
-	}
-
-	/**
-	 * ***************************************************************
-	 * Cluster Admin Page
-	 * ***************************************************************
-	 */
-
-	/**
-	 * Add a menu item to the WordPress admin menu
-	 */
-	function add_cluster_admin_page() {
-
-		$hook = add_submenu_page(
-			'contentsync',
-			( isset( $_GET['cluster_id'] ) && is_numeric( $_GET['cluster_id'] ) ) ? __( 'Edit Cluster', 'contentsync' ) : __( 'Clusters', 'contentsync' ), // page title
-			__( 'Clusters', 'contentsync' ), // menu title
-			'manage_options',
-			'contentsync_clusters',
-			array( $this, 'render_clusters_admin_page' )
-		);
-
-		add_action( "load-$hook", array( $this, 'clusters_add_screen_options' ) );
-	}
-
-	/**
-	 * Set screen options for the admin pages
-	 */
-	public function clusters_add_screen_options() {
-		$args = array(
-			'label'   => __( 'Clusters per page:', 'contentsync' ),
-			'default' => 20,
-			'option'  => 'clusters_per_page',
-		);
-
-		add_screen_option( 'per_page', $args );
-
-		$this->Cluster_List_Table = new Cluster_List_Table();
-	}
-
-	/**
-	 * Save the admin screen option
-	 */
-	public function cluster_save_screen_options( $status, $option, $value ) {
-
-		if ( 'clusters_per_page' == $option ) {
-			return $value;
-		}
-
-		return $status;
-	}
-
-	/**
-	 * Display the custom admin list page
-	 */
-	function render_clusters_admin_page() {
-
-		// check if set and is numeric
-		if ( isset( $_GET['cluster_id'] ) && is_numeric( $_GET['cluster_id'] ) ) {
-			$this->render_cluster_edit_page();
-		} else {
-
-			if ( ! $this->Cluster_List_Table ) {
-				$this->Cluster_List_Table = new Cluster_List_Table();
-			}
-
-			$this->Cluster_List_Table->prepare_items();
-			$this->Cluster_List_Table->render();
-		}
 	}
 
 	/**
@@ -453,7 +469,7 @@ class Cluster_Admin_Hooks extends Hooks_Base {
 		$cluster = (array) $cluster;
 
 		// get blogs for the select
-		$all_blogs   = \Contentsync\Connections\Connections_Helper::get_all_networks();
+		$all_blogs   = Site_Connection::get_all_local_and_remote_blogs();
 		$local_blogs = $all_blogs['local'];
 		$remote      = isset( $all_blogs['remote'] ) ? $all_blogs['remote'] : array();
 
@@ -465,13 +481,8 @@ class Cluster_Admin_Hooks extends Hooks_Base {
 			if ( $blog['blog_id'] < 1 ) {
 				continue;
 			}
-			if ( isset( $blog['attributes']['staging']['is_stage'] ) && $blog['attributes']['staging']['is_stage'] ) {
-				$title                                       = urlencode( $blog['name'] ) . ' – ' . $blog['domain'] . ' [STAGING]';
-				$values[ $single ][ (int) $blog['blog_id'] ] = $title;
-			} else {
-				$title                                       = urlencode( $blog['name'] ) . ' – ' . $blog['domain'];
-				$values[ $single ][ (int) $blog['blog_id'] ] = $title;
-			}
+			$title                                       = urlencode( $blog['name'] ) . ' – ' . $blog['domain'];
+			$values[ $single ][ (int) $blog['blog_id'] ] = $title;
 		}
 
 		// flatten remote array
@@ -1206,7 +1217,7 @@ class Cluster_Admin_Hooks extends Hooks_Base {
 				<div class="wizard_content">
 					<div data-slide="0-error">
 						<h2>' . __( 'Ooooops!', 'contentsync' ) . '</h2>
-						<div class="contentsync_info_box orange" style="width: 100%; box-sizing: border-box;">
+						<div class="contentsync-info-box orange" style="width: 100%; box-sizing: border-box;">
 							<span class="dashicons dashicons-warning"></span>
 							<div>
 								<p>' . __( 'There was a problem:', 'contentsync' ) . '</p><br>

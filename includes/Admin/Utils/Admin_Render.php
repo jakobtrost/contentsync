@@ -75,8 +75,11 @@ class Admin_Render {
 
 		$icon = $show_icon ? '<img src="' . esc_url( plugins_url( 'assets/icon/' . $status . '.svg', __DIR__ ) ) . '" style="width:auto;height:16px;">' : '';
 
+		self::maybe_enqueue_stylesheet( 'contentsync-admin-info-box', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/admin-info-box.css' );
+		self::maybe_enqueue_stylesheet( 'contentsync-admin-status-box', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/admin-status-box.css' );
+
 		return sprintf(
-			'<span %1$s class="contentsync_info_box %2$s contentsync_status">%3$s%4$s</span>',
+			'<span %1$s class="contentsync-info-box %2$s contentsync-status">%3$s%4$s</span>',
 			/* title    */ $title ? 'data-title="' . preg_replace( '/\s{1}/', '&nbsp;', $title ) . '"' : '',
 			/* color    */ $color,
 			/* icon     */ $icon,
@@ -113,7 +116,9 @@ class Admin_Render {
 			$info_icon = 'dashicons-info';
 		}
 
-		return "<div class='contentsync_info_box {$styling} {$class}'><span class='dashicons {$info_icon}'></span><div>{$above}{$text}</div></div>";
+		self::maybe_enqueue_stylesheet( 'contentsync-admin-info-box', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/admin-info-box.css' );
+
+		return "<div class='contentsync-info-box {$styling} {$class}'><span class='dashicons {$info_icon}'></span><div>{$above}{$text}</div></div>";
 	}
 
 	/**
@@ -122,24 +127,33 @@ class Admin_Render {
 	 * @param string $content   Infotext.
 	 * @param string $className Extra class names.
 	 */
-	public static function make_admin_info_popup( $content = '', $className = '' ) {
+	public static function make_admin_tooltip_popup( $content = '', $className = '' ) {
 		if ( empty( $content ) ) {
 			return false;
 		}
-		return "<span class='contentsync_popup_wrapper'>" .
+
+		self::maybe_enqueue_stylesheet( 'contentsync-admin-tooltip', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/admin-tooltip.css' );
+
+		return "<span class='contentsync-tooltip-wrapper'>" .
 			"<span class='toggle dashicons dashicons-info'></span>" .
 			"<span class='popup {$className}'>{$content}</span>" .
 		'</span>';
 	}
 
 	/**
-	 * Make admin info dialog similar to make_admin_info_popup but bigger.
+	 * Make admin info dialog similar to make_admin_tooltip_popup but bigger.
 	 *
 	 * @param string $content   Infotext.
 	 * @param string $className Extra class names.
 	 */
-	public static function make_admin_info_dialog( $content = '', $className = '' ) {
-		return "<span class='contentsync_popup_wrapper'>" .
+	public static function make_admin_tooltip_dialog( $content = '', $className = '' ) {
+		if ( empty( $content ) ) {
+			return false;
+		}
+
+		self::maybe_enqueue_stylesheet( 'contentsync-admin-tooltip', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/admin-tooltip.css' );
+
+		return "<span class='contentsync-tooltip-wrapper'>" .
 			"<span class='toggle dashicons dashicons-info'></span>" .
 			"<dialog class='{$className}'>{$content}</dialog>" .
 		'</span>';
@@ -154,5 +168,43 @@ class Admin_Render {
 	public static function make_dashicon( $icon ) {
 		$icon = str_replace( 'dashicons-', '', $icon );
 		return "<span class='dashicons dashicons-$icon'></span>";
+	}
+
+	/**
+	 * Make tabs.
+	 *
+	 * @param array  $tabs   Tabs array with label, url and class.
+	 *                      Example: array( 'label' => 'Label', 'url' => 'www.example.com', 'class' => 'active' ).
+	 * @param string $anchor Anchor ID.
+	 *
+	 * @return string HTML tabs.
+	 */
+	public static function make_tabs( $tabs = array(), $anchor = '' ) {
+		if ( empty( $tabs ) ) {
+			return '';
+		}
+
+		self::maybe_enqueue_stylesheet( 'contentsync-admin-tabs', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/admin-tabs.css' );
+
+		return "<div class='contentsync_tabs' id='{$anchor}'>" . implode(
+			'',
+			array_map(
+				function ( $tab ) {
+					return "<a href='{$tab['url']}' class='tab {$tab['class']}'>{$tab['label']}</a>";
+				},
+				$tabs
+			)
+		) . '</div>';
+	}
+
+	public static function maybe_enqueue_stylesheet( $stylesheet, $url ) {
+		if ( ! wp_style_is( $stylesheet, 'enqueued' ) ) {
+			wp_enqueue_style(
+				$stylesheet,
+				$url,
+				array(),
+				CONTENTSYNC_VERSION
+			);
+		}
 	}
 }

@@ -9,7 +9,7 @@ namespace Contentsync\Admin\Views\Distribution;
 
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Distribution\Distributor;
-use Contentsync\Distribution\Distributor_Item_Service;
+use Contentsync\Distribution\Distribution_Item_Service;
 use Contentsync\Api\Site_Connection;
 use WP_Error;
 
@@ -114,7 +114,7 @@ class Queue_List_Table extends \WP_List_Table {
 		// set items
 		$this->items = array_slice( $items, ( $current_page - 1 ) * $per_page, $per_page );
 
-		$this->all_destination_blogs = \Contentsync\Connections\Connections_Helper::get_all_networks();
+		$this->all_destination_blogs = Site_Connection::get_all_local_and_remote_blogs();
 	}
 
 
@@ -460,7 +460,7 @@ class Queue_List_Table extends \WP_List_Table {
 							$message = $error;
 						}
 						if ( ! empty( $message ) ) {
-							echo '&nbsp;' . Admin_Render::make_admin_info_popup( $message );
+							echo '&nbsp;' . Admin_Render::make_admin_tooltip_popup( $message );
 						}
 					}
 				}
@@ -505,7 +505,7 @@ class Queue_List_Table extends \WP_List_Table {
 						$post_with_escaped_content->posts[ $idx ]->post_content = esc_html( $post->post_content );
 					}
 				}
-				echo Admin_Render::make_admin_info_dialog( '<pre>' . print_r( $post_with_escaped_content, true ) . '</pre>' );
+				echo Admin_Render::make_admin_tooltip_dialog( '<pre>' . print_r( $post_with_escaped_content, true ) . '</pre>' );
 				break;
 
 			case 'time':

@@ -290,7 +290,7 @@ contentsync.siteEditor = new function () {
 		return el(
 			'span', {
 				'data-title': title,
-				'class': 'contentsync_info_box ' + color + ' contentsync_status',
+				'class': 'contentsync-info-box ' + color + ' contentsync-status',
 			},
 			icons[ status ] ?? '',
 			text ? el( 'span', null, text ) : ''
