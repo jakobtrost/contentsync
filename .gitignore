@@ -23,6 +23,7 @@ build/
 
 # IDE & Editor
 .vscode/
+.cursor/
 .idea/
 *.swp
 *.swo
