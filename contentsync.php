@@ -40,4 +40,4 @@ if ( ! defined( 'CONTENTSYNC_REST_NAMESPACE' ) ) {
 require_once __DIR__ . '/vendor/autoload.php';
 
 // Load the bootstrap class.
-new PluginBootstrap();
+new Plugin_Bootstrap();

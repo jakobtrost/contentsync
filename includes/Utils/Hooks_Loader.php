@@ -58,6 +58,6 @@ class Hooks_Loader {
 		// Convert path separators to namespace separators.
 		$class_name = str_replace( '/', '\\', $relative );
 
-		return 'Contentsync\\' . $class_name;
+		return '\Contentsync\\' . $class_name;
 	}
 }

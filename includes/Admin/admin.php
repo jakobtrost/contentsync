@@ -24,6 +24,7 @@ use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Translations\Translation_Manager;
+use Contentsync\Admin\Views\Sync\Global_List_Table;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -38,7 +39,7 @@ class Admin {
 	public static $args = array();
 
 	/**
-	 * Holds instance of the class 'Global_List_Table'
+	 * Holds instance of Global_List_Table
 	 */
 	public $Global_List_Table = null;
 

@@ -13,7 +13,7 @@ Refactor **one existing class file** so that its file name, class name, and name
 - **Class name = file name (without `.php`)**.
 - **Class and file naming**:
   - Remove legacy prefixes like `class-`, `functions-`, `hooks-`, `utils-` from file names.
-  - Use words separated by underscores, each word capitalized: `Post_Export`, `Theme_Assets`, `Post_Import_Hooks`, etc.
+  - Use words separated by underscores, each word capitalized: `Post_Export`, `Theme_Posts`, `Post_Import_Hooks`, etc.
   - File name matches exactly, e.g. `Post_Export.php` defines `class Post_Export`.
 
 ### Steps

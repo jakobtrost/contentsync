@@ -22,7 +22,7 @@ Refactor **one function or utils collection file** (typically named with prefixe
 - **Class and file naming**:
   - Remove `functions-` / `utils-` (and similar) prefixes from the file name.
   - Use `Word1_Word2` style (capitalized words separated by underscores) for class and file name.
-  - File name matches the class name exactly: e.g. `Theme_Assets.php` defines `class Theme_Assets`.
+  - File name matches the class name exactly: e.g. `Theme_Posts.php` defines `class Theme_Posts`.
 - **Methods**:
   - All previous global/namespaced functions in that file become `public static` methods of the new class.
 
@@ -50,7 +50,7 @@ Refactor **one function or utils collection file** (typically named with prefixe
      - If the callback is **also referenced elsewhere** (called directly, used by other code) → keep it in the helper class; the hooks class calls `Helper_Class::method()`.
    - **Follow the guidelines in `.cursor/refactor-hooks-to-hook-class.md`** to create the hooks provider class.
    - The hooks class should:
-     - Be named `{Feature}_Hooks.php` (e.g., if refactoring `functions-theme-posts.php`, create `Theme_Assets_Hooks.php`).
+     - Be named `{Feature}_Hooks.php` (e.g., if refactoring `functions-theme-posts.php`, create `Theme_Posts_Hooks.php`).
      - Extend `Contentsync\Utils\Hooks_Base`.
      - Place hook registrations in `register()`, `register_frontend()`, or `register_admin()` as appropriate.
      - Be instantiated in the plugin bootstrap/loader.
@@ -59,7 +59,7 @@ Refactor **one function or utils collection file** (typically named with prefixe
    - Derive the namespace from its folder under `includes/`.
    - **Check for existing classes**: Before choosing a class name, search the namespace directory for existing classes with the same name. If a class with that name already exists, append `_Service` to avoid conflicts (e.g., if `Cluster` exists, use `Cluster_Service`).
    - Choose a class name that:
-     - Describes the logical group (e.g. `Theme_Assets`, `Post_Query`, `Utils_Urls`).
+     - Describes the logical group (e.g. `Theme_Posts`, `Post_Query`, `Utils_Urls`).
      - Uses capitalized words with underscores.
    - Rename the file to `Class_Name.php` (no prefix, matches the class).
 
@@ -286,7 +286,7 @@ function disable_feature() {
 Follow the complete guidelines in **`.cursor/refactor-hooks-to-hook-class.md`**.
 
 Key points:
-- Class name: `{Feature}_Hooks` (e.g., `Theme_Assets_Hooks`).
+- Class name: `{Feature}_Hooks` (e.g., `Theme_Posts_Hooks`).
 - Extends: `Contentsync\Utils\Hooks_Base`.
 - Methods: `register()`, `register_frontend()`, `register_admin()`.
 - Callbacks use `[ $this, 'method_name' ]` for instance methods.
