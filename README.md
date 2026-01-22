@@ -1,6 +1,6 @@
 # Content Sync
 
-![Image](https://raw.githubusercontent.com/jakobtrost/contentsync/26516b52d56d52a28690fb1ccbb660a98afb75db/assets/icon-256x256.png)
+![Image](https://raw.githubusercontent.com/jakobtrost/contentsync/519158cd78ace3fd450c5b1ff6e55041f5f6b8d3/assets/icon.svg)
 
 Content Sync is a powerful WordPress plugin that allows you to synchronize content across multiple websites, saving you significant time in content management workflows. Perfect for agencies managing multiple client sites, multi-site networks, or anyone who needs to keep content consistent across multiple WordPress installations.
 
