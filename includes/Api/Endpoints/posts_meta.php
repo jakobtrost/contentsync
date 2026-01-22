@@ -17,7 +17,6 @@ use Contentsync\Utils\Multisite_Manager;
 
 defined( 'ABSPATH' ) || exit;
 
-new Posts_Meta();
 class Posts_Meta extends Endpoint_Base {
 
 	/**

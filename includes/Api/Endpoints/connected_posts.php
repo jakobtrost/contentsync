@@ -24,7 +24,6 @@ use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-new Connected_Posts();
 class Connected_Posts extends Endpoint_Base {
 
 	/**

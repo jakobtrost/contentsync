@@ -42,7 +42,6 @@ use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-new Distribution_Endpoint();
 class Distribution_Endpoint extends Endpoint_Base {
 
 	/**

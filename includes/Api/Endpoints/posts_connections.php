@@ -20,7 +20,6 @@ use Contentsync\Utils\Multisite_Manager;
 
 defined( 'ABSPATH' ) || exit;
 
-new Posts_Connections();
 class Posts_Connections extends Endpoint_Base {
 
 	/**

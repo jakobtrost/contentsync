@@ -8,7 +8,6 @@ namespace Contentsync\Api\Endpoints;
 
 defined( 'ABSPATH' ) || exit;
 
-new Site_Name();
 class Site_Name extends Endpoint_Base {
 
 	/**

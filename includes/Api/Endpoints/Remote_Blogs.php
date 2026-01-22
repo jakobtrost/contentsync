@@ -10,7 +10,6 @@ use Contentsync\Utils\Multisite_Manager;
 
 defined( 'ABSPATH' ) || exit;
 
-new Remote_Blogs();
 class Remote_Blogs extends Endpoint_Base {
 
 	/**

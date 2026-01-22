@@ -11,7 +11,6 @@ use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-new Check_Auth();
 class Check_Auth extends Endpoint_Base {
 
 	/**

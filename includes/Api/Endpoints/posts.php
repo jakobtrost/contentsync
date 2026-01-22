@@ -22,7 +22,6 @@ use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-new Posts();
 class Posts extends Endpoint_Base {
 
 	/**
