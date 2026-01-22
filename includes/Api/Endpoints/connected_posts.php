@@ -122,7 +122,7 @@ class Connected_Posts extends Endpoint_Base {
 		// modify the gid based on the origin of the request
 		$remote_gid = empty( $origin ) ? $gid : $root_blog_id . '-' . $root_post_id . '-' . $origin;
 
-		$message = 'Try to get all connected posts of the gid <b>' . $remote_gid . '</b> on all connected blogs of the network <u>' . network_site_url() . '</u>';
+		$message = 'Try to get all connected posts of the gid <b>' . $remote_gid . '</b> on all connected blogs of the network <u>' . Urls::get_network_url() . '</u>';
 
 		$connected_posts = Post_Connection_Map::get_all_local_connections( $remote_gid );
 
@@ -154,7 +154,7 @@ class Connected_Posts extends Endpoint_Base {
 		add_filter( 'filter_gid_for_conflict_action', array( $this, 'match_gid_before_import' ), 10, 3 );
 		add_filter( 'import_synced_post_meta-synced_post_id', array( $this, 'match_gid_before_import' ), 10, 3 );
 
-		$message = 'Try to update all posts on all connected blogs of the network "' . network_site_url() . '": ';
+		$message = 'Try to update all posts on all connected blogs of the network "' . Urls::get_network_url() . '": ';
 
 		foreach ( $connected_posts as $blog_id => $post_con ) {
 			if ( is_numeric( $blog_id ) ) {

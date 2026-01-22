@@ -241,7 +241,7 @@ class Distribution_Endpoint extends Endpoint_Base {
 			return true;
 		}
 		error_log( 'is_array_or_object: The value is neither an array nor an object.' );
-		var_error_log( $value );
+		error_log( print_r( $value, true ) );
 		return false;
 	}
 

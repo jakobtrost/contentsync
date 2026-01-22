@@ -88,8 +88,8 @@ class Multisite_Manager {
 		Translation_Manager::init_translation_environment();
 
 		// remove filters from the query args within the export process
-		if ( ! has_filter( 'contentsync_export_post_query_args', [ Post_Query::class, 'remove_filters_from_query_args' ] ) ) {
-			add_filter( 'contentsync_export_post_query_args', [ Post_Query::class, 'remove_filters_from_query_args' ] );
+		if ( ! has_filter( 'contentsync_export_post_query_args', array( Post_Query::class, 'remove_filters_from_query_args' ) ) ) {
+			add_filter( 'contentsync_export_post_query_args', array( Post_Query::class, 'remove_filters_from_query_args' ) );
 		}
 
 		// Register the filter hook if not already registered
@@ -109,6 +109,11 @@ class Multisite_Manager {
 	 * @return bool
 	 */
 	public static function restore_blog() {
+
+		if ( ! is_multisite() ) {
+			return true;
+		}
+
 		\restore_current_blog();
 		self::set_origin_site_url( null );
 

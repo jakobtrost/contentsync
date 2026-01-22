@@ -28,6 +28,11 @@ class Urls {
 	 * @return string
 	 */
 	public static function get_network_url() {
+
+		if ( ! function_exists( '\network_site_url' ) ) {
+			return self::get_nice_url( \site_url() );
+		}
+
 		return self::get_nice_url( \network_site_url() );
 	}
 

@@ -16,7 +16,7 @@
  *
  * The `add` method records a log entry consisting of a timestamp, a message, a type
  * and an optional context. If instant logging is enabled, it writes the message and
- * context directly using `error_log` and `var_error_log`. Otherwise it appends the
+ * context directly using `error_log`. Otherwise it appends the
  * entry to the internal `$logs` array. The `get_logs` and `get_logs_by_type` methods
  * return all logs or a filtered subset. You can retrieve the last log entry using
  * `get_last_log`.
@@ -88,7 +88,7 @@ class Logger {
 		if ( self::$instantly ) {
 			error_log( $message );
 			if ( $context !== 'do_not_log' ) {
-				var_error_log( $context );
+				error_log( print_r( $context, true ) );
 			}
 		}
 
@@ -177,7 +177,7 @@ class Logger {
 		foreach ( self::$logs as $log ) {
 			error_log( $log['message'] );
 			if ( $log['context'] !== 'do_not_log' ) {
-				var_error_log( $log['context'] );
+				error_log( print_r( $log['context'], true ) );
 			}
 		}
 		if ( $clear ) {
