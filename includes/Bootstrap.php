@@ -8,11 +8,15 @@ namespace Contentsync;
 
 use Contentsync\Utils\Logger;
 use Contentsync\Database\Database_Tables_Hooks;
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
-class Plugin_Bootstrap {
+class Bootstrap {
 	public function __construct() {
 		register_activation_hook( CONTENTSYNC_PLUGIN_FILE, array( $this, 'contentsync_plugin_activated' ) );
 		register_deactivation_hook( CONTENTSYNC_PLUGIN_FILE, array( $this, 'contentsync_plugin_deactivated' ) );
+
+		// Initialize plugin update checker.
+		$this->init_update_checker();
 
 		// Load all loader classes (which will load their respective resources).
 		$this->load_all_loaders();
@@ -82,5 +86,31 @@ class Plugin_Bootstrap {
 		$class_name = str_replace( '/', '\\', $relative );
 
 		return '\Contentsync\\' . $class_name;
+	}
+
+	/**
+	 * Initialize the plugin update checker for GitHub integration.
+	 *
+	 * This sets up automatic update notifications and one-click upgrades
+	 * from the GitHub repository.
+	 */
+	private function init_update_checker() {
+		$update_checker = PucFactory::buildUpdateChecker(
+			'https://github.com/jakobtrost/contentsync/',
+			CONTENTSYNC_PLUGIN_FILE,
+			'contentsync'
+		);
+
+		// Optional: Set the branch that contains the stable release.
+		// Uncomment and modify if you want to use a specific branch instead of releases/tags.
+		// $update_checker->setBranch( 'main' );
+
+		// Optional: If you're using a private repository, specify the access token.
+		// Uncomment and add your token if needed.
+		// $update_checker->setAuthentication( 'your-github-token-here' );
+
+		// Optional: Enable release assets if you want to use custom release assets.
+		// Uncomment if you want to use release assets instead of the default zip.
+		// $update_checker->getVcsApi()->enableReleaseAssets();
 	}
 }
