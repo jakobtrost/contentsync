@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 
 class Queue_Admin_Page_Hooks extends Hooks_Base {
 
-	const QUEUE_PAGE_POSITION = 40;
+	const QUEUE_PAGE_POSITION = 14;
 
 	/**
 	 * Holds instance of the class 'List_Table'
@@ -36,7 +36,7 @@ class Queue_Admin_Page_Hooks extends Hooks_Base {
 	public function register_admin() {
 
 		// add the menu items & pages
-		add_action( 'admin_menu', array( $this, 'add_submenu_item' ) );
+		add_action( 'admin_menu', array( $this, 'add_submenu_item' ), self::QUEUE_PAGE_POSITION );
 		add_action( 'network_admin_menu', array( $this, 'add_submenu_item' ) );
 
 		add_filter( 'set-screen-option', array( $this, 'queue_save_screen_options' ), 10, 3 );

@@ -30,7 +30,7 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 	public function register_admin() {
 
 		add_action( 'admin_menu', array( $this, 'add_submenu_items' ), self::SYNCED_POSTS_PAGE_POSITION );
-		add_action( 'admin_menu', array( $this, 'add_submenu_items_to_network' ) );
+		add_action( 'admin_menu', array( $this, 'add_submenu_items_to_network' ), 21 );
 		add_action( 'network_admin_menu', array( $this, 'add_submenu_items' ), self::SYNCED_POSTS_PAGE_POSITION );
 
 		add_action( 'load-toplevel_page_contentsync', array( $this, 'add_screen_options' ) );
@@ -75,7 +75,7 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 				'manage_options', // capability
 				network_admin_url( 'admin.php?page=contentsync' ), // slug
 				'', // function
-				self::SYNCED_POSTS_PAGE_POSITION // position
+				self::SYNCED_POSTS_PAGE_POSITION + 1 // position
 			);
 		}
 	}

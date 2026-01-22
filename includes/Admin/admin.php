@@ -1076,7 +1076,7 @@ class Admin {
 				);
 
 				printf(
-					'<div class="contentsync_info_box contentsync_status" data-title="%1$s">' .
+					'<div class="contentsync-info-box contentsync_status" data-title="%1$s">' .
 						'<button role="button" class="button large button-tertiary" onclick="%2$s" data-post_id="%3$s">' .
 							'<span class="dashicons dashicons-plus-alt2"></span>' .
 						'</button>' .

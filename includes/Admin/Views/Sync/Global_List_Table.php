@@ -253,7 +253,7 @@ class Global_List_Table extends WP_List_Table {
 	public function tabs() {
 
 		$current = isset( $_GET['post_type'] ) ? esc_attr( $_GET['post_type'] ) : '';
-		$builtin = array_flip( array( 'post', 'page', 'attachment' ) );
+		$builtin = array_flip( array( 'post', 'page', 'attachment', 'wp_template', 'wp_template_part', 'wp_navigation', 'wp_block' ) );
 
 		// re-sort supported post types
 		$post_types = array_keys(
@@ -272,18 +272,11 @@ class Global_List_Table extends WP_List_Table {
 		);
 		foreach ( $post_types as $post_type ) {
 			$post_type_obj = get_post_type_object( $post_type );
-			$classNames    = '';
-			if ( isset( $builtin[ $post_type ] ) ) {
-				$classNames .= 'blue';
-			}
-			if ( $current == $post_type ) {
-				$classNames .= 'active';
-			}
 			if ( $post_type_obj ) {
 				$tabs[ $post_type ] = array(
 					'label' => $post_type_obj->labels->name,
 					'url'   => add_query_arg( 'post_type', $post_type, remove_query_arg( array( 'paged' ) ) ),
-					'class' => $classNames,
+					'class' => $current == $post_type ? 'active' : '',
 				);
 			}
 		}

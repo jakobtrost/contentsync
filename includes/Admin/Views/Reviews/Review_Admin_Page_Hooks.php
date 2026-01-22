@@ -21,7 +21,9 @@ defined( 'ABSPATH' ) || exit;
 
 class Review_Admin_Page_Hooks extends Hooks_Base {
 
-	const REVIEW_PAGE_POSITION = 61;
+	const REVIEW_PAGE_POSITION = 14;
+
+	const REVIEW_PAGE_POSITION_NETWORK = 61;
 
 	/**
 	 * The Post_Review_List_Table instance.
@@ -34,7 +36,7 @@ class Review_Admin_Page_Hooks extends Hooks_Base {
 	public function register_admin() {
 		// add the menu items & pages
 		add_action( 'admin_menu', array( $this, 'add_submenu_item' ), self::REVIEW_PAGE_POSITION );
-		add_action( 'network_admin_menu', array( $this, 'add_submenu_item' ), self::REVIEW_PAGE_POSITION );
+		add_action( 'network_admin_menu', array( $this, 'add_network_submenu_item' ), self::REVIEW_PAGE_POSITION_NETWORK );
 
 		add_filter( 'set-screen-option', array( $this, 'save_screen_options' ), 10, 3 );
 	}
@@ -44,14 +46,36 @@ class Review_Admin_Page_Hooks extends Hooks_Base {
 	 */
 	function add_submenu_item() {
 
+		if ( is_multisite() && ! is_super_admin() ) {
+			return;
+		}
+
 		$hook = add_submenu_page(
 			'contentsync',
 			__( 'Reviews', 'contentsync' ), // page title
-			( is_network_admin() ? '' : '→ ' ) . __( 'Reviews', 'contentsync' ), // menu title
+			__( 'Reviews', 'contentsync' ), // menu title
 			'manage_options',
-			is_network_admin() ? 'contentsync-post-reviews' : network_admin_url( 'admin.php?page=contentsync-post-reviews' ),
-			is_network_admin() ? array( $this, 'render_admin_page' ) : '',
+			'contentsync-post-reviews',
+			array( $this, 'render_admin_page' ),
 			self::REVIEW_PAGE_POSITION // position
+		);
+
+		add_action( "load-$hook", array( $this, 'add_screen_options' ) );
+	}
+
+	/**
+	 * Add a menu item to the WordPress admin menu
+	 */
+	function add_network_submenu_item() {
+
+		$hook = add_submenu_page(
+			'contentsync',
+			__( 'Reviews', 'contentsync' ), // page title
+			__( 'Reviews', 'contentsync' ), // menu title
+			'manage_options',
+			'contentsync-post-reviews',
+			array( $this, 'render_admin_page' ),
+			self::REVIEW_PAGE_POSITION_NETWORK // position
 		);
 
 		add_action( "load-$hook", array( $this, 'add_screen_options' ) );

@@ -140,7 +140,6 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		$this->items = array_slice( $items, ( $current_page - 1 ) * $per_page, $per_page );
 	}
 
-
 	/**
 	 * =================================================================
 	 *                          RENDER
@@ -231,26 +230,23 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		$all_url   = remove_query_arg( array( 'post_type', 'post_status', 'paged' ) );
 		$trash_url = add_query_arg( array( 'post_status' => 'trash' ), $all_url );
 
-		echo "<div class='contentsync_tabs'>";
-		printf(
-			"<a href='%s' class='tab %s'>%s</a>",
-			$all_url,
-			( ! $trashed && empty( $current ) ) ? 'active' : '',
-			__( 'All', 'contentsync_hub' )
+		$tabs = array(
+			'all' => array(
+				'label' => __( 'All', 'contentsync_hub' ),
+				'url'   => remove_query_arg( 'post_type' ),
+				'class' => empty( $current ) ? 'active' : '',
+			),
 		);
+
 		foreach ( Theme_Posts::get_theme_post_types() as $post_type ) {
-			$post_type_obj = get_post_type_object( $post_type );
-			printf(
-				"<a href='%s' class='tab blue %s'>%s</a>",
-				add_query_arg(
-					array( 'post_type' => '_' . $post_type ),
-					$all_url
-				),
-				( ! $trashed && $current == $post_type ) ? 'active' : '',
-				$post_type_obj ? $post_type_obj->labels->singular_name : $post_type
+			$post_type_obj      = get_post_type_object( $post_type );
+			$tabs[ $post_type ] = array(
+				'label' => $post_type_obj->labels->singular_name,
+				'url'   => add_query_arg( 'post_type', '_' . $post_type, remove_query_arg( array( 'paged' ) ) ),
+				'class' => $current == $post_type ? 'active' : '',
 			);
 		}
-		echo '</div>';
+		echo Admin_Render::make_tabs( $tabs );
 	}
 
 	/**

@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Hook provider class for admin bulk actions.
  */
-class Admin_Bulk_Actions_Hooks extends Hooks_Base {
+class Bulk_Actions_Hooks extends Hooks_Base {
 
 	/**
 	 * Register admin-only hooks.

@@ -197,6 +197,12 @@ class Admin_Render {
 		) . '</div>';
 	}
 
+	/**
+	 * Checks if a stylesheet is already enqueued. If not, enqueues it.
+	 *
+	 * @param string $stylesheet The stylesheet slug.
+	 * @param string $url        The URL of the stylesheet.
+	 */
 	public static function maybe_enqueue_stylesheet( $stylesheet, $url ) {
 		if ( ! wp_style_is( $stylesheet, 'enqueued' ) ) {
 			wp_enqueue_style(

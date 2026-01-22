@@ -58,8 +58,13 @@ class Post_Review_List_Table extends \WP_List_Table {
 		$sortable              = $this->get_sortable_columns();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$rel   = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'open';
-		$items = Post_Review_Service::get_post_reviews( $rel == 'open' ? null : $rel );
+		$rel = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? esc_attr( $_GET['rel'] ) : 'open';
+
+		if ( is_network_admin() ) {
+			$items = Post_Review_Service::get_post_reviews( $rel == 'open' ? null : $rel );
+		} else {
+			$items = Post_Review_Service::get_post_review_by_blog( get_current_blog_id(), $rel == 'open' ? null : $rel );
+		}
 		// debug($items);
 
 		// sort
@@ -99,7 +104,7 @@ class Post_Review_List_Table extends \WP_List_Table {
 		// );
 		echo '<hr class="wp-header-end">';
 
-		echo '<p>' . __( 'Here you can manage all pending post reviews.', 'contentsync' ) . '</p>';
+		// echo '<p>' . __( 'Here you can manage all pending post reviews.', 'contentsync' ) . '</p>';
 
 		$this->views();
 
@@ -138,10 +143,16 @@ class Post_Review_List_Table extends \WP_List_Table {
 			if ( $type == 'open' ) {
 				$items_count = 0;
 				foreach ( array( 'new', 'in_review', 'denied' ) as $state ) {
-					$items_count += count( Post_Review_Service::get_post_reviews( $state ) );
+					if ( is_network_admin() ) {
+						$items_count += count( Post_Review_Service::get_post_reviews( $state ) );
+					} else {
+						$items_count += count( Post_Review_Service::get_post_review_by_blog( get_current_blog_id(), $state ) );
+					}
 				}
+			} elseif ( is_network_admin() ) {
+					$items_count = count( Post_Review_Service::get_post_reviews( $type ) );
 			} else {
-				$items_count = count( Post_Review_Service::get_post_reviews( $type ) );
+				$items_count = count( Post_Review_Service::get_post_review_by_blog( get_current_blog_id(), $type ) );
 			}
 			$query = remove_query_arg( array( 'rel', 'paged', 'action', 'post', '_wpnonce' ) );
 

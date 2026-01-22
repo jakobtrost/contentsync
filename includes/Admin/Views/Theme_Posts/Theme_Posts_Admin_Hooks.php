@@ -10,6 +10,8 @@ defined( 'ABSPATH' ) || exit;
 
 class Theme_Posts_Admin_Hooks extends Hooks_Base {
 
+	const THEME_POSTS_PAGE_POSITION = 15;
+
 	/**
 	 * The Theme_Posts_List_Table instance.
 	 */
@@ -19,10 +21,13 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 	 * Register admin-only hooks.
 	 */
 	public function register_admin() {
-		add_action( 'admin_menu', array( $this, 'add_theme_export_admin_page' ) );
+
+		add_action( 'admin_menu', array( $this, 'add_submenu_item' ), self::THEME_POSTS_PAGE_POSITION );
+		add_action( 'admin_menu', array( $this, 'add_theme_posts_admin_page' ) );
+
 		add_filter( 'set-screen-option', array( $this, 'save_screen_options' ), 10, 3 );
 
-		add_filter( 'synced_post_export_is_current_screen_supported', array( $this, 'support_post_export_on_theme_export_admin_page' ), 10, 2 );
+		add_filter( 'synced_post_export_is_current_screen_supported', array( $this, 'support_post_export_on_theme_posts_admin_page' ), 10, 2 );
 
 		// add overlay contents
 		add_filter( 'contentsync_overlay_contents', array( $this, 'add_overlay_contents' ) );
@@ -33,7 +38,30 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 	/**
 	 * Add a menu item to the WordPress admin menu
 	 */
-	function add_theme_export_admin_page() {
+	public function add_submenu_item() {
+
+		// Only add the menu item if the current theme supports blocks
+		if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) {
+			return;
+		}
+
+		$hook = add_submenu_page(
+			'contentsync',
+			__( 'Theme Posts', 'contentsync_hub' ), // page title
+			__( 'Theme Posts', 'contentsync_hub' ), // menu title
+			'manage_options',
+			'theme-posts',
+			array( $this, 'render_theme_posts_admin_page' ),
+			self::THEME_POSTS_PAGE_POSITION // position
+		);
+
+		add_action( "load-$hook", array( $this, 'add_screen_options' ) );
+	}
+
+	/**
+	 * Add a menu item to the WordPress admin menu
+	 */
+	function add_theme_posts_admin_page() {
 
 		// Only add the menu item if the current theme supports blocks
 		if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) {
@@ -44,8 +72,8 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 			__( 'Theme Posts', 'contentsync_hub' ), // page title
 			__( 'Theme Posts', 'contentsync_hub' ), // menu title
 			'manage_options',
-			'theme-posts',
-			array( $this, 'render_theme_export_admin_page' )
+			admin_url( 'admin.php?page=theme-posts' ),
+			null
 		);
 
 		add_action( "load-$hook", array( $this, 'add_screen_options' ) );
@@ -62,10 +90,6 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 		);
 
 		add_screen_option( 'per_page', $args );
-
-		if ( ! class_exists( 'Contentsync\Admin\Views\Theme_Posts\Theme_Posts_List_Table' ) ) {
-			require_once __DIR__ . '/Theme_Posts_List_Table.php';
-		}
 
 		$this->Theme_Posts_List_Table = new Theme_Posts_List_Table();
 	}
@@ -85,11 +109,7 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 	/**
 	 * Display the custom admin list page
 	 */
-	function render_theme_export_admin_page() {
-
-		if ( ! class_exists( 'Contentsync\Admin\Views\Theme_Posts\Theme_Posts_List_Table' ) ) {
-			require_once __DIR__ . '/Theme_Posts_List_Table.php';
-		}
+	function render_theme_posts_admin_page() {
 
 		if ( ! $this->Theme_Posts_List_Table ) {
 			$this->Theme_Posts_List_Table = new Theme_Posts_List_Table();
@@ -102,7 +122,7 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 	/**
 	 * Add a filter to allow the post export to be run on the custom admin page
 	 */
-	function support_post_export_on_theme_export_admin_page( $is_supported, $screen ) {
+	function support_post_export_on_theme_posts_admin_page( $is_supported, $screen ) {
 		if ( $screen && is_object( $screen ) && isset( $screen->id ) && $screen->id === 'appearance_page_theme-posts' ) {
 			$is_supported = true;
 		}

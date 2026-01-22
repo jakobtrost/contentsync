@@ -306,6 +306,41 @@ class Post_Review_Service {
 	}
 
 	/**
+	 * Get all post reviews by blog ID.
+	 *
+	 * @param int          $blog_id
+	 * @param string|array $state
+	 *
+	 * @return Post_Review[]
+	 */
+	public static function get_post_review_by_blog( $blog_id = 0, $state = null ) {
+		global $wpdb;
+
+		$blog_id = $blog_id ? (int) $blog_id : get_current_blog_id();
+
+		if ( empty( $state ) ) {
+			$state = array( 'new', 'in_review', 'denied' );
+		} elseif ( ! is_array( $state ) ) {
+			$state = array( $state );
+		}
+
+		$table_name   = $wpdb->base_prefix . 'synced_post_reviews';
+		$post_reviews = $wpdb->get_results( "SELECT * FROM $table_name WHERE blog_id = $blog_id AND state IN ('" . implode( "','", $state ) . "') ORDER BY date DESC" );
+
+		if ( ! $post_reviews ) {
+			// return empty array to render empty table
+			return array();
+		}
+
+		$post_review_objects = array();
+		foreach ( $post_reviews as $post_review ) {
+			$post_review_objects[] = new Post_Review( $post_review );
+		}
+
+		return $post_review_objects;
+	}
+
+	/**
 	 * Get a post review by post ID and blog ID.
 	 *
 	 * @param int $post_id
