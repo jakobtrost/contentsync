@@ -1,0 +1,100 @@
+.contentsync_tabs {
+	display: flex;
+	position: relative;
+	/* height: 50px; */
+	margin: 20px -20px 20px -23px;
+	padding: 0px 15px 0 18px;
+	background-image: linear-gradient(180deg, #f1f1f1 0%, #e2e2e2 100%);
+	width: calc(100% + 10px);
+	overflow: auto clip;
+	isolation: isolate;
+	flex-wrap: wrap;
+}
+
+.contentsync_tabs::before {
+	content: ' ';
+	position: absolute;
+	display: block;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	border-bottom: 1px solid #c4c4c4;
+	z-index: -1;
+}
+
+.contentsync_tabs .tab {
+	display: flex;
+	position: relative;
+	align-items: center;
+	height: 40px;
+	font-size: 13px;
+	font-weight: 400;
+	margin: 5px 5px 0;
+	padding: 0px 20px;
+	color: #575756;
+	background: #d7d7d7;
+	border: 1px solid #c4c4c4;
+	text-decoration: none;
+	box-shadow: none;
+	outline: 0;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.contentsync_tabs .tab:hover {
+	color: #1e1f1f;
+	background: #f1f1f1;
+}
+
+.contentsync_tabs .tab:not(.active) {
+	z-index: -2;
+}
+
+.contentsync_tabs .tab.active {
+	height: 38px;
+	font-weight: 600;
+	color: #1e1f1f;
+	background: #f1f1f1;
+	border-top-width: 3px;
+	border-bottom: 1px solid transparent;
+	border-top-color: #505050;
+}
+
+.contentsync_tabs .tab.blue:hover,
+.contentsync_tabs .tab.active.blue {
+	border-top-color: rgba(47, 128, 237, 1);
+}
+
+.contentsync_tabs .tab.wp:hover,
+.contentsync_tabs .tab.active.wp {
+	border-top-color: #3072a6;
+}
+
+.contentsync_tabs .tab.green:hover,
+.contentsync_tabs .tab.active.green {
+	border-top-color: rgba(39, 174, 96, 1);
+}
+
+.contentsync_tabs .tab.orange:hover,
+.contentsync_tabs .tab.active.orange {
+	border-top-color: rgba(242, 153, 74, 1);
+}
+
+.contentsync_tabs .tab.red:hover,
+.contentsync_tabs .tab.active.red {
+	border-top-color: rgba(235, 87, 87, 1);
+}
+
+.contentsync_tabs .tab.purple:hover,
+.contentsync_tabs .tab.active.purple {
+	border-top-color: #9b51e0;
+}
+
+.contentsync_tabs .tab.greyd:hover,
+.contentsync_tabs .tab.active.greyd {
+	border-top-color: #f2b25a;
+}
+
+.contentsync_tabs .tab .dashicons {
+	margin-right: 6px;
+}

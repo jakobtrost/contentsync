@@ -1,0 +1,126 @@
+.contentsync-info-box {
+	color: #172b4d;
+	padding: 8px 12px;
+	border-radius: 0.3em;
+	background: rgba(0, 0, 0, 0.05);
+	display: -webkit-inline-box;
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: row;
+	flex-direction: row;
+	-webkit-box-pack: start;
+	-ms-flex-pack: start;
+	justify-content: flex-start;
+	-webkit-box-align: start;
+	-ms-flex-align: start;
+	align-items: flex-start;
+	margin-bottom: 1em;
+}
+
+.contentsync-info-box > .dashicons {
+	margin: 0 0.4em 0 0;
+	font-size: 1.45em;
+	height: 1em;
+	width: 1em;
+}
+
+.contentsync-info-box > div > b:first-child {
+	display: block;
+	margin-bottom: 4px;
+}
+
+.contentsync-info-box > div > p {
+	margin: 0px;
+}
+
+/* blue styling  */
+.contentsync-info-box.blue,
+.contentsync-info-box.info {
+	background: rgba(47, 128, 237, 0.2);
+}
+
+.contentsync-info-box.blue > .dashicons,
+.contentsync-info-box.info > .dashicons {
+	color: rgba(47, 128, 237, 1);
+}
+
+/* green styling  */
+.contentsync-info-box.green,
+.contentsync-info-box.success {
+	background: rgba(39, 174, 96, 0.2);
+}
+
+.contentsync-info-box.green > .dashicons,
+.contentsync-info-box.success > .dashicons {
+	color: rgba(39, 174, 96, 1);
+}
+
+/* orange styling  */
+.contentsync-info-box.orange,
+.contentsync-info-box.warning {
+	background: rgba(242, 153, 74, 0.2);
+}
+
+.contentsync-info-box.orange > .dashicons,
+.contentsync-info-box.warning > .dashicons {
+	color: #e1822e;
+}
+
+/* red styling  */
+.contentsync-info-box.red,
+.contentsync-info-box.alert,
+.contentsync-info-box.danger,
+.contentsync-info-box.error {
+	background: rgba(235, 87, 87, 0.2);
+}
+
+.contentsync-info-box.red > .dashicons,
+.contentsync-info-box.alert > .dashicons,
+.contentsync-info-box.danger > .dashicons,
+.contentsync-info-box.error > .dashicons {
+	color: #eb5757;
+}
+
+/* purple styling  */
+.contentsync-info-box.new,
+.contentsync-info-box.purple {
+	background: rgba(155, 81, 224, 0.2);
+}
+
+.contentsync-info-box.new > .dashicons,
+.contentsync-info-box.purple > .dashicons {
+	color: #9b51e0;
+}
+
+/* gray styling */
+.contentsync-info-box.grey,
+.contentsync-info-box.grey {
+	background: rgba(0, 0, 0, 0.05);
+}
+
+.contentsync-info-box.grey > .dashicons,
+.contentsync-info-box.grey > .dashicons {
+	color: #575756;
+}
+
+/* greyd styling  */
+.contentsync-info-box.greyd {
+	background: linear-gradient(135deg, rgba(249, 221, 97, 0.4) 0%, rgba(242, 178, 90, 0.4) 100%);
+}
+
+.contentsync-info-box.greyd > .dashicons {
+	color: #f2b25a;
+}
+
+/* clear styling  */
+.contentsync-info-box.clear {
+	color: inherit;
+	padding: 0;
+	background: transparent;
+}
+
+.contentsync-info-box.clear > .dashicons {
+	display: none;
+}

@@ -1,0 +1,8 @@
+#adminmenu #toplevel_page_contentsync .wp-submenu li > a:empty {
+	pointer-events: none;
+	padding: 0;
+	margin: 8px 12px;
+	border-top: 1px solid currentColor;
+	opacity: 0.5;
+	position: relative;
+}
