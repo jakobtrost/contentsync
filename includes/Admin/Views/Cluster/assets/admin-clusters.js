@@ -1,9 +1,9 @@
 /**
  * Admin features for the 'cluster' feature
  */
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
 
-contentsync.clusters = new ( function () {
+contentSync.clusters = new ( function () {
 	this.debug = true;
 
 	this.init = () => {
@@ -24,8 +24,8 @@ contentsync.clusters = new ( function () {
 
 			if ( location.href.indexOf( 'admin.php?page=contentsync_clusters' ) === -1 ) return;
 
-			contentsync.overlay.addPageTitleAction( __( 'Add Cluster', 'contentsync' ), {
-				onclick: 'contentsync.clusters.wizard.openWizard()',
+			contentSync.overlay.addPageTitleAction( __( 'Add Cluster', 'contentsync' ), {
+				onclick: 'contentSync.clusters.wizard.openWizard()',
 			} );
 
 			const wizard = document.querySelector( '#greyd-wizard.cluster_wizard' );
@@ -101,7 +101,7 @@ contentsync.clusters = new ( function () {
 			deleteButtons.forEach( ( button ) => {
 				button.addEventListener( 'click', ( e ) => {
 					const title = button.closest( '.title' ).querySelector( '.row-title' );
-					contentsync.overlay.confirm(
+					contentSync.overlay.confirm(
 						'contentsync_delete_cluster',
 						title.textContent,
 						this.deleteCluster,
@@ -147,12 +147,12 @@ contentsync.clusters = new ( function () {
 					if ( data ) {
 						if ( this.debug ) console.log( data );
 						if ( data.success ) {
-							contentsync.overlay.triggerOverlay( true, {
+							contentSync.overlay.triggerOverlay( true, {
 								type: 'reload',
 								css: 'contentsync_delete_cluster',
 							} );
 						} else {
-							contentsync.overlay.triggerOverlay( true, {
+							contentSync.overlay.triggerOverlay( true, {
 								type: 'fail',
 								css: 'contentsync_delete_cluster',
 								replace: data,
@@ -172,11 +172,11 @@ contentsync.clusters = new ( function () {
 			// this.updateOptions();
 
 			$( '.settings_input_option.autotags' ).each( function () {
-				contentsync.clusters.multiselect.setAutotags( this );
+				contentSync.clusters.multiselect.setAutotags( this );
 			} );
 
 			if ( $( '.tag_suggestions' ).length > 0 ) {
-				contentsync.clusters.multiselect.initAutotags();
+				contentSync.clusters.multiselect.initAutotags();
 			}
 		};
 
@@ -301,11 +301,11 @@ contentsync.clusters = new ( function () {
 					if ( filterTableRow ) {
 						// const tagSuggestionHeight = filterTableRow.querySelector('.tag_suggestions').getBoundingClientRect().height;
 						// const rowHeight = filterTableRow.getBoundingClientRect().height ;
-						// contentsync.clusters.conditions.updateHeight(filterTableRow, rowHeight);
+						// contentSync.clusters.conditions.updateHeight(filterTableRow, rowHeight);
 
 						const sub = filterTableRow.closest( '.sub' );
 						const th = sub.querySelector( 'table' ).getBoundingClientRect().height;
-						contentsync.clusters.conditions.updateHeight( sub, th );
+						contentSync.clusters.conditions.updateHeight( sub, th );
 					}
 				} );
 
@@ -414,7 +414,7 @@ contentsync.clusters = new ( function () {
 				}
 			} );
 			$( document ).on( 'click', '.tag_close', function ( e ) {
-				contentsync.clusters.multiselect.tagRemove( this );
+				contentSync.clusters.multiselect.tagRemove( this );
 			} );
 
 			$( document ).on( 'click', '.tag', function ( e ) {
@@ -645,13 +645,13 @@ contentsync.clusters = new ( function () {
 
 			const newRow = into.append( clone );
 
-			contentsync.clusters.conditions.toggleRow( openRow );
+			contentSync.clusters.conditions.toggleRow( openRow );
 			row.classList.remove( 'hidden' );
 
 			// close
-			contentsync.clusters.conditions.toggleRow( row );
-			contentsync.clusters.conditions.addTriggers();
-			contentsync.clusters.conditions.updateRowNumbers();
+			contentSync.clusters.conditions.toggleRow( row );
+			contentSync.clusters.conditions.addTriggers();
+			contentSync.clusters.conditions.updateRowNumbers();
 		};
 
 		this.deleteRow = ( button ) => {
@@ -659,8 +659,8 @@ contentsync.clusters = new ( function () {
 			const confirmed = confirm( 'Are you sure you want to delete the condition?' );
 			if ( confirmed ) {
 				row.remove();
-				contentsync.clusters.conditions.updateRowNumbers();
-				contentsync.clusters.checkPostTypes.checkAll();
+				contentSync.clusters.conditions.updateRowNumbers();
+				contentSync.clusters.checkPostTypes.checkAll();
 			}
 		};
 
@@ -695,7 +695,7 @@ contentsync.clusters = new ( function () {
 			let height = sh <= 2 ? th : 0;
 			// console.log(height);
 
-			contentsync.clusters.conditions.updateHeight( sub, height );
+			contentSync.clusters.conditions.updateHeight( sub, height );
 
 			if ( height > 0 ) {
 				row.classList.add( 'open' );
@@ -746,7 +746,7 @@ contentsync.clusters = new ( function () {
 			const wrapper = inputSection.parentElement;
 			const autotagsSelect = wrapper.querySelector( '.settings_input_option.autotags' );
 
-			contentsync.clusters.multiselect.clearAutotags( autotagsSelect );
+			contentSync.clusters.multiselect.clearAutotags( autotagsSelect );
 
 			const taxonomy = select.value;
 			const sub = select.closest( '.sub' );
@@ -766,7 +766,7 @@ contentsync.clusters = new ( function () {
 					data[ blogID ].post_types[ selectedPosttype ].taxonomies[ taxonomy ].terms;
 			}
 
-			contentsync.clusters.multiselect.updateOptions( termsData, autotagsSelect );
+			contentSync.clusters.multiselect.updateOptions( termsData, autotagsSelect );
 		};
 
 		this.handleDateModeChange = ( fieldset ) => {
@@ -790,7 +790,7 @@ contentsync.clusters = new ( function () {
 			} );
 
 			const th = sub.querySelector( 'table' ).getBoundingClientRect().height;
-			contentsync.clusters.conditions.updateHeight( sub, th );
+			contentSync.clusters.conditions.updateHeight( sub, th );
 		};
 
 		this.updatePosttypeOptions = ( data, select ) => {
@@ -829,7 +829,7 @@ contentsync.clusters = new ( function () {
 					e.target.classList.contains( 'make_posts_global_automatically' )
 				) {
 					// console.log(e.target.value);
-					contentsync.clusters.checkPostTypes.checkAll();
+					contentSync.clusters.checkPostTypes.checkAll();
 				}
 			} );
 		};
@@ -838,7 +838,7 @@ contentsync.clusters = new ( function () {
 			var pts = document.querySelectorAll( '.cluster_post_type_select' );
 			// console.log(pts);
 			for ( var i = 0; i < pts.length; i++ ) {
-				contentsync.clusters.checkPostTypes.check( pts[ i ] );
+				contentSync.clusters.checkPostTypes.check( pts[ i ] );
 			}
 		};
 
@@ -901,7 +901,7 @@ contentsync.clusters = new ( function () {
 
 				if ( el.closest( '.row_container' ).classList.contains( 'open' ) ) {
 					// update height
-					contentsync.clusters.conditions.updateHeight( el.closest( '.sub' ) );
+					contentSync.clusters.conditions.updateHeight( el.closest( '.sub' ) );
 				}
 			}
 		};
@@ -909,5 +909,5 @@ contentsync.clusters = new ( function () {
 } )();
 
 document.addEventListener( 'DOMContentLoaded', () => {
-	contentsync.clusters.init();
+	contentSync.clusters.init();
 } );

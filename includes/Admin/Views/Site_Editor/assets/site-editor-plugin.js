@@ -15,12 +15,12 @@
 		 * not an ID, but in the form of theme-name//template-name, e. g. greyd-wp//home
 		 */
 		let lastPostReference = null;
-		[ contentsync.siteEditor.postReference, contentsync.siteEditor.setPostReference ] = wp.element.useState( null );
+		[ contentSync.siteEditor.postReference, contentSync.siteEditor.setPostReference ] = wp.element.useState( null );
 		
 		/**
 		 * Contentsync post data.
 		 */
-		[ contentsync.siteEditor.data, contentsync.siteEditor.setData ] = wp.element.useState( {
+		[ contentSync.siteEditor.data, contentSync.siteEditor.setData ] = wp.element.useState( {
 			postReference: null,
 			post: {
 				id: -1, // -1 = loading, 0 = no post found, > 0 = post found
@@ -48,20 +48,20 @@
 			const currentPostReference = wp.data.select( 'core/editor' ).getCurrentPostId();
 			if (
 				currentPostReference !== null
-				&& currentPostReference !== contentsync.siteEditor.postReference
+				&& currentPostReference !== contentSync.siteEditor.postReference
 				&& currentPostReference !== lastPostReference
 			) {
 
 				lastPostReference = currentPostReference;
-				contentsync.siteEditor.setPostReference( currentPostReference ); // triggers a re-render
+				contentSync.siteEditor.setPostReference( currentPostReference ); // triggers a re-render
 			}
 		}, [ 'core/editor' ] );
 
 		/**
 		 * If reference is set, get post data.
 		 */
-		if ( contentsync.siteEditor.postReference !== null ) {
-			contentsync.siteEditor.getData( contentsync.siteEditor.postReference );
+		if ( contentSync.siteEditor.postReference !== null ) {
+			contentSync.siteEditor.getData( contentSync.siteEditor.postReference );
 		}
 
 		/**
@@ -75,7 +75,7 @@
 				status: ''
 			},
 			similarPosts
-		} = contentsync.siteEditor.data;
+		} = contentSync.siteEditor.data;
 
 		const hasUnsolvedError = post?.error && !post.error?.repaired;
 
@@ -141,7 +141,7 @@
 						el( wp.components.Button, {
 							isPrimary: true,
 							onClick: function( e ) {
-								contentsync.exportPost( e.target, post.id, post.title );
+								contentSync.exportPost( e.target, post.id, post.title );
 							}
 						}, __( 'Convert to global content', 'contentsync' ) ),
 
@@ -152,7 +152,7 @@
 					similarPosts === null && el( wp.components.Button, {
 						isSecondary: true,
 						onClick: () => {
-							contentsync.siteEditor.getSimilarPosts( post.id );
+							contentSync.siteEditor.getSimilarPosts( post.id );
 						},
 						'data-post-id': post.id
 					}, __( 'Find similar posts', 'contentsync' ) ),
@@ -179,7 +179,7 @@
 											el( 'span', {
 												className: 'button button-ghost tiny',
 												onClick: function( e ) {
-													contentsync.overwritePost( e.target );
+													contentSync.overwritePost( e.target );
 												},
 												'data-post_id': post.id,
 												'data-gid': similarPost.meta.synced_post_id
@@ -195,11 +195,11 @@
 
 				// error
 				hasUnsolvedError && [
-					contentsync.siteEditor.renderStatusBox( 'error', post.error?.message ),
+					contentSync.siteEditor.renderStatusBox( 'error', post.error?.message ),
 					post.currentUserCan && el( wp.components.Button, {
 						isSecondary: true,
 						onClick: function( e ) {
-							contentsync.repairPost( e.target, post.id );
+							contentSync.repairPost( e.target, post.id );
 						}
 					}, __( 'Repair', 'contentsync' ) )
 				],
@@ -207,7 +207,7 @@
 				// root post
 				( 'root' === post.status && !hasUnsolvedError ) && [
 
-					contentsync.siteEditor.renderStatusBox( post.status, __( 'Root post', 'contentsync' ) ),
+					contentSync.siteEditor.renderStatusBox( post.status, __( 'Root post', 'contentsync' ) ),
 
 					// Content Sync Options
 					post.currentUserCan && el( 'div', { className: 'contentsync-options-section' }, [
@@ -228,10 +228,10 @@
 								}, __( 'Global Canonical URL', 'contentsync' ) ),
 								el( 'input', {
 									type: 'text',
-									value: contentsync.siteEditor.data.canonicalUrl,
+									value: contentSync.siteEditor.data.canonicalUrl,
 									onChange: ( e ) => {
 										setOptionsChanged( true );
-										contentsync.siteEditor.setData( prev => ( {
+										contentSync.siteEditor.setData( prev => ( {
 											...prev,
 											canonicalUrl: e.target.value
 										} ) );
@@ -243,7 +243,7 @@
 							// Dynamic options based on available options
 							post?.availableOptions && Object.keys( post.availableOptions ).map( ( key ) => {
 								const option = post.availableOptions[ key ];
-								const optionValue = contentsync.siteEditor.data.options[ option.name ] || false;
+								const optionValue = contentSync.siteEditor.data.options[ option.name ] || false;
 								
 								return el( 'div', { 
 									key: option.name,
@@ -257,7 +257,7 @@
 											checked: optionValue,
 											onChange: ( e ) => {
 												setOptionsChanged( true );
-												contentsync.siteEditor.setData( prev => ( {
+												contentSync.siteEditor.setData( prev => ( {
 													...prev,
 													options: {
 														...prev.options,
@@ -289,7 +289,7 @@
 									isPrimary: true,
 									onClick: () => {
 										// setOptionsChanged( false );
-										contentsync.siteEditor.saveOptions( post.id, contentsync.siteEditor.data.options, contentsync.siteEditor.data.canonicalUrl );
+										contentSync.siteEditor.saveOptions( post.id, contentSync.siteEditor.data.options, contentSync.siteEditor.data.canonicalUrl );
 									},
 									className: 'contentsync-save-button'
 								}, __( 'Save Options', 'contentsync' ) )
@@ -348,7 +348,7 @@
 							// className: 'button button-ghost',
 							isSecondary: true,
 							onClick: function( e ) {
-								contentsync.unexportPost( e.target, post.gid );
+								contentSync.unexportPost( e.target, post.gid );
 							},
 						}, __( 'Unlink', 'contentsync' ) )
 					] )
@@ -357,7 +357,7 @@
 				// linked post
 				( 'linked' === post.status && !hasUnsolvedError ) && [
 
-					contentsync.siteEditor.renderStatusBox( post.status, __( 'Linked post', 'contentsync' ) ),
+					contentSync.siteEditor.renderStatusBox( post.status, __( 'Linked post', 'contentsync' ) ),
 
 					el( 'p', {}, [
 						sprintf(
@@ -388,7 +388,7 @@
 							className: 'contentsync-action-button',
 							isSecondary: true,
 							onClick: function( e ) {
-								contentsync.unimportPost( e.target, post.id );
+								contentSync.unimportPost( e.target, post.id );
 							}
 						}, __( 'Convert to local post', 'contentsync' ) )
 					] )

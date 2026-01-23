@@ -1,6 +1,6 @@
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
 
-contentsync.siteEditor = new function () {
+contentSync.siteEditor = new function () {
 
 	/**
 	 * fallback for setData
@@ -59,7 +59,7 @@ contentsync.siteEditor = new function () {
 	this.getData = ( postReference, forceReload ) => {
 
 		if ( typeof forceReload === 'undefined' || !forceReload ) {
-			if ( postReference === null || contentsync.siteEditor?.data?.postReference === postReference ) {
+			if ( postReference === null || contentSync.siteEditor?.data?.postReference === postReference ) {
 				return;
 			}
 		}
@@ -88,9 +88,9 @@ contentsync.siteEditor = new function () {
 					document.body.classList.remove( 'contentsync-locked' );
 				}
 
-				contentsync.siteEditor.setNotice( response?.data?.notice );
+				contentSync.siteEditor.setNotice( response?.data?.notice );
 				console.log( 'setData:', response?.data );
-				contentsync.siteEditor.setData( {
+				contentSync.siteEditor.setData( {
 					postReference: postReference,
 					post: response?.data?.post,
 					similarPosts: null,
@@ -104,8 +104,8 @@ contentsync.siteEditor = new function () {
 				} );
 			} else {
 				document.body.classList.remove( 'contentsync-locked' );
-				contentsync.siteEditor.setNotice( [] );
-				contentsync.siteEditor.setData( {
+				contentSync.siteEditor.setNotice( [] );
+				contentSync.siteEditor.setData( {
 					postReference: postReference,
 					post: {
 						id: 0,
@@ -127,7 +127,7 @@ contentsync.siteEditor = new function () {
 		} ).catch( ( err ) => {
 			document.body.classList.remove( 'contentsync-locked' );
 			console.error( 'apiFetch error: ', err );
-			contentsync.siteEditor.setData( {
+			contentSync.siteEditor.setData( {
 				postReference: postReference,
 				post: {
 					id: 0,
@@ -222,8 +222,8 @@ contentsync.siteEditor = new function () {
 					}
 				}
 
-				contentsync.siteEditor.setData( {
-					...contentsync.siteEditor.data,
+				contentSync.siteEditor.setData( {
+					...contentSync.siteEditor.data,
 					similarPosts: similarPosts
 				} );
 			}

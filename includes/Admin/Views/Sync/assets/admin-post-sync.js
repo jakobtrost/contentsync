@@ -1,6 +1,6 @@
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
 
-contentsync.postSync = new function() {
+contentSync.postSync = new function() {
 
 	this.init = function () {
 
@@ -68,12 +68,12 @@ contentsync.postSync = new function() {
 				 */
 				if (
 					mode === 'reload'
-					&& typeof contentsync.siteEditor.postReference !== 'undefined'
-					&& contentsync.siteEditor.postReference !== null
+					&& typeof contentSync.siteEditor.postReference !== 'undefined'
+					&& contentSync.siteEditor.postReference !== null
 				) {
 					const actionsWithoutReload = [ 'contentsync_export', 'contentsync_unexport', 'contentsync_unimport', 'contentsync_repair' ];
 					if ( actionsWithoutReload.indexOf( action ) > -1 ) {
-						contentsync.siteEditor.getData( contentsync.siteEditor.postReference, true );
+						contentSync.siteEditor.getData( contentSync.siteEditor.postReference, true );
 						mode = 'success';
 					}
 				}
@@ -81,7 +81,7 @@ contentsync.postSync = new function() {
 				// use for development
 				// mode = mode === 'reload' ? 'success': 'fail';
 
-				contentsync.overlay.triggerOverlay( true, { 'type': mode, 'css': action } );
+				contentSync.overlay.triggerOverlay( true, { 'type': mode, 'css': action } );
 			}
 		);
 
@@ -114,8 +114,8 @@ contentsync.postSync = new function() {
 			}
 		}
 
-		contentsync.checkUnsavedChanges();
-		contentsync.overlay.confirm( action, postTitle, contentsync.ajax, [ action, { 'post_id': post_id } ] );
+		contentSync.checkUnsavedChanges();
+		contentSync.overlay.confirm( action, postTitle, contentSync.ajax, [ action, { 'post_id': post_id } ] );
 	};
 
 	/**
@@ -126,8 +126,8 @@ contentsync.postSync = new function() {
 		var action = 'contentsync_unexport';
 		var gid    = typeof gid === 'undefined' ? $( elem ).data( 'gid' ) : gid;
 
-		contentsync.checkUnsavedChanges();
-		contentsync.overlay.confirm( action, '', contentsync.ajax, [ action, { 'gid': gid } ] );
+		contentSync.checkUnsavedChanges();
+		contentSync.overlay.confirm( action, '', contentSync.ajax, [ action, { 'gid': gid } ] );
 	};
 
 	/**
@@ -145,7 +145,7 @@ contentsync.postSync = new function() {
 
 	this.checkImportOverlay = function( action, gid, postType, form ) {
 
-		contentsync.overlay.triggerOverlay( true, { 'type': 'check_post', 'css': action } );
+		contentSync.overlay.triggerOverlay( true, { 'type': 'check_post', 'css': action } );
 
 		$.post(
 			greyd.ajax_url ?? wizzard_details.ajax_url,
@@ -173,31 +173,31 @@ contentsync.postSync = new function() {
 						console.error( e );
 					}
 
-					console.log( contentsync.postExport );
+					console.log( contentSync.postExport );
 
 					// display conflicts
-					contentsync.buildConflictOptions( form, result, true );
+					contentSync.buildConflictOptions( form, result, true );
 
 					/**
 					 * trigger overlay 'confirm'
 					 * 
 					 * callback: this.importPost( gid );
 					 */
-					contentsync.overlay.confirm( action, '', contentsync.importPost, [ gid, postType ] );
+					contentSync.overlay.confirm( action, '', contentSync.importPost, [ gid, postType ] );
 				}
 				// complete with error
 				else if ( response.indexOf( 'error::' ) > -1 ) {
 					var msg = response.split( 'error::' )[ 1 ];
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': msg } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': msg } );
 				}
 				// unknown state
 				else {
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': response } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': response } );
 				}
 			}
 		);
 
-		// contentsync.overlay.confirm( action, '', contentsync.ajax, [ action, { 'gid': gid } ] );
+		// contentSync.overlay.confirm( action, '', contentSync.ajax, [ action, { 'gid': gid } ] );
 	};
 
 	/**
@@ -216,7 +216,7 @@ contentsync.postSync = new function() {
 			}, {} );
 		}
 
-		contentsync.ajax( action, data );
+		contentSync.ajax( action, data );
 	};
 
 	/**
@@ -265,8 +265,8 @@ contentsync.postSync = new function() {
 					}
 					else {
 						// console.info("selected post is already imported:", posts[0]);
-						contentsync.overlay.triggerOverlay( true, { 'type': 'imported', 'css': 'contentsync_import_bulk', 'replace': posts[ 0 ].title } );
-						contentsync.overlay.fadeOutOverlay();
+						contentSync.overlay.triggerOverlay( true, { 'type': 'imported', 'css': 'contentsync_import_bulk', 'replace': posts[ 0 ].title } );
+						contentSync.overlay.fadeOutOverlay();
 					}
 				}
 				else {
@@ -289,7 +289,7 @@ contentsync.postSync = new function() {
 	 */
 	this.checkImportBulkOverlay = function( action, posts, form ) {
 
-		contentsync.overlay.triggerOverlay( true, { 'type': 'check_post', 'css': action } );
+		contentSync.overlay.triggerOverlay( true, { 'type': 'check_post', 'css': action } );
 		// clear old items
 		form.find( '.inner_content.item' ).remove();
 
@@ -347,7 +347,7 @@ contentsync.postSync = new function() {
 						posts.forEach( ( post, i ) => {
 
 							// display conflicts
-							// contentsync.buildConflictOptions( form, [ post ], false );
+							// contentSync.buildConflictOptions( form, [ post ], false );
 
 							let postsForConflict = [];
 
@@ -365,7 +365,7 @@ contentsync.postSync = new function() {
 							}
 
 							// display conflicts
-							contentsync.buildConflictOptions( form, postsForConflict, clear );
+							contentSync.buildConflictOptions( form, postsForConflict, clear );
 							clear = false;
 						} );
 
@@ -383,7 +383,7 @@ contentsync.postSync = new function() {
 						 * 
 						 * callback: this.importBulk( posts, form );
 						 */
-						contentsync.overlay.confirm( action, '', contentsync.importBulk, [ posts, form ] );
+						contentSync.overlay.confirm( action, '', contentSync.importBulk, [ posts, form ] );
 					}
 
 				}
@@ -391,11 +391,11 @@ contentsync.postSync = new function() {
 				// complete with error
 				if ( error || response.indexOf( 'error::' ) > -1 ) {
 					var msg = response.split( 'error::' )[ 1 ];
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': msg } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': msg } );
 				}
 				// unknown state
 				else if ( response.indexOf( 'success::' ) == -1 ) {
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': response } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': action, 'replace': response } );
 				}
 			}
 		);
@@ -435,13 +435,13 @@ contentsync.postSync = new function() {
 		} );
 
 		// empty queue
-		contentsync.importQueue = [];
+		contentSync.importQueue = [];
 
 		// make import queue
 		posts.forEach( ( item, i ) => {
 			if ( item.relationship == 'import' ) {
 				// skip if already imported
-				contentsync.importQueue.push( {
+				contentSync.importQueue.push( {
 					gid: item.gid,
 					action: 'skip',
 					callback: () => {
@@ -456,7 +456,7 @@ contentsync.postSync = new function() {
 			else {
 
 				// import post
-				contentsync.importQueue.push( {
+				contentSync.importQueue.push( {
 					gid: item.gid,
 					ajax_data: {
 						gid: item.gid,
@@ -491,21 +491,21 @@ contentsync.postSync = new function() {
 		} );
 
 		// start queue
-		// console.log(contentsync.importQueue);
-		contentsync.importBulkNext( 0 );
+		// console.log(contentSync.importQueue);
+		contentSync.importBulkNext( 0 );
 
 	};
 
 	this.importBulkNext = function( index ) {
 
-		if ( contentsync.importQueue.length == index ) {
+		if ( contentSync.importQueue.length == index ) {
 			// finish queue
-			contentsync.importBulkFinish();
+			contentSync.importBulkFinish();
 
 			return;
 		}
 
-		var item = contentsync.importQueue[ index ];
+		var item = contentSync.importQueue[ index ];
 		if ( item.ajax_data ) {
 			$.post(
 				greyd.ajax_url ?? wizzard_details.ajax_url,
@@ -516,19 +516,19 @@ contentsync.postSync = new function() {
 					'data': item.ajax_data
 				},
 				function ( response ) {
-					contentsync.importQueue[ index ].result = item.callback( response );
+					contentSync.importQueue[ index ].result = item.callback( response );
 					// next
-					contentsync.importBulkNext( index+1 );
+					contentSync.importBulkNext( index+1 );
 				}
 			);
 		}
 		else {
 			if ( item.action && item.action == 'skip' ) {
-				contentsync.importQueue[ index ].result = item.callback();
+				contentSync.importQueue[ index ].result = item.callback();
 			}
 
 			// next
-			contentsync.importBulkNext( index+1 );
+			contentSync.importBulkNext( index+1 );
 		}
 
 	};
@@ -537,7 +537,7 @@ contentsync.postSync = new function() {
 	
 		// success or fail (some failed)
 		var mode = 'success';
-		contentsync.importQueue.forEach( item => {
+		contentSync.importQueue.forEach( item => {
 			// console.log(item);
 			if ( item.result !== true ) {
 				mode = 'fail';
@@ -560,8 +560,8 @@ contentsync.postSync = new function() {
 		$( '.fail .color_light.escape' ).remove();
 
 		// show result
-		contentsync.overlay.triggerOverlay( true, { 'type': mode, 'css': 'contentsync_import_bulk' } );
-		clearTimeout( contentsync.overlay.overlayTimeout );
+		contentSync.overlay.triggerOverlay( true, { 'type': mode, 'css': 'contentsync_import_bulk' } );
+		clearTimeout( contentSync.overlay.overlayTimeout );
 		
 	};
 
@@ -573,7 +573,7 @@ contentsync.postSync = new function() {
 		var action = 'contentsync_unimport';
 		var post_id = typeof postId === 'undefined' ? $( elem ).data( 'post_id' ) : postId;
 
-		contentsync.overlay.confirm( action, '', contentsync.ajax, [ action, { 'post_id': post_id } ] );
+		contentSync.overlay.confirm( action, '', contentSync.ajax, [ action, { 'post_id': post_id } ] );
 	};
 
 	/**
@@ -588,8 +588,8 @@ contentsync.postSync = new function() {
 		};
 		var replace = $( elem ).prev().text();
 
-		contentsync.checkUnsavedChanges();
-		contentsync.overlay.confirm( action, replace, contentsync.ajax, [ action, data ] );
+		contentSync.checkUnsavedChanges();
+		contentSync.overlay.confirm( action, replace, contentSync.ajax, [ action, data ] );
 	};
 
 	/**
@@ -607,7 +607,7 @@ contentsync.postSync = new function() {
 			data[ 'post_id' ] = postId;
 		}
 
-		contentsync.overlay.confirm( action, '', contentsync.ajax, [ action, data ] );
+		contentSync.overlay.confirm( action, '', contentSync.ajax, [ action, data ] );
 	};
 	
 	/**
@@ -617,7 +617,7 @@ contentsync.postSync = new function() {
 
 		var action = 'contentsync_trash';
 
-		contentsync.overlay.confirm( action, '', contentsync.ajax, [ action, $( elem ).data() ] );
+		contentSync.overlay.confirm( action, '', contentSync.ajax, [ action, $( elem ).data() ] );
 	};
 
 	/**
@@ -628,7 +628,7 @@ contentsync.postSync = new function() {
 		var action = 'contentsync_delete';
 		var gid = $( elem ).data( 'gid' );
 
-		contentsync.overlay.confirm( action, '', contentsync.ajax, [ action, { 'gid': gid } ] );
+		contentSync.overlay.confirm( action, '', contentSync.ajax, [ action, { 'gid': gid } ] );
 	};
 
 	/**
@@ -892,8 +892,8 @@ contentsync.postSync = new function() {
 	 */
 	this.buildConflictOptions = function ( wrapper, posts, clear ) {
 
-		// if ( typeof contentsync.postExport !== 'undefined' ) {
-		// 	return contentsync.postExport.buildConflictOptions( wrapper, posts );
+		// if ( typeof contentSync.postExport !== 'undefined' ) {
+		// 	return contentSync.postExport.buildConflictOptions( wrapper, posts );
 		// }
 		// else if ( typeof post_export !== 'undefined' ) {
 		// 	return post_export.buildConflictOptions( wrapper, posts );
@@ -963,5 +963,5 @@ contentsync.postSync = new function() {
 };
 
 document.addEventListener( 'DOMContentLoaded', () => {
-	contentsync.postSync.init();
+	contentSync.postSync.init();
 } );
