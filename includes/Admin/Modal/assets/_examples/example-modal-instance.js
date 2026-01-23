@@ -1,7 +1,7 @@
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
 const __ = typeof wp?.i18n?.__ === 'function' ? wp.i18n.__ : ( text ) => text;
 
-contentsync.exportPostModal = new function() {
+contentSync.exportPostModal = new function() {
 
 	/**
 	 * Modal config
@@ -34,7 +34,7 @@ contentsync.exportPostModal = new function() {
 			cancel: {
 				text: __( 'Cancel', 'contentsync' )
 			},
-			confirm: {
+			submit: {
 				text: __( 'Export now', 'contentsync' )
 			}
 		},
@@ -49,7 +49,7 @@ contentsync.exportPostModal = new function() {
 	/**
 	 * Modal instance
 	 */
-	this.modal = new contentsync.Modal( this.config );
+	this.modal = new contentSync.Modal( this.config );
 
 	/**
 	 * Set description
@@ -71,5 +71,5 @@ contentsync.exportPostModal = new function() {
 document.addEventListener( 'DOMContentLoaded', () => {
 
 	// open on load
-	contentsync.exportPostModal.modal.open();
+	contentSync.exportPostModal.modal.open();
 } );

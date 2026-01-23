@@ -5,7 +5,29 @@
  * Supports dynamic content, form inputs, notices, and callback functions.
  */
 class Modal {
-	// Static counter for header IDs
+
+	/**
+	 * Modal config
+	 * @type {Object}
+	 */
+	config = null;
+
+	/**
+	 * Modal DOM element
+	 * @type {HTMLElement}
+	 */
+	modalElement = null;
+
+	/**
+	 * Event listeners
+	 * @type {Object}
+	 */
+	boundHandlers = {};
+
+	/**
+	 * Static counter for header IDs (allows multiple modals on the same page)
+	 * @type {number}
+	 */
 	static headerIdCounter = 0;
 
 	/**
@@ -38,7 +60,7 @@ class Modal {
 
 		// Create wrapper
 		const wrapper = document.createElement( 'div' );
-		wrapper.className = 'components-modal__screen-overlay contentsync-modal';
+		wrapper.className = 'components-modal__screen-overlay contentSync-modal';
 		wrapper.id = `${modalId}__wrapper`;
 
 		// Create frame
@@ -310,7 +332,7 @@ class Modal {
 
 		// Create info box structure matching Admin_Render::make_admin_info_box
 		const notice = document.createElement( 'div' );
-		notice.className = `contentsync-info-box ${styling}`.trim();
+		notice.className = `contentSync-info-box ${styling}`.trim();
 
 		// Icon span
 		const iconSpan = document.createElement( 'span' );
@@ -350,16 +372,16 @@ class Modal {
 		footer.appendChild( cancelButton );
 
 		// Confirm button
-		const confirmButton = document.createElement( 'button' );
-		confirmButton.type = 'button';
-		confirmButton.className = 'components-button components-flex-item is-primary';
-		if ( this.config.buttons && this.config.buttons.confirm && this.config.buttons.confirm.classes ) {
-			confirmButton.className = `components-button components-flex-item ${this.config.buttons.confirm.classes}`;
+		const submitButton = document.createElement( 'button' );
+		submitButton.type = 'button';
+		submitButton.className = 'components-button components-flex-item is-primary';
+		if ( this.config.buttons && this.config.buttons.submit && this.config.buttons.submit.classes ) {
+			submitButton.className = `components-button components-flex-item ${this.config.buttons.submit.classes}`;
 		}
 
-		confirmButton.textContent = ( this.config.buttons && this.config.buttons.confirm && this.config.buttons.confirm.text ) || 'Confirm';
-		confirmButton.dataset.action = 'confirm';
-		footer.appendChild( confirmButton );
+		submitButton.textContent = ( this.config.buttons && this.config.buttons.submit && this.config.buttons.submit.text ) || 'Confirm';
+		submitButton.dataset.action = 'submit';
+		footer.appendChild( submitButton );
 
 		return footer;
 	}
@@ -465,15 +487,15 @@ class Modal {
 		}
 
 		// Confirm button handler
-		const confirmButton = this.modalElement.querySelector( '[data-action="confirm"]' );
-		if ( confirmButton ) {
+		const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
+		if ( submitButton ) {
 			this.boundHandlers.handleConfirm = () => {
 				if ( this.config.onConfirm && typeof this.config.onConfirm === 'function' ) {
 					this.config.onConfirm.call( this );
 				}
 			};
 
-			confirmButton.addEventListener( 'click', this.boundHandlers.handleConfirm );
+			submitButton.addEventListener( 'click', this.boundHandlers.handleConfirm );
 		}
 	}
 
@@ -502,9 +524,9 @@ class Modal {
 				cancelButton.removeEventListener( 'click', this.boundHandlers.handleCancel );
 			}
 
-			const confirmButton = this.modalElement.querySelector( '[data-action="confirm"]' );
-			if ( confirmButton && this.boundHandlers.handleConfirm ) {
-				confirmButton.removeEventListener( 'click', this.boundHandlers.handleConfirm );
+			const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
+			if ( submitButton && this.boundHandlers.handleConfirm ) {
+				submitButton.removeEventListener( 'click', this.boundHandlers.handleConfirm );
 			}
 		}
 
@@ -556,21 +578,21 @@ class Modal {
 	}
 
 	/**
-	 * Toggle the busy state of the confirm button
+	 * Toggle the busy state of the submit button
 	 */
 	toggleConfirmButtonBusy( busy = true ) {
-		const confirmButton = this.modalElement.querySelector( '[data-action="confirm"]' );
-		if ( confirmButton ) {
-			confirmButton.disabled = busy;
+		const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
+		if ( submitButton ) {
+			submitButton.disabled = busy;
 			if ( busy ) {
-				confirmButton.classList.add( 'is-busy' );
+				submitButton.classList.add( 'is-busy' );
 			} else {
-				confirmButton.classList.remove( 'is-busy' );
+				submitButton.classList.remove( 'is-busy' );
 			}
 		}
 	}
 }
 
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
 
-contentsync.Modal = Modal;
+contentSync.Modal = Modal;

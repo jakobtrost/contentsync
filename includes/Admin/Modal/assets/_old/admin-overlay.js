@@ -1,6 +1,6 @@
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
 
-contentsync.overlay = new function() {
+contentSync.overlay = new function() {
 
 	this.overlayTimeout;
 
@@ -8,14 +8,14 @@ contentsync.overlay = new function() {
 
 		// add trigger to escape-button
 		$( '.contentsync_overlay .button[role=\'escape\']' ).on( 'click', function() {
-			contentsync.overlay.triggerOverlay( false, {
+			contentSync.overlay.triggerOverlay( false, {
 				id: $( this ).closest( '.contentsync_overlay' ).attr( 'id' )
 			} );
 		} );
 
 		// greyd info popup
 		$( '.contentsync-tooltip-wrapper' ).on( 'click', function( e ){
-			contentsync.overlay.togglePopup( e, $( this ) );
+			contentSync.overlay.togglePopup( e, $( this ) );
 		} );
 
 		// tabs
@@ -78,7 +78,7 @@ contentsync.overlay = new function() {
 
 		console.log( show, type, css, replace, id );
 
-		clearTimeout( contentsync.overlay.overlayTimeout );
+		clearTimeout( contentSync.overlay.overlayTimeout );
 		var overlay = $( '.contentsync_overlay#'+id );
 		if ( overlay.length === 0 ) return false;
 
@@ -132,18 +132,18 @@ contentsync.overlay = new function() {
 
 			// hide overlay...
 			if ( type === 'success' ) {
-				contentsync.overlay.fadeOutOverlay();
+				contentSync.overlay.fadeOutOverlay();
 			} else if ( type === 'fail' ) {
-				// contentsync.overlay.fadeOutOverlay(5000);
+				// contentSync.overlay.fadeOutOverlay(5000);
 			}
 			// ...or reload page
 			else if ( type === 'reload' ) {
-				contentsync.overlay.reloadPage();
+				contentSync.overlay.reloadPage();
 			}
 		}
 		else {
 			$( '.contentsync_overlay' ).addClass( 'hidden' );
-			clearTimeout( contentsync.overlay.overlayTimeout );
+			clearTimeout( contentSync.overlay.overlayTimeout );
 		}
 	};
 
@@ -169,7 +169,7 @@ contentsync.overlay = new function() {
 			}
 
 			overlayArgs.type = 'loading';
-			contentsync.overlay.triggerOverlay( true, overlayArgs );
+			contentSync.overlay.triggerOverlay( true, overlayArgs );
 		} );
 	};
 
@@ -215,9 +215,9 @@ contentsync.overlay = new function() {
 
 	this.fadeOutOverlay = function( time ) {
 		time = time ? time : 2400;
-		clearTimeout( contentsync.overlay.overlayTimeout );
-		contentsync.overlay.overlayTimeout = setTimeout( function() {
-			contentsync.overlay.triggerOverlay( false );
+		clearTimeout( contentSync.overlay.overlayTimeout );
+		contentSync.overlay.overlayTimeout = setTimeout( function() {
+			contentSync.overlay.triggerOverlay( false );
 		}, time );
 	};
 
@@ -228,8 +228,8 @@ contentsync.overlay = new function() {
 		}
 
 		time = time ? time : 1500;
-		clearTimeout( contentsync.overlay.overlayTimeout );
-		contentsync.overlay.overlayTimeout = setTimeout( function() {
+		clearTimeout( contentSync.overlay.overlayTimeout );
+		contentSync.overlay.overlayTimeout = setTimeout( function() {
 			$( 'form#reload_page' ).submit();
 		}, time );
 	};
@@ -258,5 +258,5 @@ contentsync.overlay = new function() {
 };
 
 document.addEventListener( 'DOMContentLoaded', () => {
-	contentsync.overlay.init();
+	contentSync.overlay.init();
 } );

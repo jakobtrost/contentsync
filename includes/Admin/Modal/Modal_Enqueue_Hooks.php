@@ -56,7 +56,7 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 		// // Depends on components-modal.js
 		// wp_register_script(
 		// 'contentsync-example-modal-instance',
-		// CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/examples/example-modal-instance.js',
+		// CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/_examples/example-modal-instance.js',
 		// array( 'contentsync-components-modal' ),
 		// CONTENTSYNC_VERSION,
 		// true
