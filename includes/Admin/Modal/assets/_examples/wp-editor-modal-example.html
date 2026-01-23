@@ -1,0 +1,92 @@
+<!--
+const config = {
+	id: 'modal-instance-id',
+	title: 'Modal Title',
+	description: 'Modal Description',
+	formInputs: [
+		{
+			type: 'checkbox',
+			name: 'form-control-name-1',
+			label: 'Form Control Label 1',
+			description: 'Form Control Description 1',
+			value: 1
+		},
+		{
+			type: 'custom',
+			content: '<div class="components-custom-control__input-container">Some Custom HTML defined by the instance...</div>'
+		}
+	],
+	notice: {
+		text: 'Modal Notice Text',
+		type: 'info'
+	},
+	buttons: {
+		cancel: {
+			text: 'Cancel'
+		},
+		confirm: {
+			text: 'Save'
+		}
+	}
+}
+-->
+
+<div class="components-modal__screen-overlay" id="modal-instance-id__wrapper">
+	<div class="components-modal__frame" id="modal-instance-id" role="dialog" aria-labelledby="components-modal-header-0" tabindex="-1">
+	   <div class="components-modal__content" role="document">
+		  <div class="components-modal__header">
+			 <div class="components-modal__header-heading-container">
+				<h1 id="components-modal-header-0" class="components-modal__header-heading">Modal Title</h1>
+			 </div>
+			 <div class="components-spacer"></div>
+			 <button type="button" class="components-button is-compact has-icon" aria-label="Close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+				   <path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path>
+				</svg>
+			 </button>
+		  </div>
+		  <div>
+			<p class="components-modal__description">
+				Modal Description
+			</p>
+			<div class="components-panel__body">
+				<form id="modal-instance-id__form" class="components-panel__body-form" onsubmit="return false;">
+					<div class="components-panel__row">
+						<div class="components-base-control components-checkbox-control">
+							<span class="components-checkbox-control__input-container">
+								<input id="form-control-name-1" class="components-checkbox-control__input" type="checkbox" value="1" checked="">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="presentation" class="components-checkbox-control__checked" aria-hidden="true" focusable="false">
+									<path d="M16.5 7.5 10 13.9l-2.5-2.4-1 1 3.5 3.6 7.5-7.6z"></path>
+								</svg>
+							</span>
+							<label class="components-checkbox-control__label" for="form-control-name-1">
+								<strong>Form Control Label 1</strong>
+								<small>Form Control Description 1</small>
+							</label>
+						</div>
+					</div>
+					<div class="components-panel__row">
+						<div class="components-base-control components-custom-control">
+							<div class="components-custom-control__input-container">Some Custom HTML defined by the instance...</div>
+						</div>
+					</div>
+				</form>
+				<div class="components-panel__body-notices">
+					<div class="components-panel__body-notice notice-info">
+						<p>
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+								<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path>
+							</svg>
+							<span>Modal Notice Text</span>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="components-panel__footer components-flex">
+				<button type="button" class="components-button components-flex-item is-tertiary">Cancel</button>
+				<button type="button" class="components-button components-flex-item is-primary">Save</button>
+			</div>
+		  </div>
+	   </div>
+	</div>
+ </div>
