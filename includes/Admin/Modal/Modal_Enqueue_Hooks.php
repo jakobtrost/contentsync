@@ -29,35 +29,34 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 
 		// Enqueue components-modal.css (modal styles)
 		wp_register_style(
-			'contentsync-components-modal',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/components-modal.css',
+			'contentsync-modal',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/contentsync-modal.css',
 			array(),
 			CONTENTSYNC_VERSION,
 		);
-		wp_enqueue_style( 'contentsync-components-modal' );
+		wp_enqueue_style( 'contentsync-modal' );
 
 		// Enqueue admin-info-box.css (admin info box styles)
 		Admin_Render::maybe_enqueue_stylesheet(
-			'contentsync-admin-info-box',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/admin-info-box.css'
+			'contentsync-info-box',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/contentsync-info-box.css'
 		);
 
 		// Enqueue components-modal.js (base Modal class)
 		wp_register_script(
-			'contentsync-components-modal',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/components-modal.js',
+			'contentSync-Modal',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/contentSync.Modal.js',
 			array(),
 			CONTENTSYNC_VERSION,
 			true
 		);
-		wp_enqueue_script( 'contentsync-components-modal' );
+		wp_enqueue_script( 'contentSync-Modal' );
 
 		// // Enqueue example-modal-instance.js (test/example implementation)
-		// // Depends on components-modal.js
 		// wp_register_script(
 		// 'contentsync-example-modal-instance',
 		// CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/_examples/example-modal-instance.js',
-		// array( 'contentsync-components-modal' ),
+		// array( 'contentSync-Modal' ),
 		// CONTENTSYNC_VERSION,
 		// true
 		// );

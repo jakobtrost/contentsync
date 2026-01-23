@@ -27,12 +27,12 @@ class Admin_Utils_Enqueue_Hooks extends Hooks_Base {
 	public function enqueue_admin_utils() {
 
 		wp_register_script(
-			'contentsync-admin-utils',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/admin-utils.js',
+			'contentSync-utils',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/contentSync.utils.js',
 			array(),
 			CONTENTSYNC_VERSION,
 			true
 		);
-		wp_enqueue_script( 'contentsync-admin-utils' );
+		wp_enqueue_script( 'contentSync-utils' );
 	}
 }

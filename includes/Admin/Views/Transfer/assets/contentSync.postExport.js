@@ -107,6 +107,17 @@ contentSync.postExport = new function() {
 		this.Modal.close();
 
 		// @todo: make snackbar work
+		contentSync.Snackbar.add( {
+			mainMessage: __( 'Post exported successfully, The file will be downloaded automatically, if not, click the link', 'contentsync' ),
+			link: {
+				text: __( 'Download file', 'contentsync' ),
+				url: response.download_link,
+				target: '_self',
+				rel: 'external noreferrer noopener'
+			},
+			type: 'success',
+			timeout: 10000,
+		} );
 	};
 
 	/**
@@ -120,5 +131,9 @@ contentSync.postExport = new function() {
 		this.Modal.toggleConfirmButtonBusy( false );
 
 		// @todo: show snackbar "Error exporting post: %s"
+		contentSync.Snackbar.add( {
+			text: __( 'Error exporting post: %s', 'contentsync' ),
+			type: 'error'
+		} );
 	};
 };

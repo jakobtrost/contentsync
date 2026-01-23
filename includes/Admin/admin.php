@@ -232,7 +232,7 @@ class Admin {
 				$buttons = array(
 					array(
 						'label'   => __( 'Repair', 'contentsync' ),
-						'onClick' => 'contentsync.repairPost(this, ' . esc_attr( $post_id ) . ')',
+						'onClick' => 'contentSync.repairPost(this, ' . esc_attr( $post_id ) . ')',
 						'variant' => 'primary',
 					),
 				);
@@ -258,7 +258,7 @@ class Admin {
 						array(
 							'label'     => __( 'Convert to local post', 'contentsync' ),
 							'className' => 'button-ghost',
-							'onClick'   => 'contentsync.unimportPost(this, ' . esc_attr( $post_id ) . ')',
+							'onClick'   => 'contentSync.unimportPost(this, ' . esc_attr( $post_id ) . ')',
 							'variant'   => 'tertiary',
 						),
 					);
@@ -439,15 +439,15 @@ class Admin {
 						array(
 							'label'   => __( 'Approve changes', 'contentsync' ),
 							'variant' => 'primary',
-							'onClick' => 'contentsync.openReviewApprove(this, ' . esc_attr( $post_id ) . ', ' . esc_attr( $review->ID ) . ')',
+							'onClick' => 'contentSync.openReviewApprove(this, ' . esc_attr( $post_id ) . ', ' . esc_attr( $review->ID ) . ')',
 						),
 						array(
 							'label'   => __( 'Request modification', 'contentsync' ),
-							'onClick' => 'contentsync.openReviewDeny(this, ' . esc_attr( $post_id ) . ', ' . esc_attr( $review->ID ) . ')',
+							'onClick' => 'contentSync.openReviewDeny(this, ' . esc_attr( $post_id ) . ', ' . esc_attr( $review->ID ) . ')',
 						),
 						array(
 							'label'   => __( 'Revert changes', 'contentsync' ),
-							'onClick' => 'contentsync.openReviewRevert(this, ' . esc_attr( $post_id ) . ', ' . esc_attr( $review->ID ) . ')',
+							'onClick' => 'contentSync.openReviewRevert(this, ' . esc_attr( $post_id ) . ', ' . esc_attr( $review->ID ) . ')',
 						),
 					);
 				}
@@ -592,7 +592,7 @@ class Admin {
 			// make global
 			if ( Synced_Post_Service::current_user_can_edit_synced_posts( $status ) ) {
 				$return .= '<p>' . __( 'Do you want this post to be available throughout all connected sites?', 'contentsync' ) . '</p>' .
-					'<span class="button" onclick="contentsync.exportPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' .
+					'<span class="button" onclick="contentSync.exportPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' .
 						__( 'Convert to global content', 'contentsync' ) .
 					'</span>';
 			}
@@ -611,7 +611,7 @@ class Admin {
 							'<li>' .
 							'<span class="flex">' .
 								'<a href="{{href}}" target="_blank">{{post_title}}</a>' .
-								'<span class="button button-ghost tiny" onclick="contentsync.overwritePost(this);" data-post_id="{{post_id}}" data-gid="{{gid}}">' . __( 'Use', 'contentsync' ) . '</span>' .
+								'<span class="button button-ghost tiny" onclick="contentSync.overwritePost(this);" data-post_id="{{post_id}}" data-gid="{{gid}}">' . __( 'Use', 'contentsync' ) . '</span>' .
 							'</span>' .
 							'<small>{{nice_url}}</small>' .
 							'</li>'
@@ -655,13 +655,13 @@ class Admin {
 				$return .= Admin_Render::make_admin_icon_status_box( 'error', Post_Error_Handler::get_error_message( self::$error ) );
 				if ( Synced_Post_Service::current_user_can_edit_synced_posts( $status ) ) {
 					// repair button
-					$return                  .= '<br><br><span class="button" onclick="contentsync.repairPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' . __( 'Repair', 'contentsync' ) . '</span>';
+					$return                  .= '<br><br><span class="button" onclick="contentSync.repairPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' . __( 'Repair', 'contentsync' ) . '</span>';
 					self::$overlay_contents[] = 'contentsync_repair';
 
 					// unlink
 					$return .= '<div class="contentsync-gray-box">' .
 						'<p>' . __( 'Edit this post?', 'contentsync' ) . '</p>' .
-						'<span class="button" onclick="contentsync.unimportPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' .
+						'<span class="button" onclick="contentSync.unimportPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' .
 							__( 'Convert to local post', 'contentsync' ) .
 						'</span>' .
 					'</div>';
@@ -837,7 +837,7 @@ class Admin {
 					// unexport
 					$return .= '<div class="contentsync-gray-box">' .
 						'<p>' . __( 'No longer make this post available globally?', 'contentsync' ) . '</p>' .
-						'<span class="button button-ghost" onclick="contentsync.unexportPost(this);" data-post_id="' . esc_attr( $post_id ) . '" data-gid="' . esc_attr( $gid ) . '">' .
+						'<span class="button button-ghost" onclick="contentSync.unexportPost(this);" data-post_id="' . esc_attr( $post_id ) . '" data-gid="' . esc_attr( $gid ) . '">' .
 							__( 'Unlink', 'contentsync' ) .
 						'</span>' .
 					'</div>';
@@ -874,7 +874,7 @@ class Admin {
 					// unlink
 					$return .= '<div class="contentsync-gray-box">' .
 						'<p>' . __( 'Edit this post?', 'contentsync' ) . '</p>' .
-						'<span class="button" onclick="contentsync.unimportPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' .
+						'<span class="button" onclick="contentSync.unimportPost(this);" data-post_id="' . esc_attr( $post_id ) . '">' .
 							__( 'Convert to local post', 'contentsync' ) .
 						'</span>' .
 					'</div>';
@@ -1082,7 +1082,7 @@ class Admin {
 						'</button>' .
 					'</div>',
 					/* title    */ preg_replace( '/\s{1}/', '&nbsp;', __( 'Convert to global content', 'contentsync' ) ),
-					/* onclick  */ 'contentsync.exportPost(this); return false;',
+					/* onclick  */ 'contentSync.exportPost(this); return false;',
 					/* post_id  */ esc_attr( $post_id ),
 				);
 			}

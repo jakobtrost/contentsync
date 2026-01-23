@@ -1,4 +1,4 @@
-.contentsync_tabs {
+.contentsync-tabs {
 	display: flex;
 	position: relative;
 	/* height: 50px; */
@@ -11,7 +11,7 @@
 	flex-wrap: wrap;
 }
 
-.contentsync_tabs::before {
+.contentsync-tabs::before {
 	content: ' ';
 	position: absolute;
 	display: block;
@@ -22,7 +22,7 @@
 	z-index: -1;
 }
 
-.contentsync_tabs .tab {
+.contentsync-tabs .tab {
 	display: flex;
 	position: relative;
 	align-items: center;
@@ -41,16 +41,16 @@
 	white-space: nowrap;
 }
 
-.contentsync_tabs .tab:hover {
+.contentsync-tabs .tab:hover {
 	color: #1e1f1f;
 	background: #f1f1f1;
 }
 
-.contentsync_tabs .tab:not(.active) {
+.contentsync-tabs .tab:not(.active) {
 	z-index: -2;
 }
 
-.contentsync_tabs .tab.active {
+.contentsync-tabs .tab.active {
 	height: 38px;
 	font-weight: 600;
 	color: #1e1f1f;
@@ -60,41 +60,41 @@
 	border-top-color: #505050;
 }
 
-.contentsync_tabs .tab.blue:hover,
-.contentsync_tabs .tab.active.blue {
+.contentsync-tabs .tab.blue:hover,
+.contentsync-tabs .tab.active.blue {
 	border-top-color: rgba(47, 128, 237, 1);
 }
 
-.contentsync_tabs .tab.wp:hover,
-.contentsync_tabs .tab.active.wp {
+.contentsync-tabs .tab.wp:hover,
+.contentsync-tabs .tab.active.wp {
 	border-top-color: #3072a6;
 }
 
-.contentsync_tabs .tab.green:hover,
-.contentsync_tabs .tab.active.green {
+.contentsync-tabs .tab.green:hover,
+.contentsync-tabs .tab.active.green {
 	border-top-color: rgba(39, 174, 96, 1);
 }
 
-.contentsync_tabs .tab.orange:hover,
-.contentsync_tabs .tab.active.orange {
+.contentsync-tabs .tab.orange:hover,
+.contentsync-tabs .tab.active.orange {
 	border-top-color: rgba(242, 153, 74, 1);
 }
 
-.contentsync_tabs .tab.red:hover,
-.contentsync_tabs .tab.active.red {
+.contentsync-tabs .tab.red:hover,
+.contentsync-tabs .tab.active.red {
 	border-top-color: rgba(235, 87, 87, 1);
 }
 
-.contentsync_tabs .tab.purple:hover,
-.contentsync_tabs .tab.active.purple {
+.contentsync-tabs .tab.purple:hover,
+.contentsync-tabs .tab.active.purple {
 	border-top-color: #9b51e0;
 }
 
-.contentsync_tabs .tab.greyd:hover,
-.contentsync_tabs .tab.active.greyd {
+.contentsync-tabs .tab.greyd:hover,
+.contentsync-tabs .tab.active.greyd {
 	border-top-color: #f2b25a;
 }
 
-.contentsync_tabs .tab .dashicons {
+.contentsync-tabs .tab .dashicons {
 	margin-right: 6px;
 }

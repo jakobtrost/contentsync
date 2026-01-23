@@ -28,17 +28,17 @@ class Ajax_Handler_Enqueue_Hooks extends Hooks_Base {
 
 		// Enqueue the AJAX handler script.
 		wp_register_script(
-			'contentsync-ajax-handler',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Ajax/assets/ajax-handler.js',
+			'contentSync-AjaxHandler',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Ajax/assets/contentSync.AjaxHandler.js',
 			array(),
 			CONTENTSYNC_VERSION,
 			true
 		);
-		wp_enqueue_script( 'contentsync-ajax-handler' );
+		wp_enqueue_script( 'contentSync-AjaxHandler' );
 
 		// Localize the script with ajax url and nonce.
 		wp_localize_script(
-			'contentsync-ajax-handler',
+			'contentSync-AjaxHandler',
 			'contentSyncAjaxData',
 			array(
 				'url'   => admin_url( 'admin-ajax.php' ),

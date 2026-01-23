@@ -368,7 +368,7 @@ class Post_Connection_Map {
 	 * Check for missing or deleted connections of a root post.
 	 *
 	 * @note   This function is usually called via js ajax.
-	 *         JS function: contentsync.checkRootConnections();
+	 *         JS function: contentSync.checkRootConnections();
 	 *
 	 * @update The function received a huge update in 1.7.0. It now checks for
 	 *         missing connections on all sites and not only on the current site.
