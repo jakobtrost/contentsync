@@ -16,17 +16,19 @@ defined( 'ABSPATH' ) || exit;
  *
  * Only loads handlers when in the admin context.
  */
-class Ajax_Loader extends Directory_Loader {
+class Ajax_Handler_Loader extends Directory_Loader {
 
 	/**
 	 * Constructor - sets up the AJAX handler loader.
 	 */
 	public function __construct() {
+
 		// Only load handlers in admin context.
 		if ( ! is_admin() ) {
 			return;
 		}
 
+		// load all handler classes in the Handler directory.
 		$handler_dir = CONTENTSYNC_PLUGIN_PATH . '/includes/Admin/Ajax/Handler';
 		$namespace   = '\Contentsync\Admin\Ajax\Handler';
 		parent::__construct( $handler_dir, $namespace );
