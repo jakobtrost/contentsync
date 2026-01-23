@@ -186,7 +186,7 @@ class Files {
 	public static function get_posts_json_file_contents_from_zip( $filepath ) {
 
 		if ( ! file_exists( $filepath ) ) {
-			__( 'The ZIP archive could not be found. It may have been moved or deleted.', 'contentsync_hub' );
+			__( 'The ZIP archive could not be found. It may have been moved or deleted.', 'contentsync' );
 		} else {
 			Logger::add( sprintf( '  - ZIP archive "%s" found.', $filepath ) );
 		}
@@ -196,7 +196,7 @@ class Files {
 		$json_file = file_get_contents( $zip );
 
 		if ( ! $json_file ) {
-			return __( 'The ZIP archive does not contain a valid "posts.json" file.', 'contentsync_hub' );
+			return __( 'The ZIP archive does not contain a valid "posts.json" file.', 'contentsync' );
 		} else {
 			Logger::add( sprintf( '  - file "%s" found.', 'posts.json' ) );
 		}
@@ -204,13 +204,13 @@ class Files {
 		// decode json data
 		$contents = json_decode( $json_file, true );
 		if ( $contents === null && json_last_error() !== JSON_ERROR_NONE ) {
-			return __( 'The post.json file could not be read.', 'contentsync_hub' );
+			return __( 'The post.json file could not be read.', 'contentsync' );
 		} else {
 			Logger::add( '  - decoded json.' );
 		}
 
 		if ( ! is_array( $contents ) ) {
-			return __( 'The posts.json file does not contain any data.', 'contentsync_hub' );
+			return __( 'The posts.json file does not contain any data.', 'contentsync' );
 		} else {
 			Logger::add( '  - json contains object.' );
 		}

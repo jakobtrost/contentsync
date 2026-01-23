@@ -37,14 +37,14 @@ class Theme_Switch_Template_Handler extends Ajax_Base {
 		$switch_references_in_content = isset( $data['switch_references_in_content'] ) ? (bool) $data['switch_references_in_content'] : false;
 
 		if ( empty( $post_id ) ) {
-			$this->send_fail( __( 'No valid post ID found.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'No valid post ID found.', 'contentsync' ) );
 			return;
 		}
 
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
-			$this->send_fail( __( 'Post not found.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'Post not found.', 'contentsync' ) );
 			return;
 		}
 
@@ -56,11 +56,11 @@ class Theme_Switch_Template_Handler extends Ajax_Base {
 		}
 
 		if ( ! $result ) {
-			$this->send_fail( __( 'Template could not be assigned to the current theme.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'Template could not be assigned to the current theme.', 'contentsync' ) );
 			return;
 		}
 
-		$this->send_success( __( 'Template was assigned to the current theme.', 'contentsync_hub' ) );
+		$this->send_success( __( 'Template was assigned to the current theme.', 'contentsync' ) );
 	}
 }
 

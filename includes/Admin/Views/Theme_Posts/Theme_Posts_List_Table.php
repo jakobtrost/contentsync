@@ -151,11 +151,11 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		printf(
 			'<a href="%s" class="page-title-action">%s</a>',
 			admin_url( 'site-editor.php' ),
-			__( 'Site Editor', 'contentsync_hub' )
+			__( 'Site Editor', 'contentsync' )
 		);
 		echo '<hr class="wp-header-end">';
 
-		echo '<p>' . __( 'Here you can manage all the customized content of your theme. This content is often not directly visible, but is used by your theme. For example, you have the option of exporting templates, styles, fonts, blocks and navigations and importing them into another theme.', 'contentsync_hub' ) . '</p>';
+		echo '<p>' . __( 'Here you can manage all the customized content of your theme. This content is often not directly visible, but is used by your theme. For example, you have the option of exporting templates, styles, fonts, blocks and navigations and importing them into another theme.', 'contentsync' ) . '</p>';
 
 		$this->tabs();
 		$this->views();
@@ -201,11 +201,11 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 			'contentsync_theme_manage_assets_columns',
 			array(
 				'cb'        => '<input type="checkbox" />',
-				'title'     => __( 'Post Title', 'contentsync_hub' ),
-				'post_name' => __( 'Slug', 'contentsync_hub' ),
-				'post_type' => __( 'Post Type', 'contentsync_hub' ),
-				'author'    => __( 'Author', 'contentsync_hub' ),
-				'date'      => __( 'Date', 'contentsync_hub' ),
+				'title'     => __( 'Post Title', 'contentsync' ),
+				'post_name' => __( 'Slug', 'contentsync' ),
+				'post_type' => __( 'Post Type', 'contentsync' ),
+				'author'    => __( 'Author', 'contentsync' ),
+				'date'      => __( 'Date', 'contentsync' ),
 			)
 		);
 	}
@@ -232,7 +232,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 
 		$tabs = array(
 			'all' => array(
-				'label' => __( 'All', 'contentsync_hub' ),
+				'label' => __( 'All', 'contentsync' ),
 				'url'   => remove_query_arg( 'post_type' ),
 				'class' => empty( $current ) ? 'active' : '',
 			),
@@ -316,7 +316,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 			'<a href="%s" class="%s">%s <span class="count">(<span class="all-count">%d</span>)</span></a>',
 			esc_url( $all_url ),
 			( ! $trashed && ! $current_theme_view ) ? 'current' : '',
-			esc_html__( 'All', 'contentsync_hub' ),
+			esc_html__( 'All', 'contentsync' ),
 			$all_count
 		);
 
@@ -331,14 +331,14 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				'<a href="%s" class="%s">%s <span class="count">(<span class="current-theme-count">%d</span>)</span></a>',
 				esc_url( $current_theme_url ),
 				$current_theme_view ? 'current' : '',
-				esc_html__( 'Current Theme', 'contentsync_hub' ),
+				esc_html__( 'Current Theme', 'contentsync' ),
 				$current_theme_count
 			);
 			$views['inactive']      = sprintf(
 				'<a href="%s" class="%s">%s <span class="count">(<span class="nactive-count">%d</span>)</span></a>',
 				esc_url( $inactive_url ),
 				$inactive_view ? 'current' : '',
-				esc_html__( 'Not Active', 'contentsync_hub' ),
+				esc_html__( 'Not Active', 'contentsync' ),
 				$inactive_theme_count
 			);
 		}
@@ -346,7 +346,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 			'<a href="%s" class="%s">%s <span class="count">(<span class="trash-count">%d</span>)</span></a>',
 			esc_url( $trash_url ),
 			$trashed ? 'current' : '',
-			esc_html__( 'Trash', 'contentsync_hub' ),
+			esc_html__( 'Trash', 'contentsync' ),
 			$trash_count
 		);
 
@@ -358,7 +358,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 	 */
 	public function no_items() {
 
-		$text = __( 'No posts found.', 'contentsync_hub' );
+		$text = __( 'No posts found.', 'contentsync' );
 
 		echo '<div style="margin: 4px 0;">' . $text . '</div>';
 	}
@@ -389,21 +389,21 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				'<a href="%s" aria-label="%s">%s</a>',
 				$restore_link,
 				esc_attr( sprintf( __( 'Restore &#8220;%s&#8221;' ), $post->post_title ) ),
-				__( 'Restore', 'contentsync_hub' )
+				__( 'Restore', 'contentsync' )
 			);
 			// Delete Permanently
 			$delete_link           = Admin_Posts::get_permanent_delete_post_link( $post );
 			$row_actions['delete'] = sprintf(
 				'<a href="%s" aria-label="%s" onclick="return confirm(\'Are you sure you want to delete this item permanently?\');">%s</a>',
 				$delete_link,
-				esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently', 'contentsync_hub' ), $post->post_title ) ),
-				__( 'Delete Permanently', 'contentsync_hub' )
+				esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently', 'contentsync' ), $post->post_title ) ),
+				__( 'Delete Permanently', 'contentsync' )
 			);
 			// Export
 			$row_actions['contentsync_export'] = sprintf(
-				'<a style="cursor:pointer;" onclick="contentsync.postExport.openExport(this);" data-post_id="%s">%s</a>',
+				'<a style="cursor:pointer;" onclick="contentSync.postExport.openExport(this);" data-post_id="%s">%s</a>',
 				$post->ID,
-				__( 'Export', 'contentsync_hub' )
+				__( 'Export', 'contentsync' )
 			);
 		} else {
 			$row_actions['edit'] = sprintf(
@@ -411,26 +411,26 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				$edit_post_link,
 				/* translators: %s: Post title. */
 				esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;' ), $post->post_title ) ),
-				__( 'Edit', 'contentsync_hub' )
+				__( 'Edit', 'contentsync' )
 			);
 			$row_actions['trash'] = sprintf(
 				'<a href="%s" aria-label="%s" onclick="return confirm(\'Are you sure you want to move this item to the trash?\');">%s</a>',
 				$trash_post_link,
 				/* translators: %s: Post title. */
 				esc_attr( sprintf( __( 'Move &#8220;%s&#8221; to the trash' ), $post->post_title ) ),
-				__( 'Trash', 'contentsync_hub' )
+				__( 'Trash', 'contentsync' )
 			);
 			$row_actions['contentsync_export'] = sprintf(
-				'<a style="cursor:pointer;" onclick="contentsync.postExport.openExport(this);" data-post_id="%s">%s</a>',
+				'<a style="cursor:pointer;" onclick="contentSync.postExport.openExport(this);" data-post_id="%s">%s</a>',
 				$post->ID,
-				__( 'Export', 'contentsync_hub' )
+				__( 'Export', 'contentsync' )
 			);
 			$row_actions['rename_template']    = sprintf(
-				'<a style="cursor:pointer;" onclick="contentsync.postExport.openRenameTemplate(this);" data-post_id="%s" data-post_title="%s" data-post_name="%s">%s</a>',
+				'<a style="cursor:pointer;" onclick="contentSync.postExport.openRenameTemplate(this);" data-post_id="%s" data-post_title="%s" data-post_name="%s">%s</a>',
 				$post->ID,
 				$post->post_title,
 				$post->post_name,
-				__( 'Rename', 'contentsync_hub' )
+				__( 'Rename', 'contentsync' )
 			);
 		}
 
@@ -458,7 +458,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 			if ( get_option( 'stylesheet' ) != $template_theme ) {
 
 				$error = sprintf(
-					__( 'This asset was created with a different theme (%1$s) and is not available for the current theme (%2$s).', 'contentsync_hub' ),
+					__( 'This asset was created with a different theme (%1$s) and is not available for the current theme (%2$s).', 'contentsync' ),
 					$template_theme_name,
 					get_option( 'stylesheet' )
 				);
@@ -466,15 +466,15 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				// add the switch theme action
 				if ( $post->post_type == 'wp_template' || $post->post_type == 'wp_template_part' ) {
 					$row_actions['switch_template_theme'] = sprintf(
-						'<a style="cursor:pointer;" onclick="contentsync.postExport.openSwitchTemplateTheme(this);" data-post_id="%s">%s</a>',
+						'<a style="cursor:pointer;" onclick="contentSync.postExport.openSwitchTemplateTheme(this);" data-post_id="%s">%s</a>',
 						$post->ID,
-						__( 'Assign to current theme', 'contentsync_hub' )
+						__( 'Assign to current theme', 'contentsync' )
 					);
 				} elseif ( $post->post_type == 'wp_global_styles' ) {
 					$row_actions['switch_global_styles'] = sprintf(
-						'<a style="cursor:pointer;" onclick="contentsync.postExport.openSwitchGlobalStyles(this, \'' . $template_theme . '\');" data-post_id="%s">%s</a>',
+						'<a style="cursor:pointer;" onclick="contentSync.postExport.openSwitchGlobalStyles(this, \'' . $template_theme . '\');" data-post_id="%s">%s</a>',
 						$post->ID,
-						__( 'Assign to current theme', 'contentsync_hub' )
+						__( 'Assign to current theme', 'contentsync' )
 					);
 				}
 			}
@@ -637,14 +637,14 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		$is_trash = ( isset( $_GET['post_status'] ) && $_GET['post_status'] === 'trash' );
 		if ( $is_trash ) {
 			$actions = array(
-				'untrash' => __( 'Restore', 'contentsync_hub' ),
-				'delete'  => __( 'Delete Permanently', 'contentsync_hub' ),
+				'untrash' => __( 'Restore', 'contentsync' ),
+				'delete'  => __( 'Delete Permanently', 'contentsync' ),
 			);
 		} else {
 			$actions = array(
-				'trash'        => __( 'Move to the trash', 'contentsync_hub' ),
-				'export'       => __( 'Export', 'contentsync_hub' ),
-				'switch_theme' => __( 'Assign to current theme', 'contentsync_hub' ),
+				'trash'        => __( 'Move to the trash', 'contentsync' ),
+				'export'       => __( 'Export', 'contentsync' ),
+				'switch_theme' => __( 'Assign to current theme', 'contentsync' ),
 			);
 		}
 		return $actions;
@@ -667,11 +667,11 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 					$result = wp_delete_post( $post_id, true );
 					if ( $result ) {
 						Admin_Render::render_admin_notice(
-							sprintf( __( 'The post "%s" has been permanently deleted.', 'contentsync_hub' ), $post->post_title ),
+							sprintf( __( 'The post "%s" has been permanently deleted.', 'contentsync' ), $post->post_title ),
 							'success'
 						);
 					} else {
-						Admin_Render::render_admin_notice( __( 'Error occurred when deleting the post permanently.', 'contentsync_hub' ), 'error' );
+						Admin_Render::render_admin_notice( __( 'Error occurred when deleting the post permanently.', 'contentsync' ), 'error' );
 					}
 				}
 				return;
@@ -807,28 +807,28 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		// set the admin notice content
 		$notices = array(
 			'edit'         => array(
-				'success' => __( 'The posts %s have been successfully edited.', 'contentsync_hub' ),
-				'fail'    => __( 'There were errors when editing the posts.', 'contentsync_hub' ),
+				'success' => __( 'The posts %s have been successfully edited.', 'contentsync' ),
+				'fail'    => __( 'There were errors when editing the posts.', 'contentsync' ),
 			),
 			'trash'        => array(
-				'success' => __( 'The posts %s have been successfully moved to the trash.', 'contentsync_hub' ),
-				'fail'    => __( 'Errors occurred when moving posts to the trash.', 'contentsync_hub' ),
+				'success' => __( 'The posts %s have been successfully moved to the trash.', 'contentsync' ),
+				'fail'    => __( 'Errors occurred when moving posts to the trash.', 'contentsync' ),
 			),
 			'untrash'      => array(
-				'success' => __( 'The posts %s have been successfully restored.', 'contentsync_hub' ),
-				'fail'    => __( 'Errors occurred when restoring the posts.', 'contentsync_hub' ),
+				'success' => __( 'The posts %s have been successfully restored.', 'contentsync' ),
+				'fail'    => __( 'Errors occurred when restoring the posts.', 'contentsync' ),
 			),
 			'delete'       => array(
-				'success' => __( 'The posts %s have been permanently deleted.', 'contentsync_hub' ),
-				'fail'    => __( 'Errors occurred when deleting the posts permanently.', 'contentsync_hub' ),
+				'success' => __( 'The posts %s have been permanently deleted.', 'contentsync' ),
+				'fail'    => __( 'Errors occurred when deleting the posts permanently.', 'contentsync' ),
 			),
 			'switch_theme' => array(
-				'success' => __( 'The posts %s have been successfully assigned to the current theme', 'contentsync_hub' ),
-				'fail'    => __( 'Errors occurred when assigning posts to the current theme.', 'contentsync_hub' ),
+				'success' => __( 'The posts %s have been successfully assigned to the current theme', 'contentsync' ),
+				'fail'    => __( 'Errors occurred when assigning posts to the current theme.', 'contentsync' ),
 			),
 			'export'       => array(
-				'success' => __( 'The posts %s were exported successfully.', 'contentsync_hub' ),
-				'fail'    => __( 'Errors occurred when exporting the posts.', 'contentsync_hub' ),
+				'success' => __( 'The posts %s were exported successfully.', 'contentsync' ),
+				'fail'    => __( 'Errors occurred when exporting the posts.', 'contentsync' ),
 			),
 		);
 
@@ -845,7 +845,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 			$notice_class = 'error';
 			$content      = $notices[ $bulk_action ]['fail'];
 			if ( is_string( $result ) && ! empty( $result ) ) {
-				$content .= ' ' . __( 'Error message:', 'contentsync_hub' ) . ' ' . $result;
+				$content .= ' ' . __( 'Error message:', 'contentsync' ) . ' ' . $result;
 			}
 		}
 

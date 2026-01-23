@@ -1611,7 +1611,7 @@ class Post_Import extends Post_Transfer_Base {
 	private function get_media_file_contents( $filepath, $medianame ) {
 
 		if ( ! file_exists( $filepath ) ) {
-			__( 'The ZIP archive could not be found. It may have been moved or deleted.', 'contentsync_hub' );
+			__( 'The ZIP archive could not be found. It may have been moved or deleted.', 'contentsync' );
 		} else {
 			Logger::add( sprintf( '  - ZIP archive "%s" found.', $filepath ) );
 		}
@@ -1621,7 +1621,7 @@ class Post_Import extends Post_Transfer_Base {
 		$media_file = file_get_contents( $zip );
 
 		if ( ! $media_file ) {
-			return sprintf( __( "The file '%s' could not be found in the ZIP archive.", 'contentsync_hub' ), 'media/' . $medianame );
+			return sprintf( __( "The file '%s' could not be found in the ZIP archive.", 'contentsync' ), 'media/' . $medianame );
 		} else {
 			Logger::add( sprintf( '  - file "%s" found.', 'posts.json' ) );
 		}

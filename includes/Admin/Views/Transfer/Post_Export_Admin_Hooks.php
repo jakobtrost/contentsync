@@ -97,14 +97,14 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 		$export_options = array(
 			'nested' => array(
 				'name'    => 'nested',
-				'title'   => __( 'Export nested content', 'contentsync_hub' ),
-				'descr'   => __( 'Templates, media, etc. are added to the download so that used images, backgrounds, etc. will be displayed correctly on the target website.', 'contentsync_hub' ),
+				'title'   => __( 'Export nested content', 'contentsync' ),
+				'descr'   => __( 'Templates, media, etc. are added to the download so that used images, backgrounds, etc. will be displayed correctly on the target website.', 'contentsync' ),
 				'checked' => true,
 			),
 			'menus'  => array(
 				'name'    => 'resolve_menus',
-				'title'   => __( 'Resolve menus', 'contentsync_hub' ),
-				'descr'   => __( 'All menus will be converted to static links.', 'contentsync_hub' ),
+				'title'   => __( 'Resolve menus', 'contentsync' ),
+				'descr'   => __( 'All menus will be converted to static links.', 'contentsync' ),
 				'checked' => true,
 			),
 		);
@@ -118,8 +118,8 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 		if ( ! empty( Translation_Manager::get_translation_tool() ) ) {
 			$export_options['translations'] = array(
 				'name'  => 'translations',
-				'title' => __( 'Include translations', 'contentsync_hub' ),
-				'descr' => __( 'All translations of the post will be added to the download.', 'contentsync_hub' ),
+				'title' => __( 'Include translations', 'contentsync' ),
+				'descr' => __( 'All translations of the post will be added to the download.', 'contentsync' ),
 			);
 		}
 
@@ -140,7 +140,7 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 		if ( $screen->id === 'edit-page' ) {
 			$export_form .= Admin_Render::make_admin_info_box(
 				array(
-					'text'  => __( 'Posts in query loops are not included in the import. Posts and Post Types must be exported separately.', 'contentsync_hub' ),
+					'text'  => __( 'Posts in query loops are not included in the import. Posts and Post Types must be exported separately.', 'contentsync' ),
 					'style' => 'info',
 				)
 			);
@@ -149,21 +149,21 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 		// add the contents
 		$contents['post_export'] = array(
 			'confirm' => array(
-				'title'   => __( 'Export', 'contentsync_hub' ),
-				'descr'   => sprintf( __( 'Do you want to export "%s"?', 'contentsync_hub' ), "<b class='replace'></b>" ),
+				'title'   => __( 'Export', 'contentsync' ),
+				'descr'   => sprintf( __( 'Do you want to export "%s"?', 'contentsync' ), "<b class='replace'></b>" ),
 				'content' => $export_form,
-				'button'  => __( 'Export now', 'contentsync_hub' ),
+				'button'  => __( 'Export now', 'contentsync' ),
 			),
 			'loading' => array(
-				'descr' => __( 'Exporting post.', 'contentsync_hub' ),
+				'descr' => __( 'Exporting post.', 'contentsync' ),
 			),
 			'success' => array(
-				'title' => __( 'Export successful', 'contentsync_hub' ),
-				'descr' => __( 'Post has been exported.', 'contentsync_hub' ),
+				'title' => __( 'Export successful', 'contentsync' ),
+				'descr' => __( 'Post has been exported.', 'contentsync' ),
 			),
 			'fail'    => array(
-				'title' => __( 'Export failed', 'contentsync_hub' ),
-				'descr' => '<span class="replace">' . __( 'The post could not be exported.', 'contentsync_hub' ) . '</span>',
+				'title' => __( 'Export failed', 'contentsync' ),
+				'descr' => '<span class="replace">' . __( 'The post could not be exported.', 'contentsync' ) . '</span>',
 			),
 		);
 
@@ -174,9 +174,9 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 		// get form options
 		$options = '';
 		foreach ( array(
-			'skip'    => __( 'Skip', 'contentsync_hub' ),
-			'replace' => __( 'Replace', 'contentsync_hub' ),
-			'keep'    => __( 'Keep both', 'contentsync_hub' ),
+			'skip'    => __( 'Skip', 'contentsync' ),
+			'replace' => __( 'Replace', 'contentsync' ),
+			'keep'    => __( 'Keep both', 'contentsync' ),
 		) as $name => $value ) {
 			$options .= "<option value='$name'>$value</option>";
 		}
@@ -185,34 +185,34 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 		// add the contents
 		$contents['post_import'] = array(
 			'check_file' => array(
-				'title'   => __( 'Please wait', 'contentsync_hub' ),
-				'descr'   => __( 'The file is being validated.', 'contentsync_hub' ),
-				'content' => '<div class="loading"><div class="loader"></div></div><a href="javascript:window.location.href=window.location.href" class="color_light escape">' . __( 'Cancel', 'contentsync_hub' ) . '</a>',
+				'title'   => __( 'Please wait', 'contentsync' ),
+				'descr'   => __( 'The file is being validated.', 'contentsync' ),
+				'content' => '<div class="loading"><div class="loader"></div></div><a href="javascript:window.location.href=window.location.href" class="color_light escape">' . __( 'Cancel', 'contentsync' ) . '</a>',
 			),
 			'confirm'    => array(
-				'title'   => __( 'Import', 'contentsync_hub' ),
+				'title'   => __( 'Import', 'contentsync' ),
 				'content' => "<form id='post_import_form'>
-									<input type='file' name='import_file' id='import_file' title='" . __( 'Select file', 'contentsync_hub' ) . "' accept='zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed' >
+									<input type='file' name='import_file' id='import_file' title='" . __( 'Select file', 'contentsync' ) . "' accept='zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed' >
 									<div class='conflicts'>
-										<p>" . __( '<b>Attention:</b> Some content in the file already appears to exist on this site. Choose what to do with it.', 'contentsync_hub' ) . "</p>
+										<p>" . __( '<b>Attention:</b> Some content in the file already appears to exist on this site. Choose what to do with it.', 'contentsync' ) . "</p>
 										<div class='inner_content' data-options='$options'></div>
 									</div>
 									<div class='new'>
-										<p>" . sprintf( __( 'No conflicts found. Do you want to import the file "%s" now?', 'contentsync_hub' ), "<strong class='post_title'></strong>" ) . '</p>
+										<p>" . sprintf( __( 'No conflicts found. Do you want to import the file "%s" now?', 'contentsync' ), "<strong class='post_title'></strong>" ) . '</p>
 									</div>
 								</form>',
-				'button'  => __( 'Import now', 'contentsync_hub' ),
+				'button'  => __( 'Import now', 'contentsync' ),
 			),
 			'loading'    => array(
-				'descr' => __( 'Importing post.', 'contentsync_hub' ),
+				'descr' => __( 'Importing post.', 'contentsync' ),
 			),
 			'reload'     => array(
-				'title' => __( 'Import successful', 'contentsync_hub' ),
-				'descr' => __( 'Post has been imported.', 'contentsync_hub' ),
+				'title' => __( 'Import successful', 'contentsync' ),
+				'descr' => __( 'Post has been imported.', 'contentsync' ),
 			),
 			'fail'       => array(
-				'title' => __( 'Import failed', 'contentsync_hub' ),
-				'descr' => '<span class="replace">' . __( 'The file could not be imported.', 'contentsync_hub' ) . '</span>',
+				'title' => __( 'Import failed', 'contentsync' ),
+				'descr' => '<span class="replace">' . __( 'The file could not be imported.', 'contentsync' ) . '</span>',
 			),
 		);
 
@@ -229,12 +229,12 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 	public function add_export_row_action( $actions, $post ) {
 
 		if ( self::is_current_screen_supported() ) {
-			// $actions['contentsync_export'] = "<a style='cursor:pointer;' onclick='contentsync.postExport.openModal(this);' data-post_id='" . $post->ID . " data-post_title='" . $post->post_title . "'>" . __( 'Export', 'contentsync_hub' ) . '</a>';
+			// $actions['contentsync_export'] = "<a style='cursor:pointer;' onclick='contentSync.postExport.openModal(this);' data-post_id='" . $post->ID . " data-post_title='" . $post->post_title . "'>" . __( 'Export', 'contentsync' ) . '</a>';
 			$actions['contentsync_export'] = sprintf(
 				'<a style="cursor:pointer;" onclick="contentSync.postExport.openModal(this);" data-post_id="%s" data-post_title="%s">%s</a>',
 				$post->ID,
 				esc_attr( ( empty( $post->post_title ) ? 'post' : $post->post_title ) ),
-				esc_html__( 'Export', 'contentsync_hub' )
+				esc_html__( 'Export', 'contentsync' )
 			);
 		}
 
@@ -251,17 +251,17 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 		}
 
 		wp_register_script(
-			'contentsync-post-export-script',
-			plugin_dir_url( __FILE__ ) . 'assets/js/post-export.js',
-			array( 'jquery', 'contentsync-admin-script' ),
+			'contentSync-postExport',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Transfer/assets/contentSync.postExport.js',
+			array( 'jquery', 'contentSync-utils', 'contentSync-Modal', 'contentSync-AjaxHandler' ),
 			CONTENTSYNC_VERSION
 		);
-		wp_enqueue_script( 'contentsync-post-export-script' );
+		wp_enqueue_script( 'contentSync-postExport' );
 
 		wp_add_inline_script(
-			'contentsync-post-export-script',
+			'contentSync-postExport',
 			'jQuery(function() {
-				contentsync.overlay.addPageTitleAction( "⬇&nbsp;' . __( 'Import', 'contentsync_hub' ) . '", { onclick: "contentsync.postExport.openImport();" } );
+				contentSync.overlay.addPageTitleAction( "⬇&nbsp;' . __( 'Import', 'contentsync' ) . '", { onclick: "contentSync.postExport.openImport();" } );
 			});',
 			'after'
 		);

@@ -40,7 +40,7 @@ class Post_Import_Handler extends Ajax_Base {
 		$filename = isset( $data['filename'] ) ? sanitize_file_name( $data['filename'] ) : '';
 
 		if ( empty( $filename ) ) {
-			$this->send_fail( __( 'The file name is empty.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'The file name is empty.', 'contentsync' ) );
 			return;
 		}
 
@@ -73,7 +73,7 @@ class Post_Import_Handler extends Ajax_Base {
 			return;
 		}
 
-		$this->send_success( sprintf( __( "Post file '%s' has been imported successfully.", 'contentsync_hub' ), $filename ) );
+		$this->send_success( sprintf( __( "Post file '%s' has been imported successfully.", 'contentsync' ), $filename ) );
 	}
 }
 

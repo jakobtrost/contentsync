@@ -45,10 +45,10 @@ class Bulk_Actions_Hooks extends Hooks_Base {
 	 */
 	public function add_post_export_bulk_action( $bulk_actions ) {
 
-		$bulk_actions['contentsync_export'] = __( 'Export', 'contentsync_hub' );
+		$bulk_actions['contentsync_export'] = __( 'Export', 'contentsync' );
 
 		if ( ! empty( Translation_Manager::get_translation_tool() ) ) {
-			$bulk_actions['contentsync_export_multilanguage'] = __( 'Export including translations', 'contentsync_hub' );
+			$bulk_actions['contentsync_export_multilanguage'] = __( 'Export including translations', 'contentsync' );
 		}
 
 		return $bulk_actions;
@@ -85,7 +85,7 @@ class Bulk_Actions_Hooks extends Hooks_Base {
 			$sendback = $href;
 		} else {
 			// set transient to display admin notice
-			set_transient( 'contentsync_transient_notice', 'error::' . __( 'The export file could not be written.', 'contentsync_hub' ) );
+			set_transient( 'contentsync_transient_notice', 'error::' . __( 'The export file could not be written.', 'contentsync' ) );
 		}
 
 		return $sendback;

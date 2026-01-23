@@ -126,8 +126,8 @@ class Theme_Posts {
 		}
 
 		if ( ! $current_global_styles_id ) {
-			echo __( 'No global_styles_id created yet.', 'contentsync_hub' );
-			return new \WP_Error( 'no_global_styles_id', __( 'No global_styles_id created yet.', 'contentsync_hub' ) );
+			echo __( 'No global_styles_id created yet.', 'contentsync' );
+			return new \WP_Error( 'no_global_styles_id', __( 'No global_styles_id created yet.', 'contentsync' ) );
 		}
 
 		$result = wp_update_post(

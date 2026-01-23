@@ -576,7 +576,7 @@ class Global_List_Table extends WP_List_Table {
 	 * Build ajax link
 	 */
 	public function ajax_link( $action, $text, $data = array() ) {
-		return "<a onclick='contentsync.{$action}(this);' " . implode(
+		return "<a onclick='contentSync.{$action}(this);' " . implode(
 			' ',
 			array_map(
 				function ( $key, $val ) {

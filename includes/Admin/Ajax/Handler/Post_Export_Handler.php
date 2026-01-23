@@ -37,7 +37,7 @@ class Post_Export_Handler extends Ajax_Base {
 		$post_id = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 
 		if ( empty( $post_id ) ) {
-			$this->send_fail( __( 'No valid post ID could be found.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'No valid post ID could be found.', 'contentsync' ) );
 			return;
 		}
 
@@ -52,7 +52,7 @@ class Post_Export_Handler extends Ajax_Base {
 		$filepath = ( new Post_Export( $post_id, $args ) )->export_to_zip();
 
 		if ( ! $filepath ) {
-			$this->send_fail( __( 'The export file could not be written.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'The export file could not be written.', 'contentsync' ) );
 			return;
 		}
 

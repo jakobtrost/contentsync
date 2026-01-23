@@ -40,7 +40,7 @@ class Post_Import_Check_Handler extends Ajax_Base {
 		$file_data = $this->get_file_data();
 
 		if ( ! $file_data ) {
-			$this->send_fail( __( 'No file was uploaded.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'No file was uploaded.', 'contentsync' ) );
 			return;
 		}
 
@@ -48,18 +48,18 @@ class Post_Import_Check_Handler extends Ajax_Base {
 		if ( isset( $file_data['error'] ) && $file_data['error'] > 0 ) {
 			$file_errors = array(
 				1 => sprintf(
-					__( "The uploaded file exceeds the server's maximum file limit (max %s MB). The limit is defined in the <u>php.ini</u> file.", 'contentsync_hub' ),
+					__( "The uploaded file exceeds the server's maximum file limit (max %s MB). The limit is defined in the <u>php.ini</u> file.", 'contentsync' ),
 					intval( ini_get( 'upload_max_filesize' ) )
 				),
-				2 => __( 'The uploaded file exceeds the allowed file size of the html form.', 'contentsync_hub' ),
-				3 => __( 'The uploaded file was only partially uploaded.', 'contentsync_hub' ),
-				4 => __( 'No file was uploaded.', 'contentsync_hub' ),
-				6 => __( 'Missing a temporary folder.', 'contentsync_hub' ),
-				7 => __( 'Failed to save the file.', 'contentsync_hub' ),
-				8 => __( 'The file was stopped while uploading.', 'contentsync_hub' ),
+				2 => __( 'The uploaded file exceeds the allowed file size of the html form.', 'contentsync' ),
+				3 => __( 'The uploaded file was only partially uploaded.', 'contentsync' ),
+				4 => __( 'No file was uploaded.', 'contentsync' ),
+				6 => __( 'Missing a temporary folder.', 'contentsync' ),
+				7 => __( 'Failed to save the file.', 'contentsync' ),
+				8 => __( 'The file was stopped while uploading.', 'contentsync' ),
 			);
 
-			$error_message = isset( $file_errors[ $file_data['error'] ] ) ? $file_errors[ $file_data['error'] ] : __( 'Unknown upload error.', 'contentsync_hub' );
+			$error_message = isset( $file_errors[ $file_data['error'] ] ) ? $file_errors[ $file_data['error'] ] : __( 'Unknown upload error.', 'contentsync' );
 			$this->send_fail( $error_message );
 			return;
 		}
@@ -71,7 +71,7 @@ class Post_Import_Check_Handler extends Ajax_Base {
 
 		// Check filetype
 		if ( $filetype !== 'application/zip' && $filetype !== 'application/x-zip-compressed' ) {
-			$this->send_fail( __( 'Please select a valid ZIP archive.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'Please select a valid ZIP archive.', 'contentsync' ) );
 			return;
 		}
 
@@ -80,7 +80,7 @@ class Post_Import_Check_Handler extends Ajax_Base {
 		$result   = move_uploaded_file( $filepath, $new_file );
 
 		if ( ! $result ) {
-			$this->send_fail( __( 'Failed to save the uploaded file.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'Failed to save the uploaded file.', 'contentsync' ) );
 			return;
 		}
 

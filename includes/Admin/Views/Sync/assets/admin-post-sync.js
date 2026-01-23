@@ -885,7 +885,7 @@ contentSync.postSync = new function() {
 	/**
 	 * Build the conflict selects inside the wrapper
 	 * 
-	 * @see contentsync_hub/features/post-export/assets/js/post-export.js
+	 * @see contentsync/features/post-export/assets/js/post-export.js
 	 * 
 	 * @param {object} wrapper  HTML wrapper jQuery object
 	 * @param {mixed} posts     Either an array of posts or a string.

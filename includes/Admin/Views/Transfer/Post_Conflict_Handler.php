@@ -75,7 +75,7 @@ class Post_Conflict_Handler {
 					$conflicts,
 					(object) array(
 						'ID'        => 'multioption',
-						'post_link' => __( 'Multiselect', 'contentsync_hub' ),
+						'post_link' => __( 'Multiselect', 'contentsync' ),
 						'post_type' => '',
 					)
 				);
@@ -136,17 +136,17 @@ class Post_Conflict_Handler {
 
 		if ( $post->post_type === 'attachment' ) {
 			$post_title = basename( get_attached_file( $post->ID ) );
-			$post_type  = __( 'Image/file', 'contentsync_hub' );
+			$post_type  = __( 'Image/file', 'contentsync' );
 			$post_url   = wp_get_attachment_url( $post->ID );
 		} else {
 			$post_title = $post->post_title;
 			$post_type  = get_post_type_object( $post->post_type )->labels->singular_name;
 			$post_url   = Urls::get_edit_post_link( $post );
 		}
-		$post_title = empty( $post_title ) ? '<i>' . __( 'Unknown post', 'contentsync_hub' ) . '</i>' : $post_title;
-		$post_type  = empty( $post_type ) ? '<i>' . __( 'Unknown post type', 'contentsync_hub' ) . '</i>' : $post_type;
+		$post_title = empty( $post_title ) ? '<i>' . __( 'Unknown post', 'contentsync' ) . '</i>' : $post_title;
+		$post_type  = empty( $post_type ) ? '<i>' . __( 'Unknown post type', 'contentsync' ) . '</i>' : $post_type;
 
-		return "<a href='$post_url' target='_blank' title='" . __( 'Open in new tab', 'contentsync_hub' ) . "'>$post_title ($post_type)</a>";
+		return "<a href='$post_url' target='_blank' title='" . __( 'Open in new tab', 'contentsync' ) . "'>$post_title ($post_type)</a>";
 	}
 
 	/**

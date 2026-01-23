@@ -36,14 +36,14 @@ class Theme_Switch_Global_Styles_Handler extends Ajax_Base {
 		$post_id = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 
 		if ( empty( $post_id ) ) {
-			$this->send_fail( __( 'No valid post ID found.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'No valid post ID found.', 'contentsync' ) );
 			return;
 		}
 
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
-			$this->send_fail( __( 'Post not found.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'Post not found.', 'contentsync' ) );
 			return;
 		}
 
@@ -55,11 +55,11 @@ class Theme_Switch_Global_Styles_Handler extends Ajax_Base {
 		}
 
 		if ( ! $result ) {
-			$this->send_fail( __( 'Styles could not be assigned to the current theme.', 'contentsync_hub' ) );
+			$this->send_fail( __( 'Styles could not be assigned to the current theme.', 'contentsync' ) );
 			return;
 		}
 
-		$this->send_success( __( 'Styles were assigned to the current theme.', 'contentsync_hub' ) );
+		$this->send_success( __( 'Styles were assigned to the current theme.', 'contentsync' ) );
 	}
 }
 
