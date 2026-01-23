@@ -19,11 +19,13 @@ defined( 'ABSPATH' ) || exit;
  */
 class Post_Export_Handler extends Ajax_Base {
 
+	protected $action = 'post_export';
+
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		parent::__construct( 'post_export' );
+		parent::__construct( $this->action );
 	}
 
 	/**

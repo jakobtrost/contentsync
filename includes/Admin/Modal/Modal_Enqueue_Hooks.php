@@ -19,13 +19,13 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 	 * Register admin-only hooks.
 	 */
 	public function register_admin() {
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_dialog_scripts' ), 98 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_modal_assets' ), 98 );
 	}
 
 	/**
 	 * Enqueue Modal/Modal Scripts.
 	 */
-	public function enqueue_dialog_scripts() {
+	public function enqueue_modal_assets() {
 
 		// Enqueue components-modal.css (modal styles)
 		wp_register_style(
@@ -52,15 +52,15 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 		);
 		wp_enqueue_script( 'contentsync-components-modal' );
 
-		// Enqueue example-modal-instance.js (test/example implementation)
-		// Depends on components-modal.js
-		wp_register_script(
-			'contentsync-example-modal-instance',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/material/example-modal-instance.js',
-			array( 'contentsync-components-modal' ),
-			CONTENTSYNC_VERSION,
-			true
-		);
-		wp_enqueue_script( 'contentsync-example-modal-instance' );
+		// // Enqueue example-modal-instance.js (test/example implementation)
+		// // Depends on components-modal.js
+		// wp_register_script(
+		// 'contentsync-example-modal-instance',
+		// CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/examples/example-modal-instance.js',
+		// array( 'contentsync-components-modal' ),
+		// CONTENTSYNC_VERSION,
+		// true
+		// );
+		// wp_enqueue_script( 'contentsync-example-modal-instance' );
 	}
 }
