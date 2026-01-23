@@ -5,7 +5,7 @@ Description:    Synchronize content on any number of websites and benefit from m
 Plugin URI:     https://github.com/jakobtrost/contentsync
 Author:         Jakob Trost
 Author URI:     https://jakobtrost.de
-Version:        0.1
+Version:        0.1.0
 Text Domain:    contentsync
 Domain Path:    /languages/
 */
@@ -14,7 +14,7 @@ namespace Contentsync;
 defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'CONTENTSYNC_VERSION' ) ) {
-	define( 'CONTENTSYNC_VERSION', '2.17.4' );
+	define( 'CONTENTSYNC_VERSION', '0.1.0' );
 }
 
 if ( ! defined( 'CONTENTSYNC_PLUGIN_PATH' ) ) {

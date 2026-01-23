@@ -23,7 +23,7 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 	public function register_admin() {
 
 		add_action( 'admin_menu', array( $this, 'add_submenu_item' ), self::THEME_POSTS_PAGE_POSITION );
-		add_action( 'admin_menu', array( $this, 'add_theme_posts_admin_page' ) );
+		add_action( 'admin_menu', array( $this, 'add_themes_menu_item' ) );
 
 		add_filter( 'set-screen-option', array( $this, 'save_screen_options' ), 10, 3 );
 
@@ -61,7 +61,7 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 	/**
 	 * Add a menu item to the WordPress admin menu
 	 */
-	function add_theme_posts_admin_page() {
+	function add_themes_menu_item() {
 
 		// Only add the menu item if the current theme supports blocks
 		if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) {
@@ -70,7 +70,7 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 
 		$hook = add_theme_page(
 			__( 'Theme Posts', 'contentsync_hub' ), // page title
-			__( 'Theme Posts', 'contentsync_hub' ), // menu title
+			'→ ' . __( 'Theme Posts', 'contentsync_hub' ), // menu title
 			'manage_options',
 			admin_url( 'admin.php?page=theme-posts' ),
 			null

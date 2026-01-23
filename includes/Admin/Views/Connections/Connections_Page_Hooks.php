@@ -67,7 +67,7 @@ class Connections_Page_Hooks extends Hooks_Base {
 	public function render_admin_page() {
 
 		// start of wrapper
-		echo "<div class='wrap'><h1>" . __( 'Connections to other WordPress websites', 'contentsync_hub' ) . '</h1>';
+		echo '<div class="wrap"><h1>' . __( 'Connections to other WordPress websites', 'contentsync_hub' ) . '</h1>';
 
 		// connection declined -> add error
 		if ( isset( $_GET['success'] ) && $_GET['success'] === 'false' ) {
@@ -79,30 +79,28 @@ class Connections_Page_Hooks extends Hooks_Base {
 		$Connections_List_Table->render_table();
 
 		// add connection form
-		echo "<h1 style='margin-top:2em;'>" . __( 'Add connection', 'contentsync_hub' ) . "</h1>
-		<form method='post' class='add_site_connection'>
-			<input type='hidden' name='_nonce' value='" . wp_create_nonce( Site_Connection::get_option_name() ) . "' />
-
-			" . ( is_ssl() ? '' : Admin_Render::make_admin_info_box(
+		echo '<h1 style="margin-top:2em;">' . __( 'Add connection', 'contentsync_hub' ) . '</h1>' .
+		'<form method="post" class="add_site_connection">' .
+			'<input type="hidden" name="_nonce" value="' . wp_create_nonce( Site_Connection::get_option_name() ) . '" />' .
+			( is_ssl() ? '' : Admin_Render::make_admin_info_box(
 				array(
 					'style' => 'warning',
 					'above' => __( 'Missing SSL certificate', 'contentsync_hub' ),
 					'text'  => __( 'We noticed that this site does not have a valid SSL certificate. This can lead to problems when setting up a link, as this requires a secure and encrypted connection.', 'contentsync_hub' ),
 				)
-			) ) . "
-			
-			<label for='page_url'>" . __( 'URL of the website or main page', 'contentsync_hub' ) . "</label>
-			<div class='flex'>
-				<input class='large' type='text' name='page_url' id='page_url' value='' placeholder='" . __( 'https://www.multsite-parent.com', 'contentsync_hub' ) . "' />
-				<button type='submit' name='submit' class='button button-primary large'>" . __( 'Request connection', 'contentsync_hub' ) . '</button>
-			</div>
-			<p>' . __( 'In order to connect to another site, you must have valid admin access to that site. For multisites you need super admin access.', 'contentsync_hub' ) . '</p>
-			<p>' . __( 'In addition, a valid SSL certificate should be available on both sides and the Content Sync Plugin should be active and up-to-date.', 'contentsync_hub' ) . '</p>
-			<p>' . sprintf(
+			) ) .
+			'<p>' . __( 'In order to connect to another site, you must have valid admin access to that site. For multisites you need super admin access.', 'contentsync_hub' ) . '</p>' .
+			'<p>' . __( 'In addition, a valid SSL certificate should be available on both sides and the Content Sync Plugin should be active and up-to-date.', 'contentsync_hub' ) . '</p>' .
+			'<p>' . sprintf(
 				__( 'To add a connection to this page on another page, enter the URL %s.', 'contentsync_hub' ),
 				'<code>' . Urls::get_network_url() . '</code>'
-			) . '</p>
-		</form>';
+			) . '</p>' .
+			'<!-- <label for="page_url">' . __( 'URL of the website or main page', 'contentsync_hub' ) . '</label> -->' .
+			'<div class="flex">' .
+				'<input class="regular-text" type="text" name="page_url" id="page_url" value="" placeholder="' . __( 'https://www.multsite-parent.com', 'contentsync_hub' ) . '" />' .
+				'<button type="submit" name="submit" class="button button-primary large">' . __( 'Request connection', 'contentsync_hub' ) . '</button>' .
+			'</div>' .
+		'</form>';
 
 		// end of wrapper
 		echo '</div>';
