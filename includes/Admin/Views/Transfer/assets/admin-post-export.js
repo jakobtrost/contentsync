@@ -1,84 +1,124 @@
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
+const __ = typeof wp?.i18n?.__ === 'function' ? wp.i18n.__ : ( text ) => text;
 
-contentsync.postExport = new function() {
-
-	/**
-	 * Start the export dialog (row action)
-	 * 
-	 * @param {object} elem 
-	 */
-	this.openExport = function( elem ) {
-
-		const td = $( elem ).closest( 'td.title' );
-
-		let title = '';
-		if ( td.find( '.filename' ).length ) {
-			title = td.find( '.filename' ).clone().children().remove().end().text();
-		} else {
-			title = td.find( 'strong a' ).text();
-		}
-
-		contentsync.overlay.confirm( 'post_export', title.trim(), contentsync.postExport.exportPost, [ elem ] );
-	}; 
+contentSync.postExport = new function() {
 
 	/**
-	 * Export a post (row action)
-	 * 
-	 * @param {object} elem 
+	 * Modal instance
 	 */
-	this.exportPost = function( elem ) {
-
-		const mode = 'post_export';
-		const postId     = $( elem ).data( 'post_id' );
-		const $form       = $( '#post_export_form' );
-		const formData    = $form.serializeArray().reduce( function( obj, item ) {
-			obj[ item.name ] = item.value;
-
-			return obj;
-		}, {} );
-		formData.post_id = postId;
-		console.log( formData );
-		
-		$.post(
-			greyd.ajax_url, {
-				'action': 'contentsync_ajax',
-				'_ajax_nonce': greyd.nonce,
-				'mode': mode,
-				'data': formData
-			}, 
-			function( response ) {
-				console.log( response );
-				
-				// successfull
-				if ( response.indexOf( 'success::' ) > -1 ) {
-
-					// trigger overlay
-					contentsync.overlay.triggerOverlay( true, { 'type': 'success', 'css': mode } );
-				
-					let $link      = $( 'a#post_export_download' );
-					if ( $link.length === 0 ) {
-						$( '#wpfooter' ).after( '<a id="post_export_download"></a>' );
-						$link = $( 'a#post_export_download' );
-					}
-
-					const file     = response.split( 'success::' )[ 1 ];
-					const filename = file.match( /\/[^\/]+.zip/ ) ? file.match( /\/[^\/]+.zip/ )[ 0 ].replace( '/', '' ) : '';
-
-					$link.attr( {
-						'href': file,
-						'download': filename
-					} );
-					$link[ 0 ].click();
-					$form[ 0 ].reset();
-				}
-				else if ( response.indexOf( 'error::' ) > -1 ) {
-					const msg = response.split( 'error::' )[ 1 ];
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
-				}
-				else {
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
-				}
+	this.Modal = new contentSync.Modal( {
+		id: 'export-post-modal',
+		title: __( 'Post Export', 'contentsync' ),
+		description: __( 'Do you want to export "%s"?', 'contentsync' ),
+		formInputs: [
+			{
+				type: 'checkbox',
+				name: 'nested',
+				label: __( 'Export nested content', 'contentsync' ),
+				description: __( 'Templates, media, etc. are added to the download so that used images, backgrounds, etc. will be displayed correctly on the target website.', 'contentsync' ),
+				value: 1
+			},
+			{
+				type: 'checkbox',
+				name: 'menus',
+				label: __( 'Resolve menus', 'contentsync' ),
+				description: __( 'All menus will be converted to static links.', 'contentsync' ),
+				value: 1
 			}
-		);
+		],
+		notice: {
+			text: __( 'Posts in query loops are not included in the import. Posts and Post Types must be exported separately.', 'contentsync' ),
+			type: 'info',
+		},
+		buttons: {
+			cancel: {
+				text: __( 'Cancel', 'contentsync' )
+			},
+			submit: {
+				text: __( 'Export now', 'contentsync' )
+			}
+		},
+		onConfirm: () => {
+			this.exportPostData();
+		}
+	} );
+
+	/**
+	 * AJAX handler instance
+	 */
+	this.AjaxHandler = new contentSync.AjaxHandler( {
+		action: 'post_export',
+		onSuccess: this.onSuccess,
+		onError: this.onError,
+	} );
+
+	/**
+	 * Current selected post Id, defined on user click on a post 'Export' <a>-element.
+	 * 
+	 * @type {number}
+	 */
+	this.postId = 0;
+
+	/**
+	 * Current selected post Title, defined on user click on a post 'Export' <a>-element.
+	 * 
+	 * @type {string}
+	 */
+	this.postTitle = '';
+
+	/**
+	 * Open modal
+	 * 
+	 * @param {HTMLElement} elem - Element that triggered the modal
+	 */
+	this.openModal = ( elem ) => {
+		this.postTitle = toString( elem.dataset.postTitle );
+		this.postId = parseInt( elem.dataset.postId );
+		this.Modal.setDescription( this.Modal.config.description.replace( '%s', this.postTitle ) );
+		this.Modal.open();
+	};
+
+	/**
+	 * On modal submit
+	 */
+	this.onModalSubmit = () => {
+		this.Modal.toggleConfirmButtonBusy( true );
+
+		const data = {
+			post_id: this.postId,
+			post_title: this.postTitle,
+			form_data: this.Modal.getFormData()
+		};
+		console.log( 'onModalSubmit', data );
+
+		this.AjaxHandler.send( data );
+	};
+
+	/**
+	 * When the AJAX request is successful
+	 * 
+	 * @param {string} message - Success message
+	 * @param {mixed} response - Response from server
+	 */
+	this.onSuccess = ( message, response ) => {
+		this.Modal.toggleConfirmButtonBusy( false );
+		console.log( 'onSuccess', message, response );
+
+		this.Modal.close();
+
+		// @todo: make snackbar work
+	};
+
+	/**
+	 * When the AJAX request is unsuccessful
+	 * 
+	 * @param {string} message - Error message
+	 * @param {mixed} response - Response from server
+	 */
+	this.onError = ( message, response ) => {
+		console.log( 'onError', message, response );
+		this.Modal.toggleConfirmButtonBusy( false );
+
+		// @todo: show snackbar "Error exporting post: %s"
 	};
 };

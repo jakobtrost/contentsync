@@ -1,6 +1,6 @@
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
 
-contentsync.postImport = new function() {
+contentSync.postImport = new function() {
 
 	/**
 	 * Open browser upload dialog (on import button click)
@@ -29,7 +29,7 @@ contentsync.postImport = new function() {
 		const mode = 'check_post_import';
 				
 		// trigger overlay 'check_file'
-		contentsync.overlay.triggerOverlay( true, { 'type': 'check_file', 'css': mode } );
+		contentSync.overlay.triggerOverlay( true, { 'type': 'check_file', 'css': mode } );
 
 		// create formData
 		const formData = new FormData();
@@ -52,7 +52,7 @@ contentsync.postImport = new function() {
 			'error': function( xhr, textStatus, errorThrown ) {
 				console.warn( textStatus+': '+errorThrown, xhr );
 				$input.val( '' );
-				contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': errorThrown+': <code>'+xhr.responseText+'</code>' } );
+				contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': errorThrown+': <code>'+xhr.responseText+'</code>' } );
 			},
 			'success': function( response ) {
 				$input.val( '' );
@@ -65,25 +65,25 @@ contentsync.postImport = new function() {
 					result = result.indexOf( '[' ) === 0 ? JSON.parse( result ) : result;
 					console.log( result );
 
-					contentsync.postImport.buildConflictOptions( $( '#post_import_form' ), result );
+					contentSync.postImport.buildConflictOptions( $( '#post_import_form' ), result );
 					
 					/**
 					 * trigger overlay 'confirm'
 					 * 
 					 * callback: this.postImport( filename )
 					 */
-					contentsync.overlay.confirm( mode, '', contentsync.postImport.postImport, [ fileData.name ] );
+					contentSync.overlay.confirm( mode, '', contentSync.postImport.postImport, [ fileData.name ] );
 				}
 				// complete with error
 				else if ( response.indexOf( 'error::' ) > -1 ) {
 					const msg = response.split( 'error::' )[ 1 ];
 					console.log( msg );
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
 				}
 				// unknown state
 				else {
 					console.log( response );
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
 				}
 			}
 		} );
@@ -174,19 +174,19 @@ contentsync.postImport = new function() {
 					const msg = response.split( 'success::' )[ 1 ];
 
 					// use for development
-					// contentsync.overlay.triggerOverlay( true, { "type": "success", "css": mode } );return;
+					// contentSync.overlay.triggerOverlay( true, { "type": "success", "css": mode } );return;
 
 					// trigger overlay
-					contentsync.overlay.triggerOverlay( true, { 'type': 'reload', 'css': mode } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'reload', 'css': mode } );
 				}
 				// complete with error
 				else if ( response.indexOf( 'error::' ) > -1 ) {
 					const msg = response.split( 'error::' )[ 1 ];
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
 				}
 				// unknown state
 				else {
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
 				}
 			}
 		);
@@ -194,5 +194,5 @@ contentsync.postImport = new function() {
 };
 
 document.addEventListener( 'DOMContentLoaded', () => {
-	contentsync.postImport.init();
+	contentSync.postImport.init();
 } );

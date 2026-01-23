@@ -18,15 +18,15 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 	 */
 	public function register_admin() {
 		// UI
-		add_filter( 'contentsync_overlay_contents', array( $this, 'add_overlay_contents' ) );
+		// add_filter( 'contentsync_overlay_contents', array( $this, 'add_overlay_contents' ) );
 		add_filter( 'page_row_actions', array( $this, 'add_export_row_action' ), 10, 2 );
 		add_filter( 'post_row_actions', array( $this, 'add_export_row_action' ), 10, 2 );
 		add_filter( 'media_row_actions', array( $this, 'add_export_row_action' ), 10, 2 );
-		add_action( 'admin_enqueue_scripts', array( $this, 'add_import_page_title_action' ) );
-		add_action( 'admin_notices', array( $this, 'display_transient_notice' ) );
+		// add_action( 'admin_enqueue_scripts', array( $this, 'add_import_page_title_action' ) );
+		// add_action( 'admin_notices', array( $this, 'display_transient_notice' ) );
 
 		// debug
-		add_action( 'admin_init', array( $this, 'maybe_enable_debug_mode' ) );
+		// add_action( 'admin_init', array( $this, 'maybe_enable_debug_mode' ) );
 	}
 
 	/**
@@ -229,7 +229,13 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 	public function add_export_row_action( $actions, $post ) {
 
 		if ( self::is_current_screen_supported() ) {
-			$actions['contentsync_export'] = "<a style='cursor:pointer;' onclick='contentsync.postExport.openExport(this);' data-post_id='" . $post->ID . "'>" . __( 'Export', 'contentsync_hub' ) . '</a>';
+			// $actions['contentsync_export'] = "<a style='cursor:pointer;' onclick='contentsync.postExport.openModal(this);' data-post_id='" . $post->ID . " data-post_title='" . $post->post_title . "'>" . __( 'Export', 'contentsync_hub' ) . '</a>';
+			$actions['contentsync_export'] = sprintf(
+				'<a style="cursor:pointer;" onclick="contentSync.postExport.openModal(this);" data-post_id="%s" data-post_title="%s">%s</a>',
+				$post->ID,
+				esc_attr( ( empty( $post->post_title ) ? 'post' : $post->post_title ) ),
+				esc_html__( 'Export', 'contentsync_hub' )
+			);
 		}
 
 		return $actions;
