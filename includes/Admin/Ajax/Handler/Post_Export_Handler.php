@@ -26,6 +26,13 @@ class Post_Export_Handler extends Ajax_Base {
 	 */
 	public function __construct() {
 		parent::__construct( $this->action );
+
+		// if ( wp_doing_ajax() ) {
+		// error_log( 'Post_Export_Handler constructor' );
+		// error_log( 'action: ' . $this->action );
+		// error_log( print_r( $_REQUEST, true ) );
+		// error_log( print_r( $_POST, true ) );
+		// }
 	}
 
 	/**
@@ -34,6 +41,8 @@ class Post_Export_Handler extends Ajax_Base {
 	 * @param array $data Request data containing post_id and export options.
 	 */
 	protected function handle( $data ) {
+		error_log( 'Post_Export_Handler handle' );
+		error_log( print_r( $data, true ) );
 		$post_id = isset( $data['post_id'] ) ? intval( $data['post_id'] ) : 0;
 
 		if ( empty( $post_id ) ) {

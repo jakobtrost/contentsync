@@ -87,6 +87,25 @@ class AjaxHandler {
 	 * @returns {jqXHR} jQuery XHR object
 	 */
 	send( data ) {
+
+		wp.apiFetch( {
+			path: '/contentsync/v1/post_export',
+			method: 'POST',
+			data: {
+				post_id: data.post_id,
+				post_title: data.post_title,
+				form_data: data.form_data
+			},
+		} ).then( ( res ) => {
+
+			console.log( res );
+
+		} ).catch( ( err ) => {
+			console.log( err );
+		} );
+
+		return;
+
 		// Call onSend callback if provided
 		if ( this.config.onSend && typeof this.config.onSend === 'function' ) {
 			this.config.onSend.call( this, data );
@@ -98,8 +117,21 @@ class AjaxHandler {
 		// Build jQuery.ajax options
 		const ajaxOptions = this.buildAjaxOptions( requestData );
 
+		return jQuery.ajax( ajaxOptions );
+
+
+		console.log( 'ajaxUrl', this.ajaxUrl );
+		console.log( 'requestData', requestData );
+
 		// Send the request
-		return $.ajax( ajaxOptions );
+		return jQuery.post(
+			this.ajaxUrl,
+			requestData,
+			function( response ) {
+				console.log( 'response', response );
+				this.handleSuccess( response );
+			}
+		);
 	}
 
 	/**
@@ -110,8 +142,8 @@ class AjaxHandler {
 	prepareRequestData( data ) {
 		// If data is FormData, append WordPress AJAX parameters
 		if ( data instanceof FormData ) {
-			data.append( 'action', 'contentSync_ajax' );
-			data.append( '_ajax_nonce', this.nonce );
+			data.append( 'action', 'contentsync_ajax' );
+			data.append( '_nonce', this.nonce );
 			data.append( 'mode', this.action );
 
 			// User data should be appended as 'data' key
@@ -121,8 +153,8 @@ class AjaxHandler {
 
 		// For regular objects, build standard WordPress AJAX payload
 		return {
-			action: 'contentSync_ajax',
-			_ajax_nonce: this.nonce,
+			action: 'contentsync_ajax',
+			_nonce: this.nonce,
 			mode: this.action,
 			data: data || {},
 		};
@@ -166,6 +198,9 @@ class AjaxHandler {
 	 * @param {jqXHR} jqXHR - jQuery XHR object
 	 */
 	handleSuccess( response, textStatus, jqXHR ) {
+
+		console.log( 'handleSuccess', response, textStatus, jqXHR );
+
 		// Parse response (format: 'success::message' or 'error::message')
 		const parsed = this.parseResponse( response );
 
@@ -195,6 +230,9 @@ class AjaxHandler {
 	 * @param {string} [responseText] - Optional response text (if already parsed from success handler)
 	 */
 	handleError( jqXHR, textStatus, errorThrown, responseText ) {
+
+		console.log( 'handleError', jqXHR, textStatus, errorThrown, responseText );
+
 		// Get full response text
 		const fullResponse = responseText || ( jqXHR && jqXHR.responseText ) || '';
 		

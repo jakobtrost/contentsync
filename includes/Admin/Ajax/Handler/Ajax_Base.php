@@ -31,13 +31,6 @@ abstract class Ajax_Base {
 	protected $action;
 
 	/**
-	 * Full identifier for the action hook
-	 *
-	 * @var string
-	 */
-	protected $identifier;
-
-	/**
 	 * Request data
 	 *
 	 * @var array
@@ -50,11 +43,9 @@ abstract class Ajax_Base {
 	 * @param string $action Action name (e.g., 'post_export' or 'contentsync_export').
 	 */
 	public function __construct( $action ) {
-		$this->action     = $action;
-		$this->identifier = 'contentsync_ajax_mode_' . $action;
-
-		// Register the handler
-		add_action( $this->identifier, array( $this, 'maybe_handle' ), 10, 1 );
+		$this->action = $action;
+		add_action( 'wp_ajax_nopriv_' . $action, array( $this, 'maybe_handle' ), 10, 1 );
+		add_action( 'wp_ajax_' . $action, array( $this, 'maybe_handle' ), 10, 1 );
 	}
 
 	/**
@@ -65,14 +56,18 @@ abstract class Ajax_Base {
 	 * @param array $data Request data.
 	 */
 	public function maybe_handle( $data ) {
+
+		error_log( 'maybe_handle' );
+		wp_send_json_error( 'maybe_handle' );
+
 		// Check nonce
-		if ( ! isset( $_REQUEST['_ajax_nonce'] ) || ! wp_verify_nonce( $_REQUEST['_ajax_nonce'], 'contentsync_ajax' ) ) {
+		if ( ! isset( $_REQUEST['_nonce'] ) || ! wp_verify_nonce( $_REQUEST['_nonce'], 'contentsync_ajax' ) ) {
 			$this->send_fail( __( 'Security check failed. Please refresh the page and try again.', 'contentsync' ) );
 			return;
 		}
 
 		// Check referrer (AJAX referrer)
-		check_ajax_referer( 'contentsync_ajax', '_ajax_nonce' );
+		check_ajax_referer( 'contentsync_ajax', '_nonce' );
 
 		// Log the request
 		Logger::add( sprintf( '========= HANDLE AJAX: %s =========', $this->action ), $data );
@@ -165,14 +160,5 @@ abstract class Ajax_Base {
 	 */
 	public function get_action() {
 		return $this->action;
-	}
-
-	/**
-	 * Get identifier
-	 *
-	 * @return string Full identifier.
-	 */
-	public function get_identifier() {
-		return $this->identifier;
 	}
 }

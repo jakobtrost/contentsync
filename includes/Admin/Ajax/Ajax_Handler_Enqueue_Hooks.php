@@ -30,7 +30,7 @@ class Ajax_Handler_Enqueue_Hooks extends Hooks_Base {
 		wp_register_script(
 			'contentSync-AjaxHandler',
 			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Ajax/assets/contentSync.AjaxHandler.js',
-			array(),
+			array( 'jquery' ),
 			CONTENTSYNC_VERSION,
 			true
 		);
