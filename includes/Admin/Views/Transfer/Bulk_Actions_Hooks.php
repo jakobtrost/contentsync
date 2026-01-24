@@ -6,6 +6,7 @@ use Contentsync\Translations\Translation_Manager;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Utils\Hooks_Base;
+use Contentsync\Utils\Files;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -80,7 +81,7 @@ class Bulk_Actions_Hooks extends Hooks_Base {
 		$filepath = ( new Post_Export( $items, $args ) )->export_to_zip();
 
 		if ( $filepath ) {
-			$href = convert_wp_content_dir_to_path( $filepath );
+			$href = Files::convert_wp_content_dir_to_url( $filepath );
 			// $sendback = add_query_arg( 'download', $href, $sendback );
 			$sendback = $href;
 		} else {

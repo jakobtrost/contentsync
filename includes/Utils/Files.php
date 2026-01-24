@@ -137,6 +137,18 @@ class Files {
 	}
 
 	/**
+	 * Convert WP_CONTENT_DIR filepath to URL. This is used to return the filepath to the client.
+	 *
+	 * @param string $filepath Full file path.
+	 * @return string URL.
+	 */
+	public static function convert_wp_content_dir_to_url( $filepath ) {
+		$url_path = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filepath );
+		$url_path = str_replace( '\\', '/', $url_path );
+		return $url_path;
+	}
+
+	/**
 	 * Get path to the contentsync export folder. Use this path to write files.
 	 *
 	 * @param string $folder Folder inside wp-content/contentsync/
