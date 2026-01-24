@@ -143,9 +143,9 @@ class SnackBar {
 			this.dismiss();
 		} );
 
-		// if ( this.timeout > 0 ) {
-		// 	setTimeout( () => this.dismiss(), this.timeout );
-		// }
+		if ( this.timeout > 0 ) {
+			setTimeout( () => this.dismiss(), this.timeout );
+		}
 	}
 
 	dismiss() {

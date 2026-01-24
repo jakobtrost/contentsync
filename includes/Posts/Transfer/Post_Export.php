@@ -208,57 +208,6 @@ class Post_Export extends Post_Transfer_Base {
 	}
 
 	/**
-	 * Get the filename for the export.
-	 *
-	 * @return string The filename.
-	 */
-	private function get_filename() {
-
-		// vars
-		$filename = array();
-
-		// bulk export
-		if ( is_array( $this->posts ) && count( $this->posts ) ) {
-			$bulk       = true;
-			$first_post = reset( $this->posts );
-		}
-
-		if ( ! $first_post || ! is_object( $first_post ) ) {
-			return 'post-export';
-		}
-
-		if ( count( $this->posts ) === 1 ) {
-			// add post name to filename
-			$filename[] = $first_post->post_name;
-		}
-
-		// get the post type
-		$post_type     = isset( $first_post->post_type ) ? $first_post->post_type : 'post';
-		$post_type_obj = get_post_type_object( $post_type );
-		if ( $post_type_obj && isset( $post_type_obj->labels ) ) {
-			$post_type = $post_type_obj->labels->name;
-		} else {
-			$post_type = $post_type . ( $bulk ? 's' : '' );
-		}
-
-		// add post type to filename
-		$filename[] = $post_type;
-
-		// add site title to filename
-		$filename[] = get_bloginfo( 'name' );
-
-		// add date to filename
-		$filename[] = date( 'Y-m-d' );
-
-		// cleanup strings
-		foreach ( $filename as $k => $string ) {
-			$filename[ $k ] = preg_replace( '/[^a-z_]/', '', strtolower( preg_replace( '/-+/', '_', $string ) ) );
-		}
-
-		return implode( '-', $filename );
-	}
-
-	/**
 	 * Write export as a .zip archive
 	 *
 	 * @return mixed $path      Path to the archive. False on failure.
@@ -321,5 +270,56 @@ class Post_Export extends Post_Transfer_Base {
 
 		// return path to file
 		return $zip_path;
+	}
+
+	/**
+	 * Get the filename for the export.
+	 *
+	 * @return string The filename.
+	 */
+	private function get_filename() {
+
+		// vars
+		$filename = array();
+
+		// bulk export
+		if ( is_array( $this->posts ) && count( $this->posts ) ) {
+			$bulk       = count( $this->posts ) > 1 ? true : false;
+			$first_post = reset( $this->posts );
+		}
+
+		if ( ! $first_post || ! is_object( $first_post ) ) {
+			return 'post-export';
+		}
+
+		if ( count( $this->posts ) === 1 ) {
+			// add post name to filename
+			$filename[] = $first_post->post_name;
+		}
+
+		// get the post type
+		$post_type     = isset( $first_post->post_type ) ? $first_post->post_type : 'post';
+		$post_type_obj = get_post_type_object( $post_type );
+		if ( $post_type_obj && isset( $post_type_obj->labels ) ) {
+			$post_type = $bulk ? $post_type_obj->labels->name : $post_type_obj->labels->singular_name;
+		} else {
+			$post_type = $post_type . ( $bulk ? 's' : '' );
+		}
+
+		// add post type to filename
+		$filename[] = $post_type;
+
+		// add site title to filename
+		$filename[] = get_bloginfo( 'name' );
+
+		// add date to filename
+		$filename[] = date( 'Y-m-d', time() );
+
+		// cleanup strings
+		foreach ( $filename as $k => $string ) {
+			$filename[ $k ] = preg_replace( '/[^a-z0-9_]/', '', strtolower( preg_replace( '/-+/', '_', $string ) ) );
+		}
+
+		return implode( '-', $filename );
 	}
 }

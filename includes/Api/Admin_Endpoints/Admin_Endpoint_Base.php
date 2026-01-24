@@ -8,8 +8,6 @@
  */
 namespace Contentsync\Api\Admin_Endpoints;
 
-use Contentsync\Api\Remote_Request;
-
 abstract class Admin_Endpoint_Base {
 
 	/**
@@ -113,12 +111,31 @@ abstract class Admin_Endpoint_Base {
 	}
 
 	/**
-	 * Send response
+	 * Send a simple JSON response.
 	 *
-	 * @see \Contentsync\Api\Remote_Request::send_response() for details.
+	 * @param mixed    $data    Response payload.
+	 * @param string   $message Optional. Human-readable message.
+	 * @param int|bool $status  Optional. HTTP status code (int) or success flag (bool). Default true.
+	 *                         When bool: true => 200, false => 400.
+	 * @return \WP_REST_Response
 	 */
-	public function respond( $data, $message = '', $success = null, $status = null ) {
-		return Remote_Request::send_response( $data, $message, $success, $status );
+	public function respond( $data, $message = '', $status = true ) {
+		$status_code = is_numeric( $status ) ? absint( $status ) : ( $status ? 200 : 400 );
+
+		if ( empty( $message ) ) {
+			$message = ( $status_code >= 200 && $status_code < 300 )
+				? __( 'Request successful.', 'contentsync' )
+				: __( 'Request failed.', 'contentsync' );
+		}
+
+		return new \WP_REST_Response(
+			array(
+				'status'  => $status_code,
+				'message' => $message,
+				'data'    => $data,
+			),
+			$status_code
+		);
 	}
 
 
@@ -138,52 +155,52 @@ abstract class Admin_Endpoint_Base {
 	 */
 	public function get_endpoint_args() {
 		return array(
-			'gid'                        => array(
+			'gid'                          => array(
 				'validate_callback' => array( $this, 'is_gid' ),
 			),
-			'post_id'                    => array(
+			'post_id'                      => array(
 				'validate_callback' => array( $this, 'is_number' ),
 			),
-			'blog_id'                    => array(
+			'blog_id'                      => array(
 				'validate_callback' => array( $this, 'is_number' ),
 			),
-			'review_id'                   => array(
+			'review_id'                    => array(
 				'validate_callback' => array( $this, 'is_number' ),
 			),
-			'posts'                      => array(
+			'posts'                        => array(
 				'validate_callback' => array( $this, 'is_array_or_object' ),
 			),
-			'filename'                    => array(
+			'filename'                     => array(
 				'validate_callback' => array( $this, 'is_string' ),
 			),
-			'conflicts'                   => array(
+			'conflicts'                    => array(
 				'validate_callback' => array( $this, 'is_array_or_object' ),
 			),
-			'form_data'                   => array(
+			'form_data'                    => array(
 				'validate_callback' => array( $this, 'is_array_or_object' ),
 			),
-			'post_title'                  => array(
+			'post_title'                   => array(
 				'validate_callback' => array( $this, 'is_string' ),
 			),
-			'post_name'                   => array(
+			'post_name'                    => array(
 				'validate_callback' => array( $this, 'is_string' ),
 			),
 			'switch_references_in_content' => array(
 				'validate_callback' => array( $this, 'is_bool' ),
 			),
-			'append_nested'               => array(
+			'append_nested'                => array(
 				'validate_callback' => array( $this, 'is_bool' ),
 			),
-			'resolve_menus'               => array(
+			'resolve_menus'                => array(
 				'validate_callback' => array( $this, 'is_bool' ),
 			),
-			'translations'                => array(
+			'translations'                 => array(
 				'validate_callback' => array( $this, 'is_bool' ),
 			),
-			'post_type'                   => array(
+			'post_type'                    => array(
 				'validate_callback' => array( $this, 'is_string' ),
 			),
-			'nested'                      => array(
+			'nested'                       => array(
 				'validate_callback' => array( $this, 'is_bool' ),
 			),
 		);

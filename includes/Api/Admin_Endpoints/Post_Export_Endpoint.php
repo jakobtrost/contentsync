@@ -10,7 +10,7 @@
 
 namespace Contentsync\Api\Admin_Endpoints;
 
-use Contentsync\Posts\Transfer\Post_Export as Post_Export_Service;
+use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Utils\Files;
 
 defined( 'ABSPATH' ) || exit;
@@ -67,7 +67,7 @@ class Post_Export_Endpoint extends Admin_Endpoint_Base {
 		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( ! $post_id ) {
-			return $this->respond( false, __( 'No valid post ID could be found.', 'contentsync' ), false, 400 );
+			return $this->respond( false, __( 'No valid post ID could be found.', 'contentsync' ), 400 );
 		}
 
 		$append_nested = $request->get_param( 'append_nested' ) || $request->get_param( 'nested' );
@@ -77,10 +77,10 @@ class Post_Export_Endpoint extends Admin_Endpoint_Base {
 			'translations'  => (bool) $request->get_param( 'translations' ),
 		);
 
-		$filepath = ( new Post_Export_Service( $post_id, $args ) )->export_to_zip();
+		$filepath = ( new Post_Export( $post_id, $args ) )->export_to_zip();
 
 		if ( ! $filepath ) {
-			return $this->respond( false, __( 'The export file could not be written.', 'contentsync' ), false, 400 );
+			return $this->respond( false, __( 'The export file could not be written.', 'contentsync' ), 400 );
 		}
 
 		$url_path = Files::convert_wp_content_dir_to_url( $filepath );
