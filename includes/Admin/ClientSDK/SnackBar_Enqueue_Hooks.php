@@ -30,15 +30,15 @@ class SnackBar_Enqueue_Hooks extends Hooks_Base {
 		// Enqueue SnackBar (WordPress-style snackbars, vanilla JS)
 		wp_register_style(
 			'contentsync-snackbar',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/contentsync-snackbar.css',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/css/contentsync-snackbar.css',
 			array(),
 			CONTENTSYNC_VERSION
 		);
-		// wp_enqueue_style( 'contentsync-snackbar' );
+		wp_enqueue_style( 'contentsync-snackbar' );
 
 		wp_register_script(
 			'contentSync-SnackBar',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/contentSync.SnackBar.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/js/contentSync.SnackBar.js',
 			array(),
 			CONTENTSYNC_VERSION,
 			true

@@ -30,7 +30,7 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 		// Enqueue components-modal.css (modal styles)
 		wp_register_style(
 			'contentsync-modal',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/contentsync-modal.css',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/css/contentsync-modal.css',
 			array(),
 			CONTENTSYNC_VERSION,
 		);
@@ -39,13 +39,13 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 		// Enqueue admin-info-box.css (admin info box styles)
 		Admin_Render::maybe_enqueue_stylesheet(
 			'contentsync-info-box',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/contentsync-info-box.css'
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-info-box.css'
 		);
 
 		// Enqueue components-modal.js (base Modal class)
 		wp_register_script(
 			'contentSync-Modal',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/contentSync.Modal.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/js/contentSync.Modal.js',
 			array(),
 			CONTENTSYNC_VERSION,
 			true
