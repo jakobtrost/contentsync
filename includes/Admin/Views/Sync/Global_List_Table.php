@@ -188,7 +188,7 @@ class Global_List_Table extends WP_List_Table {
 							case 'wpml':
 								echo '<div class="notice notice-error">' .
 									'<p>' .
-										__( "We've noticed that you're using multilingual global content.", 'contentsync' ) .
+										__( "We've noticed that you're using multilingual synced posts.", 'contentsync' ) .
 										' <strong>' .
 											__( 'WPML must be active on the main page of this multisite and every other connection for this to work.', 'contentsync' ) .
 										'</strong> ' .
@@ -201,7 +201,7 @@ class Global_List_Table extends WP_List_Table {
 							case 'polylang':
 								echo '<div class="notice notice-error">' .
 									'<p>' .
-										__( "We've noticed that you're using multilingual global content.", 'contentsync' ) .
+										__( "We've noticed that you're using multilingual synced posts.", 'contentsync' ) .
 										__( 'Polylang should be active on every page with synchronized multilingual content.', 'contentsync' ) .
 									'</p><p>' .
 										__( 'On the other hand, unexpected behavior and errors may occur when synchronizing posts and especially post types in different languages.', 'contentsync' ) .
@@ -368,14 +368,14 @@ class Global_List_Table extends WP_List_Table {
 	 */
 	public function no_items() {
 
-		$text = __( 'No global content found.', 'contentsync' );
+		$text = __( 'No synced post found.', 'contentsync' );
 		$rel  = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? sanitize_key( $_GET['rel'] ) : 'all';
 		if ( $rel === 'export' ) {
-			$text = __( 'No global content exported from here was found.', 'contentsync' );
+			$text = __( 'No synced post exported from here was found.', 'contentsync' );
 		} elseif ( $rel === 'import' ) {
-			$text = __( 'No global content imported here was found.', 'contentsync' );
+			$text = __( 'No synced post imported here was found.', 'contentsync' );
 		} elseif ( $rel === 'errors' ) {
-			$text = __( 'No faulty global content found.', 'contentsync' );
+			$text = __( 'No faulty synced post found.', 'contentsync' );
 		}
 
 		echo '<div style="margin: 4px 0;">' . $text . '</div>';
@@ -1165,15 +1165,15 @@ class Global_List_Table extends WP_List_Table {
 				'fail'    => __( 'There were errors when moving the posts to the trash.', 'contentsync' ),
 			),
 			'delete'           => array(
-				'success' => __( 'Are you sure you want to delete the global content %s everywhere? This action cannot be undone.', 'contentsync' ),
+				'success' => __( 'Are you sure you want to delete the synced post %s everywhere? This action cannot be undone.', 'contentsync' ),
 				'fail'    => __( 'There were errors when deleting the content.', 'contentsync' ),
 			),
 			'delete_confirmed' => array(
-				'success' => __( 'The global content %s has been permanently deleted on all sites.', 'contentsync' ),
+				'success' => __( 'The synced post %s has been permanently deleted on all sites.', 'contentsync' ),
 				'fail'    => __( 'There were errors when deleting the content.', 'contentsync' ),
 			),
 			'repair'           => array(
-				'success' => __( 'The global content has been successfully repaired. In this overview, the old error messages are still displayed. When you refresh this page, you should no longer see the errors.', 'contentsync' ),
+				'success' => __( 'The synced post has been successfully repaired. In this overview, the old error messages are still displayed. When you refresh this page, you should no longer see the errors.', 'contentsync' ),
 				'fail'    => __( 'Errors occurred while repairing the contents. All error messages are still displayed in this overview. If you refresh this page, you will see the bugs that have not yet been fixed.', 'contentsync' ),
 			),
 		);

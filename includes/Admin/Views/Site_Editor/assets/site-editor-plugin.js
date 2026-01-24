@@ -143,7 +143,7 @@
 							onClick: function( e ) {
 								contentSync.exportPost( e.target, post.id, post.title );
 							}
-						}, __( 'Convert to global content', 'contentsync' ) ),
+						}, __( 'Convert to synced post', 'contentsync' ) ),
 
 						el( 'hr' )
 					],

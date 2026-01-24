@@ -109,7 +109,7 @@ class Cluster_List_Table extends \WP_List_Table {
 		// );
 		echo '<hr class="wp-header-end">';
 
-		echo '<p>' . __( 'Here you can manage all global content clusters.', 'contentsync' ) . '</p>';
+		echo '<p>' . __( 'Here you can manage all synced posts clusters.', 'contentsync' ) . '</p>';
 
 		echo '<form id="posts-filter" method="post">';
 

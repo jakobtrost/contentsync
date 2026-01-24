@@ -4,11 +4,11 @@
  * Synced Post Object
  *
  * The `Synced_Post` class wraps the native WordPress `WP_Post` object and augments it
- * with additional metadata for the global content system. It enables you to access
+ * with additional metadata for the Content Sync system. It enables you to access
  * both standard post properties and custom global properties in a unified way. The
  * class ensures that only valid synced posts are instantiated and throws exceptions
  * when a post cannot be found, when it is in the trash or when it lacks the required
- * global metadata.
+ * Content Sync metadata.
  *
  * When you construct a `Synced_Post` object you may pass either a post ID or an existing
  * post object. The constructor converts an ID into a post object using `get_post`,
@@ -29,7 +29,6 @@
  * new object or `false` if the post does not exist. The `new_synced_post` function
  * wraps the class construction in a try/catch block and returns `false` on failure.
  * Together these utilities provide a reliable interface for working with synced posts.
- *
  */
 namespace Contentsync\Posts\Sync;
 
@@ -219,7 +218,7 @@ class Synced_Post {
 	}
 
 	/**
-	 * Retrieve global content meta for the current post.
+	 * Retrieve contentsync meta for the current post.
 	 *
 	 * This helper method assembles all meta data that describes a global
 	 * post. It begins with the default values provided by the

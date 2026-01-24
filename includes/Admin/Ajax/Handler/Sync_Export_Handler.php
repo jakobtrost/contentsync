@@ -2,7 +2,7 @@
 /**
  * Sync Export AJAX Handler
  *
- * Handles AJAX requests for making posts synced (exporting to global content).
+ * Handles AJAX requests for making posts synced (exporting to synced post).
  *
  * @package Contentsync
  * @subpackage Admin\Ajax

@@ -345,7 +345,7 @@ class Remote_Request {
 		$success = $success !== null ? boolval( $success ) : boolval( $data );
 		$status  = $status ? absint( $status ) : ( $success ? 200 : 400 );
 		$data    = array(
-			'message' => empty( $message ) ? 'Your global content request ' . ( $success ? 'was successful.' : 'has failed.' ) : strval( $message ),
+			'message' => empty( $message ) ? 'Your Content Sync request ' . ( $success ? 'was successful.' : 'has failed.' ) : strval( $message ),
 			'code'    => $success ? 'gc_success' : 'gc_error',
 			'data'    => array(
 				'status'       => $status,

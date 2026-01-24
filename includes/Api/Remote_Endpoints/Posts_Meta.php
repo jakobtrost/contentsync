@@ -194,7 +194,7 @@ class Posts_Meta extends Remote_Endpoint_Base {
 	 *
 	 * Looks up the provided value against the array of valid global
 	 * content meta keys. Returns true when the meta key is defined for
-	 * global content and false otherwise.
+	 * synced posts and false otherwise.
 	 *
 	 * @param string $value Meta key to test.
 	 * @return bool True if the key is part of the Contentsync meta set, false otherwise.

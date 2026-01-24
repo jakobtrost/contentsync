@@ -463,7 +463,7 @@ class Synced_Post_Service {
 	}
 
 	/**
-	 * Function to check if current user is allowed to edit global contents.
+	 * Function to check if current user is allowed to edit synced postss.
 	 * Permission is based on 'edit_posts' capability and can be overridden
 	 * with the filter 'contentsync_user_can_edit'.
 	 *
