@@ -9,7 +9,7 @@ contentSync.postExport = new function() {
 	this.Modal = new contentSync.Modal( {
 		id: 'export-post-modal',
 		title: __( 'Post Export', 'contentsync' ),
-		description: __( 'Do you want to export "%s"?', 'contentsync' ),
+		description: __( 'Do you want to export the post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
 		formInputs: [
 			{
 				type: 'checkbox',
@@ -38,9 +38,7 @@ contentSync.postExport = new function() {
 				text: __( 'Export now', 'contentsync' )
 			}
 		},
-		onConfirm: () => {
-			this.exportPostData();
-		}
+		onSubmit: () => this.onModalSubmit()
 	} );
 
 	/**
@@ -72,17 +70,23 @@ contentSync.postExport = new function() {
 	 * @param {HTMLElement} elem - Element that triggered the modal
 	 */
 	this.openModal = ( elem ) => {
-		this.postTitle = toString( elem.dataset.postTitle );
-		this.postId = parseInt( elem.dataset.postId );
-		this.Modal.setDescription( this.Modal.config.description.replace( '%s', this.postTitle ) );
+		console.log( 'openModal', elem.dataset );
+		this.postTitle = elem.dataset.post_title;
+		this.postId = parseInt( elem.dataset.post_id );
+
+		console.log( 'postTitle', this.postTitle );
+		console.log( 'postId', this.postId );
+		console.log( 'Modal', this.Modal );
+
 		this.Modal.open();
+		this.Modal.setDescription( this.Modal.config.description.replace( '%s', this.postTitle ) );
 	};
 
 	/**
 	 * On modal submit
 	 */
 	this.onModalSubmit = () => {
-		this.Modal.toggleConfirmButtonBusy( true );
+		this.Modal.toggleSubmitButtonBusy( true );
 
 		const data = {
 			post_id: this.postId,
@@ -101,12 +105,22 @@ contentSync.postExport = new function() {
 	 * @param {mixed} response - Response from server
 	 */
 	this.onSuccess = ( message, response ) => {
-		this.Modal.toggleConfirmButtonBusy( false );
+		this.Modal.toggleSubmitButtonBusy( false );
 		console.log( 'onSuccess', message, response );
 
 		this.Modal.close();
 
-		// @todo: make snackbar work
+		contentSync.utils.addSnackBar( {
+			text: __( 'Post exported successfully, The file will be downloaded automatically, if not, click the link', 'contentsync' ),
+			link: {
+				text: __( 'Download file', 'contentsync' ),
+				url: response.download_link,
+				target: '_self',
+				rel: 'external noreferrer noopener'
+			},
+			type: 'success',
+			timeout: 10000,
+		} );
 	};
 
 	/**
@@ -117,8 +131,11 @@ contentSync.postExport = new function() {
 	 */
 	this.onError = ( message, response ) => {
 		console.log( 'onError', message, response );
-		this.Modal.toggleConfirmButtonBusy( false );
+		this.Modal.toggleSubmitButtonBusy( false );
 
-		// @todo: show snackbar "Error exporting post: %s"
+		contentSync.utils.addSnackBar( {
+			text: __( 'Error exporting post: %s', 'contentsync' ).replace( '%s', message ),
+			type: 'error'
+		} );
 	};
 };

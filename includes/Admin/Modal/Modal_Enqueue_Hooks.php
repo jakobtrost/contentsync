@@ -52,6 +52,24 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 		);
 		wp_enqueue_script( 'contentSync-Modal' );
 
+		// Enqueue SnackBar (WordPress-style snackbars, vanilla JS)
+		wp_register_style(
+			'contentsync-snackbar',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/contentsync-snackbar.css',
+			array(),
+			CONTENTSYNC_VERSION
+		);
+		// wp_enqueue_style( 'contentsync-snackbar' );
+
+		wp_register_script(
+			'contentSync-SnackBar',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/contentSync.SnackBar.js',
+			array(),
+			CONTENTSYNC_VERSION,
+			true
+		);
+		wp_enqueue_script( 'contentSync-SnackBar' );
+
 		// // Enqueue example-modal-instance.js (test/example implementation)
 		// wp_register_script(
 		// 'contentsync-example-modal-instance',

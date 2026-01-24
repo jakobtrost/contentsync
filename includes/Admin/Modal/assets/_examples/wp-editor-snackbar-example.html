@@ -1,0 +1,20 @@
+<div class="components-snackbar-list components-editor-notices__snackbar" tabindex="-1">
+	<!-- the opacity of this element is animated from 0 to 1 and backwards for fade in and out -->
+	<div style="height: auto; opacity: 1;">
+		<div class="components-snackbar-list__notice-container">
+			<div class="components-snackbar" tabindex="0" role="button" aria-label="Dismiss this notice">
+				<div class="components-snackbar__content">
+					{{ text }}
+					<a class="components-external-link components-snackbar__action" href="{{ linkUrl }}" target="{{ target }}" rel="external noreferrer noopener">
+						<span class="components-external-link__contents">
+							{{ linkText }}
+						</span>
+						<span class="components-external-link__icon" aria-label="(opens in a new tab)">
+							<img draggable="false" role="img" class="emoji" alt="↗" src="https://s.w.org/images/core/emoji/17.0.2/svg/2197.svg">
+						</span>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,16 @@
+.contentsync-snackbar-list:not(:empty) {
+	bottom: 16px;
+	padding-left: 16px;
+	padding-right: 16px;
+	position: fixed;
+	right: 0;
+}
+
+.contentsync-snackbar-list .components-snackbar .components-snackbar__content-with-icon {
+	position: static;
+}
+
+.contentsync-snackbar-list .components-snackbar .components-snackbar__icon {
+	left: 18px;
+	top: 12px;
+}
