@@ -30,7 +30,7 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 		// Enqueue components-modal.css (modal styles)
 		wp_register_style(
 			'contentsync-modal',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Scripts/assets/contentsync-modal.css',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/contentsync-modal.css',
 			array(),
 			CONTENTSYNC_VERSION,
 		);
@@ -45,7 +45,7 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 		// Enqueue components-modal.js (base Modal class)
 		wp_register_script(
 			'contentSync-Modal',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Scripts/assets/contentSync.Modal.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/contentSync.Modal.js',
 			array(),
 			CONTENTSYNC_VERSION,
 			true
@@ -55,7 +55,7 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 		// // Enqueue example-modal-instance.js (test/example implementation)
 		// wp_register_script(
 		// 'contentsync-example-modal-instance',
-		// CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Scripts/assets/_examples/example-modal-instance.js',
+		// CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/_examples/example-modal-instance.js',
 		// array( 'contentSync-Modal' ),
 		// CONTENTSYNC_VERSION,
 		// true

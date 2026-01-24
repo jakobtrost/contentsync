@@ -29,7 +29,7 @@ class AjaxHandler_Enqueue_Hooks extends Hooks_Base {
 		// Enqueue the AJAX handler script.
 		wp_register_script(
 			'contentSync-AjaxHandler',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Scripts/assets/contentSync.AjaxHandler.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/contentSync.AjaxHandler.js',
 			array( 'jquery' ),
 			CONTENTSYNC_VERSION,
 			true

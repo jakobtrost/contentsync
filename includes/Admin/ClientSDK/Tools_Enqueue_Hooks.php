@@ -28,7 +28,7 @@ class Tools_Enqueue_Hooks extends Hooks_Base {
 
 		wp_register_script(
 			'contentSync-tools',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Scripts/assets/contentSync.tools.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/contentSync.tools.js',
 			array(),
 			CONTENTSYNC_VERSION,
 			true
