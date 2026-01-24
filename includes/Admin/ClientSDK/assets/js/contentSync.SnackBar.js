@@ -44,6 +44,18 @@ class SnackBar {
 	 */
 	wrapper = null;
 
+	/** @type {number|null} */
+	_dismissTimeoutId = null;
+
+	/** @type {number} */
+	_dismissScheduledAt = 0;
+
+	/** @type {number} */
+	_dismissDuration = 0;
+
+	/** @type {number|null} */
+	_remainingMs = null;
+
 	/**
 	 * Creating a new SnackBar instance automatically adds the HTML to the DOM
 	 *
@@ -144,8 +156,60 @@ class SnackBar {
 		} );
 
 		if ( this.timeout > 0 ) {
-			setTimeout( () => this.dismiss(), this.timeout );
+			this._scheduleDismiss( this.timeout );
+			wrapper.addEventListener( 'mouseenter', () => this._pauseDismiss() );
+			wrapper.addEventListener( 'mouseleave', () => this._resumeDismiss() );
 		}
+	}
+
+	/**
+	 * Schedule the auto-dismiss timeout.
+	 * @param {number} durationMs
+	 * @private
+	 */
+	_scheduleDismiss( durationMs ) {
+		this._dismissScheduledAt = Date.now();
+		this._dismissDuration = durationMs;
+		this._dismissTimeoutId = window.setTimeout( () => {
+			this._dismissTimeoutId = null;
+
+			this.dismiss();
+		}, durationMs );
+	}
+
+	/**
+	 * Pause the dismiss countdown (on mouseenter).
+	 * @private
+	 */
+	_pauseDismiss() {
+		if ( this._dismissTimeoutId === null ) { return; }
+
+		window.clearTimeout( this._dismissTimeoutId );
+
+		const remaining = this._dismissDuration - ( Date.now() - this._dismissScheduledAt );
+
+		this._dismissTimeoutId = null;
+
+		if ( remaining <= 0 ) {
+			this.dismiss();
+
+			return;
+		}
+
+		this._remainingMs = remaining;
+	}
+
+	/**
+	 * Resume the dismiss countdown (on mouseleave).
+	 * @private
+	 */
+	_resumeDismiss() {
+		if ( this._dismissTimeoutId !== null || this._remainingMs == null || this._remainingMs <= 0 ) {
+			return;
+		}
+
+		this._scheduleDismiss( this._remainingMs );
+		this._remainingMs = null;
 	}
 
 	dismiss() {

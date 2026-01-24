@@ -127,15 +127,14 @@ contentSync.postExport = new function() {
 		link.click();
 
 		contentSync.tools.addSnackBar( {
-			text: __( 'Post exported successfully, The file will be downloaded automatically, if not, click the link', 'contentsync' ),
+			text: __( 'The post was exported successfully. The file will download automatically. If not, click the link.', 'contentsync' ),
 			link: {
 				text: __( 'Download file', 'contentsync' ),
 				url: downloadUrl,
 				target: '_self',
 				rel: 'external noreferrer noopener'
 			},
-			type: 'success',
-			timeout: 10000,
+			type: 'success'
 		} );
 	};
 
