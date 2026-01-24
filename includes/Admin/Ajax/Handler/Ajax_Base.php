@@ -57,20 +57,8 @@ abstract class Ajax_Base {
 	 */
 	public function maybe_handle( $data ) {
 
-		error_log( 'maybe_handle' );
-		wp_send_json_error( 'maybe_handle' );
-
-		// Check nonce
-		if ( ! isset( $_REQUEST['_nonce'] ) || ! wp_verify_nonce( $_REQUEST['_nonce'], 'contentsync_ajax' ) ) {
-			$this->send_fail( __( 'Security check failed. Please refresh the page and try again.', 'contentsync' ) );
-			return;
-		}
-
 		// Check referrer (AJAX referrer)
 		check_ajax_referer( 'contentsync_ajax', '_nonce' );
-
-		// Log the request
-		Logger::add( sprintf( '========= HANDLE AJAX: %s =========', $this->action ), $data );
 
 		// Store data
 		$this->data = $data;
