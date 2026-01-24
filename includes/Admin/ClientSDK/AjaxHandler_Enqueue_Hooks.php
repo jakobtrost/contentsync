@@ -1,18 +1,18 @@
 <?php
 
 /**
- * Content Sync AJAX Handler Enqueue Hooks
+ * Content Sync AJAX Enqueue Hooks
  *
  * This class handles enqueuing scripts and styles for the AJAX handler.
  */
 
-namespace Contentsync\Admin\Ajax;
+namespace Contentsync\Admin\ClientSDK;
 
 use Contentsync\Utils\Hooks_Base;
 
 defined( 'ABSPATH' ) || exit;
 
-class Ajax_Handler_Enqueue_Hooks extends Hooks_Base {
+class AjaxHandler_Enqueue_Hooks extends Hooks_Base {
 
 	/**
 	 * Register admin-only hooks.
@@ -29,7 +29,7 @@ class Ajax_Handler_Enqueue_Hooks extends Hooks_Base {
 		// Enqueue the AJAX handler script.
 		wp_register_script(
 			'contentSync-AjaxHandler',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Ajax/assets/contentSync.AjaxHandler.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Scripts/assets/contentSync.AjaxHandler.js',
 			array( 'jquery' ),
 			CONTENTSYNC_VERSION,
 			true

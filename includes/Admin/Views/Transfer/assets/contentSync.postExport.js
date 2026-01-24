@@ -110,7 +110,7 @@ contentSync.postExport = new function() {
 
 		this.Modal.close();
 
-		contentSync.utils.addSnackBar( {
+		contentSync.tools.addSnackBar( {
 			text: __( 'Post exported successfully, The file will be downloaded automatically, if not, click the link', 'contentsync' ),
 			link: {
 				text: __( 'Download file', 'contentsync' ),
@@ -133,7 +133,7 @@ contentSync.postExport = new function() {
 		console.log( 'onError', message, response );
 		this.Modal.toggleSubmitButtonBusy( false );
 
-		contentSync.utils.addSnackBar( {
+		contentSync.tools.addSnackBar( {
 			text: __( 'Error exporting post: %s', 'contentsync' ).replace( '%s', message ),
 			type: 'error'
 		} );

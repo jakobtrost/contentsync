@@ -6,7 +6,7 @@
  * This class handles enqueuing scripts and styles for the Modal/Modal components.
  */
 
-namespace Contentsync\Admin\Modal;
+namespace Contentsync\Admin\ClientSDK;
 
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Admin\Utils\Admin_Render;
@@ -30,7 +30,7 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 		// Enqueue components-modal.css (modal styles)
 		wp_register_style(
 			'contentsync-modal',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/contentsync-modal.css',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Scripts/assets/contentsync-modal.css',
 			array(),
 			CONTENTSYNC_VERSION,
 		);
@@ -45,35 +45,17 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 		// Enqueue components-modal.js (base Modal class)
 		wp_register_script(
 			'contentSync-Modal',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/contentSync.Modal.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Scripts/assets/contentSync.Modal.js',
 			array(),
 			CONTENTSYNC_VERSION,
 			true
 		);
 		wp_enqueue_script( 'contentSync-Modal' );
 
-		// Enqueue SnackBar (WordPress-style snackbars, vanilla JS)
-		wp_register_style(
-			'contentsync-snackbar',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/contentsync-snackbar.css',
-			array(),
-			CONTENTSYNC_VERSION
-		);
-		// wp_enqueue_style( 'contentsync-snackbar' );
-
-		wp_register_script(
-			'contentSync-SnackBar',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/contentSync.SnackBar.js',
-			array(),
-			CONTENTSYNC_VERSION,
-			true
-		);
-		wp_enqueue_script( 'contentSync-SnackBar' );
-
 		// // Enqueue example-modal-instance.js (test/example implementation)
 		// wp_register_script(
 		// 'contentsync-example-modal-instance',
-		// CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Modal/assets/_examples/example-modal-instance.js',
+		// CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Scripts/assets/_examples/example-modal-instance.js',
 		// array( 'contentSync-Modal' ),
 		// CONTENTSYNC_VERSION,
 		// true

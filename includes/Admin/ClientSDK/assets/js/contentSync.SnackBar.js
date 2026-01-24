@@ -1,6 +1,6 @@
 /**
  * SnackBar – WordPress-style snackbar (vanilla JS). Each instance is one snackbar.
- * Use contentSync.utils.addSnackBar(options) to create and show a snackbar.
+ * Use contentSync.tools.addSnackBar(options) to create and show a snackbar.
  */
 var contentSync = contentSync || {};
 

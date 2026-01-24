@@ -1,6 +1,6 @@
 var contentSync = contentSync || {};
 
-contentSync.utils = new function() {
+contentSync.tools = new function() {
 
 	/**
 	 * Add a page title action
