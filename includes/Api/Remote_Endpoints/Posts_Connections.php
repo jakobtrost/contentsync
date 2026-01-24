@@ -12,7 +12,7 @@
  *
  * /posts/{{gid}}/connections (GET, POST & DELETE)
  */
-namespace Contentsync\Api\Endpoints;
+namespace Contentsync\Api\Remote_Endpoints;
 
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
@@ -20,7 +20,7 @@ use Contentsync\Utils\Multisite_Manager;
 
 defined( 'ABSPATH' ) || exit;
 
-class Posts_Connections extends Endpoint_Base {
+class Posts_Connections extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor

@@ -6,11 +6,11 @@
  * @see     WP_REST_Controller
  * @source  /wp-includes/rest-api/endpoints/class-wp-rest-controller.php
  */
-namespace Contentsync\Api\Endpoints;
+namespace Contentsync\Api\Remote_Endpoints;
 
 use Contentsync\Api\Remote_Request;
 
-abstract class Endpoint_Base {
+abstract class Remote_Endpoint_Base {
 
 	/**
 	 * The namespace.

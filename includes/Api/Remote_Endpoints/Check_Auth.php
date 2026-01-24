@@ -4,14 +4,14 @@
  *
  * @link {{your-domain}}/wp-json/contentsync/v1/check_auth
  */
-namespace Contentsync\Api\Endpoints;
+namespace Contentsync\Api\Remote_Endpoints;
 
 use Contentsync\Api\Site_Connection;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-class Check_Auth extends Endpoint_Base {
+class Check_Auth extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor

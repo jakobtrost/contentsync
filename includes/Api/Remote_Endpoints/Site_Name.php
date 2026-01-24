@@ -4,11 +4,11 @@
  *
  * @link {{your-domain}}/wp-json/contentsync/v1/site_name
  */
-namespace Contentsync\Api\Endpoints;
+namespace Contentsync\Api\Remote_Endpoints;
 
 defined( 'ABSPATH' ) || exit;
 
-class Site_Name extends Endpoint_Base {
+class Site_Name extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor

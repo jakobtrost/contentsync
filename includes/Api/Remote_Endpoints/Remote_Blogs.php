@@ -4,13 +4,13 @@
  *
  * @link {{your-domain}}/wp-json/contentsync/v1/remote_blogs
  */
-namespace Contentsync\Api\Endpoints;
+namespace Contentsync\Api\Remote_Endpoints;
 
 use Contentsync\Utils\Multisite_Manager;
 
 defined( 'ABSPATH' ) || exit;
 
-class Remote_Blogs extends Endpoint_Base {
+class Remote_Blogs extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor

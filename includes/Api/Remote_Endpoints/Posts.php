@@ -12,7 +12,7 @@
  * /posts/{{gid}}/prepare
  * /posts/linked
  */
-namespace Contentsync\Api\Endpoints;
+namespace Contentsync\Api\Remote_Endpoints;
 
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Synced_Post_Query;
@@ -22,7 +22,7 @@ use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-class Posts extends Endpoint_Base {
+class Posts extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor

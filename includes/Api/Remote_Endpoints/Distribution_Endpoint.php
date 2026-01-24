@@ -30,7 +30,7 @@
  * @see includes/Distribution/Destinations/Remote_Destination.php
  * @see includes/Distribution/Destinations/Blog_Destination.php
  */
-namespace Contentsync\Api\Endpoints;
+namespace Contentsync\Api\Remote_Endpoints;
 
 use Contentsync\Distribution\Distributor;
 use Contentsync\Distribution\Distribution_Item_Service;
@@ -42,7 +42,7 @@ use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-class Distribution_Endpoint extends Endpoint_Base {
+class Distribution_Endpoint extends Remote_Endpoint_Base {
 
 	/**
 	 * Store the current request origin in the class

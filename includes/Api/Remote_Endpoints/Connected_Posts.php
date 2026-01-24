@@ -13,7 +13,7 @@
  * /connected_posts (GET, POST & DELETE)
  * /connected_posts/export
  */
-namespace Contentsync\Api\Endpoints;
+namespace Contentsync\Api\Remote_Endpoints;
 
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Synced_Post_Service;
@@ -24,7 +24,7 @@ use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-class Connected_Posts extends Endpoint_Base {
+class Connected_Posts extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor

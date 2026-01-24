@@ -7,17 +7,17 @@ use Contentsync\Utils\Directory_Loader;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Automatically discovers and loads all endpoint classes.
+ * Automatically discovers and loads all remote endpoint classes.
  *
- * This loader scans the includes/Api/Endpoints/ directory for endpoint files
- * and instantiates each class. Since endpoint classes extend Endpoint_Base
+ * This loader scans the includes/Api/Remote_Endpoints/ directory for endpoint files
+ * and instantiates each class. Since endpoint classes extend Remote_Endpoint_Base
  * and register their endpoints in the constructor, this ensures all endpoints
  * are registered without manual instantiation.
  */
-class Endpoint_Loader extends Directory_Loader {
+class Remote_Endpoint_Loader extends Directory_Loader {
 
 	/**
-	 * Constructor - sets up the endpoint loader.
+	 * Constructor - sets up the remote endpoint loader.
 	 */
 	public function __construct() {
 
@@ -31,8 +31,8 @@ class Endpoint_Loader extends Directory_Loader {
 			return;
 		}
 
-		$endpoints_dir = CONTENTSYNC_PLUGIN_PATH . '/includes/Api/Endpoints';
-		$namespace     = '\Contentsync\Api\Endpoints';
+		$endpoints_dir = CONTENTSYNC_PLUGIN_PATH . '/includes/Api/Remote_Endpoints';
+		$namespace     = '\Contentsync\Api\Remote_Endpoints';
 		parent::__construct( $endpoints_dir, $namespace );
 	}
 }

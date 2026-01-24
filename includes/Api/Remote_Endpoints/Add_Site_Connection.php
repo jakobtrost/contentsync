@@ -4,14 +4,14 @@
  *
  * @link {{your-domain}}/wp-json/contentsync/v1/add_site_connection
  */
-namespace Contentsync\Api\Endpoints;
+namespace Contentsync\Api\Remote_Endpoints;
 
 use Contentsync\Api\Site_Connection;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-class Add_Site_Connection extends Endpoint_Base {
+class Add_Site_Connection extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor
