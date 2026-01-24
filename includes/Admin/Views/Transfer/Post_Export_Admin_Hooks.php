@@ -13,62 +13,63 @@ defined( 'ABSPATH' ) || exit;
 
 class Post_Export_Admin_Hooks extends Hooks_Base {
 
-	public function register_frontend() {
-		add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
-	}
-
 	/**
 	 * Register admin-only hooks.
 	 */
 	public function register_admin() {
-		// UI
-		// add_filter( 'contentsync_overlay_contents', array( $this, 'add_overlay_contents' ) );
+
+		// add the 'Export' action for each supported post in the edit screen
 		add_filter( 'page_row_actions', array( $this, 'add_export_row_action' ), 10, 2 );
 		add_filter( 'post_row_actions', array( $this, 'add_export_row_action' ), 10, 2 );
 		add_filter( 'media_row_actions', array( $this, 'add_export_row_action' ), 10, 2 );
-		// add_action( 'admin_enqueue_scripts', array( $this, 'add_import_page_title_action' ) );
-		// add_action( 'admin_notices', array( $this, 'display_transient_notice' ) );
 
-		// debug
+		// old
+		// add_filter( 'contentsync_overlay_contents', array( $this, 'add_overlay_contents' ) );
+		// add_action( 'admin_notices', array( $this, 'display_transient_notice' ) );
 		// add_action( 'admin_init', array( $this, 'maybe_enable_debug_mode' ) );
 	}
-	/**
-	 * Set up Rest API routes.
-	 *
-	 * @return void
-	 */
-	public function rest_api_init() {
 
-		register_rest_route(
-			CONTENTSYNC_REST_NAMESPACE,
-			'/post_export',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( $this, 'rest_test' ),
-				'permission_callback' => function () {
-					return current_user_can( 'install_plugins' );
-				},
-			)
-		);
-	}
+	// public function register_frontend() {
+	// 	add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
+	// }
 
-	/**
-	 * Save tools via Rest API.
-	 *
-	 * @param object $request given request.
-	 *
-	 * @return string
-	 */
-	public function rest_test( $request ) {
-		error_log( 'rest_test' );
-		error_log( print_r( $request, true ) );
-		return json_encode(
-			array(
-				'status'  => 200,
-				'message' => 'Test successful',
-			)
-		);
-	}
+	// /**
+	//  * Set up Rest API routes.
+	//  *
+	//  * @return void
+	//  */
+	// public function rest_api_init() {
+
+	// 	register_rest_route(
+	// 		CONTENTSYNC_REST_NAMESPACE,
+	// 		'/post_export',
+	// 		array(
+	// 			'methods'             => 'POST',
+	// 			'callback'            => array( $this, 'rest_test' ),
+	// 			'permission_callback' => function () {
+	// 				return current_user_can( 'install_plugins' );
+	// 			},
+	// 		)
+	// 	);
+	// }
+
+	// /**
+	//  * Save tools via Rest API.
+	//  *
+	//  * @param object $request given request.
+	//  *
+	//  * @return string
+	//  */
+	// public function rest_test( $request ) {
+	// 	error_log( 'rest_test' );
+	// 	error_log( print_r( $request, true ) );
+	// 	return json_encode(
+	// 		array(
+	// 			'status'  => 200,
+	// 			'message' => 'Test successful',
+	// 		)
+	// 	);
+	// }
 
 	/**
 	 * Add export button to row actions
@@ -79,59 +80,18 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 	 */
 	public function add_export_row_action( $actions, $post ) {
 
-		if ( self::is_current_screen_supported() ) {
-
-			// Admin_Render::maybe_enqueue_script(
-			// 'contentSync-postExport',
-			// CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Transfer/assets/contentSync.postExport.js'
-			// );
-			$scriptName = 'contentSync-postExport';
-			if ( ! wp_script_is( $scriptName, 'enqueued' ) ) {
-				wp_enqueue_script(
-					$scriptName,
-					CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Transfer/assets/contentSync.postExport.js',
-					array( 'contentSync-utils', 'contentSync-Modal', 'contentSync-AjaxHandler', 'contentSync-SnackBar' ),
-					CONTENTSYNC_VERSION,
-					true
-				);
-			}
-
-			// $actions['contentsync_export'] = "<a style='cursor:pointer;' onclick='contentSync.postExport.openModal(this);' data-post_id='" . $post->ID . " data-post_title='" . $post->post_title . "'>" . __( 'Export', 'contentsync' ) . '</a>';
-			$actions['contentsync_export'] = sprintf(
-				'<a style="cursor:pointer;" onclick="contentSync.postExport.openModal(this);" data-post_id="%s" data-post_title="%s">%s</a>',
-				$post->ID,
-				esc_attr( ( empty( $post->post_title ) ? 'post' : $post->post_title ) ),
-				esc_html__( 'Export', 'contentsync' )
-			);
+		if ( ! self::is_current_screen_supported() ) {
+			return $actions;
 		}
+
+		$actions['contentsync_export'] = sprintf(
+			'<a style="cursor:pointer;" onclick="contentSync.postExport.openModal(this);" data-post_id="%s" data-post_title="%s">%s</a>',
+			$post->ID,
+			esc_attr( ( empty( $post->post_title ) ? 'post' : $post->post_title ) ),
+			esc_html__( 'Export', 'contentsync' )
+		);
 
 		return $actions;
-	}
-
-	/**
-	 * Add import button via javascript
-	 */
-	public function add_import_page_title_action() {
-
-		if ( ! self::is_current_screen_supported() || ! current_user_can( 'edit_others_posts' ) ) {
-			return;
-		}
-
-		wp_register_script(
-			'contentSync-postExport',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Transfer/assets/contentSync.postExport.js',
-			array( 'jquery', 'contentSync-utils', 'contentSync-Modal', 'contentSync-AjaxHandler', 'contentSync-SnackBar' ),
-			CONTENTSYNC_VERSION
-		);
-		wp_enqueue_script( 'contentSync-postExport' );
-
-		wp_add_inline_script(
-			'contentSync-postExport',
-			'jQuery(function() {
-				contentSync.overlay.addPageTitleAction( "⬇&nbsp;' . __( 'Import', 'contentsync' ) . '", { onclick: "contentSync.postExport.openImport();" } );
-			});',
-			'after'
-		);
 	}
 
 	/**
