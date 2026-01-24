@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Post Export Endpoint Class
  */
-class Post_Export extends Admin_Endpoint_Base {
+class Post_Export_Endpoint extends Admin_Endpoint_Base {
 
 	/**
 	 * REST base for this endpoint.

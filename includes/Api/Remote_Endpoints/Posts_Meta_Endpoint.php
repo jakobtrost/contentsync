@@ -17,7 +17,7 @@ use Contentsync\Utils\Multisite_Manager;
 
 defined( 'ABSPATH' ) || exit;
 
-class Posts_Meta extends Remote_Endpoint_Base {
+class Posts_Meta_Endpoint extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor

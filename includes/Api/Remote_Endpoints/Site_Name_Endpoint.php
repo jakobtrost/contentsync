@@ -8,7 +8,7 @@ namespace Contentsync\Api\Remote_Endpoints;
 
 defined( 'ABSPATH' ) || exit;
 
-class Site_Name extends Remote_Endpoint_Base {
+class Site_Name_Endpoint extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor

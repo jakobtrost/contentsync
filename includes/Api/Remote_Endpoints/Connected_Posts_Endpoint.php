@@ -24,7 +24,7 @@ use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-class Connected_Posts extends Remote_Endpoint_Base {
+class Connected_Posts_Endpoint extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor

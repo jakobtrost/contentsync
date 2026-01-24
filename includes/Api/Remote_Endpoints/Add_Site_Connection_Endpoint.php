@@ -11,7 +11,7 @@ use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-class Add_Site_Connection extends Remote_Endpoint_Base {
+class Add_Site_Connection_Endpoint extends Remote_Endpoint_Base {
 
 	/**
 	 * Class constructor
