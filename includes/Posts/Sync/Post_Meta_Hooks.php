@@ -31,7 +31,7 @@ class Post_Meta_Hooks extends Hooks_Base {
 	 */
 	public function adjust_synced_post_status_after_import( $post_id, $post ) {
 
-		$gid = get_gid( $post_id );
+		$gid = Synced_Post_Utils::get_gid( $post_id );
 		if ( empty( $gid ) ) {
 			return;
 		}

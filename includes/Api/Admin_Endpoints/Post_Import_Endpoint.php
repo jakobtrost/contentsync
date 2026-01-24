@@ -12,8 +12,8 @@
 
 namespace Contentsync\Api\Admin_Endpoints;
 
-use Contentsync\Admin\Transfer\Post_Conflict_Handler;
-use Contentsync\Posts\Transfer\Post_Import as Post_Import_Service;
+use Contentsync\Admin\Views\Transfer\Post_Conflict_Handler;
+use Contentsync\Posts\Transfer\Post_Import;
 use Contentsync\Utils\Files;
 
 defined( 'ABSPATH' ) || exit;
@@ -96,7 +96,7 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'Please select a valid ZIP archive.', 'contentsync' ), 400 );
 		}
 
-		$filename = $file['name'] ?? '';
+		$filename = sanitize_file_name( $file['name'] ) ?? '';
 		$tmp_name = $file['tmp_name'] ?? '';
 		$new_file = Files::get_wp_content_folder_path( 'tmp' ) . $filename;
 
@@ -104,6 +104,7 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'Failed to save the uploaded file.', 'contentsync' ), 400 );
 		}
 
+		error_log( 'new_file: ' . $new_file );
 		$post_data = Files::get_posts_json_file_contents_from_zip( $new_file );
 
 		if ( ! is_array( $post_data ) ) {
@@ -111,7 +112,7 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 		}
 
 		$conflicts = Post_Conflict_Handler::get_conflicting_post_options( $post_data );
-		$data      = $conflicts ? $conflicts : $filename;
+		$data      = $conflicts ? $conflicts : array();
 
 		return $this->respond( $data, '', true );
 	}
@@ -125,13 +126,16 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 	public function import( $request ) {
 		set_time_limit( 5000 );
 
+		error_log( 'import params: ' . print_r( $request->get_params(), true ) );
+
 		$filename = sanitize_file_name( $request->get_param( 'filename' ) ?? '' );
 
 		if ( empty( $filename ) ) {
 			return $this->respond( false, __( 'The file name is empty.', 'contentsync' ), 400 );
 		}
 
-		$zip_file  = Files::get_wp_content_folder_path( 'tmp' ) . $filename;
+		$zip_file = Files::get_wp_content_folder_path( 'tmp' ) . $filename;
+		error_log( 'zip_file: ' . $zip_file );
 		$post_data = Files::get_posts_json_file_contents_from_zip( $zip_file );
 
 		if ( ! is_array( $post_data ) ) {
@@ -142,7 +146,7 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 		$conflicts        = (array) ( $request->get_param( 'conflicts' ) ?? array() );
 		$conflict_actions = Post_Conflict_Handler::get_conflicting_post_selections( $conflicts );
 
-		$post_import   = new Post_Import_Service(
+		$post_import   = new Post_Import(
 			$post_data,
 			array(
 				'zip_file'         => $zip_file,

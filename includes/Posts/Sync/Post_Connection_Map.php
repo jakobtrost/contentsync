@@ -6,6 +6,7 @@ use Contentsync\Api\Site_Connection;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 use Contentsync\Api\Remote_Request;
+use Contentsync\Posts\Sync\Synced_Post_Utils;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -352,7 +353,7 @@ class Post_Connection_Map {
 		foreach ( Multisite_Manager::get_all_blogs() as $blog_id => $blog_args ) {
 
 			Multisite_Manager::switch_blog( $blog_id );
-			$post = get_local_post_by_gid( $gid );
+			$post = Synced_Post_Query::get_local_post_by_gid( $gid );
 			if ( $post ) {
 				$connection_map[ $blog_id ] = self::create_array( $blog_id, $post->ID );
 			}
@@ -388,7 +389,7 @@ class Post_Connection_Map {
 			);
 		}
 
-		$gid            = get_gid( $post_id );
+		$gid            = Synced_Post_Utils::get_gid( $post_id );
 		$connection_map = self::get( $post_id );
 		$cur_net_url    = Urls::get_network_url();
 		$return         = array();

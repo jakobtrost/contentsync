@@ -1,7 +1,11 @@
 var contentSync = contentSync || {};
-const __ = typeof wp?.i18n?.__ === 'function' ? wp.i18n.__ : ( text ) => text;
 
 contentSync.postExport = new function() {
+
+	/**
+	 * i18n function
+	 */
+	const __ = typeof wp?.i18n?.__ === 'function' ? wp.i18n.__ : ( text ) => text;
 
 	/**
 	 * Modal instance
@@ -70,13 +74,8 @@ contentSync.postExport = new function() {
 	 * @param {HTMLElement} elem - Element that triggered the modal
 	 */
 	this.openModal = ( elem ) => {
-		console.log( 'openModal', elem.dataset );
 		this.postTitle = elem.dataset.post_title;
 		this.postId = parseInt( elem.dataset.post_id );
-
-		console.log( 'postTitle', this.postTitle );
-		console.log( 'postId', this.postId );
-		console.log( 'Modal', this.Modal );
 
 		this.Modal.open();
 		this.Modal.setDescription( this.Modal.config.description.replace( '%s', this.postTitle ) );
@@ -106,13 +105,10 @@ contentSync.postExport = new function() {
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
 	this.onSuccess = ( responseData, fullResponse ) => {
-		console.log( 'postExport.onSuccess: ', responseData, fullResponse );
 		this.Modal.toggleSubmitButtonBusy( false );
 		this.Modal.close();
 
 		const downloadUrl = typeof responseData === 'string' ? responseData : false;
-
-		console.log( 'downloadUrl: ', downloadUrl );
 		
 		if ( !downloadUrl ) {
 			return this.onError( __( 'Error exporting post: No download URL found', 'contentsync' ), fullResponse );
@@ -145,9 +141,6 @@ contentSync.postExport = new function() {
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
 	this.onError = ( message, fullResponse ) => {
-		console.log( 'postExport.onError: ', message, fullResponse );
-		this.Modal.toggleSubmitButtonBusy( false );
-
 		contentSync.tools.addSnackBar( {
 			text: __( 'Error exporting post: %s', 'contentsync' ).replace( '%s', message ),
 			type: 'error'

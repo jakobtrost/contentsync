@@ -60,9 +60,9 @@ class Synced_Post_Hooks extends Hooks_Base {
 			 *
 			 * @return string $gid   The modified GID for conflict resolution.
 			 */
-			$gid = apply_filters( 'filter_gid_for_conflict_action', get_gid( $post ), $post->ID, (object) $post );
+			$gid = apply_filters( 'filter_gid_for_conflict_action', Synced_Post_Utils::get_gid( $post ), $post->ID, (object) $post );
 
-			$existing_post = get_local_post_by_gid( $gid, $post->post_type );
+			$existing_post = Synced_Post_Query::get_local_post_by_gid( $gid, $post->post_type );
 			if ( $existing_post ) {
 
 				$action = isset( $post->is_root_post ) && $post->is_root_post ? 'replace' : 'skip';
@@ -91,11 +91,11 @@ class Synced_Post_Hooks extends Hooks_Base {
 
 		foreach ( $conflicts as $post_id => $post ) {
 
-			$current_gid = get_gid( $post->ID );
-			$import_gid  = get_gid( $all_posts[ $post_id ] );
+			$current_gid = Synced_Post_Utils::get_gid( $post->ID );
+			$import_gid  = Synced_Post_Utils::get_gid( $all_posts[ $post_id ] );
 
 			// remove the conflict if it is the same synced post
-			if ( get_synced_post( $current_gid ) && $current_gid === $import_gid ) {
+			if ( Synced_Post_Query::get_synced_post( $current_gid ) && $current_gid === $import_gid ) {
 				unset( $conflicts[ $post_id ] );
 			}
 		}

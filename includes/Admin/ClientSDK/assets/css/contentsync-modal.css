@@ -2,7 +2,7 @@
  * Description
  */
 .contentsync-modal .components-modal__description {
-	margin-block: 0;
+	margin-block: 0 8px;
 }
 
 /**
@@ -10,16 +10,19 @@
  */
 .contentsync-modal .components-panel__body {
 	border: none;
-	padding-block: 16px;
+	padding-block: 0 16px;
 }
 
 .contentsync-modal .components-panel__body-form {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	margin-block: 8px;
+	padding-block: 8px;
 }
 
+/**
+ * Checkbox control
+ */
 .contentsync-modal .components-panel__body-form .components-checkbox-control {
 	display: flex;
 	flex-direction: row;
@@ -42,8 +45,72 @@
 	max-width: calc(100% - var(--checkbox-input-margin) - var(--checkbox-input-size));
 }
 
+/**
+ * File upload control
+ */
+.contentsync-modal .components-form-file-upload,
+.contentsync-modal .components-panel__row label.components-button {
+	max-width: 100%;
+}
+
+.contentsync-modal .components-form-file-upload__button-label {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	max-width: calc(100% - 24px);
+	overflow: hidden;
+}
+
 .contentsync-modal .components-panel__body .contentsync-info-box {
 	margin-block: 8px 0;
+}
+
+.contentsync-modal input[type='file'],
+.contentsync-modal .components-panel__row:has(> .hidden:first-child:last-child) {
+	height: 0;
+	min-height: 0;
+	overflow: hidden;
+	opacity: 0;
+}
+
+/**
+ * Custom control
+ */
+.contentsync-modal .components-custom-control {
+	width: 100%;
+}
+
+/**
+ * Post conflicts container
+ */
+.contentsync-modal .post-conflicts-container .spinner {
+	margin-top: 0;
+}
+
+.contentsync-modal .components-panel__row:has(.post-conflicts-container:empty) {
+	display: none;
+}
+
+.contentsync-modal .posts-conflicts-inner-container {
+	width: calc(100% + 64px);
+	margin: -4px -32px;
+	padding: 10px 32px;
+	background-color: #fbfbfb;
+	border-top: 1px solid #d0d0d0;
+	border-bottom: 1px solid #d0d0d0;
+	max-height: 300px;
+	overflow: auto;
+}
+
+.contentsync-modal .post-conflicts-container .post-conflict {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+}
+
+.contentsync-modal .post-conflicts-container .post-conflict span {
+	flex: 1;
 }
 
 /**

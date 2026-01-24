@@ -82,6 +82,7 @@ class Modal {
 
 		// Create main content wrapper
 		const mainContent = document.createElement( 'div' );
+		mainContent.className = 'components-modal__main-content';
 
 		// Create description
 		if ( this.config.description ) {
@@ -200,6 +201,8 @@ class Modal {
 					row.appendChild( this.renderCheckboxInput( input ) );
 				} else if ( input.type === 'custom' ) {
 					row.appendChild( this.renderCustomInput( input ) );
+				} else if ( input.type === 'file' ) {
+					row.appendChild( this.renderFileInput( input ) );
 				}
 
 				form.appendChild( row );
@@ -277,6 +280,63 @@ class Modal {
 		return control;
 	}
 
+	renderFileInput( input ) {
+
+		const fileInput = document.createElement( 'input' );
+		fileInput.type = 'file';
+		fileInput.name = input.name;
+		fileInput.id = `${input.name}__input`;
+		fileInput.title = input.title || 'Select file';
+		fileInput.accept = input.accept || 'zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed';
+		fileInput.value = input.value || '';
+
+		const fileUpload = document.createElement( 'div' );
+		fileUpload.className = 'components-form-file-upload';
+		fileUpload.id = `${input.name}__upload`;
+		const button = this.renderFileUploadButton( input );
+		fileUpload.appendChild( button );
+		fileUpload.appendChild( fileInput );
+
+
+		fileInput.addEventListener( 'change', ( e ) => {
+			console.log( 'fileInput.change: ', e );
+			const file = e.target.files && e.target.files[ 0 ];
+			if ( file ) {
+				document.getElementById( `${input.name}__upload` ).classList.add( 'hidden' );
+			} else {
+				document.getElementById( `${input.name}__upload` ).classList.remove( 'hidden' );
+			}
+		} );
+
+		return fileUpload;
+	}
+
+	renderFileUploadButton( input ) {
+		const button = document.createElement( 'label' );
+		button.htmlFor = `${input.name}__input`;
+		button.className = 'components-button has-text has-icon is-secondary';
+
+		const labelSpan = document.createElement( 'span' );
+		labelSpan.className = 'components-form-file-upload__button-label';
+		labelSpan.textContent = input.label || 'Upload';
+		button.appendChild( labelSpan );
+
+		const svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
+		svg.setAttribute( 'xmlns', 'http://www.w3.org/2000/svg' );
+		svg.setAttribute( 'viewBox', '0 0 24 24' );
+		svg.setAttribute( 'width', '24' );
+		svg.setAttribute( 'height', '24' );
+		svg.setAttribute( 'aria-hidden', 'true' );
+		svg.setAttribute( 'focusable', 'false' );
+
+		const path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+		path.setAttribute( 'd', 'M18.5 15v3.5H13V6.7l4.5 4.1 1-1.1-6.2-5.8-5.8 5.8 1 1.1 4-4v11.7h-6V15H4v5h16v-5z' );
+		svg.appendChild( path );
+		button.appendChild( svg );
+
+		return button;
+	}
+
 	/**
 	 * Render a custom input
 	 * @param {Object} input - Custom input config
@@ -285,12 +345,7 @@ class Modal {
 	renderCustomInput( input ) {
 		const control = document.createElement( 'div' );
 		control.className = 'components-base-control components-custom-control';
-
-		const container = document.createElement( 'div' );
-		container.className = 'components-custom-control__input-container';
-		container.innerHTML = input.content || '';
-
-		control.appendChild( container );
+		control.innerHTML = input.content || '';
 
 		return control;
 	}
@@ -363,11 +418,17 @@ class Modal {
 		const cancelButton = document.createElement( 'button' );
 		cancelButton.type = 'button';
 		cancelButton.className = 'components-button components-flex-item is-tertiary';
-		if ( this.config.buttons && this.config.buttons.cancel && this.config.buttons.cancel.classes ) {
-			cancelButton.className = `components-button components-flex-item ${this.config.buttons.cancel.classes}`;
+		if ( this.config?.buttons?.cancel?.classNames ) {
+			cancelButton.className = `components-button components-flex-item ${this.config?.buttons?.cancel?.classNames}`;
 		}
 
-		cancelButton.textContent = ( this.config.buttons && this.config.buttons.cancel && this.config.buttons.cancel.text ) || 'Cancel';
+		if ( this.config?.buttons?.cancel?.attributes ) {
+			Object.entries( this.config?.buttons?.cancel?.attributes ).forEach( ( [ key, value ] ) => {
+				cancelButton.setAttribute( key, value );
+			} );
+		}
+
+		cancelButton.textContent = ( this.config?.buttons?.cancel?.text ) || 'Cancel';
 		cancelButton.dataset.action = 'cancel';
 		footer.appendChild( cancelButton );
 
@@ -375,11 +436,17 @@ class Modal {
 		const submitButton = document.createElement( 'button' );
 		submitButton.type = 'button';
 		submitButton.className = 'components-button components-flex-item is-primary';
-		if ( this.config.buttons && this.config.buttons.submit && this.config.buttons.submit.classes ) {
-			submitButton.className = `components-button components-flex-item ${this.config.buttons.submit.classes}`;
+		if ( this.config?.buttons?.submit?.classNames ) {
+			submitButton.className = `components-button components-flex-item ${this.config?.buttons?.submit?.classNames}`;
 		}
 
-		submitButton.textContent = ( this.config.buttons && this.config.buttons.submit && this.config.buttons.submit.text ) || 'Submit';
+		if ( this.config?.buttons?.submit?.attributes ) {
+			Object.entries( this.config?.buttons?.submit?.attributes ).forEach( ( [ key, value ] ) => {
+				submitButton.setAttribute( key, value );
+			} );
+		}
+
+		submitButton.textContent = ( this.config?.buttons?.submit?.text ) || 'Submit';
 		submitButton.dataset.action = 'submit';
 		footer.appendChild( submitButton );
 
@@ -547,11 +614,18 @@ class Modal {
 		if ( descriptionParagraph ) {
 			descriptionParagraph.innerHTML = text;
 		}
+		else {
+			const description = this.renderDescription();
+			description.innerHTML = text;
+			const mainContent = this.modalElement.querySelector( '.components-modal__main-content' );
+			// append as first child
+			mainContent.insertBefore( description, mainContent.firstChild );
+		}
 	}
 
 	/**
 	 * Get form data
-	 * @returns {Object} Form data object with field names as keys
+	 * @returns {FormData|Object} Form data object with field names as keys
 	 */
 	getFormData() {
 		if ( !this.modalElement ) {
@@ -563,16 +637,27 @@ class Modal {
 			return {};
 		}
 
-		const formData = {};
-		const inputs = form.querySelectorAll( 'input[type="checkbox"], input[type="text"], input[type="number"], select, textarea' );
+		let formData;
+		const hasFileInput = form.querySelector( 'input[type="file"]' ) ? true : false;
 
-		inputs.forEach( input => {
-			if ( input.type === 'checkbox' ) {
-				formData[ input.name ] = input.checked;
-			} else {
-				formData[ input.name ] = input.value;
-			}
-		} );
+		if ( hasFileInput ) {
+			formData = new FormData( form );
+		} else {
+			formData = {};
+			const inputs = form.querySelectorAll( 'input, select, textarea' );
+			inputs.forEach( ( input ) => {
+
+				let value = input.value;
+
+				if ( input.type === 'checkbox' ) {
+					value = input.checked;
+				} else if ( input.type === 'file' ) {
+					value = input.files && input.files[ 0 ];
+				}
+
+				formData[ input.name ] = value;
+			} );
+		}
 
 		return formData;
 	}
@@ -590,6 +675,18 @@ class Modal {
 				submitButton.classList.remove( 'is-busy' );
 			}
 		}
+	}
+
+	/**
+	 * Toggle the disabled state of the submit button
+	 */
+	toggleSubmitButtonDisabled( disabled = true ) {
+		const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
+		if ( !submitButton ) {
+			return;
+		}
+
+		submitButton.disabled = disabled;
 	}
 }
 

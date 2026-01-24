@@ -58,8 +58,6 @@ class RestHandler {
 			throw new Error( 'RestHandler: restPath is required' );
 		}
 
-		console.log( 'RestHandler: constructor: ', config );
-
 		this.config = config;
 		this.restPath = config.restPath;
 
@@ -123,17 +121,11 @@ class RestHandler {
 		const url = this.getUrl();
 
 		const handleSuccess = ( body ) => {
-			console.log( '_sendJson: handleSuccess: ', body );
-
 			const status = body && typeof body.status === 'number' ? body.status : 0;
 			const data = body && body.hasOwnProperty( 'data' ) ? body.data : body;
 			const isSuccess = status >= 200 && status < 300;
 
-			console.log( '_sendJson: isSuccess: ', isSuccess );
-
 			if ( isSuccess ) {
-				console.log( 'config: ', this.config );
-				console.log( this.config.onSuccess, typeof this.config.onSuccess === 'function' );
 				if ( this.config.onSuccess && typeof this.config.onSuccess === 'function' ) {
 					this.config.onSuccess.call( this, data, body );
 				}
@@ -146,8 +138,8 @@ class RestHandler {
 		};
 
 		const handleError = ( err ) => {
-			console.log( '_sendJson: handleError: ', err );
 			const msg = ( err && err.message ) ? err.message : ( err && err.code ) ? err.code : 'Request failed';
+			console.error( 'Rest API Error: ', msg, err );
 			const full = err || {};
 			if ( this.config.onError && typeof this.config.onError === 'function' ) {
 				this.config.onError.call( this, msg, full );
@@ -161,7 +153,6 @@ class RestHandler {
 				data,
 				parse: true,
 			} ).then( ( body ) => {
-				console.log( '_sendJson: wp.apiFetch response body: ', body );
 				handleSuccess( body );
 
 				return body;
@@ -178,7 +169,6 @@ class RestHandler {
 			credentials: 'same-origin',
 			...this.requestOptions,
 		} ).then( ( res ) => res.json() ).then( ( body ) => {
-			console.log( '_sendJson: fetch response body: ', body );
 			const status = body && typeof body.status === 'number' ? body.status : 0;
 			if ( status >= 400 || status < 200 ) {
 				handleError( { message: ( body && body.message ) || 'Request failed', ...( body || {} ) } );
@@ -199,6 +189,14 @@ class RestHandler {
 		const url = this.getUrl();
 		const self = this;
 
+		if ( data instanceof FormData ) {
+			for ( const [ key, value ] of data.entries() ) {
+				console.log( 'formData[', key, ']: ', value );
+			}
+		} else {
+			console.log( 'data: ', data );
+		}
+
 		return jQuery.ajax( {
 			url,
 			method: 'POST',
@@ -212,7 +210,6 @@ class RestHandler {
 			},
 			...this.requestOptions,
 		} ).then( function( body ) {
-			console.log( '_sendFormData: jQuery.ajax response body: ', body );
 			if ( typeof body === 'string' ) {
 				try {
 					body = JSON.parse( body );
@@ -239,7 +236,6 @@ class RestHandler {
 				}
 			}
 		} ).fail( function( jqXHR ) {
-			console.log( '_sendFormData: jQuery.ajax error: ', jqXHR );
 			let msg = ( jqXHR && jqXHR.statusText ) ? jqXHR.statusText : 'Request failed';
 			let full = jqXHR || {};
 			if ( jqXHR && jqXHR.responseJSON ) {

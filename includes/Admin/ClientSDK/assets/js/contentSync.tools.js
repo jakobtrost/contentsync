@@ -18,7 +18,7 @@ contentSync.tools = new function() {
 			let url       = args.url ? ` href='${args.url}'` : '';
 			let id        = args.id  ? ` id='${args.id}'` : '';
 			let onclick   = args.onclick ? ` onclick='${args.onclick}'` : '';
-			$( 'hr.wp-header-end' ).before( `<a class='button-ghost page-title-action ${className}'${id}${url}${onclick}>${label}</a>` );
+			document.querySelector( 'hr.wp-header-end' ).insertAdjacentHTML( 'beforebegin', `<button class='button-ghost page-title-action ${className}'${id}${url}${onclick}>${label}</button>` );
 		}
 	};
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Contentsync\Admin\Transfer;
+namespace Contentsync\Admin\Views\Transfer;
 
-use Contentsync\Posts\Sync\Post_Transfer_Service;
+use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Posts\Sync\Synced_Post_Query;
 use Contentsync\Utils\Urls;
 
@@ -81,7 +81,7 @@ class Post_Conflict_Handler {
 				);
 			}
 			// we don't set keys to keep the order when decoding the array to JS
-			return json_encode( array_values( $conflicts ) );
+			return array_values( $conflicts );
 		}
 		return false;
 	}

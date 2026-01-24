@@ -10,7 +10,7 @@
 
 namespace Contentsync\Admin\Ajax\Handler;
 
-use Contentsync\Admin\Transfer\Post_Conflict_Handler;
+use Contentsync\Admin\Views\Transfer\Post_Conflict_Handler;
 
 defined( 'ABSPATH' ) || exit;
 
