@@ -151,7 +151,7 @@ class Files {
 	/**
 	 * Get path to the contentsync export folder. Use this path to write files.
 	 *
-	 * @param string $folder Folder inside wp-content/contentsync/
+	 * @param string $folder Folder inside wp-content/contentsync-exports/
 	 *
 	 * @return string $path
 	 */
@@ -162,7 +162,7 @@ class Files {
 
 		if ( ! $path ) {
 
-			$path = WP_CONTENT_DIR . '/contentsync';
+			$path = WP_CONTENT_DIR . '/contentsync-exports';
 
 			if ( ! file_exists( $path ) ) {
 				Logger::add( sprintf( '  - create folder "%s".', $path ) );
