@@ -41,7 +41,7 @@ contentSync.exportPostModal = new function() {
 		onOpen: () => {
 			this.setDescription();
 		},
-		onConfirm: () => {
+		onSubmit: () => {
 			this.exportPostData();
 		}
 	};
@@ -64,7 +64,7 @@ contentSync.exportPostModal = new function() {
 	 */
 	this.exportPostData = () => {
 		console.log( 'exportPostData' );
-		this.modal.toggleConfirmButtonBusy( true );
+		this.modal.toggleSubmitButtonBusy( true );
 	};
 };
 

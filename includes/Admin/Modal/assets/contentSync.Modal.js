@@ -60,7 +60,7 @@ class Modal {
 
 		// Create wrapper
 		const wrapper = document.createElement( 'div' );
-		wrapper.className = 'components-modal__screen-overlay contentSync-modal';
+		wrapper.className = 'components-modal__screen-overlay contentsync-modal';
 		wrapper.id = `${modalId}__wrapper`;
 
 		// Create frame
@@ -175,7 +175,7 @@ class Modal {
 	renderDescription() {
 		const description = document.createElement( 'p' );
 		description.className = 'components-modal__description';
-		description.textContent = this.config.description || '';
+		description.innerHTML = this.config.description || '';
 
 		return description;
 	}
@@ -332,7 +332,7 @@ class Modal {
 
 		// Create info box structure matching Admin_Render::make_admin_info_box
 		const notice = document.createElement( 'div' );
-		notice.className = `contentSync-info-box ${styling}`.trim();
+		notice.className = `contentsync-info-box ${styling}`.trim();
 
 		// Icon span
 		const iconSpan = document.createElement( 'span' );
@@ -371,7 +371,7 @@ class Modal {
 		cancelButton.dataset.action = 'cancel';
 		footer.appendChild( cancelButton );
 
-		// Confirm button
+		// Submit button
 		const submitButton = document.createElement( 'button' );
 		submitButton.type = 'button';
 		submitButton.className = 'components-button components-flex-item is-primary';
@@ -379,7 +379,7 @@ class Modal {
 			submitButton.className = `components-button components-flex-item ${this.config.buttons.submit.classes}`;
 		}
 
-		submitButton.textContent = ( this.config.buttons && this.config.buttons.submit && this.config.buttons.submit.text ) || 'Confirm';
+		submitButton.textContent = ( this.config.buttons && this.config.buttons.submit && this.config.buttons.submit.text ) || 'Submit';
 		submitButton.dataset.action = 'submit';
 		footer.appendChild( submitButton );
 
@@ -486,16 +486,16 @@ class Modal {
 			cancelButton.addEventListener( 'click', this.boundHandlers.handleCancel );
 		}
 
-		// Confirm button handler
+		// Submit button handler
 		const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
 		if ( submitButton ) {
-			this.boundHandlers.handleConfirm = () => {
-				if ( this.config.onConfirm && typeof this.config.onConfirm === 'function' ) {
-					this.config.onConfirm.call( this );
+			this.boundHandlers.handleSubmit = () => {
+				if ( this.config.onSubmit && typeof this.config.onSubmit === 'function' ) {
+					this.config.onSubmit.call( this );
 				}
 			};
 
-			submitButton.addEventListener( 'click', this.boundHandlers.handleConfirm );
+			submitButton.addEventListener( 'click', this.boundHandlers.handleSubmit );
 		}
 	}
 
@@ -525,8 +525,8 @@ class Modal {
 			}
 
 			const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
-			if ( submitButton && this.boundHandlers.handleConfirm ) {
-				submitButton.removeEventListener( 'click', this.boundHandlers.handleConfirm );
+			if ( submitButton && this.boundHandlers.handleSubmit ) {
+				submitButton.removeEventListener( 'click', this.boundHandlers.handleSubmit );
 			}
 		}
 
@@ -545,7 +545,7 @@ class Modal {
 
 		const descriptionParagraph = this.modalElement.querySelector( '.components-modal__description' );
 		if ( descriptionParagraph ) {
-			descriptionParagraph.textContent = text;
+			descriptionParagraph.innerHTML = text;
 		}
 	}
 
@@ -580,7 +580,7 @@ class Modal {
 	/**
 	 * Toggle the busy state of the submit button
 	 */
-	toggleConfirmButtonBusy( busy = true ) {
+	toggleSubmitButtonBusy( busy = true ) {
 		const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
 		if ( submitButton ) {
 			submitButton.disabled = busy;
