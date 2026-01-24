@@ -37,7 +37,7 @@ abstract class Post_Transfer_Base {
 	 *
 	 * @return array The parsed arguments.
 	 */
-	protected function parse_arguments( $arguments ) {
+	private function parse_arguments( $arguments ) {
 		return $arguments;
 	}
 

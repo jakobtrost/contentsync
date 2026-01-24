@@ -2,6 +2,7 @@
 
 namespace Contentsync\Posts\Transfer;
 
+use Contentsync\Utils\Logger;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Posts\Sync\Post_Meta_Hooks;
 use Contentsync\Translations\Translation_Manager;
