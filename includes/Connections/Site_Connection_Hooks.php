@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Api;
+namespace Contentsync\Connections;
 
 use Contentsync\Utils\Hooks_Base;
 

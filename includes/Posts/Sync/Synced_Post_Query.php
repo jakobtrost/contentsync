@@ -9,7 +9,7 @@
 
 namespace Contentsync\Posts\Sync;
 
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Posts\Theme_Posts;
 use Contentsync\Posts\Transfer\Post_Export;

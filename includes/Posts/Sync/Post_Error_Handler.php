@@ -8,7 +8,7 @@
 
 namespace Contentsync\Posts\Sync;
 
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 

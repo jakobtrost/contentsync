@@ -23,7 +23,7 @@ use Contentsync\Posts\Sync\Synced_Post_Service;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Admin\Views\Cluster\Cluster_List_Table;
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 
 defined( 'ABSPATH' ) || exit;
 

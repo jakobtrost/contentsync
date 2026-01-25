@@ -8,7 +8,7 @@
 namespace Contentsync\Admin\Views\Connections;
 
 use Contentsync\Admin\Utils\Admin_Render;
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Urls;
 use Contentsync\Api\Remote_Request;
 

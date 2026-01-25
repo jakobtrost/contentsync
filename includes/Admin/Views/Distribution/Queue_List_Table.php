@@ -10,7 +10,7 @@ namespace Contentsync\Admin\Views\Distribution;
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Distribution\Distribution_Item_Service;
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;

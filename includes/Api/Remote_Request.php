@@ -14,7 +14,7 @@
 
 namespace Contentsync\Api;
 
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Urls;
 

@@ -6,7 +6,7 @@
  */
 namespace Contentsync\Api\Remote_Endpoints;
 
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;

@@ -10,7 +10,7 @@ namespace Contentsync\Admin\Views\Cluster;
 use Contentsync\Admin\Utils\Admin_Posts;
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Cluster\Cluster_Service;
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 
 defined( 'ABSPATH' ) || exit;
 
