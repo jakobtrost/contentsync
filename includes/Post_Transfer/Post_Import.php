@@ -3,7 +3,7 @@
 namespace Contentsync\Post_Transfer;
 
 use WP_Error;
-use Contentsync\Posts\Sync\Post_Meta_Hooks;
+use Contentsync\Post_Sync\Post_Meta_Hooks;
 use Contentsync\Utils\Files;
 use Contentsync\Utils\Logger;
 use Contentsync\Translations\Translation_Manager;

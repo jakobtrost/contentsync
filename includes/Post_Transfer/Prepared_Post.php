@@ -4,7 +4,7 @@ namespace Contentsync\Post_Transfer;
 
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Post_Query;
-use Contentsync\Posts\Sync\Post_Meta_Hooks;
+use Contentsync\Post_Sync\Post_Meta_Hooks;
 use Contentsync\Translations\Translation_Manager;
 
 defined( 'ABSPATH' ) || exit;

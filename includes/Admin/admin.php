@@ -14,13 +14,13 @@
 
 namespace Contentsync\Admin;
 
-use Contentsync\Posts\Sync\Post_Error_Handler;
+use Contentsync\Post_Sync\Post_Error_Handler;
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Cluster\Cluster_Service;
-use Contentsync\Posts\Sync\Post_Connection_Map;
-use Contentsync\Posts\Sync\Post_Meta;
-use Contentsync\Posts\Sync\Synced_Post_Service;
-use Contentsync\Posts\Sync\Synced_Post_Utils;
+use Contentsync\Post_Sync\Post_Connection_Map;
+use Contentsync\Post_Sync\Post_Meta;
+use Contentsync\Post_Sync\Synced_Post_Service;
+use Contentsync\Post_Sync\Synced_Post_Utils;
 use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Translations\Translation_Manager;

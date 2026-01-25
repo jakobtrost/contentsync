@@ -9,13 +9,13 @@
 namespace Contentsync\Admin\Views\Sync;
 
 use WP_List_Table;
-use Contentsync\Posts\Sync\Post_Error_Handler;
+use Contentsync\Post_Sync\Post_Error_Handler;
 use Contentsync\Admin\Utils\Admin_Render;
-use Contentsync\Posts\Sync\Post_Connection_Map;
-use Contentsync\Posts\Sync\Post_Meta;
-use Contentsync\Posts\Sync\Synced_Post_Service;
-use Contentsync\Posts\Sync\Synced_Post_Query;
-use Contentsync\Posts\Sync\Synced_Post_Utils;
+use Contentsync\Post_Sync\Post_Connection_Map;
+use Contentsync\Post_Sync\Post_Meta;
+use Contentsync\Post_Sync\Synced_Post_Service;
+use Contentsync\Post_Sync\Synced_Post_Query;
+use Contentsync\Post_Sync\Synced_Post_Utils;
 use Contentsync\Connections\Site_Connection;
 use Contentsync\Theme_Posts\Theme_Posts_Service;
 use Contentsync\Post_Transfer\Post_Transfer_Service;
@@ -1060,7 +1060,7 @@ class Global_List_Table extends WP_List_Table {
 				// continue;
 				// }
 
-				// $result = \Contentsync\Posts\Sync\import_synced_post( $gid );
+				// $result = \Contentsync\Post_Sync\import_synced_post( $gid );
 				// if ( $result === true && $post = get_post( $result ) ) {
 				// $post_titles[] = $post->post_title;
 				// }

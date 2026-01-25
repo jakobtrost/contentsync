@@ -14,9 +14,9 @@
  */
 namespace Contentsync\Api\Remote_Endpoints;
 
-use Contentsync\Posts\Sync\Post_Connection_Map;
-use Contentsync\Posts\Sync\Synced_Post_Query;
-use Contentsync\Posts\Sync\Synced_Post_Utils;
+use Contentsync\Post_Sync\Post_Connection_Map;
+use Contentsync\Post_Sync\Synced_Post_Query;
+use Contentsync\Post_Sync\Synced_Post_Utils;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 
@@ -97,7 +97,7 @@ class Posts_Endpoint extends Remote_Endpoint_Base {
 		$args = isset( $request['args'] ) ? $request['args'] : null;
 
 		$posts = $this->get_synced_posts_for_endpoint( $args );
-		// $posts = \Contentsync\Posts\Sync\get_all_synced_posts_from_current_network();
+		// $posts = \Contentsync\Post_Sync\get_all_synced_posts_from_current_network();
 
 		$message = 'No synced posts found on this stage';
 		if ( $posts ) {

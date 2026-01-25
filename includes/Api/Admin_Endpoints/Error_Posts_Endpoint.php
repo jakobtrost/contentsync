@@ -12,7 +12,7 @@
 
 namespace Contentsync\Api\Admin_Endpoints;
 
-use Contentsync\Posts\Sync\Post_Error_Handler;
+use Contentsync\Post_Sync\Post_Error_Handler;
 
 defined( 'ABSPATH' ) || exit;
 

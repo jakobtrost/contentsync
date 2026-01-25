@@ -3,7 +3,7 @@
 namespace Contentsync\Admin\Views\Transfer;
 
 use Contentsync\Admin\Utils\Admin_Render;
-use Contentsync\Posts\Sync\Synced_Post_Query;
+use Contentsync\Post_Sync\Synced_Post_Query;
 use Contentsync\Post_Transfer\Post_Export;
 use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Translations\Translation_Manager;

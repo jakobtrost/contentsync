@@ -161,7 +161,7 @@ class Remote_Request {
 	/**
 	 * Delete all connected posts of a synced post from a certain connection
 	 *
-	 * @see \Contentsync\Posts\Sync\delete_root_post_and_connected_posts()
+	 * @see \Contentsync\Post_Sync\delete_root_post_and_connected_posts()
 	 *
 	 * @param array|string $connection_or_site_url
 	 * @param string       $gid               Global ID of the root post with an appended network_url.
@@ -448,7 +448,7 @@ class Remote_Request {
 	 * @return string Encoded GID safe for use in URLs.
 	 */
 	public static function prepare_gid_for_url( $gid ) {
-		// list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
+		// list( $blog_id, $post_id, $net_url ) = \Contentsync\Post_Sync\explode_gid( $gid );
 		// $_gid  = $blog_id . '-' . $post_id;
 		return urlencode( str_replace( '/', '-', $gid ) );
 	}

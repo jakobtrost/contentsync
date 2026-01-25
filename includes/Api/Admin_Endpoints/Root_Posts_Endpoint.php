@@ -13,8 +13,8 @@
 
 namespace Contentsync\Api\Admin_Endpoints;
 
-use Contentsync\Posts\Sync\Post_Connection_Map;
-use Contentsync\Posts\Sync\Synced_Post_Service;
+use Contentsync\Post_Sync\Post_Connection_Map;
+use Contentsync\Post_Sync\Synced_Post_Service;
 use Contentsync\Utils\Multisite_Manager;
 
 defined( 'ABSPATH' ) || exit;

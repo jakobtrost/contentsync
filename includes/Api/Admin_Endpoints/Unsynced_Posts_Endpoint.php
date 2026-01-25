@@ -13,11 +13,11 @@
 
 namespace Contentsync\Api\Admin_Endpoints;
 
-use Contentsync\Posts\Sync\Post_Connection_Map;
-use Contentsync\Posts\Sync\Post_Meta;
-use Contentsync\Posts\Sync\Synced_Post_Service;
-use Contentsync\Posts\Sync\Synced_Post_Query;
-use Contentsync\Posts\Sync\Synced_Post_Utils;
+use Contentsync\Post_Sync\Post_Connection_Map;
+use Contentsync\Post_Sync\Post_Meta;
+use Contentsync\Post_Sync\Synced_Post_Service;
+use Contentsync\Post_Sync\Synced_Post_Query;
+use Contentsync\Post_Sync\Synced_Post_Utils;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
