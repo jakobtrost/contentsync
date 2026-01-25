@@ -26,13 +26,6 @@ contentSync.postSync = new function() {
 				this.checkSimilarPosts( post_id );
 			}
 		}
-
-		// connection options
-		if ( $( '.contentsync_connection_options' ).length ) {
-			this.initConnectionOptions();
-		}
-
-
 	};
 
 	/**
@@ -753,73 +746,6 @@ contentSync.postSync = new function() {
 				}
 			}
 		);
-	};
-
-	/**
-	 * Make export options editable for root posts
-	 */
-	this.initConnectionOptions = function () {
-
-		var timeout = null;
-		var saving = false;
-
-		// show the button when an option is changed
-		$( '.contentsync_connection_options label' ).on( 'click', function () {
-			if ( !saving ) {
-				$( this ).siblings( '.button' ).removeClass( 'hidden' );
-			}
-		} );
-
-		// save the options
-		$( '.contentsync_connection_options .button' ).on( 'click', function () {
-
-			// not multiple actions at once
-			if ( saving ) {
-				console.log( 'saving in progress...' );
-
-				return;
-			} else {
-				saving = true;
-			}
-
-			var button = $( this );
-			var wrapper = button.closest( '.contentsync_connection_options' );
-			var site_url = wrapper.data( 'site_url' );
-			var contents = wrapper.find( 'input[name=\'contents\']' ).is( ':checked' );
-			var search = wrapper.find( 'input[name=\'search\']' ).is( ':checked' );
-
-			button.addClass( 'loading' );
-
-			$.post(
-				greyd.ajax_url ?? wizzard_details.ajax_url,
-				{
-					'action': 'contentsync_ajax',
-					'_ajax_nonce': greyd.nonce ?? wizzard_details.nonce,
-					'mode': 'global_action',
-					'data': {
-						'action': 'contentsync_update_site_connections',
-						'site_url': site_url,
-						'contents': contents,
-						'search': search,
-					}
-				},
-				function ( response ) {
-					console.log( response );
-
-					var success = response.indexOf( 'success::' ) > -1;
-
-					button.addClass( success ? 'success' : 'fail button-danger' );
-
-					// reset
-					clearTimeout( timeout );
-					timeout = setTimeout( function () {
-						button.removeClass( 'success fail button-danger loading' );
-						if ( success ) button.addClass( 'hidden' );
-						saving = false;
-					}, 1500 );
-				}
-			);
-		} );
 	};
 
 	/**
