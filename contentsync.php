@@ -33,9 +33,6 @@ if ( ! defined( 'CONTENTSYNC_REST_NAMESPACE' ) ) {
 	define( 'CONTENTSYNC_REST_NAMESPACE', 'contentsync/v1' );
 }
 
-// require_once __DIR__ . '/includes/Utils/File_Loader_Logger.php';
-// Utils\File_Loader_Logger::init();
-
 // Load Composer autoloader for PSR-4 autoloading.
 require_once __DIR__ . '/vendor/autoload.php';
 
