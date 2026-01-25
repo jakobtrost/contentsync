@@ -6,7 +6,7 @@
  * @extends WP_List_Table ( wp-admin/includes/class-wp-list-table.php )
  */
 
-namespace Contentsync\Admin\Views\Sync;
+namespace Contentsync\Admin\Views\Post_Sync;
 
 use WP_List_Table;
 use Contentsync\Post_Sync\Post_Error_Handler;

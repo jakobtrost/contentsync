@@ -1,9 +1,9 @@
 <?php
 
-namespace Contentsync\Admin\Views\Sync;
+namespace Contentsync\Admin\Views\Post_Sync;
 
 use Contentsync\Utils\Hooks_Base;
-use Contentsync\Admin\Views\Sync\Global_List_Table;
+use Contentsync\Admin\Views\Post_Sync\Global_List_Table;
 
 defined( 'ABSPATH' ) || exit;
 
