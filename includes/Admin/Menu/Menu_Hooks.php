@@ -10,6 +10,7 @@ class Menu_Hooks extends Hooks_Base {
 
 		add_action( 'admin_menu', array( $this, 'add_main_plugin_menu_item' ), 3 );
 		add_action( 'network_admin_menu', array( $this, 'add_main_plugin_menu_item' ), 3 );
+		add_action( 'admin_menu', array( $this, 'add_submenu_items_to_network' ), 90 );
 
 		add_action( 'admin_bar_menu', array( $this, 'add_network_adminbar_items' ), 11 );
 
@@ -48,6 +49,33 @@ class Menu_Hooks extends Hooks_Base {
 	 */
 	public function add_screen_options() {
 		do_action( 'contentsync_add_main_plugin_page_screen_options' );
+	}
+
+	/**
+	 * Add the submenu items to the network admin.
+	 */
+	public function add_submenu_items_to_network() {
+
+		if ( ! is_multisite() || ! is_super_admin() ) {
+			return;
+		}
+
+		/**
+		 * add ghost item to display it as a line using
+		 *
+		 * @see assets/admin-menu.css
+		 */
+		add_submenu_page( 'contentsync', '', '', 'manage_options', '', '', 90 );
+
+		add_submenu_page(
+			'contentsync', // parent slug
+			__( 'Network Posts', 'contentsync' ),  // page title
+			'→ ' . __( 'Network Posts', 'contentsync' ), // menu title
+			'manage_options', // capability
+			network_admin_url( 'admin.php?page=contentsync' ), // slug
+			'', // function
+			91 // position
+		);
 	}
 
 	/**

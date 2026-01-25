@@ -78,17 +78,17 @@ class Cluster_Page_Hooks extends Hooks_Base {
 	 */
 	function add_submenu_item() {
 
-		if ( is_multisite() && ! is_super_admin() ) {
-			return;
+		if ( is_multisite() && ! is_network_admin() ) {
+			return; // dont add the normal admin link in multisites if not on the network admin
 		}
 
 		$hook = add_submenu_page(
 			'contentsync',
 			( isset( $_GET['cluster_id'] ) && is_numeric( $_GET['cluster_id'] ) ) ? __( 'Edit Cluster', 'contentsync' ) : __( 'Cluster', 'contentsync' ), // page title
-			( is_network_admin() ? '' : '→ ' ) . __( 'Cluster', 'contentsync' ), // menu title
+			__( 'Cluster', 'contentsync' ), // menu title
 			'manage_options',
-			is_network_admin() ? 'contentsync_clusters' : network_admin_url( 'admin.php?page=contentsync_clusters' ),
-			is_network_admin() ? array( $this, 'render_clusters_admin_page' ) : '',
+			'contentsync_clusters',
+			array( $this, 'render_clusters_admin_page' ),
 			self::CLUSTER_PAGE_POSITION // position
 		);
 

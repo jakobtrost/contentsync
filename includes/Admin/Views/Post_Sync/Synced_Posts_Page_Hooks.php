@@ -30,7 +30,6 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 	public function register_admin() {
 
 		add_action( 'admin_menu', array( $this, 'add_submenu_items' ), self::SYNCED_POSTS_PAGE_POSITION );
-		add_action( 'admin_menu', array( $this, 'add_submenu_items_to_network' ), 21 );
 		add_action( 'network_admin_menu', array( $this, 'add_submenu_items' ), self::SYNCED_POSTS_PAGE_POSITION );
 
 		add_action( 'load-toplevel_page_contentsync', array( $this, 'add_screen_options' ) );
@@ -51,33 +50,6 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 			'contentsync', // by making the page slug the same as parent, this becomes the first submenu item
 			array( $this, 'render_sync_overview_page' )
 		);
-	}
-
-	/**
-	 * Add the first submenu item
-	 */
-	public function add_submenu_items_to_network() {
-
-		if ( is_multisite() && is_super_admin() ) {
-			add_submenu_page(
-				'contentsync', // parent slug
-				'',  // page title
-				'', // menu title
-				'manage_options', // capability
-				'', // slug
-				'', // function
-				self::SYNCED_POSTS_PAGE_POSITION // position
-			);
-			add_submenu_page(
-				'contentsync', // parent slug
-				__( 'Network Posts', 'contentsync' ),  // page title
-				'→ ' . __( 'Network Posts', 'contentsync' ), // menu title
-				'manage_options', // capability
-				network_admin_url( 'admin.php?page=contentsync' ), // slug
-				'', // function
-				self::SYNCED_POSTS_PAGE_POSITION + 1 // position
-			);
-		}
 	}
 
 	/**

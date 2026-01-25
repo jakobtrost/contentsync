@@ -46,17 +46,17 @@ class Connections_Page_Hooks extends Hooks_Base {
 	 */
 	public function add_submenu_item() {
 
-		if ( is_multisite() && ! is_super_admin() ) {
-			return;
+		if ( is_multisite() && ! is_network_admin() ) {
+			return; // dont add the normal admin link in multisites if not on the network admin
 		}
 
 		$page_slug = add_submenu_page(
 			'contentsync', // parent slug
 			__( 'Connections', 'contentsync' ),  // page title
-			( is_network_admin() ? '' : '→ ' ) . __( 'Connections', 'contentsync' ), // menu title
+			__( 'Connections', 'contentsync' ), // menu title
 			'manage_options', // capability
-			is_network_admin() ? 'site_connections' : network_admin_url( 'admin.php?page=site_connections' ), // slug
-			is_network_admin() ? array( $this, 'render_admin_page' ) : '', // function
+			'site_connections', // slug
+			array( $this, 'render_admin_page' ), // function
 			self::CONNECTIONS_PAGE_POSITION // position
 		);
 	}
