@@ -18,7 +18,7 @@ use Contentsync\Posts\Sync\Synced_Post_Query;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Connections\Site_Connection;
 use Contentsync\Theme_Posts\Theme_Posts_Service;
-use Contentsync\Posts\Transfer\Post_Transfer_Service;
+use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;

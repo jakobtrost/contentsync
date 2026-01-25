@@ -10,7 +10,7 @@
 
 namespace Contentsync\Api\Admin_Endpoints;
 
-use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Post_Transfer\Post_Export;
 use Contentsync\Utils\Files;
 
 defined( 'ABSPATH' ) || exit;

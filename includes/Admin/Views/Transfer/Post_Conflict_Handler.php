@@ -2,7 +2,7 @@
 
 namespace Contentsync\Admin\Views\Transfer;
 
-use Contentsync\Posts\Transfer\Post_Transfer_Service;
+use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Posts\Sync\Synced_Post_Query;
 use Contentsync\Utils\Urls;
 

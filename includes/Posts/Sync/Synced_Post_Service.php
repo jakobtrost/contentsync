@@ -12,8 +12,8 @@ use Exception;
 use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Utils\Post_Query;
-use Contentsync\Posts\Transfer\Post_Export;
-use Contentsync\Posts\Transfer\Post_Import;
+use Contentsync\Post_Transfer\Post_Export;
+use Contentsync\Post_Transfer\Post_Import;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Multisite_Manager;
 
@@ -233,7 +233,7 @@ class Synced_Post_Service {
 		}
 		Logger::add( 'destination_arrays', $destination_arrays );
 
-		if ( is_object( $post_id ) && is_a( $post_id, 'Contentsync\Posts\Transfer\Prepared_Post' ) ) {
+		if ( is_object( $post_id ) && is_a( $post_id, 'Contentsync\Post_Transfer\Prepared_Post' ) ) {
 			$post_id->import_action = 'trash';
 		}
 

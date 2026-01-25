@@ -21,7 +21,7 @@ use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Post_Meta;
 use Contentsync\Posts\Sync\Synced_Post_Service;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
-use Contentsync\Posts\Transfer\Post_Transfer_Service;
+use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Admin\Views\Sync\Global_List_Table;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Posts\Transfer;
+namespace Contentsync\Post_Transfer;
 
 use WP_Error;
 use Contentsync\Posts\Sync\Post_Meta_Hooks;

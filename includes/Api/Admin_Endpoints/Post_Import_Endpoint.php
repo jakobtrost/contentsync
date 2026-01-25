@@ -13,7 +13,7 @@
 namespace Contentsync\Api\Admin_Endpoints;
 
 use Contentsync\Admin\Views\Transfer\Post_Conflict_Handler;
-use Contentsync\Posts\Transfer\Post_Import;
+use Contentsync\Post_Transfer\Post_Import;
 use Contentsync\Utils\Files;
 
 defined( 'ABSPATH' ) || exit;

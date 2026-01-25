@@ -15,8 +15,8 @@ use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Trigger_Hooks;
-use Contentsync\Posts\Transfer\Post_Export;
-use Contentsync\Posts\Transfer\Post_Import;
+use Contentsync\Post_Transfer\Post_Export;
+use Contentsync\Post_Transfer\Post_Import;
 use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;

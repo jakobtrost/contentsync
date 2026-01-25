@@ -4,8 +4,8 @@ namespace Contentsync\Admin\Views\Transfer;
 
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Posts\Sync\Synced_Post_Query;
-use Contentsync\Posts\Transfer\Post_Export;
-use Contentsync\Posts\Transfer\Post_Transfer_Service;
+use Contentsync\Post_Transfer\Post_Export;
+use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Hooks_Base;
 
@@ -30,45 +30,45 @@ class Post_Export_Admin_Hooks extends Hooks_Base {
 	}
 
 	// public function register_frontend() {
-	// 	add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
+	// add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
 	// }
 
 	// /**
-	//  * Set up Rest API routes.
-	//  *
-	//  * @return void
-	//  */
+	// * Set up Rest API routes.
+	// *
+	// * @return void
+	// */
 	// public function rest_api_init() {
 
-	// 	register_rest_route(
-	// 		CONTENTSYNC_REST_NAMESPACE,
-	// 		'/post_export',
-	// 		array(
-	// 			'methods'             => 'POST',
-	// 			'callback'            => array( $this, 'rest_test' ),
-	// 			'permission_callback' => function () {
-	// 				return current_user_can( 'install_plugins' );
-	// 			},
-	// 		)
-	// 	);
+	// register_rest_route(
+	// CONTENTSYNC_REST_NAMESPACE,
+	// '/post_export',
+	// array(
+	// 'methods'             => 'POST',
+	// 'callback'            => array( $this, 'rest_test' ),
+	// 'permission_callback' => function () {
+	// return current_user_can( 'install_plugins' );
+	// },
+	// )
+	// );
 	// }
 
 	// /**
-	//  * Save tools via Rest API.
-	//  *
-	//  * @param object $request given request.
-	//  *
-	//  * @return string
-	//  */
+	// * Save tools via Rest API.
+	// *
+	// * @param object $request given request.
+	// *
+	// * @return string
+	// */
 	// public function rest_test( $request ) {
-	// 	error_log( 'rest_test' );
-	// 	error_log( print_r( $request, true ) );
-	// 	return json_encode(
-	// 		array(
-	// 			'status'  => 200,
-	// 			'message' => 'Test successful',
-	// 		)
-	// 	);
+	// error_log( 'rest_test' );
+	// error_log( print_r( $request, true ) );
+	// return json_encode(
+	// array(
+	// 'status'  => 200,
+	// 'message' => 'Test successful',
+	// )
+	// );
 	// }
 
 	/**

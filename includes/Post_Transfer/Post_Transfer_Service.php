@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Posts\Transfer;
+namespace Contentsync\Post_Transfer;
 
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Logger;

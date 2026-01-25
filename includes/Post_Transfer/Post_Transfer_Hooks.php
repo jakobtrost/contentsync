@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Posts\Transfer;
+namespace Contentsync\Post_Transfer;
 
 use Contentsync\Utils\Hooks_Base;
 

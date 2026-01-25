@@ -16,7 +16,7 @@ namespace Contentsync\Posts\Sync;
 use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Cluster\Content_Condition_Service;
 use Contentsync\Distribution\Distributor;
-use Contentsync\Posts\Transfer\Post_Export;
+use Contentsync\Post_Transfer\Post_Export;
 use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Utils\Logger;

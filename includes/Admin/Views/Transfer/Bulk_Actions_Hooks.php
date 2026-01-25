@@ -3,8 +3,8 @@
 namespace Contentsync\Admin\Views\Transfer;
 
 use Contentsync\Translations\Translation_Manager;
-use Contentsync\Posts\Transfer\Post_Export;
-use Contentsync\Posts\Transfer\Post_Transfer_Service;
+use Contentsync\Post_Transfer\Post_Export;
+use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Utils\Files;
 

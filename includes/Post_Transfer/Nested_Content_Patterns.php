@@ -3,7 +3,7 @@
  * Nested content patterns helper class.
  */
 
-namespace Contentsync\Posts\Transfer;
+namespace Contentsync\Post_Transfer;
 
 defined( 'ABSPATH' ) || exit;
 
