@@ -4,14 +4,14 @@
  *
  * This class contains helper functions for working with theme posts such as templates, template parts, global styles, etc.
  */
-namespace Contentsync\Posts;
+namespace Contentsync\Theme_Posts;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Theme_Posts utility helpers.
  */
-class Theme_Posts {
+class Theme_Posts_Service {
 
 	/**
 	 * Get theme post types.

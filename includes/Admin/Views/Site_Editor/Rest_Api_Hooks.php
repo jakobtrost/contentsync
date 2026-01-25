@@ -13,7 +13,7 @@ use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Posts\Post_Query;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Synced_Post_Service;
-use Contentsync\Posts\Theme_Posts;
+use Contentsync\Theme_Posts\Theme_Posts_Service;
 use Contentsync\Utils\Hooks_Base;
 
 defined( 'ABSPATH' ) || exit;
@@ -298,7 +298,7 @@ class Rest_Api_Hooks extends Hooks_Base {
 			case 'wp_template':
 			case 'wp_template_part':
 				// greyd-theme//footer, greyd-theme//404 ...
-				return Theme_Posts::get_wp_template_theme( $post ) . '//' . $post->post_name;
+				return Theme_Posts_Service::get_wp_template_theme( $post ) . '//' . $post->post_name;
 
 			case 'wp_navigation':
 			case 'wp_block':

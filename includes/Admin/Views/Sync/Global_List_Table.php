@@ -17,7 +17,7 @@ use Contentsync\Posts\Sync\Synced_Post_Service;
 use Contentsync\Posts\Sync\Synced_Post_Query;
 use Contentsync\Posts\Sync\Synced_Post_Utils;
 use Contentsync\Connections\Site_Connection;
-use Contentsync\Posts\Theme_Posts;
+use Contentsync\Theme_Posts\Theme_Posts_Service;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Multisite_Manager;
@@ -506,7 +506,7 @@ class Global_List_Table extends WP_List_Table {
 			// because the theme will automatically be switched to the theme of the destination blog
 			// during import.
 			if ( $item->local_post ) {
-				$blog_theme = Theme_Posts::get_wp_template_theme( $item->local_post );
+				$blog_theme = Theme_Posts_Service::get_wp_template_theme( $item->local_post );
 			}
 			// debug( $item, true );
 			$item->post_links = array(

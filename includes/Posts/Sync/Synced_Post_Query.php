@@ -11,7 +11,7 @@ namespace Contentsync\Posts\Sync;
 
 use Contentsync\Connections\Site_Connection;
 use Contentsync\Posts\Post_Query;
-use Contentsync\Posts\Theme_Posts;
+use Contentsync\Theme_Posts\Theme_Posts_Service;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;
 use Contentsync\Utils\Multisite_Manager;
@@ -416,7 +416,7 @@ class Synced_Post_Query {
 			$post->blog_id = $current_blog ? $current_blog : get_current_blog_id();
 
 			// attach theme used in blog
-			$post->blog_theme = Theme_Posts::get_wp_template_theme( $post );
+			$post->blog_theme = Theme_Posts_Service::get_wp_template_theme( $post );
 		}
 		return $post;
 	}

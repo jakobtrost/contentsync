@@ -2,7 +2,7 @@
 
 namespace Contentsync\Utils;
 
-use Contentsync\Posts\Theme_Posts;
+use Contentsync\Theme_Posts\Theme_Posts_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -54,7 +54,7 @@ class Urls {
 		switch ( $post->post_type ) {
 			case 'wp_global_styles':
 				// do not allow editing of global styles and font families from other themes
-				if ( Theme_Posts::get_wp_template_theme( $post ) != get_option( 'stylesheet' ) ) {
+				if ( Theme_Posts_Service::get_wp_template_theme( $post ) != get_option( 'stylesheet' ) ) {
 					return null;
 				}
 
@@ -73,7 +73,7 @@ class Urls {
 				return add_query_arg(
 					array(
 						'postType' => $post->post_type,
-						'postId'   => Theme_Posts::get_wp_template_theme( $post ) . '//' . $post->post_name,
+						'postId'   => Theme_Posts_Service::get_wp_template_theme( $post ) . '//' . $post->post_name,
 						'canvas'   => 'edit',
 					),
 					admin_url( 'site-editor.php' )
@@ -84,7 +84,7 @@ class Urls {
 				return add_query_arg(
 					array(
 						'postType'     => $post->post_type,
-						'postId'       => Theme_Posts::get_wp_template_theme( $post ) . '//' . $post->post_name,
+						'postId'       => Theme_Posts_Service::get_wp_template_theme( $post ) . '//' . $post->post_name,
 						'categoryId'   => $post->ID,
 						'categoryType' => $post->post_type,
 						'canvas'       => 'edit',

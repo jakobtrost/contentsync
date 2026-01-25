@@ -10,7 +10,7 @@ namespace Contentsync\Admin\Views\Theme_Posts;
 
 use Contentsync\Admin\Utils\Admin_Posts;
 use Contentsync\Admin\Utils\Admin_Render;
-use Contentsync\Posts\Theme_Posts;
+use Contentsync\Theme_Posts\Theme_Posts_Service;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
@@ -49,10 +49,10 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		// remove the first char '_' from argument
 		$posttype = isset( $_GET['post_type'] ) ? substr( $_GET['post_type'], 1 ) : '';
 
-		if ( in_array( $posttype, Theme_Posts::get_theme_post_types() ) ) {
+		if ( in_array( $posttype, Theme_Posts_Service::get_theme_post_types() ) ) {
 			$this->post_type = $posttype;
 		} else {
-			$this->post_type = Theme_Posts::get_theme_post_types();
+			$this->post_type = Theme_Posts_Service::get_theme_post_types();
 		}
 	}
 
@@ -111,7 +111,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 			}
 		}
 
-		$items = Theme_Posts::get_theme_posts( $args );
+		$items = Theme_Posts_Service::get_theme_posts( $args );
 
 		// sort
 		$orderby  = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'post_date';
@@ -238,7 +238,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 			),
 		);
 
-		foreach ( Theme_Posts::get_theme_post_types() as $post_type ) {
+		foreach ( Theme_Posts_Service::get_theme_post_types() as $post_type ) {
 			$post_type_obj      = get_post_type_object( $post_type );
 			$tabs[ $post_type ] = array(
 				'label' => $post_type_obj->labels->singular_name,
@@ -264,7 +264,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		$inactive_url  = add_query_arg( array( 'view' => 'inactive' ), $all_url );
 
 		// Determine which post types are currently in scope for counting
-		$scoped_post_types = is_string( $this->post_type ) ? array( $this->post_type ) : Theme_Posts::get_theme_post_types();
+		$scoped_post_types = is_string( $this->post_type ) ? array( $this->post_type ) : Theme_Posts_Service::get_theme_post_types();
 		$theme_post_types  = array_filter(
 			$scoped_post_types,
 			function ( $post_type ) {
@@ -304,11 +304,11 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 				),
 			),
 		);
-		$current_theme_posts = Theme_Posts::get_theme_posts( $current_theme_args );
+		$current_theme_posts = Theme_Posts_Service::get_theme_posts( $current_theme_args );
 		$current_theme_count = count( $current_theme_posts );
 
 		$current_theme_args['tax_query'][0]['operator'] = 'NOT IN';
-		$inactive_theme_posts                           = Theme_Posts::get_theme_posts( $current_theme_args );
+		$inactive_theme_posts                           = Theme_Posts_Service::get_theme_posts( $current_theme_args );
 		$inactive_theme_count                           = count( $inactive_theme_posts );
 
 		$views        = array();
@@ -444,7 +444,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 		$error       = '';
 		$post_status = '';
 
-		$template_theme = Theme_Posts::get_wp_template_theme( $post );
+		$template_theme = Theme_Posts_Service::get_wp_template_theme( $post );
 		if ( $template_theme ) {
 
 			$template_theme_name = '';
@@ -767,9 +767,9 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 						$post_title = $post->post_title;
 
 						if ( $post->post_type == 'wp_template' || $post->post_type == 'wp_template_part' ) {
-							$result = Theme_Posts::set_wp_template_theme( $post, true );
+							$result = Theme_Posts_Service::set_wp_template_theme( $post, true );
 						} elseif ( $post->post_type == 'wp_global_styles' ) {
-							$result = Theme_Posts::set_wp_global_styles_theme( $post );
+							$result = Theme_Posts_Service::set_wp_global_styles_theme( $post );
 						} else {
 							$result = false;
 						}

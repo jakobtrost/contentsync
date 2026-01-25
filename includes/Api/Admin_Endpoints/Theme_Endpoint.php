@@ -13,7 +13,7 @@
 
 namespace Contentsync\Api\Admin_Endpoints;
 
-use Contentsync\Posts\Theme_Posts;
+use Contentsync\Theme_Posts\Theme_Posts_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -161,7 +161,7 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'Post not found.', 'contentsync' ), 400 );
 		}
 
-		$result = Theme_Posts::set_wp_global_styles_theme( $post );
+		$result = Theme_Posts_Service::set_wp_global_styles_theme( $post );
 
 		if ( is_wp_error( $result ) ) {
 			return $this->respond( false, $result->get_error_message(), 400 );
@@ -194,7 +194,7 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'Post not found.', 'contentsync' ), 400 );
 		}
 
-		$result = Theme_Posts::set_wp_template_theme( $post, $switch_references_in_content );
+		$result = Theme_Posts_Service::set_wp_template_theme( $post, $switch_references_in_content );
 
 		if ( is_wp_error( $result ) ) {
 			return $this->respond( false, $result->get_error_message(), 400 );

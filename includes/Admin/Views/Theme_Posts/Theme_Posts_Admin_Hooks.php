@@ -2,7 +2,7 @@
 
 namespace Contentsync\Admin\Views\Theme_Posts;
 
-use Contentsync\Admin\Views\Theme_Posts\Theme_Posts_List_Table;
+use Contentsync\Admin\Views\Theme_Theme_Posts\Theme_Posts_Service_List_Table;
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Utils\Hooks_Base;
 
