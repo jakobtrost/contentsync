@@ -11,7 +11,7 @@
  * distribution or review workflows.
  */
 
-namespace Contentsync\Posts\Sync;
+namespace Contentsync\Post_Sync;
 
 use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Cluster\Content_Condition_Service;

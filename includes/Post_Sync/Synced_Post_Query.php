@@ -7,7 +7,7 @@
  * fetching posts from blogs and networks.
  */
 
-namespace Contentsync\Posts\Sync;
+namespace Contentsync\Post_Sync;
 
 use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Post_Query;

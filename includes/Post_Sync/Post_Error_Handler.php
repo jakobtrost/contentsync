@@ -6,7 +6,7 @@
  * across multisite networks.
  */
 
-namespace Contentsync\Posts\Sync;
+namespace Contentsync\Post_Sync;
 
 use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Multisite_Manager;

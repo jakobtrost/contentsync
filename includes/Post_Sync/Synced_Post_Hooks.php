@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Posts\Sync;
+namespace Contentsync\Post_Sync;
 
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Utils\Logger;

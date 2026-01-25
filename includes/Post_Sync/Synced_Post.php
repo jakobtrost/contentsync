@@ -30,7 +30,7 @@
  * wraps the class construction in a try/catch block and returns `false` on failure.
  * Together these utilities provide a reliable interface for working with synced posts.
  */
-namespace Contentsync\Posts\Sync;
+namespace Contentsync\Post_Sync;
 
 use Contentsync\Utils\Post_Query;
 use Contentsync\Utils\Urls;

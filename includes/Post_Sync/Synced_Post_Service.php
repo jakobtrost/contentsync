@@ -6,7 +6,7 @@
  * including import, export, update, delete, and linking/unlinking operations.
  */
 
-namespace Contentsync\Posts\Sync;
+namespace Contentsync\Post_Sync;
 
 use Exception;
 use Contentsync\Cluster\Cluster_Service;

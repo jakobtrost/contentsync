@@ -1,12 +1,12 @@
 <?php
 
-namespace Contentsync\Posts\Sync;
+namespace Contentsync\Post_Sync;
 
 use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Multisite_Manager;
 use Contentsync\Utils\Urls;
 use Contentsync\Api\Remote_Request;
-use Contentsync\Posts\Sync\Synced_Post_Utils;
+use Contentsync\Post_Sync\Synced_Post_Utils;
 
 defined( 'ABSPATH' ) || exit;
 

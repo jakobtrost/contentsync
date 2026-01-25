@@ -6,7 +6,7 @@
  * including GID manipulation and REST request detection.
  */
 
-namespace Contentsync\Posts\Sync;
+namespace Contentsync\Post_Sync;
 
 defined( 'ABSPATH' ) || exit;
 
