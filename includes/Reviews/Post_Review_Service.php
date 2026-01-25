@@ -100,7 +100,7 @@ class Post_Review_Service {
 		}
 
 		if ( $send_mail ) {
-			Review_Mail::send_review_mail( $review_id, $state, 'reviewers' );
+			Review_Mail_Service::send_review_mail( $review_id, $state, 'reviewers' );
 		}
 	}
 
@@ -170,7 +170,7 @@ class Post_Review_Service {
 		);
 		$new_message->save();
 
-		Review_Mail::send_review_mail( $review_id, 'approved', 'editor' );
+		Review_Mail_Service::send_review_mail( $review_id, 'approved', 'editor' );
 
 		return true;
 	}
@@ -212,7 +212,7 @@ class Post_Review_Service {
 
 		$result = self::set_post_review_state( $review_id, 'denied' );
 
-		Review_Mail::send_review_mail( $review_id, 'denied', 'editor' );
+		Review_Mail_Service::send_review_mail( $review_id, 'denied', 'editor' );
 
 		return $result;
 	}
@@ -279,7 +279,7 @@ class Post_Review_Service {
 			$result = Distributor::distribute_single_post( $post_id, $destination_ids );
 		}
 
-		Review_Mail::send_review_mail( $review_id, 'reverted', 'editor' );
+		Review_Mail_Service::send_review_mail( $review_id, 'reverted', 'editor' );
 
 		$result = self::set_post_review_state( $review_id, 'reverted' );
 
