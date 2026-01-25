@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Admin\Views\Transfer;
+namespace Contentsync\Admin\Views\Post_Transfer;
 
 use Contentsync\Utils\Hooks_Base;
 
@@ -33,7 +33,7 @@ class Post_Import_Enqueue_Hooks extends Hooks_Base {
 
 		wp_register_script(
 			'contentSync-postImport',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Transfer/assets/js/contentSync.postImport.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Transfer/assets/js/contentSync.postImport.js',
 			array( 'jquery', 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
 			CONTENTSYNC_VERSION
 		);

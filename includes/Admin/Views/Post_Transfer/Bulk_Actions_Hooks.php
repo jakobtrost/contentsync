@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Admin\Views\Transfer;
+namespace Contentsync\Admin\Views\Post_Transfer;
 
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Post_Transfer\Post_Export;

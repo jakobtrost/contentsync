@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Admin\Views\Transfer;
+namespace Contentsync\Admin\Views\Post_Transfer;
 
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Post_Sync\Synced_Post_Query;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Contentsync\Admin\Views\Transfer;
+namespace Contentsync\Admin\Views\Post_Transfer;
 
 use Contentsync\Utils\Hooks_Base;
 
@@ -31,7 +31,7 @@ class Post_Export_Enqueue_Hooks extends Hooks_Base {
 
 		wp_register_script(
 			'contentSync-postExport',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Transfer/assets/js/contentSync.postExport.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Transfer/assets/js/contentSync.postExport.js',
 			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
 			CONTENTSYNC_VERSION,
 			true
