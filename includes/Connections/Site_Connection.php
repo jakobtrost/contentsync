@@ -58,10 +58,8 @@ class Site_Connection {
 	public static function get( $site_url ) {
 
 		$site_url = apply_filters( 'contentsync_connection_key', Urls::get_nice_url( $site_url ) );
-		Logger::add( 'get_site_connection', $site_url );
 
 		$connections = self::get_all();
-		Logger::add( 'get_site_connections', $connections );
 		if ( isset( $connections[ $site_url ] ) ) {
 			$connection = $connections[ $site_url ];
 		} else {

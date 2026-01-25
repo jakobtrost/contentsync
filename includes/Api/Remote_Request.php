@@ -61,8 +61,16 @@ class Remote_Request {
 	 * @return mixed
 	 */
 	public static function get_remote_blogs( $connection_or_site_url ) {
-		$cache_key = 'contentsync_remote_blogs_' . $connection_or_site_url;
-		$cache     = wp_cache_get( $cache_key );
+
+		if ( is_string( $connection_or_site_url ) ) {
+			$cache_key = 'contentsync_remote_blogs_' . $connection_or_site_url;
+		} elseif ( is_array( $connection_or_site_url ) ) {
+			$cache_key = 'contentsync_remote_blogs_' . key( $connection_or_site_url );
+		} else {
+			return new \WP_Error( 'invalid_argument', __( 'Invalid argument', 'contentsync' ) );
+		}
+
+		$cache = wp_cache_get( $cache_key );
 		if ( $cache ) {
 			return $cache;
 		}
@@ -366,8 +374,8 @@ class Remote_Request {
 	 * @return mixed Decoded response data on success, false or WP_Error on failure.
 	 */
 	public static function handle_response( $response, $args = array() ) {
-		Logger::add( 'handle_response', $response );
-		Logger::add( 'handle_response - args', $args );
+		// Logger::add( 'handle_response', $response );
+		// Logger::add( 'handle_response - args', $args );
 
 		// parse arguments
 		$args = wp_parse_args(
