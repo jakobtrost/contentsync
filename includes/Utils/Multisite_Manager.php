@@ -3,7 +3,7 @@
 namespace Contentsync\Utils;
 
 use Contentsync\Utils\Urls;
-use Contentsync\Posts\Post_Query;
+use Contentsync\Utils\Post_Query;
 use Contentsync\Translations\Translation_Manager;
 use Contentsync\Utils\Blog_Reference;
 

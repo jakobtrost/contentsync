@@ -10,7 +10,7 @@ namespace Contentsync\Admin\Sync\Site_Editor;
 
 use Contentsync\Posts\Sync\Post_Error_Handler;
 use Contentsync\Cluster\Cluster_Service;
-use Contentsync\Posts\Post_Query;
+use Contentsync\Utils\Post_Query;
 use Contentsync\Posts\Sync\Post_Connection_Map;
 use Contentsync\Posts\Sync\Synced_Post_Service;
 use Contentsync\Theme_Posts\Theme_Posts_Service;

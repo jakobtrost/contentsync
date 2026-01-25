@@ -10,7 +10,7 @@
 namespace Contentsync\Posts\Sync;
 
 use Contentsync\Connections\Site_Connection;
-use Contentsync\Posts\Post_Query;
+use Contentsync\Utils\Post_Query;
 use Contentsync\Theme_Posts\Theme_Posts_Service;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Transfer_Service;

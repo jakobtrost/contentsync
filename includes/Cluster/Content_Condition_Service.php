@@ -13,7 +13,7 @@
  */
 namespace Contentsync\Cluster;
 
-use Contentsync\Posts\Post_Query;
+use Contentsync\Utils\Post_Query;
 use Contentsync\Utils\Multisite_Manager;
 
 defined( 'ABSPATH' ) || exit;

@@ -32,7 +32,7 @@
  */
 namespace Contentsync\Posts\Sync;
 
-use Contentsync\Posts\Post_Query;
+use Contentsync\Utils\Post_Query;
 use Contentsync\Utils\Urls;
 use Exception;
 

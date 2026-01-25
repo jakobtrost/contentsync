@@ -11,7 +11,7 @@ namespace Contentsync\Posts\Sync;
 use Exception;
 use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Distribution\Distributor;
-use Contentsync\Posts\Post_Query;
+use Contentsync\Utils\Post_Query;
 use Contentsync\Posts\Transfer\Post_Export;
 use Contentsync\Posts\Transfer\Post_Import;
 use Contentsync\Utils\Logger;

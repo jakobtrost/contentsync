@@ -5,7 +5,7 @@
  * This class contains helper functions for querying posts without filters
  * and retrieving post taxonomy terms and language information.
  */
-namespace Contentsync\Posts;
+namespace Contentsync\Utils;
 
 use Contentsync\Translations\Translation_Manager;
 
