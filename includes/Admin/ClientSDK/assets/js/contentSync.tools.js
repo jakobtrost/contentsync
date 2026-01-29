@@ -50,7 +50,7 @@ contentSync.tools = new function() {
 		console.log( 'addSnackBar', options );
 
 		// Ensure .components-snackbar-list exists (create and append to document.body if not)
-		var list = document.querySelector( '.components-snackbar-list' );
+		let list = document.querySelector( '.components-snackbar-list' );
 		if ( ! list ) {
 			list = document.createElement( 'div' );
 			list.className = 'components-snackbar-list components-editor-notices__snackbar contentsync-snackbar-list';
@@ -77,22 +77,19 @@ contentSync.tools = new function() {
 		text      = ( text !== undefined && text !== null ) ? String( text ) : '';
 		showIcon  = showIcon !== false;
 
-		var data   = typeof contentSyncToolsData !== 'undefined' ? contentSyncToolsData : {};
-		var assets = data.assetsPath || '';
-
-		var titleMap = {
+		const titleMap = {
 			root:   __( 'Global synced post', 'contentsync' ),
 			linked: __( 'Global linked post', 'contentsync' ),
 			error:  __( 'Error', 'contentsync' ),
 			info:   __( 'Info', 'contentsync' )
 		};
-		var textMap = {
+		const textMap = {
 			failed:  __( 'Failed', 'contentsync' ),
 			success: __( 'Completed', 'contentsync' ),
 			started: __( 'Started', 'contentsync' ),
 			init:    __( 'Scheduled', 'contentsync' )
 		};
-		var colorMap = {
+		const colorMap = {
 			root:    'purple', export: 'purple', purple: 'purple',
 			success: 'green',  import: 'green',  green: 'green',
 			info:    'blue',   started: 'blue',  blue: 'blue',
@@ -100,37 +97,37 @@ contentSync.tools = new function() {
 			warning: 'yellow', yellow: 'yellow'
 		};
 		// Only these icons exist under assets/icon/
-		var iconMap = {
+		const iconMap = {
 			root: 'root', linked: 'linked', unlinked: 'unlinked',
 			error: 'error', failed: 'error', red: 'error',
 			info: 'info', started: 'info', blue: 'info', success: 'info', import: 'info', init: 'info',
 			export: 'root', purple: 'root', green: 'info', warning: 'info', yellow: 'info'
 		};
 
-		var title = titleMap[ status ] || null;
-		var color = colorMap[ status ] !== undefined ? colorMap[ status ] : '';
+		const title = titleMap[ status ] || null;
+		const color = colorMap[ status ] !== undefined ? colorMap[ status ] : '';
 		if ( text === '' ) {
 			text = textMap[ status ] || '';
 		}
 
-		var iconSlug = iconMap[ status ] !== undefined ? iconMap[ status ] : 'info';
-		var iconUrl  = assets ? ( assets.replace( /\/?$/, '' ) + '/icon/icon-' + iconSlug + '.svg' ) : '';
+		const iconSlug = iconMap[ status ] !== undefined ? iconMap[ status ] : 'info';
+		const iconUrl  = contentSyncToolsData ? ( contentSyncToolsData?.iconsPath + 'icon-' + iconSlug + '.svg' ) : '';
 
-		var span = document.createElement( 'span' );
+		const span = document.createElement( 'span' );
 		span.className = 'contentsync-info-box contentsync-status' + ( color ? ' ' + color : '' );
 		if ( title ) {
 			span.setAttribute( 'data-title', title.replace( /\s/g, '\u00A0' ) );
 		}
 
 		if ( showIcon && iconUrl ) {
-			var img = document.createElement( 'img' );
+			const img = document.createElement( 'img' );
 			img.src = iconUrl;
 			img.setAttribute( 'style', 'width:auto;height:16px;' );
 			span.appendChild( img );
 		}
 
 		if ( text ) {
-			var textNode = document.createElement( 'span' );
+			const textNode = document.createElement( 'span' );
 			textNode.textContent = text;
 			span.appendChild( textNode );
 		}

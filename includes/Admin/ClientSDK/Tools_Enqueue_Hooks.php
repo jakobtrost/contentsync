@@ -39,7 +39,7 @@ class Tools_Enqueue_Hooks extends Hooks_Base {
 			'contentSync-tools',
 			'contentSyncToolsData',
 			array(
-				'assetsPath' => CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets',
+				'iconsPath' => CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/icon/',
 			)
 		);
 	}
