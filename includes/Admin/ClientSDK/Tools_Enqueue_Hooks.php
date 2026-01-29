@@ -34,5 +34,13 @@ class Tools_Enqueue_Hooks extends Hooks_Base {
 			true
 		);
 		wp_enqueue_script( 'contentSync-tools' );
+
+		wp_localize_script(
+			'contentSync-tools',
+			'contentSyncToolsData',
+			array(
+				'assetsPath' => CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets',
+			)
+		);
 	}
 }

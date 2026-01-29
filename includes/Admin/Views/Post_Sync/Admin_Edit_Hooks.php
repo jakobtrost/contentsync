@@ -13,11 +13,49 @@ defined( 'ABSPATH' ) || exit;
 class Admin_Edit_Hooks extends Hooks_Base {
 
 	public function register_admin() {
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_edit_assets' ) );
+
 		add_action( 'admin_init', array( $this, 'add_edit_column' ) );
 		add_action( 'admin_init', array( $this, 'add_bulk_actions' ) );
 
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_edit_assets' ) );
 		add_filter( 'post_row_actions', array( $this, 'remove_row_actions_for_synced_posts' ), 10, 2 );
+	}
+
+
+	/**
+	 * =================================================================
+	 *                          ENQUEUE ASSETS
+	 * =================================================================
+	 */
+
+	/**
+	 * Enqueue admin edit assets
+	 */
+	public function enqueue_admin_edit_assets() {
+
+		if ( ! Admin_Render::is_current_edit_screen_supported() ) {
+			return;
+		}
+
+		// CSS
+		wp_register_style(
+			'contentsync-post-sync-admin-edit',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/admin-edit.css',
+			array(),
+			CONTENTSYNC_VERSION,
+			'all'
+		);
+		wp_enqueue_style( 'contentsync-post-sync-admin-edit' );
+
+		// JS
+		wp_register_script(
+			'contentSync-makeRoot',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.makeRoot.js',
+			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
+			CONTENTSYNC_VERSION,
+			true
+		);
+		wp_enqueue_script( 'contentSync-makeRoot' );
 	}
 
 
@@ -103,12 +141,13 @@ class Admin_Edit_Hooks extends Hooks_Base {
 		if ( Synced_Post_Service::current_user_can_edit_synced_posts( 'root' ) ) {
 
 			printf(
-				'<button role="button" class="button button-tertiary contentsync-make-global-button" onclick="%2$s" data-post_id="%3$s" data-title="%1$s">' .
+				'<button role="button" class="button button-tertiary contentsync-make-global-button" onclick="%2$s" data-title="%1$s" data-post_id="%3$s" data-post_title="%4$s">' .
 					'<span class="dashicons dashicons-plus-alt2"></span>' .
 				'</button>',
 				/* title    */ __( 'Convert to synced post', 'contentsync' ),
-				/* onclick  */ 'console.log(\'convert to synced post\'); return false;',
+				/* onclick  */ 'contentSync.makeRoot.openModal(this); return false;',
 				/* post_id  */ esc_attr( $post_id ),
+				/* post_title */ esc_html( get_the_title( $post_id ) ),
 			);
 		}
 	}
@@ -158,25 +197,6 @@ class Admin_Edit_Hooks extends Hooks_Base {
 	 *                          MISC
 	 * =================================================================
 	 */
-
-	/**
-	 * Enqueue admin edit assets
-	 */
-	public function enqueue_admin_edit_assets() {
-
-		if ( ! Admin_Render::is_current_edit_screen_supported() ) {
-			return;
-		}
-
-		wp_register_style(
-			'contentsync-post-sync-admin-edit',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/admin-edit.css',
-			array(),
-			CONTENTSYNC_VERSION,
-			'all'
-		);
-		wp_enqueue_style( 'contentsync-post-sync-admin-edit' );
-	}
 
 	/**
 	 * Filter row actions for synced posts:

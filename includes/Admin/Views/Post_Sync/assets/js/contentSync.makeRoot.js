@@ -1,6 +1,6 @@
 var contentSync = contentSync || {};
 
-contentSync.postExport = new function() {
+contentSync.makeRoot = new function() {
 
 	/**
 	 * i18n function
@@ -11,15 +11,15 @@ contentSync.postExport = new function() {
 	 * Modal instance
 	 */
 	this.Modal = new contentSync.Modal( {
-		id: 'export-post-modal',
-		title: __( 'Post Export', 'contentsync' ),
-		description: __( 'Do you want to export the post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
+		id: 'make-root-modal',
+		title: __( 'Make post global', 'contentsync' ),
+		description: __( 'Do you want to make the post %s globally synced?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
 		formInputs: [
 			{
 				type: 'checkbox',
 				name: 'nested',
-				label: __( 'Export nested content', 'contentsync' ),
-				description: __( 'Templates, media, etc. are added to the download so that used images, backgrounds, etc. will be displayed correctly on the target website.', 'contentsync' ),
+				label: __( 'Make nested content global', 'contentsync' ),
+				description: __( 'Templates, media, etc. are also made global so that used images, backgrounds, etc. will be displayed correctly on the destination websites.', 'contentsync' ),
 				value: 1
 			},
 			{
@@ -31,7 +31,7 @@ contentSync.postExport = new function() {
 			}
 		],
 		notice: {
-			text: __( 'Posts in query loops are not included in the import. Posts and Post Types must be exported separately.', 'contentsync' ),
+			text: __( 'Posts in query loops are not included in the global sync. Posts and Post Types must be made global separately.', 'contentsync' ),
 			type: 'info',
 		},
 		buttons: {
@@ -39,7 +39,7 @@ contentSync.postExport = new function() {
 				text: __( 'Cancel', 'contentsync' )
 			},
 			submit: {
-				text: __( 'Export now', 'contentsync' )
+				text: __( 'Make global', 'contentsync' )
 			}
 		},
 		onSubmit: () => this.onModalSubmit()
@@ -49,13 +49,13 @@ contentSync.postExport = new function() {
 	 * REST handler instance
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
-		restPath: 'post-export',
+		restPath: 'unsynced-posts/make_root',
 		onSuccess: ( data, fullResponse ) => this.onSuccess( data, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
 
 	/**
-	 * Current selected post Id, defined on user click on a post 'Export' <a>-element.
+	 * Current selected post Id, defined on user click on a post 'Make global' button.
 	 * 
 	 * @type {number}
 	 */
@@ -69,16 +69,24 @@ contentSync.postExport = new function() {
 	this.postTitle = '';
 
 	/**
+	 * Button element that triggered the modal
+	 * 
+	 * @type {HTMLElement}
+	 */
+	this.buttonElement = null;
+
+	/**
 	 * Open modal
 	 * 
 	 * @param {HTMLElement} elem - Element that triggered the modal
 	 */
 	this.openModal = ( elem ) => {
-		this.postTitle = elem.dataset.post_title;
+		this.buttonElement = elem;
 		this.postId = parseInt( elem.dataset.post_id );
+		this.postTitle = elem.dataset.post_title;
 
 		this.Modal.open();
-		this.Modal.setDescription( this.Modal.config.description.replace( '%s', this.postTitle ) );
+		this.Modal.setDescription( this.Modal.config.description.replace( '%s', '<u>' + this.postTitle + '</u>' ) );
 	};
 
 	/**
@@ -101,37 +109,27 @@ contentSync.postExport = new function() {
 	/**
 	 * When the REST request is successful
 	 *
-	 * @param {string} responseData - Export file URL (from response.data)
+	 * @param {string} responseData - Global post ID (from response.data)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
 	this.onSuccess = ( responseData, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		this.Modal.close();
 
-		const downloadUrl = typeof responseData === 'string' ? responseData : false;
+		const gid = typeof responseData === 'string' ? responseData : false;
 		
-		if ( !downloadUrl ) {
-			return this.onError( __( 'Error exporting post: No download URL found', 'contentsync' ), fullResponse );
+		if ( !gid ) {
+			return this.onError( __( 'Error making post global: No global post ID found', 'contentsync' ), fullResponse );
 		}
 
-		// create a link element
-		const link = document.createElement( 'a' );
-		link.href = downloadUrl;
-		link.download = downloadUrl.split( '/' ).pop();
-		link.target = '_self';
-		link.rel = 'external noreferrer noopener';
-		link.click();
-
 		contentSync.tools.addSnackBar( {
-			text: __( 'The post was exported successfully. The file will download automatically. If not, click the link.', 'contentsync' ),
-			link: {
-				text: __( 'Download file', 'contentsync' ),
-				url: downloadUrl,
-				target: '_self',
-				rel: 'external noreferrer noopener'
-			},
+			text: __( 'The post was made global successfully.', 'contentsync' ),
 			type: 'success'
 		} );
+
+		let buttonParent = this.buttonElement.parentElement;
+		buttonParent.removeChild( this.buttonElement );
+		buttonParent.appendChild( contentSync.tools.makeAdminIconStatusBox( 'root' ) );
 	};
 
 	/**
@@ -143,7 +141,7 @@ contentSync.postExport = new function() {
 	this.onError = ( message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		contentSync.tools.addSnackBar( {
-			text: __( 'Error exporting post: %s', 'contentsync' ).replace( '%s', message ),
+			text: __( 'Error making post global: %s', 'contentsync' ).replace( '%s', message ),
 			type: 'error'
 		} );
 	};

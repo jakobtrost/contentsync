@@ -67,14 +67,12 @@ class Admin_Render {
 	/**
 	 * Make the contentsync status box
 	 */
-	public static function make_admin_icon_status_box( $status = 'export', $text = '', $show_icon = true ) {
-
-		$status = $status === 'root' ? 'export' : ( $status === 'linked' ? 'import' : $status );
+	public static function make_admin_icon_status_box( $status = 'root', $text = '', $show_icon = true ) {
 
 		// generate the title based on the status
 		$titles = array(
-			'export' => __( 'Root post', 'contentsync' ),
-			'import' => __( 'Linked post', 'contentsync' ),
+			'root'   => __( 'Global synced post', 'contentsync' ),
+			'linked' => __( 'Global linked post', 'contentsync' ),
 			'error'  => __( 'Error', 'contentsync' ),
 			'info'   => __( 'Info', 'contentsync' ),
 		);
@@ -84,6 +82,7 @@ class Admin_Render {
 		$color  = '';
 		$colors = array(
 			// purple
+			'root'    => 'purple',
 			'export'  => 'purple',
 			'purple'  => 'purple',
 			// green
@@ -115,7 +114,7 @@ class Admin_Render {
 			$text  = isset( $texts[ $status ] ) ? $texts[ $status ] : $text;
 		}
 
-		$icon_url = CONTENTSYNC_PLUGIN_URL . 'includes/Admin/Utils/assets/icon/' . $status . '.svg';
+		$icon_url = CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/icon/icon-' . $status . '.svg';
 		$icon     = $show_icon ? '<img src="' . esc_url( $icon_url ) . '" style="width:auto;height:16px;">' : '';
 
 		self::maybe_enqueue_stylesheet( 'contentsync-info-box', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-info-box.css' );
