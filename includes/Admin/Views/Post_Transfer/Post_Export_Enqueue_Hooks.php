@@ -2,6 +2,7 @@
 
 namespace Contentsync\Admin\Views\Post_Transfer;
 
+use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Utils\Hooks_Base;
 
 defined( 'ABSPATH' ) || exit;
@@ -25,7 +26,7 @@ class Post_Export_Enqueue_Hooks extends Hooks_Base {
 	 */
 	public function enqueue_scripts() {
 
-		if ( ! Post_Export_Admin_Hooks::is_current_screen_supported() ) {
+		if ( ! Admin_Render::is_current_edit_screen_supported() ) {
 			return;
 		}
 

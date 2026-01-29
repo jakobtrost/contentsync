@@ -2,12 +2,54 @@
 
 namespace Contentsync\Admin\Utils;
 
+use Contentsync\Post_Transfer\Post_Transfer_Service;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Static helper class for admin rendering utilities.
  */
 class Admin_Render {
+
+	/**
+	 * Check if current screen supports content sync functionality
+	 *
+	 * @return bool
+	 */
+	public static function is_current_edit_screen_supported() {
+
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return false;
+		}
+
+		$supported = false;
+
+		$screen = get_current_screen();
+		if ( is_object( $screen ) && isset( $screen->base ) ) {
+			if ( $screen->base === 'edit' || $screen->base === 'upload' ) {
+
+				$current_post_type = isset( $screen->post_type ) ? $screen->post_type : 'post';
+				$supported         = in_array( $current_post_type, Post_Transfer_Service::get_supported_post_types() );
+			}
+		}
+
+		/**
+		 * Filter to customize whether the current screen supports content sync functionality.
+		 *
+		 * This filter allows developers to extend or modify the logic that determines
+		 * which admin screens should display content sync options. It's useful
+		 * for adding support to custom post type screens or implementing custom
+		 * screen detection logic.
+		 *
+		 * @filter contentsync_is_current_edit_screen_supported
+		 *
+		 * @param bool  $supported Whether the current screen supports export/import.
+		 * @param object $screen   The current WP_Screen object.
+		 *
+		 * @return bool           Whether the current screen supports export/import.
+		 */
+		return apply_filters( 'contentsync_is_current_edit_screen_supported', $supported, $screen );
+	}
 
 	/**
 	 * Show WordPress style notice in top of page.

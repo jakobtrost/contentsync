@@ -7,6 +7,7 @@ use Contentsync\Post_Transfer\Post_Export;
 use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Utils\Files;
+use Contentsync\Admin\Utils\Notice\Admin_Notice_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -46,7 +47,7 @@ class Bulk_Actions_Hooks extends Hooks_Base {
 	 */
 	public function add_post_export_bulk_action( $bulk_actions ) {
 
-		$bulk_actions['contentsync_export'] = __( 'Export', 'contentsync' );
+		$bulk_actions['contentsync_export'] = __( 'Content Sync Export', 'contentsync' );
 
 		if ( ! empty( Translation_Manager::get_translation_tool() ) ) {
 			$bulk_actions['contentsync_export_multilanguage'] = __( 'Export including translations', 'contentsync' );
@@ -86,7 +87,7 @@ class Bulk_Actions_Hooks extends Hooks_Base {
 			$sendback = $href;
 		} else {
 			// set transient to display admin notice
-			set_transient( 'contentsync_transient_notice', 'error::' . __( 'The export file could not be written.', 'contentsync' ) );
+			Admin_Notice_Service::add( __( 'The export file could not be written.', 'contentsync' ), 'error' );
 		}
 
 		return $sendback;

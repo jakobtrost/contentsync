@@ -2,6 +2,7 @@
 
 namespace Contentsync\Admin\Views\Post_Transfer;
 
+use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Utils\Hooks_Base;
 
 defined( 'ABSPATH' ) || exit;
@@ -27,7 +28,7 @@ class Post_Import_Enqueue_Hooks extends Hooks_Base {
 	 */
 	public function enqueue_scripts() {
 
-		if ( ! Post_Export_Admin_Hooks::is_current_screen_supported() || ! current_user_can( 'edit_others_posts' ) ) {
+		if ( ! Admin_Render::is_current_edit_screen_supported() || ! current_user_can( 'edit_others_posts' ) ) {
 			return;
 		}
 
@@ -47,7 +48,7 @@ class Post_Import_Enqueue_Hooks extends Hooks_Base {
 	 */
 	public function add_import_page_title_action() {
 
-		if ( ! Post_Export_Admin_Hooks::is_current_screen_supported() || ! current_user_can( 'edit_others_posts' ) ) {
+		if ( ! Admin_Render::is_current_edit_screen_supported() || ! current_user_can( 'edit_others_posts' ) ) {
 			return;
 		}
 

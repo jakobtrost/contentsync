@@ -21,6 +21,7 @@ use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Admin\Utils\Notice\Admin_Notice_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -728,12 +729,11 @@ class Trigger_Hooks extends Hooks_Base {
 		// display admin notice when root post is trashed and there is still a connection
 		$connection_map = Post_Connection_Map::get( $post_id );
 		if ( $connection_map && is_array( $connection_map ) && count( $connection_map ) ) {
-			set_transient(
-				'contentsync_transient_notice',
-				'info::' .
+			Admin_Notice_Service::add(
 				__( '<strong>You have trashed a global source post, which is used on other pages.</strong> This does not delete the linked posts.', 'contentsync' ) .
 				'</p><p>' .
-				__( 'If you want to delete this post everywhere, restore the post and use the "Delete everywhere" feature via "Content Sync > Network Overview".', 'contentsync' )
+				__( 'If you want to delete this post everywhere, restore the post and use the "Delete everywhere" feature via "Content Sync > Network Overview".', 'contentsync' ),
+				'info'
 			);
 		}
 

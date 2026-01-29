@@ -9,6 +9,7 @@ use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Utils\Urls;
 use Contentsync\Api\Remote_Request;
+use Contentsync\Admin\Utils\Notice\Admin_Notice_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -187,27 +188,23 @@ class Connections_Page_Hooks extends Hooks_Base {
 
 		// update successfull
 		if ( $update ) {
-			set_transient(
-				'contentsync_transient_notice',
-				'success::' . sprintf(
+			Admin_Notice_Service::add(
+				sprintf(
 					__( 'The connection to the %s page has been saved. Be sure to add the connection in the other direction as well.', 'contentsync' ),
 					"<strong>$nice_url</strong>"
 				) . '<br><br>' .
-				sprintf(
-					__( 'To do this, go to the admin or network admin area of the page %1$s and enter the URL %2$s at "Add Connection".', 'contentsync' ),
-					"<a href='" . esc_url( $site_url ) . "' target='_blank'>$nice_url</a>",
-					'<strong>' . Urls::get_network_url() . '</strong>'
-				)
+				sprintf( __( 'To do this, go to the admin or network admin area of the page %1$s and enter the URL %2$s at "Add Connection".', 'contentsync' ), "<a href='" . esc_url( $site_url ) . "' target='_blank'>$nice_url</a>", '<strong>' . Urls::get_network_url() . '</strong>' ),
+				'success'
 			);
 		}
 		// update failed
 		elseif ( $update === false ) {
-			set_transient(
-				'contentsync_transient_notice',
-				'error::' . sprintf(
+			Admin_Notice_Service::add(
+				sprintf(
 					__( 'The connection to the %s page could not be saved. Please try again.', 'contentsync' ),
 					'<strong>' . $nice_url . '</strong>'
-				)
+				),
+				'error'
 			);
 		}
 

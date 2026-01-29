@@ -22,17 +22,3 @@
 .contentsync-info-box.contentsync-status.green {
 	color: rgba(39, 174, 96, 1);
 }
-
-/**
- * make global button
- */
-.contentsync-info-box.contentsync-status:has(.button) {
-	padding: 0;
-	background: none;
-}
-
-.contentsync-status .button {
-	padding: 6px 10px;
-	align-items: center;
-	position: relative;
-}
