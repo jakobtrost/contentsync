@@ -1,0 +1,47 @@
+/**
+ * make global button
+ */
+.contentsync-make-global-button.contentsync-make-global-button {
+	background: none;
+	padding: 6px 10px;
+	align-items: center;
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	--tooltip-background: gray;
+}
+
+.contentsync-make-global-button:not(:hover) {
+	border-color: transparent;
+}
+
+/**
+ * Tooltip
+ */
+.contentsync-make-global-button:hover::after {
+	content: attr(data-title);
+	position: absolute;
+	display: block;
+	top: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	margin: 8px 0 0;
+	padding: 0px 4px;
+	border-radius: 2px;
+	font-size: smaller;
+	line-height: 1.8;
+	background: var(--tooltip-background);
+	color: white;
+}
+
+.contentsync-make-global-button:hover::before {
+	content: '';
+	position: absolute;
+	display: block;
+	top: 100%;
+	left: 50%;
+	margin: 0 -4px;
+	border: 4px solid transparent;
+	border-bottom-color: var(--tooltip-background);
+}
