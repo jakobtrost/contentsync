@@ -1018,8 +1018,8 @@ class Admin {
 		}
 
 		if ( defined( 'GREYD_THEME_CONFIG' ) ) {
-			add_filter( 'contentsync_theme_manage_assets_columns', array( $this, 'add_column' ) );
-			add_filter( 'contentsync_theme_manage_assets_column_default', array( $this, 'render_column' ), 10, 3 );
+			add_filter( 'contentsync_theme_posts_columns', array( $this, 'add_column' ) );
+			add_filter( 'contentsync_theme_posts_column_default', array( $this, 'render_column' ), 10, 3 );
 		}
 	}
 

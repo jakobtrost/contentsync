@@ -198,7 +198,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 
 	public function get_columns() {
 		return apply_filters(
-			'contentsync_theme_manage_assets_columns',
+			'contentsync_theme_posts_columns',
 			array(
 				'cb'        => '<input type="checkbox" />',
 				'title'     => __( 'Post Title', 'contentsync' ),
@@ -625,7 +625,7 @@ class Theme_Posts_List_Table extends \WP_List_Table {
 
 	public function column_default( $item, $column_name ) {
 		$post_id = isset( $item->ID ) ? $item->ID : 0;
-		return apply_filters( 'contentsync_theme_manage_assets_column_default', $column_name, $post_id );
+		return apply_filters( 'contentsync_theme_posts_column_default', $column_name, $post_id );
 	}
 
 	/**
