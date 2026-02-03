@@ -41,6 +41,10 @@ class Modal_Enqueue_Hooks extends Hooks_Base {
 			'contentsync-info-box',
 			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-info-box.css'
 		);
+		Admin_Render::maybe_enqueue_stylesheet(
+			'contentsync-status',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-status.css'
+		);
 
 		// Enqueue components-modal.js (base Modal class)
 		wp_register_script(

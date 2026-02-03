@@ -15,7 +15,7 @@
 	z-index: -999;
 	right: -6px;
 	top: -6px;
-	padding: 12px 12px 4px;
+	padding: 8px 30px 8px 12px;
 	width: 240px;
 	border-radius: 4px;
 	background: #fff;
@@ -42,28 +42,19 @@
 	transform: rotate(3deg) scale(0.8) rotate3d(2, 3, 0.5, 20deg) translate(-50px, 20px);
 }
 
-.contentsync-tooltip-wrapper .toggle.checked {
+.contentsync-tooltip-wrapper:hover .toggle {
 	z-index: 100;
 }
 
-.contentsync-tooltip-wrapper .toggle.checked + .popup {
+.contentsync-tooltip-wrapper:hover .popup {
 	opacity: 1;
 	z-index: 99;
 	-webkit-transform: none;
 	transform: none;
-	-webkit-transition:
-		opacity 0.2s ease,
-		-webkit-transform 0.2s ease;
-	transition:
-		opacity 0.2s ease,
-		-webkit-transform 0.2s ease;
-	transition:
-		opacity 0.2s ease,
-		transform 0.2s ease;
-	transition:
-		opacity 0.2s ease,
-		transform 0.2s ease,
-		-webkit-transform 0.2s ease;
+	-webkit-transition: opacity 0.2s ease, -webkit-transform 0.2s ease;
+	transition: opacity 0.2s ease, -webkit-transform 0.2s ease;
+	transition: opacity 0.2s ease, transform 0.2s ease;
+	transition: opacity 0.2s ease, transform 0.2s ease, -webkit-transform 0.2s ease;
 }
 
 .contentsync-tooltip-wrapper .popup > * {

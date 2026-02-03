@@ -66,6 +66,12 @@ class Admin_Render {
 
 	/**
 	 * Make the contentsync status box
+	 *
+	 * @param string $status Either 'root', 'linked', 'unlinked', 'info', 'error'
+	 * @param string $text   The text to display.
+	 * @param bool   $show_icon Whether to show the icon.
+	 *
+	 * @return string The HTML of the status box.
 	 */
 	public static function make_admin_icon_status_box( $status = 'root', $text = '', $show_icon = true ) {
 
@@ -118,7 +124,7 @@ class Admin_Render {
 		$icon     = $show_icon ? '<img src="' . esc_url( $icon_url ) . '" style="width:auto;height:16px;">' : '';
 
 		self::maybe_enqueue_stylesheet( 'contentsync-info-box', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-info-box.css' );
-		self::maybe_enqueue_stylesheet( 'contentsync-status-box', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-status-box.css' );
+		self::maybe_enqueue_stylesheet( 'contentsync-status', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-status.css' );
 
 		return sprintf(
 			'<span %1$s class="contentsync-info-box %2$s contentsync-status">%3$s%4$s</span>',
@@ -168,8 +174,11 @@ class Admin_Render {
 	 *
 	 * @param string $content   Infotext.
 	 * @param string $className Extra class names.
+	 * @param string $toggle_icon Icon slug.
+	 *
+	 * @return string The HTML of the tooltip popup.
 	 */
-	public static function make_admin_tooltip_popup( $content = '', $className = '' ) {
+	public static function make_admin_tooltip_popup( $content = '', $className = '', $toggle_icon = 'info' ) {
 		if ( empty( $content ) ) {
 			return false;
 		}
@@ -177,7 +186,7 @@ class Admin_Render {
 		self::maybe_enqueue_stylesheet( 'contentsync-tooltip', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-tooltip.css' );
 
 		return "<span class='contentsync-tooltip-wrapper'>" .
-			"<span class='toggle dashicons dashicons-info'></span>" .
+			"<span class='toggle dashicons dashicons-{$toggle_icon}'></span>" .
 			"<span class='popup {$className}'>{$content}</span>" .
 		'</span>';
 	}

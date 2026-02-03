@@ -383,4 +383,40 @@ class Synced_Post {
 
 		return new Synced_Post( $_post );
 	}
+
+
+	/**
+	 * =================================================================
+	 *                          Additional WP_Post default args
+	 * =================================================================
+	 */
+	public $guid;
+	public $post_date_gmt;
+	public $comment_status;
+	public $ping_status;
+	public $post_password;
+	public $to_ping;
+	public $pinged;
+	public $post_modified;
+	public $post_modified_gmt;
+	public $post_content_filtered;
+	public $post_parent;
+	public $menu_order;
+	public $post_mime_type;
+	public $comment_count;
+	public $post_type_name;
+
+
+	/**
+	 * =================================================================
+	 *                          Additional custom dynamic args
+	 * =================================================================
+	 */
+	public $gid;
+	public $local_post;
+	public $relationship;
+	public $actions;
+	public $blog_theme;
+	public $error;
+	public $filter;
 }

@@ -110,8 +110,8 @@ class Global_List_Table extends WP_List_Table {
 
 		// get posts in relation to this blog
 		if ( ! is_network_admin() ) {
-			$this->posts['export'] = Synced_Post_Query::get_synced_posts_of_blog( $blog_id, 'root', $query_args );
-			$this->posts['import'] = Synced_Post_Query::get_synced_posts_of_blog( $blog_id, 'linked', $query_args );
+			$this->posts['root']   = Synced_Post_Query::get_synced_posts_of_blog( $blog_id, 'root', $query_args );
+			$this->posts['linked'] = Synced_Post_Query::get_synced_posts_of_blog( $blog_id, 'linked', $query_args );
 		}
 
 		if ( $connections && count( $connections ) > 0 ) {
@@ -308,8 +308,8 @@ class Global_List_Table extends WP_List_Table {
 		} else {
 			$views = array(
 				'all'    => __( 'All', 'contentsync' ),
-				'export' => __( 'Exported from here', 'contentsync' ),
-				'import' => __( 'Imported here', 'contentsync' ),
+				'root'   => __( 'Root here', 'contentsync' ),
+				'linked' => __( 'Linked here', 'contentsync' ),
 			);
 		}
 
@@ -340,7 +340,7 @@ class Global_List_Table extends WP_List_Table {
 		if ( $rel !== 'errors' ) {
 			$return['errors'] = sprintf(
 				'<span class="js_check_errors" data-mode="%s" data-blog_id="%s" data-post_type="%s">' .
-					'<span class="loading">%s<span class="spinner is-active"></span></span>' .
+					'<span class="loading hidden">%s<span class="spinner is-active"></span></span>' .
 					'<span class="no_errors hidden">%s</span>' .
 					'<span class="errors_found hidden">' .
 						'<a href="%s" class="%s">' .
@@ -370,9 +370,9 @@ class Global_List_Table extends WP_List_Table {
 
 		$text = __( 'No synced post found.', 'contentsync' );
 		$rel  = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? sanitize_key( $_GET['rel'] ) : 'all';
-		if ( $rel === 'export' ) {
+		if ( $rel === 'root' ) {
 			$text = __( 'No synced post exported from here was found.', 'contentsync' );
-		} elseif ( $rel === 'import' ) {
+		} elseif ( $rel === 'linked' ) {
 			$text = __( 'No synced post imported here was found.', 'contentsync' );
 		} elseif ( $rel === 'errors' ) {
 			$text = __( 'No faulty synced post found.', 'contentsync' );
@@ -450,8 +450,8 @@ class Global_List_Table extends WP_List_Table {
 		$item->post_type_name = post_type_exists( $item->post_type ) ? get_post_type_object( $item->post_type )->labels->singular_name : $item->post_type;
 		$item->blog_id        = ( $item->local_post || ! $post->blog_id ) ? get_current_blog_id() : $post->blog_id;
 
-		// if relationship == 'unused' but local_post is set, this is an error
-		if ( $item->relationship == 'unused' && $item->local_post ) {
+		// if relationship == 'unlinked' but local_post is set, this is an error
+		if ( $item->relationship == 'unlinked' && $item->local_post ) {
 			$item->relationship = 'error';
 			$error              = Post_Error_Handler::check_post_for_errors( $item );
 			if ( $error ) {
@@ -537,9 +537,9 @@ class Global_List_Table extends WP_List_Table {
 			// edit the local post
 			'edit'     => $item->local_post || $item->error ? "<a href='" . $item->post_links['edit'] . "'>" . __( 'Edit', 'contentsync' ) . '</a>' : '',
 			// import by gid
-			'import'   => $this->ajax_link( 'checkImport', __( 'Import', 'contentsync' ), $data ),
+			'linked'   => $this->ajax_link( 'checkImport', __( 'Import', 'contentsync' ), $data ),
 			// unexport if this is the root
-			'unexport' => $item->relationship == 'export' ? $this->ajax_link( 'unexportPost', __( 'Unlink', 'contentsync' ), $data ) : '',
+			'unexport' => $item->relationship == 'root' ? $this->ajax_link( 'unexportPost', __( 'Unlink', 'contentsync' ), $data ) : '',
 			// unimport if local post exists
 			'unimport' => $item->local_post ? $this->ajax_link( 'unimportPost', __( 'Unlink', 'contentsync' ), $data ) : '',
 			// trash the local post
@@ -680,12 +680,12 @@ class Global_List_Table extends WP_List_Table {
 					} else {
 						$actions = array( 'root' );
 					}
-				} elseif ( $item->relationship === 'export' ) {
+				} elseif ( $item->relationship === 'root' ) {
 					$actions = array( 'edit', 'unexport', 'trash' );
-				} elseif ( $item->relationship === 'import' ) {
+				} elseif ( $item->relationship === 'linked' ) {
 					$actions = array( 'root', 'edit', 'trash', 'unimport' );
-				} elseif ( $item->relationship === 'unused' ) {
-					$actions = array( 'import', 'root' );
+				} elseif ( $item->relationship === 'unlinked' ) {
+					$actions = array( 'linked', 'root' );
 				}
 
 				if ( $item->error ) {
@@ -707,10 +707,10 @@ class Global_List_Table extends WP_List_Table {
 					} else {
 						return Admin_Render::make_admin_icon_status_box( 'error', __( 'Error', 'contentsync' ) );
 					}
-				} elseif ( $item->relationship === 'unused' ) {
-					return __( 'Not imported', 'contentsync' );
+				} elseif ( $item->relationship === 'unlinked' ) {
+					return __( 'Not Synced', 'contentsync' );
 				} else {
-					$text = $item->relationship == 'export' ? __( 'Exported', 'contentsync' ) : __( 'Imported', 'contentsync' );
+					$text = $item->relationship == 'root' ? __( 'Root', 'contentsync' ) : __( 'Linked', 'contentsync' );
 					return Admin_Render::make_admin_icon_status_box( $item->relationship, $text );
 				}
 				break;
@@ -736,7 +736,7 @@ class Global_List_Table extends WP_List_Table {
 
 			case 'usage':
 				// don't display for imported posts
-				if ( $item->relationship == 'import' || $item->relationship == 'unused' ) {
+				if ( $item->relationship == 'linked' || $item->relationship == 'unlinked' ) {
 					return '--';
 				}
 
@@ -766,7 +766,7 @@ class Global_List_Table extends WP_List_Table {
 							}
 						}
 					}
-					$render = '<div class="overflow-vertical"><strong>' . $count . 'x</strong> ' . ( empty( $root_net_url ) ? __( 'Imported', 'contentsync' ) : __( 'Imported here', 'contentsync' ) ) . ':<br>' . $render . '</div>';
+					$render = '<div class="overflow-vertical"><strong>' . $count . 'x</strong> ' . ( empty( $root_net_url ) ? __( 'Linked', 'contentsync' ) : __( 'Linked here', 'contentsync' ) ) . ':<br>' . $render . '</div>';
 				}
 
 				// render
@@ -775,7 +775,7 @@ class Global_List_Table extends WP_List_Table {
 
 			case 'language':
 				if ( ! isset( $item->language ) ) {
-					return $this->make_info_popup( __( 'The language of contents from remote sites can not be displayed in the overview.', 'contentsync' ) );
+					return Admin_Render::make_admin_tooltip_popup( __( 'The language of contents from remote sites can not be displayed in the overview.', 'contentsync' ) );
 				} elseif ( empty( $item->language ) ) {
 					return '--';
 				} else {
@@ -805,10 +805,10 @@ class Global_List_Table extends WP_List_Table {
 					);
 					foreach ( $option_infos as $name => $info ) {
 						$active  = isset( $options[ $name ] ) && $options[ $name ] ? 'active' : 'inactive';
-						$render .= $this->make_info_popup( $info[ $active ], $info['icon'], $active );
+						$render .= Admin_Render::make_admin_tooltip_popup( $info[ $active ], '', $info['icon'] );
 					}
 				} else {
-					$render = $this->make_info_popup( __( 'The options for content from external websites cannot be displayed in the overview.', 'contentsync' ) );
+					$render = Admin_Render::make_admin_tooltip_popup( __( 'The options for content from external websites cannot be displayed in the overview.', 'contentsync' ) );
 				}
 				return $render;
 				break;
@@ -845,11 +845,11 @@ class Global_List_Table extends WP_List_Table {
 		$blog_id     = get_current_blog_id();
 		list( $root_blog_id, $root_post_id, $root_net_url ) = Synced_Post_Utils::explode_gid( $gid );
 
-		$relationship = $blog_id == $root_blog_id && empty( $root_net_url ) ? 'export' : 'unused';
+		$relationship = $blog_id == $root_blog_id && empty( $root_net_url ) ? 'root' : 'unlinked';
 
 		// we're only watching imported posts anyway...
-		if ( isset( $_GET['rel'] ) && $_GET['rel'] === 'import' ) {
-			$relationship = 'import';
+		if ( isset( $_GET['rel'] ) && $_GET['rel'] === 'linked' ) {
+			$relationship = 'linked';
 		}
 		// root post from this network
 		if ( empty( $root_net_url ) && isset( $connections[ $blog_id ] ) ) {
@@ -864,11 +864,11 @@ class Global_List_Table extends WP_List_Table {
 		if ( isset( $local_post_id ) ) {
 			$local_post = get_post( $local_post_id );
 			if ( $local_post ) {
-				$relationship = 'import';
+				$relationship = 'linked';
 			} else {
 				$result = Post_Connection_Map::remove( $gid, $blog_id, $local_post_id );
 				if ( $result ) {
-					$relationship = 'unused';
+					$relationship = 'unlinked';
 				} else {
 					$relationship = 'error';
 				}
@@ -877,11 +877,6 @@ class Global_List_Table extends WP_List_Table {
 
 		return $relationship;
 	}
-
-	public function make_info_popup( $text, $icon = 'info', $class = '' ) {
-		return "<div class='contentsync_info_popup'><span class='dashicons dashicons-{$icon} {$class}'></span><span class='contentsync_info_text'>{$text}</span></div>";
-	}
-
 
 	/**
 	 * =================================================================
@@ -934,7 +929,7 @@ class Global_List_Table extends WP_List_Table {
 		} else {
 			$actions = array(
 				'unlink' => __( 'Unlink', 'contentsync' ),
-				'import' => __( 'Import', 'contentsync' ),
+				'linked' => __( 'Import', 'contentsync' ),
 				'trash'  => __( 'Trash', 'contentsync' ),
 			);
 
@@ -1044,7 +1039,7 @@ class Global_List_Table extends WP_List_Table {
 			}
 
 			// import
-			elseif ( $bulk_action === 'import' ) {
+			elseif ( $bulk_action === 'linked' ) {
 
 				/**
 				 * @todo not in use right now though...
@@ -1156,7 +1151,7 @@ class Global_List_Table extends WP_List_Table {
 				'success' => __( 'The link between the posts %s has been successfully resolved.', 'contentsync' ),
 				'fail'    => __( 'There were errors in resolving the links.', 'contentsync' ),
 			),
-			'import'           => array(
+			'linked'           => array(
 				'success' => __( 'The posts %s were successfully imported.', 'contentsync' ),
 				'fail'    => __( 'There were errors when importing the posts.', 'contentsync' ),
 			),
@@ -1279,9 +1274,9 @@ class Global_List_Table extends WP_List_Table {
 	// contentsync_status
 	public function sortby_contentsync_status_asc( $a, $b ) {
 		$ints  = array(
-			'export' => 1,
-			'import' => 2,
-			'unused' => 3,
+			'root'     => 1,
+			'linked'   => 2,
+			'unlinked' => 3,
 		);
 		$a_rel = $ints[ $this->get_contentsync_relationship( $a ) ];
 		$b_rel = $ints[ $this->get_contentsync_relationship( $b ) ];
