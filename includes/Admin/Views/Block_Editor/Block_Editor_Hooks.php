@@ -6,8 +6,9 @@
  * This class handles hooks for the Block Editor integration.
  */
 
-namespace Contentsync\Admin\Views\Site_Editor;
+namespace Contentsync\Admin\Views\Block_Editor;
 
+use Contentsync\Admin\Utils\Build_Scripts;
 use Contentsync\Utils\Hooks_Base;
 
 defined( 'ABSPATH' ) || exit;
@@ -29,22 +30,19 @@ class Block_Editor_Hooks extends Hooks_Base {
 		// editor styles
 		wp_register_style(
 			'contentsync-block-editor-controls',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Site_Editor/assets/css/block-editor-controls.css',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Block_Editor/assets/css/block-editor-controls.css',
 			array(),
 			CONTENTSYNC_VERSION,
 		);
 		wp_enqueue_style( 'contentsync-block-editor-controls' );
 
-		// enqueue scripts
-
-		wp_register_script(
+		// enqueue scripts (built from src/*.jsx via npm run build)
+		Build_Scripts::enqueue_build_script(
 			'contentsync-block-editor-tools',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Site_Editor/assets/js/contentSync.blockEditorTools.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Block_Editor/assets/js/src/contentSync.blockEditorTools.jsx',
 			array( 'wp-data', 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'lodash' ),
-			CONTENTSYNC_VERSION,
 			true
 		);
-		wp_enqueue_script( 'contentsync-block-editor-tools' );
 
 		wp_localize_script(
 			'contentsync-block-editor-tools',
@@ -54,14 +52,12 @@ class Block_Editor_Hooks extends Hooks_Base {
 			)
 		);
 
-		wp_register_script(
+		Build_Scripts::enqueue_build_script(
 			'contentsync-block-editor-plugin',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Site_Editor/assets/js/blockEditorPlugin.js',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Block_Editor/assets/js/src/blockEditorPlugin.jsx',
 			array( 'wp-data', 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'lodash' ),
-			CONTENTSYNC_VERSION,
 			true
 		);
-		wp_enqueue_script( 'contentsync-block-editor-plugin' );
 
 		// // script translations
 		// if ( function_exists( 'wp_set_script_translations' ) ) {

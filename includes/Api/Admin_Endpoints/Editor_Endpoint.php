@@ -3,7 +3,7 @@
  * Editor Admin REST Endpoint
  *
  * Handles REST requests for the Site Editor: get post data and save options.
- * Formerly Rest_Api_Hooks in Admin/Views/Site_Editor.
+ * Formerly Rest_Api_Hooks in Admin/Views/Block_Editor.
  *
  * @package Contentsync
  * @subpackage Api\Admin_Endpoints

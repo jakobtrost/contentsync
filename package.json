@@ -1,6 +1,14 @@
 {
   "devDependencies": {
+    "@babel/cli": "^7.26.0",
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.0",
     "eslint": "^9.39.2",
     "stylelint": "^16.26.1"
+  },
+  "scripts": {
+    "build": "node scripts/compile-jsx.js",
+    "dev": "node scripts/compile-jsx.js --watch"
   }
 }
