@@ -1,12 +1,15 @@
 <?php
-
 /**
- * Content Sync Site Editor REST API Hooks
+ * Editor Admin REST Endpoint
  *
- * This class handles REST API routes for the Site Editor integration.
+ * Handles REST requests for the Site Editor: get post data and save options.
+ * Formerly Rest_Api_Hooks in Admin/Views/Site_Editor.
+ *
+ * @package Contentsync
+ * @subpackage Api\Admin_Endpoints
  */
 
-namespace Contentsync\Admin\Sync\Site_Editor;
+namespace Contentsync\Api\Admin_Endpoints;
 
 use Contentsync\Post_Sync\Post_Error_Handler;
 use Contentsync\Cluster\Cluster_Service;
@@ -14,71 +17,126 @@ use Contentsync\Utils\Post_Query;
 use Contentsync\Post_Sync\Post_Connection_Map;
 use Contentsync\Post_Sync\Synced_Post_Service;
 use Contentsync\Theme_Posts\Theme_Posts_Service;
-use Contentsync\Utils\Hooks_Base;
 
 defined( 'ABSPATH' ) || exit;
 
-class Rest_Api_Hooks extends Hooks_Base {
+/**
+ * Editor Endpoint Class
+ */
+class Editor_Endpoint extends Admin_Endpoint_Base {
 
 	/**
-	 * Register hooks that run everywhere.
+	 * REST base for this endpoint.
+	 *
+	 * @var string
 	 */
-	public function register() {
-		add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
+	protected $rest_base = 'editor';
+
+	/**
+	 * Param names for the get-post-data route.
+	 *
+	 * @var array
+	 */
+	private static $get_post_data_param_names = array( 'postReference' );
+
+	/**
+	 * Param names for the save_options route.
+	 *
+	 * @var array
+	 */
+	private static $save_options_param_names = array( 'post_id', 'options', 'canonical_url' );
+
+	/**
+	 * Possible arguments for editor endpoints.
+	 *
+	 * @return array Map of param names to validate_callback config.
+	 */
+	public function get_endpoint_args() {
+		return array_merge(
+			parent::get_endpoint_args(),
+			array(
+				'postReference' => array(
+					'validate_callback' => array( $this, 'is_post_reference' ),
+				),
+				'options'       => array(
+					'validate_callback' => array( $this, 'is_array_or_object' ),
+				),
+				'canonical_url' => array(
+					'validate_callback' => array( $this, 'is_string' ),
+				),
+			)
+		);
 	}
 
 	/**
-	 * Set up Rest API routes.
+	 * Accept numeric id or string (e.g. theme//slug for site editor).
 	 *
-	 * @return void
+	 * @param mixed $value
+	 * @return bool
 	 */
-	public function rest_api_init() {
+	public function is_post_reference( $value ) {
+		if ( is_numeric( $value ) ) {
+			return true;
+		}
+		return is_string( $value ) && $value !== '';
+	}
 
+	/**
+	 * Register REST API routes
+	 */
+	public function register_routes() {
+		$all_args = $this->get_endpoint_args();
+
+		$get_post_data_args = array_intersect_key(
+			$all_args,
+			array_flip( self::$get_post_data_param_names )
+		);
 		register_rest_route(
-			'contentsync/v1',
-			'/get_post_info',
+			$this->namespace,
+			'/' . $this->rest_base . '/get-post-data',
 			array(
-				'methods'             => 'POST',
-				'callback'            => array( $this, 'get_post_info' ),
-				'permission_callback' => '__return_true',
+				'methods'             => $this->method,
+				'callback'            => array( $this, 'get_post_data' ),
+				'permission_callback' => array( $this, 'permission_callback' ),
+				'args'                => $get_post_data_args,
 			)
 		);
 
+		$save_options_args = array_intersect_key(
+			$all_args,
+			array_flip( self::$save_options_param_names )
+		);
 		register_rest_route(
-			'contentsync/v1',
-			'/save_options',
+			$this->namespace,
+			'/' . $this->rest_base . '/save-options',
 			array(
-				'methods'             => 'POST',
+				'methods'             => $this->method,
 				'callback'            => array( $this, 'save_options' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'permission_callback' ),
+				'args'                => $save_options_args,
 			)
 		);
 	}
 
 	/**
-	 * Save tools via Rest API.
+	 * Get contentsync post data via REST API.
 	 *
-	 * @param object $request given request.
-	 *
-	 * @return string
+	 * @param \WP_REST_Request $request Full request object.
+	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public function get_post_info( $request ) {
+	public function get_post_data( $request ) {
+		$params         = $request->get_params();
+		$post_reference = isset( $params['postReference'] ) ? $params['postReference'] : 0;
 
-		if ( $params !== $request->get_params() ) {
-			return json_encode(
-				array(
-					'status'  => 400,
-					'message' => 'Could get post infos',
-				)
-			);
+		if ( $post_reference === '' || $post_reference === null ) {
+			return $this->respond( false, __( 'Could not get post infos.', 'contentsync' ), 400 );
 		}
 
 		if ( ! class_exists( 'Contentsync\Admin\Admin' ) ) {
-			require_once __DIR__ . '/../../Views/admin.php';
+			require_once CONTENTSYNC_PLUGIN_PATH . '/includes/Admin/Views/admin.php';
 		}
 
-		$postReference  = isset( $params['postReference'] ) ? $params['postReference'] : 0;
-		$post_id        = self::get_numeric_post_id( $postReference );
+		$post_id        = $this->get_numeric_post_id( $post_reference );
 		$status         = get_post_meta( $post_id, 'synced_post_status', true );
 		$gid            = get_post_meta( $post_id, 'synced_post_id', true );
 		$connection_map = Post_Connection_Map::get( $post_id );
@@ -128,9 +186,9 @@ class Rest_Api_Hooks extends Hooks_Base {
 
 											if ( isset( $blog['blog'] ) ) {
 												return array(
-													'blog_id'  => intval( $tmp[0] ),
-													'blogname' => $blog['nice'],
-													'site_url' => $blog['blog'],
+													'blog_id'   => intval( $tmp[0] ),
+													'blogname'  => $blog['nice'],
+													'site_url'  => $blog['blog'],
 													'is_remote' => true,
 												);
 											}
@@ -162,86 +220,57 @@ class Rest_Api_Hooks extends Hooks_Base {
 			'notice' => \Contentsync\Admin\Admin::get_global_notice_content( $post_id, 'site_editor' ),
 		);
 
-		return json_encode(
-			array(
-				'status'  => 200,
-				'message' => 'Post data retrieved',
-				'data'    => $data,
-			)
-		);
+		return $this->respond( $data, __( 'Post data retrieved.', 'contentsync' ), 200 );
 	}
 
 	/**
-	 * Save Contentsync options via Rest API.
+	 * Save Contentsync options via REST API.
 	 *
-	 * @param object $request given request.
-	 *
-	 * @return string
+	 * @param \WP_REST_Request $request Full request object.
+	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function save_options( $request ) {
+		$params = $request->get_params();
 
-		if ( $params = $request->get_params() ) {
+		$post_id       = isset( $params['post_id'] ) ? intval( $params['post_id'] ) : 0;
+		$options       = isset( $params['options'] ) ? $params['options'] : array();
+		$canonical_url = isset( $params['canonical_url'] ) ? esc_url_raw( $params['canonical_url'] ) : '';
 
-			$post_id       = isset( $params['post_id'] ) ? intval( $params['post_id'] ) : 0;
-			$options       = isset( $params['options'] ) ? $params['options'] : array();
-			$canonical_url = isset( $params['canonical_url'] ) ? esc_url_raw( $params['canonical_url'] ) : '';
-
-			if ( $post_id <= 0 ) {
-				return json_encode(
-					array(
-						'status'  => 400,
-						'message' => 'Invalid post ID',
-					)
-				);
-			}
-
-			// Check if user can edit this post
-			if ( ! Synced_Post_Service::current_user_can_edit_synced_posts( 'root' ) ) {
-				return json_encode(
-					array(
-						'status'  => 403,
-						'message' => 'Permission denied',
-					)
-				);
-			}
-
-			// Save Contentsync options
-			if ( ! empty( $options ) ) {
-				update_post_meta( $post_id, 'contentsync_export_options', $options );
-			}
-
-			// Save canonical URL
-			if ( ! empty( $canonical_url ) ) {
-				update_post_meta( $post_id, 'contentsync_canonical_url', $canonical_url );
-			}
-
-			return json_encode(
-				array(
-					'status'  => 200,
-					'message' => 'Options saved successfully',
-					'data'    => array(
-						'options'       => $options,
-						'canonical_url' => $canonical_url,
-					),
-				)
-			);
+		if ( $post_id <= 0 ) {
+			return $this->respond( false, __( 'Invalid post ID.', 'contentsync' ), 400 );
 		}
 
-		return json_encode(
+		if ( ! Synced_Post_Service::current_user_can_edit_synced_posts( 'root' ) ) {
+			return $this->respond( false, __( 'Permission denied.', 'contentsync' ), 403 );
+		}
+
+		if ( ! empty( $options ) ) {
+			update_post_meta( $post_id, 'contentsync_export_options', $options );
+		}
+
+		if ( ! empty( $canonical_url ) ) {
+			update_post_meta( $post_id, 'contentsync_canonical_url', $canonical_url );
+		}
+
+		return $this->respond(
 			array(
-				'status'  => 400,
-				'message' => 'Invalid parameters',
-			)
+				'options'       => $options,
+				'canonical_url' => $canonical_url,
+			),
+			__( 'Options saved successfully.', 'contentsync' ),
+			200
 		);
 	}
 
 	/**
 	 * Get the numeric post id for a given site editor post id.
+	 *
+	 * @param int|string $site_editor_post_id Post ID or theme//slug string.
+	 * @return int
 	 */
-	public static function get_numeric_post_id( $site_editor_post_id ) {
-
+	public function get_numeric_post_id( $site_editor_post_id ) {
 		if ( is_numeric( $site_editor_post_id ) ) {
-			return $site_editor_post_id;
+			return (int) $site_editor_post_id;
 		}
 
 		if ( ! is_string( $site_editor_post_id ) ) {
@@ -250,7 +279,6 @@ class Rest_Api_Hooks extends Hooks_Base {
 
 		$parts = explode( '//', $site_editor_post_id );
 		if ( count( $parts ) === 2 ) {
-
 			$posts = Post_Query::get_unfiltered_posts(
 				array(
 					'name'        => $parts[1],
@@ -276,16 +304,14 @@ class Rest_Api_Hooks extends Hooks_Base {
 	}
 
 	/**
-	 * Get the site editor post id for a given post, eg. 'greyd-theme//404'.
+	 * Get the site editor post id for a given post, e.g. 'greyd-theme//404'.
 	 *
-	 * @param mixed $post          Post object or post id
-	 *
-	 * @return string|int|null     String for wp_template and wp_template_part
-	 *                             Int for wp_navigation, wp_block and page.
-	 *                             Null for all other post types.
+	 * @param \WP_Post|int $post Post object or post id.
+	 * @return string|int|null String for wp_template and wp_template_part;
+	 *                         int for wp_navigation, wp_block and page;
+	 *                         null for all other post types.
 	 */
-	public static function get_site_editor_post_id( $post ) {
-
+	public function get_site_editor_post_id( $post ) {
 		if ( ! is_object( $post ) ) {
 			$post = get_post( $post );
 		}
@@ -297,7 +323,6 @@ class Rest_Api_Hooks extends Hooks_Base {
 		switch ( $post->post_type ) {
 			case 'wp_template':
 			case 'wp_template_part':
-				// greyd-theme//footer, greyd-theme//404 ...
 				return Theme_Posts_Service::get_wp_template_theme( $post ) . '//' . $post->post_name;
 
 			case 'wp_navigation':
@@ -306,7 +331,6 @@ class Rest_Api_Hooks extends Hooks_Base {
 				return $post->ID;
 
 			default:
-				// all other post types do not support the site editor
 				return null;
 		}
 	}

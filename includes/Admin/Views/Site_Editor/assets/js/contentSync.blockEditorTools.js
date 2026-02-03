@@ -1,6 +1,11 @@
 var contentSync = contentSync || {};
 
-contentSync.siteEditor = new function () {
+contentSync.blockEditorTools = new function () {
+
+	/** REST base path for editor endpoints (localized via contentSyncEditorData.restBasePath). */
+	const editorRestBasePath = ( typeof contentSyncEditorData !== 'undefined' && contentSyncEditorData.restBasePath )
+		? contentSyncEditorData.restBasePath
+		: 'contentsync/v1/admin';
 
 	/**
 	 * fallback for setData
@@ -59,7 +64,7 @@ contentSync.siteEditor = new function () {
 	this.getData = ( postReference, forceReload ) => {
 
 		if ( typeof forceReload === 'undefined' || !forceReload ) {
-			if ( postReference === null || contentSync.siteEditor?.data?.postReference === postReference ) {
+			if ( postReference === null || contentSync.blockEditorTools?.data?.postReference === postReference ) {
 				return;
 			}
 		}
@@ -71,15 +76,13 @@ contentSync.siteEditor = new function () {
 		}
 
 		wp.apiFetch( {
-			path: '/contentsync/v1/get_post_info',
+			path: '/' + editorRestBasePath + '/editor/get-post-data',
 			method: 'POST',
 			data: {
 				postReference: postReference
 			},
-		} ).then( ( res ) => {
-			
-			const response = JSON.parse( res );
-			// console.log( 'response from: /contentsync/v1/get_post_info', response );
+		} ).then( ( response ) => {
+			// wp.apiFetch returns parsed JSON; response is { status, message, data }
 
 			if ( response?.status === 200 ) {
 				if ( response?.data?.post?.status === 'linked' ) {
@@ -88,9 +91,9 @@ contentSync.siteEditor = new function () {
 					document.body.classList.remove( 'contentsync-locked' );
 				}
 
-				contentSync.siteEditor.setNotice( response?.data?.notice );
+				contentSync.blockEditorTools.setNotice( response?.data?.notice );
 				console.log( 'setData:', response?.data );
-				contentSync.siteEditor.setData( {
+				contentSync.blockEditorTools.setData( {
 					postReference: postReference,
 					post: response?.data?.post,
 					similarPosts: null,
@@ -104,8 +107,8 @@ contentSync.siteEditor = new function () {
 				} );
 			} else {
 				document.body.classList.remove( 'contentsync-locked' );
-				contentSync.siteEditor.setNotice( [] );
-				contentSync.siteEditor.setData( {
+				contentSync.blockEditorTools.setNotice( [] );
+				contentSync.blockEditorTools.setData( {
 					postReference: postReference,
 					post: {
 						id: 0,
@@ -127,7 +130,7 @@ contentSync.siteEditor = new function () {
 		} ).catch( ( err ) => {
 			document.body.classList.remove( 'contentsync-locked' );
 			console.error( 'apiFetch error: ', err );
-			contentSync.siteEditor.setData( {
+			contentSync.blockEditorTools.setData( {
 				postReference: postReference,
 				post: {
 					id: 0,
@@ -163,16 +166,15 @@ contentSync.siteEditor = new function () {
 		}
 
 		wp.apiFetch( {
-			path: '/contentsync/v1/save_options',
+			path: '/' + editorRestBasePath + '/editor/save-options',
 			method: 'POST',
 			data: {
 				post_id: post_id,
 				options: options,
 				canonical_url: canonical_url
 			},
-		} ).then( ( res ) => {
-			
-			const response = JSON.parse( res );
+		} ).then( ( response ) => {
+			// wp.apiFetch returns parsed JSON; response is { status, message, data }
 			console.log( 'saveOptions response:', response );
 
 			if ( response?.status === 200 ) {
@@ -222,8 +224,8 @@ contentSync.siteEditor = new function () {
 					}
 				}
 
-				contentSync.siteEditor.setData( {
-					...contentSync.siteEditor.data,
+				contentSync.blockEditorTools.setData( {
+					...contentSync.blockEditorTools.data,
 					similarPosts: similarPosts
 				} );
 			}

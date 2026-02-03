@@ -3,7 +3,8 @@
  */
 ( function ( wp ) {
 
-	if ( !_.has( wp, 'editSite' ) ) return null;
+	// site editor only
+	// if ( !_.has( wp, 'editSite' ) ) return null;
 
 	var { createElement: el } = wp.element;
 	var { __, _n, sprintf } = wp.i18n;
@@ -15,12 +16,12 @@
 		 * not an ID, but in the form of theme-name//template-name, e. g. greyd-wp//home
 		 */
 		let lastPostReference = null;
-		[ contentSync.siteEditor.postReference, contentSync.siteEditor.setPostReference ] = wp.element.useState( null );
+		[ contentSync.blockEditorTools.postReference, contentSync.blockEditorTools.setPostReference ] = wp.element.useState( null );
 		
 		/**
 		 * Contentsync post data.
 		 */
-		[ contentSync.siteEditor.data, contentSync.siteEditor.setData ] = wp.element.useState( {
+		[ contentSync.blockEditorTools.data, contentSync.blockEditorTools.setData ] = wp.element.useState( {
 			postReference: null,
 			post: {
 				id: -1, // -1 = loading, 0 = no post found, > 0 = post found
@@ -48,20 +49,20 @@
 			const currentPostReference = wp.data.select( 'core/editor' ).getCurrentPostId();
 			if (
 				currentPostReference !== null
-				&& currentPostReference !== contentSync.siteEditor.postReference
+				&& currentPostReference !== contentSync.blockEditorTools.postReference
 				&& currentPostReference !== lastPostReference
 			) {
 
 				lastPostReference = currentPostReference;
-				contentSync.siteEditor.setPostReference( currentPostReference ); // triggers a re-render
+				contentSync.blockEditorTools.setPostReference( currentPostReference ); // triggers a re-render
 			}
 		}, [ 'core/editor' ] );
 
 		/**
 		 * If reference is set, get post data.
 		 */
-		if ( contentSync.siteEditor.postReference !== null ) {
-			contentSync.siteEditor.getData( contentSync.siteEditor.postReference );
+		if ( contentSync.blockEditorTools.postReference !== null ) {
+			contentSync.blockEditorTools.getData( contentSync.blockEditorTools.postReference );
 		}
 
 		/**
@@ -75,7 +76,7 @@
 				status: ''
 			},
 			similarPosts
-		} = contentSync.siteEditor.data;
+		} = contentSync.blockEditorTools.data;
 
 		const hasUnsolvedError = post?.error && !post.error?.repaired;
 
@@ -152,7 +153,7 @@
 					similarPosts === null && el( wp.components.Button, {
 						isSecondary: true,
 						onClick: () => {
-							contentSync.siteEditor.getSimilarPosts( post.id );
+							contentSync.blockEditorTools.getSimilarPosts( post.id );
 						},
 						'data-post-id': post.id
 					}, __( 'Find similar posts', 'contentsync' ) ),
@@ -195,7 +196,7 @@
 
 				// error
 				hasUnsolvedError && [
-					contentSync.siteEditor.renderStatusBox( 'error', post.error?.message ),
+					contentSync.blockEditorTools.renderStatusBox( 'error', post.error?.message ),
 					post.currentUserCan && el( wp.components.Button, {
 						isSecondary: true,
 						onClick: function( e ) {
@@ -207,7 +208,7 @@
 				// root post
 				( 'root' === post.status && !hasUnsolvedError ) && [
 
-					contentSync.siteEditor.renderStatusBox( post.status, __( 'Root post', 'contentsync' ) ),
+					contentSync.blockEditorTools.renderStatusBox( post.status, __( 'Root post', 'contentsync' ) ),
 
 					// Content Sync Options
 					post.currentUserCan && el( 'div', { className: 'contentsync-options-section' }, [
@@ -228,10 +229,10 @@
 								}, __( 'Global Canonical URL', 'contentsync' ) ),
 								el( 'input', {
 									type: 'text',
-									value: contentSync.siteEditor.data.canonicalUrl,
+									value: contentSync.blockEditorTools.data.canonicalUrl,
 									onChange: ( e ) => {
 										setOptionsChanged( true );
-										contentSync.siteEditor.setData( prev => ( {
+										contentSync.blockEditorTools.setData( prev => ( {
 											...prev,
 											canonicalUrl: e.target.value
 										} ) );
@@ -243,7 +244,7 @@
 							// Dynamic options based on available options
 							post?.availableOptions && Object.keys( post.availableOptions ).map( ( key ) => {
 								const option = post.availableOptions[ key ];
-								const optionValue = contentSync.siteEditor.data.options[ option.name ] || false;
+								const optionValue = contentSync.blockEditorTools.data.options[ option.name ] || false;
 								
 								return el( 'div', { 
 									key: option.name,
@@ -257,7 +258,7 @@
 											checked: optionValue,
 											onChange: ( e ) => {
 												setOptionsChanged( true );
-												contentSync.siteEditor.setData( prev => ( {
+												contentSync.blockEditorTools.setData( prev => ( {
 													...prev,
 													options: {
 														...prev.options,
@@ -289,7 +290,7 @@
 									isPrimary: true,
 									onClick: () => {
 										// setOptionsChanged( false );
-										contentSync.siteEditor.saveOptions( post.id, contentSync.siteEditor.data.options, contentSync.siteEditor.data.canonicalUrl );
+										contentSync.blockEditorTools.saveOptions( post.id, contentSync.blockEditorTools.data.options, contentSync.blockEditorTools.data.canonicalUrl );
 									},
 									className: 'contentsync-save-button'
 								}, __( 'Save Options', 'contentsync' ) )
@@ -357,7 +358,7 @@
 				// linked post
 				( 'linked' === post.status && !hasUnsolvedError ) && [
 
-					contentSync.siteEditor.renderStatusBox( post.status, __( 'Linked post', 'contentsync' ) ),
+					contentSync.blockEditorTools.renderStatusBox( post.status, __( 'Linked post', 'contentsync' ) ),
 
 					el( 'p', {}, [
 						sprintf(
@@ -394,11 +395,11 @@
 					] )
 				],
 
-				// // debug info
-				// el( 'hr' ),
-				// el( 'p', {}, __( 'Status: ' + post.status, 'contentsync' ) ),
-				// el( 'p', {}, __( 'Global ID: ' + post.gid, 'contentsync' ) ),
-				// el( 'p', {}, __( 'Post ID: ' + post.id, 'contentsync' ) ),
+				// debug info
+				el( 'hr' ),
+				el( 'p', {}, __( 'Status: ' + post.status, 'contentsync' ) ),
+				el( 'p', {}, __( 'Global ID: ' + post.gid, 'contentsync' ) ),
+				el( 'p', {}, __( 'Post ID: ' + post.id, 'contentsync' ) ),
 			]
 		] );
 	};
@@ -422,7 +423,7 @@
 								xmlns: 'http://www.w3.org/2000/svg'
 							}, [
 								el( 'path', {
-									d: 'M12.0387 3.12854C9.67558 3.12854 7.40929 4.06727 5.73834 5.73822C4.06739 7.40917 3.12866 9.67546 3.12866 12.0385C3.12866 14.4017 4.06739 16.6679 5.73834 18.3389C7.40929 20.0098 9.67558 20.9486 12.0387 20.9486C14.4018 20.9486 16.668 20.0098 18.339 18.3389C20.0099 16.6679 20.9487 14.4017 20.9487 12.0385C20.9487 9.67546 20.0099 7.40917 18.339 5.73822C16.668 4.06727 14.4018 3.12854 12.0387 3.12854ZM19.4637 9.54374C19.3295 9.98277 19.1065 10.3895 18.8085 10.7387C18.5104 11.0878 18.1437 11.3719 17.7312 11.5732C17.5114 10.7481 17.1053 9.98432 16.544 9.34072C15.9828 8.69711 15.2814 8.1908 14.4939 7.86074C14.622 7.42147 14.8984 7.04016 15.276 6.78164C14.8503 6.50444 14.286 6.36584 13.9494 6.85094C13.4247 7.53404 13.9494 8.44484 14.1573 8.83094V8.96954C13.6076 8.63613 13.1778 8.13702 12.9297 7.54394C11.9731 7.51322 11.0269 7.74977 10.1973 8.22704C10.1111 7.66809 10.1656 7.09649 10.3557 6.56384C10.7132 6.59797 11.0736 6.54357 11.4051 6.40544C11.7366 6.26732 12.029 6.04971 12.2565 5.77184C12.7119 5.25704 12.1278 4.60364 11.6724 4.20764H12.0288C13.3765 4.19855 14.7036 4.53969 15.8799 5.19764C16.5447 5.68903 17.0915 6.32265 17.4803 7.05228C17.8691 7.7819 18.0901 8.58912 18.1272 9.41504C18.3648 9.41504 18.8202 8.87054 19.0281 8.50424C19.1984 8.83985 19.3439 9.18734 19.4637 9.54374ZM12.0387 19.8002C10.0092 17.741 12.2862 16.0877 11.0487 14.6126C10.1379 13.7711 8.78156 14.3552 7.96976 13.3949C7.83272 12.6789 7.89196 11.9393 8.1412 11.2543C8.39044 10.5693 8.82039 9.96458 9.38546 9.50414C9.90026 9.06854 13.3455 8.51414 14.7513 9.72194C15.5735 10.4301 16.1519 11.3792 16.4046 12.4345C16.8589 12.4689 17.3133 12.369 17.7114 12.1474C18.1173 15.0977 14.5929 18.8201 12.0387 19.8002ZM8.22716 5.19764C8.60552 5.05339 9.02116 5.03931 9.40841 5.15764C9.79566 5.27596 10.1325 5.51995 10.3656 5.85104C9.94976 6.22724 9.43496 6.47474 8.88056 6.56384C8.90103 6.27233 8.96442 5.98544 9.06866 5.71244L8.22716 5.19764Z'
+									d: 'M14.9361 10.9003C14.6902 10.8235 14.4289 10.9545 14.344 11.1884L13.5386 13.4088C13.4498 13.6538 13.5872 13.9194 13.838 14.0174C13.8784 14.0332 13.918 14.0491 13.9569 14.0651C14.4191 14.2532 14.7687 14.4814 15.0057 14.7493C15.2487 15.0172 15.3702 15.3479 15.3702 15.7412C15.3701 16.163 15.2369 16.5365 14.9702 16.8614C14.7035 17.1863 14.3272 17.4401 13.8413 17.6225C13.3613 17.8049 12.7953 17.896 12.1435 17.896C11.4798 17.896 10.8841 17.7992 10.3567 17.6054C9.83526 17.4059 9.4173 17.1123 9.10321 16.7246C9.1007 16.7214 9.09832 16.718 9.09582 16.7148L9.74869 16.3539C10.0051 16.2121 10.1469 15.9362 10.1084 15.6551C10.0697 15.3739 9.85811 15.1425 9.57207 15.0691L5.90443 14.1279C5.71687 14.0797 5.51698 14.105 5.34881 14.198C5.18071 14.2909 5.058 14.4441 5.00772 14.6237L4.02496 18.1364C3.94837 18.4103 4.05151 18.7018 4.28644 18.8744C4.52137 19.047 4.84187 19.0671 5.09829 18.9253L5.86152 18.503C6.46734 19.3144 7.29606 19.9302 8.34761 20.3503C9.43801 20.7835 10.7182 21 12.1878 21C13.6693 21 14.9348 20.7863 15.9837 20.3587C17.0385 19.9255 17.8446 19.3184 18.4016 18.5375C18.9646 17.7508 19.249 16.8215 19.2549 15.7498C19.249 15.0202 19.1097 14.3731 18.8371 13.8087C18.5704 13.2444 18.1941 12.754 17.7082 12.3379C17.2223 11.9217 16.6474 11.5712 15.9837 11.2861C15.6509 11.1432 15.3017 11.0146 14.9361 10.9003ZM12.2324 3C10.905 3.00001 9.71976 3.22244 8.67679 3.66705C7.63379 4.1117 6.81284 4.7302 6.21429 5.52257C5.62169 6.31496 5.32835 7.24143 5.33427 8.30175C5.32836 9.59577 5.76992 10.6248 6.65884 11.3886C7.34585 11.979 8.22583 12.4486 9.29867 12.7972C9.53395 12.8736 9.78782 12.7577 9.88455 12.5385L10.8485 10.3545C10.9544 10.1143 10.8331 9.8408 10.5858 9.73174C10.5505 9.71618 10.5203 9.702 10.4983 9.69087C10.3629 9.6251 10.2356 9.55547 10.1167 9.48176C9.85006 9.31075 9.63962 9.10822 9.48554 8.87452C9.33743 8.64081 9.26942 8.36709 9.28127 8.0536C9.28128 7.67738 9.39384 7.34098 9.61902 7.04457C9.85014 6.74818 10.1821 6.51724 10.6146 6.35194C11.0472 6.18097 11.5776 6.09558 12.2057 6.09558C13.1301 6.09559 13.8622 6.28642 14.4015 6.66835C14.6059 6.81313 14.7766 6.98021 14.9137 7.16921L14.2513 7.53561C13.9949 7.67744 13.853 7.95325 13.8916 8.2344C13.9303 8.51554 14.1419 8.74676 14.4279 8.82019L18.0956 9.76141C18.2831 9.80952 18.483 9.78431 18.6512 9.69133C18.8193 9.59833 18.942 9.44519 18.9923 9.26557L19.975 5.75292C20.0517 5.47898 19.9484 5.18777 19.7135 5.01509C19.4786 4.84249 19.1581 4.82242 18.9017 4.96418L18.0643 5.42692C17.5067 4.68046 16.7424 4.09357 15.7704 3.66705C14.7629 3.22241 13.5835 3.00001 12.2324 3Z'
 								} )
 							] );
 						}
@@ -435,6 +436,5 @@
 	} );
 
 } )(
-	window.wp,
-	greyd.components
+	window.wp
 );

@@ -61,12 +61,12 @@ contentSync.postSync = new function() {
 				 */
 				if (
 					mode === 'reload'
-					&& typeof contentSync.siteEditor.postReference !== 'undefined'
-					&& contentSync.siteEditor.postReference !== null
+					&& typeof contentSync.blockEditorTools.postReference !== 'undefined'
+					&& contentSync.blockEditorTools.postReference !== null
 				) {
 					const actionsWithoutReload = [ 'contentsync_export', 'contentsync_unexport', 'contentsync_unimport', 'contentsync_repair' ];
 					if ( actionsWithoutReload.indexOf( action ) > -1 ) {
-						contentSync.siteEditor.getData( contentSync.siteEditor.postReference, true );
+						contentSync.blockEditorTools.getData( contentSync.blockEditorTools.postReference, true );
 						mode = 'success';
 					}
 				}
