@@ -194,7 +194,7 @@
 															<span
 																className="button button-ghost tiny"
 																onClick={(e) =>
-																	contentSync.overwrite.openModal(
+																	contentSync.overwriteLocalPost.openModal(
 																		similarPost.meta
 																			?.synced_post_id,
 																		similarPost

@@ -107,12 +107,12 @@ class Block_Editor_Hooks extends Hooks_Base {
 		);
 		wp_enqueue_script( 'contentSync-unlinkRoot' );
 		wp_register_script(
-			'contentSync-overwrite',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.overwrite.js',
+			'contentSync-overwriteLocalPost',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.overwriteLocalPost.js',
 			array( 'contentSync-blockEditorTools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
 			CONTENTSYNC_VERSION,
 			true
 		);
-		wp_enqueue_script( 'contentSync-overwrite' );
+		wp_enqueue_script( 'contentSync-overwriteLocalPost' );
 	}
 }

@@ -1,6 +1,6 @@
 var contentSync = contentSync || {};
 
-contentSync.overwrite = new function() {
+contentSync.overwriteLocalPost = new function() {
 
 	/**
 	 * i18n function
@@ -11,7 +11,7 @@ contentSync.overwrite = new function() {
 	 * Modal instance
 	 */
 	this.Modal = new contentSync.Modal( {
-		id: 'overwrite-modal',
+		id: 'overwrite-local-post-modal',
 		title: __( 'Overwrite post', 'contentsync' ),
 		description: __( 'Do you want to overwrite the current post with the global post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
 		buttons: {
