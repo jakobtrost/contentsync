@@ -13,6 +13,13 @@ defined( 'ABSPATH' ) || exit;
 class Post_Import extends Post_Transfer_Base {
 
 	/**
+	 * Array of post IDs to be imported and the new post IDs.
+	 *
+	 * @var array Key => Value pairs of post IDs.
+	 */
+	protected $post_id_map = array();
+
+	/**
 	 * Collect strings during import to replace them later.
 	 *
 	 * @var array Key => Value pairs of strings to be replaced.
@@ -113,7 +120,7 @@ class Post_Import extends Post_Transfer_Base {
 
 						// Add the post to the class var for later replacement,
 						// e.g. as nested posts inside the post content
-						$this->posts[ $post_id ] = $translation_analysis['reuse_post_id'];
+						$this->post_id_map[ $post_id ] = $translation_analysis['reuse_post_id'];
 						break;
 
 					default:
@@ -132,6 +139,7 @@ class Post_Import extends Post_Transfer_Base {
 
 				// Remove it from the import array to not change the existing post at all
 				unset( $this->posts[ $post_id ] );
+				unset( $this->post_id_map[ $post_id ] );
 				continue;
 			}
 
@@ -335,10 +343,11 @@ class Post_Import extends Post_Transfer_Base {
 
 						// add the post to the class var for later replacement,
 						// eg. as nested posts inside the post content.
-						$this->posts[ $post_id ] = $existing_post_id;
+						$this->post_id_map[ $post_id ] = $existing_post_id;
 
 						// remove it from the import array to not change it at all
 						unset( $this->posts[ $post_id ] );
+						unset( $this->post_id_map[ $post_id ] );
 
 						continue;
 					}
@@ -362,7 +371,7 @@ class Post_Import extends Post_Transfer_Base {
 			if ( is_wp_error( $result ) ) {
 				return $result;
 			} elseif ( $result ) {
-				$this->posts[ $post_id ] = $result;
+				$this->post_id_map[ $post_id ] = $result;
 
 				/**
 				 * Set the new post id for all unsupported translations of this post as well
@@ -370,8 +379,8 @@ class Post_Import extends Post_Transfer_Base {
 				if ( isset( $unsupported_translations ) && ! empty( $unsupported_translations ) ) {
 					foreach ( $unsupported_translations as $lang_code ) {
 						if ( $lang_code != $post_language_code ) {
-							$old_post_id                 = $translation_post_ids[ $lang_code ];
-							$this->posts[ $old_post_id ] = $post_id;
+							$old_post_id                       = $translation_post_ids[ $lang_code ];
+							$this->post_id_map[ $old_post_id ] = $post_id;
 							Logger::add( "  - unsupported translation of this post has been linked with this post (old_post_id: $old_post_id, new_id: $post_id)" );
 						}
 					}
@@ -408,7 +417,7 @@ class Post_Import extends Post_Transfer_Base {
 				continue;
 			}
 
-			$new_post_id = $this->posts[ $old_post_id ];
+			$new_post_id = $this->post_id_map[ $old_post_id ];
 
 			Logger::add( sprintf( "\r\n" . "Check new post '%s' (old id: %s)", $new_post_id, $old_post_id ) );
 
@@ -499,11 +508,11 @@ class Post_Import extends Post_Transfer_Base {
 			if ( $thumbnail_id  = get_post_thumbnail_id( $new_post_id ) ) {
 				Logger::add( sprintf( "Replace thumbnail for post '%s'.", $post->post_name ) );
 				$result = false;
-				if ( isset( $this->posts[ $thumbnail_id ] ) ) {
-					$result = set_post_thumbnail( $new_post_id, $this->posts[ $thumbnail_id ] );
+				if ( isset( $this->post_id_map[ $thumbnail_id ] ) ) {
+					$result = set_post_thumbnail( $new_post_id, $this->post_id_map[ $thumbnail_id ] );
 				}
 				if ( $result ) {
-					Logger::add( sprintf( "  - thumbnail ID changed from '%s' to '%s'", $thumbnail_id, $this->posts[ $thumbnail_id ] ) );
+					Logger::add( sprintf( "  - thumbnail ID changed from '%s' to '%s'", $thumbnail_id, $this->post_id_map[ $thumbnail_id ] ) );
 				} else {
 					Logger::add( sprintf( "  - thumbnail ID '%s' could not be changed.", $thumbnail_id ) );
 				}

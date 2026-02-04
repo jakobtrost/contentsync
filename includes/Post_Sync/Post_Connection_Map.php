@@ -66,7 +66,7 @@ class Post_Connection_Map {
 	 */
 	public static function add_or_remove( $gid, $args, $add = true, $post_site_url = '' ) {
 
-		list( $blog_id, $post_id, $site_url ) = explode_gid( $gid );
+		list( $blog_id, $post_id, $site_url ) = Synced_Post_Utils::explode_gid( $gid );
 		if ( $post_id === null ) {
 			return false;
 		}
@@ -320,7 +320,7 @@ class Post_Connection_Map {
 			return $post_links;
 		}
 
-		list( $root_blog_id, $root_post_id, $root_net_url ) = explode_gid( $gid );
+		list( $root_blog_id, $root_post_id, $root_net_url ) = Synced_Post_Utils::explode_gid( $gid );
 
 		// local network post
 		if ( empty( $root_net_url ) ) {
@@ -540,7 +540,7 @@ class Post_Connection_Map {
 
 		global $wpdb;
 
-		list( $root_blog_id, $root_post_id, $root_site_url ) = explode_gid( $gid );
+		list( $root_blog_id, $root_post_id, $root_site_url ) = Synced_Post_Utils::explode_gid( $gid );
 
 		$network_url = Urls::get_network_url();
 

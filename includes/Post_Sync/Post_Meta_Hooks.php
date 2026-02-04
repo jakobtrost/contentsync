@@ -36,7 +36,7 @@ class Post_Meta_Hooks extends Hooks_Base {
 			return;
 		}
 
-		list( $root_blog_id, $root_post_id, $root_net_url ) = explode_gid( $gid );
+		list( $root_blog_id, $root_post_id, $root_net_url ) = Synced_Post_Utils::explode_gid( $gid );
 		if ( $root_post_id === null ) {
 			return false;
 		}
