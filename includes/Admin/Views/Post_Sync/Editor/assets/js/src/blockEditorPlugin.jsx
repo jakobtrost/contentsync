@@ -194,13 +194,11 @@
 															<span
 																className="button button-ghost tiny"
 																onClick={(e) =>
-																	contentSync.overwritePost(
-																		e.target
+																	contentSync.overwrite.openModal(
+																		similarPost.meta
+																			?.synced_post_id,
+																		similarPost
 																	)
-																}
-																data-post_id={post.id}
-																data-gid={
-																	similarPost.meta?.synced_post_id
 																}
 															>
 																{__('Use', 'contentsync')}

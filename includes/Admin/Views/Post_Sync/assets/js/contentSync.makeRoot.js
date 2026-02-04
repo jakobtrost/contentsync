@@ -127,9 +127,11 @@ contentSync.makeRoot = new function() {
 		}
 
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
-			contentSync.blockEditorTools.showSnackbar( __( 'The post was made global successfully.', 'contentsync' ), 'success' );
-			// refresh post data
-			contentSync.blockEditorTools.getData( this.postId, true );
+			contentSync.blockEditorTools.getData( this.postId, true, ( post ) => {
+				if ( post ) {
+					contentSync.blockEditorTools.showSnackbar( __( 'The post was made global successfully.', 'contentsync' ), 'success' );
+				}
+			} );
 		} else {
 			contentSync.tools.addSnackBar( __( 'The post was made global successfully.', 'contentsync' ), 'success' );
 		}
@@ -151,9 +153,11 @@ contentSync.makeRoot = new function() {
 		this.Modal.toggleSubmitButtonBusy( false );
 
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
-			contentSync.blockEditorTools.showSnackbar( __( 'Error making post global: %s', 'contentsync' ).replace( '%s', message ), 'error' );
-			// refresh post data
-			contentSync.blockEditorTools.getData( this.postId, true );
+			contentSync.blockEditorTools.getData( this.postId, true, ( post ) => {
+				if ( post ) {
+					contentSync.blockEditorTools.showSnackbar( __( 'Error making post global: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+				}
+			} );
 		} else {
 			contentSync.tools.addSnackBar( __( 'Error making post global: %s', 'contentsync' ).replace( '%s', message ), 'error' );
 		}

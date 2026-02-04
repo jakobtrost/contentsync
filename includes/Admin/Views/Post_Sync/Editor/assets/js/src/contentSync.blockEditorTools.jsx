@@ -64,7 +64,7 @@ contentSync.blockEditorTools = new (function () {
 	/**
 	 * Set Post Data
 	 */
-	this.getData = (postReference, forceReload) => {
+	this.getData = (postReference, forceReload, callback) => {
 		if (typeof forceReload === 'undefined' || !forceReload) {
 			if (
 				postReference === null ||
@@ -122,6 +122,9 @@ contentSync.blockEditorTools = new (function () {
 						canonicalUrl: '',
 						showEditOptions: false,
 					});
+				}
+				if (callback && typeof callback === 'function') {
+					callback(response?.data?.post);
 				}
 			})
 			.catch((err) => {
@@ -200,7 +203,6 @@ contentSync.blockEditorTools = new (function () {
 				if (!data) {
 					return;
 				}
-				console.log('getSimilarPosts success: ', data, fullResponse);
 				contentSync.blockEditorTools.setData({
 					...contentSync.blockEditorTools.data,
 					similarPosts: data,
@@ -315,9 +317,9 @@ contentSync.blockEditorTools = new (function () {
 
 		const icon = { success: '✅', warning: '⚠️', error: '❌', info: null }[style];
 
-		dispatch('core/notices').createNotice(style, text, {
+		wp.data.dispatch('core/notices').createNotice(style, text, {
 			type: 'snackbar',
-			isDismissible: isDismissible,
+			// isDismissible: isDismissible,
 			icon: <span className="contentsync-snackbar-icon">{icon}</span>,
 		});
 	};

@@ -95,9 +95,11 @@ contentSync.unlinkRoot = new function() {
 		}
 
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
-			contentSync.blockEditorTools.showSnackbar( __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), 'success' );
-			// refresh post data
-			contentSync.blockEditorTools.getData( this.post.id, true );
+			contentSync.blockEditorTools.getData( this.post.id, true, ( post ) => {
+				if ( post ) {
+					contentSync.blockEditorTools.showSnackbar( __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), 'success' );
+				}
+			} );
 		} else {
 			contentSync.tools.addSnackBar( __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), 'success' );
 		}
