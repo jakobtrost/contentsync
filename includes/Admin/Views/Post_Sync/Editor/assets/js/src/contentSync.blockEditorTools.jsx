@@ -200,6 +200,7 @@ contentSync.blockEditorTools = new (function () {
 				if (!data) {
 					return;
 				}
+				console.log('getSimilarPosts success: ', data, fullResponse);
 				contentSync.blockEditorTools.setData({
 					...contentSync.blockEditorTools.data,
 					similarPosts: data,

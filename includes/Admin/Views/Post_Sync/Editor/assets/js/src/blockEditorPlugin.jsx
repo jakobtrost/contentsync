@@ -121,6 +121,8 @@
 			);
 		}
 
+		console.log('similarPosts: ', similarPosts);
+
 		let pluginContent = null;
 		// post id is loading
 		if (post.id < 0) {
@@ -171,35 +173,46 @@
 										{__('Similar posts are available globally:', 'contentsync')}
 									</p>
 									<ul className="contentsync_box_list">
-										{similarPosts.map((similarPost) => (
-											<li
-												key={
-													similarPost.meta?.synced_post_id ||
-													similarPost.post_title
-												}
-											>
-												<span className="flex">
-													<a
-														href={similarPost.post_links?.edit}
-														target="_blank"
-														rel="noopener noreferrer"
-													>
-														{similarPost.post_title}
-													</a>
-													<span
-														className="button button-ghost tiny"
-														onClick={(e) =>
-															contentSync.overwritePost(e.target)
+										{similarPosts.map(
+											(similarPost) => (
+												console.log('similarPost: ', similarPost),
+												(
+													<li
+														key={
+															similarPost.meta?.synced_post_id ||
+															similarPost.post_title
 														}
-														data-post_id={post.id}
-														data-gid={similarPost.meta?.synced_post_id}
 													>
-														{__('Use', 'contentsync')}
-													</span>
-												</span>
-												<small>{similarPost.post_links?.nice}</small>
-											</li>
-										))}
+														<span className="flex">
+															<a
+																href={similarPost.post_links?.edit}
+																target="_blank"
+																rel="noopener noreferrer"
+															>
+																{similarPost.post_title}
+															</a>
+															<span
+																className="button button-ghost tiny"
+																onClick={(e) =>
+																	contentSync.overwritePost(
+																		e.target
+																	)
+																}
+																data-post_id={post.id}
+																data-gid={
+																	similarPost.meta?.synced_post_id
+																}
+															>
+																{__('Use', 'contentsync')}
+															</span>
+														</span>
+														<small>
+															{similarPost.post_links?.nice}
+														</small>
+													</li>
+												)
+											)
+										)}
 									</ul>
 								</>
 							)}

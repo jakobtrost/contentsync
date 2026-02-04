@@ -269,7 +269,7 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 					}
 				}
 
-				$found[ $gid ] = $synced_post;
+				$found[] = $synced_post;
 			}
 		}
 
