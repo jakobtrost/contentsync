@@ -17,14 +17,14 @@ contentSync.makeRoot = new function() {
 		formInputs: [
 			{
 				type: 'checkbox',
-				name: 'nested',
+				name: 'append_nested',
 				label: __( 'Make nested content global', 'contentsync' ),
 				description: __( 'Templates, media, etc. are also made global so that used images, backgrounds, etc. will be displayed correctly on the destination websites.', 'contentsync' ),
 				value: 1
 			},
 			{
 				type: 'checkbox',
-				name: 'menus',
+				name: 'resolve_menus',
 				label: __( 'Resolve menus', 'contentsync' ),
 				description: __( 'All menus will be converted to static links.', 'contentsync' ),
 				value: 1
@@ -78,12 +78,14 @@ contentSync.makeRoot = new function() {
 	/**
 	 * Open modal
 	 * 
-	 * @param {HTMLElement} elem - Element that triggered the modal
+	 * @param {number} postId - Post ID
+	 * @param {string} postTitle - Post title
+	 * @param {HTMLElement} elem - Element that triggered the modal (optional)
 	 */
-	this.openModal = ( elem ) => {
-		this.buttonElement = elem;
-		this.postId = parseInt( elem.dataset.post_id );
-		this.postTitle = elem.dataset.post_title;
+	this.openModal = ( postId, postTitle, elem ) => {
+		this.postId = parseInt( postId );
+		this.postTitle = postTitle;
+		this.buttonElement = elem || null;
 
 		this.Modal.open();
 		this.Modal.setDescription( this.Modal.config.description.replace( '%s', '<u>' + this.postTitle + '</u>' ) );
@@ -98,10 +100,12 @@ contentSync.makeRoot = new function() {
 		const fd = this.Modal.getFormData();
 		const data = {
 			post_id: this.postId,
-			nested: fd.nested || fd.append_nested || 0,
-			resolve_menus: fd.menus || 0,
+			append_nested: fd.append_nested || 0,
+			resolve_menus: fd.resolve_menus || 0,
 			translations: 0,
 		};
+
+		console.log( 'data:', data );
 
 		this.RestHandler.send( data );
 	};
@@ -122,14 +126,19 @@ contentSync.makeRoot = new function() {
 			return this.onError( __( 'Error making post global: No global post ID found', 'contentsync' ), fullResponse );
 		}
 
-		contentSync.tools.addSnackBar( {
-			text: __( 'The post was made global successfully.', 'contentsync' ),
-			type: 'success'
-		} );
+		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
+			contentSync.blockEditorTools.showSnackbar( __( 'The post was made global successfully.', 'contentsync' ), 'success' );
+			// refresh post data
+			contentSync.blockEditorTools.getData( this.postId, true );
+		} else {
+			contentSync.tools.addSnackBar( __( 'The post was made global successfully.', 'contentsync' ), 'success' );
+		}
 
-		let buttonParent = this.buttonElement.parentElement;
-		buttonParent.removeChild( this.buttonElement );
-		buttonParent.appendChild( contentSync.tools.makeAdminIconStatusBox( 'root' ) );
+		if ( this.buttonElement ) {
+			let buttonParent = this.buttonElement.parentElement;
+			buttonParent.removeChild( this.buttonElement );
+			buttonParent.appendChild( contentSync.tools.makeAdminIconStatusBox( 'root' ) );
+		}
 	};
 
 	/**
@@ -140,9 +149,13 @@ contentSync.makeRoot = new function() {
 	 */
 	this.onError = ( message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
-		contentSync.tools.addSnackBar( {
-			text: __( 'Error making post global: %s', 'contentsync' ).replace( '%s', message ),
-			type: 'error'
-		} );
+
+		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
+			contentSync.blockEditorTools.showSnackbar( __( 'Error making post global: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+			// refresh post data
+			contentSync.blockEditorTools.getData( this.postId, true );
+		} else {
+			contentSync.tools.addSnackBar( __( 'Error making post global: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+		}
 	};
 };

@@ -144,9 +144,7 @@
 							</p>
 							<Button
 								isPrimary
-								onClick={(e) =>
-									contentSync.exportPost(e.target, post.id, post.title)
-								}
+								onClick={() => contentSync.makeRoot.openModal(post.id, post.title)}
 							>
 								{__('Convert to synced post', 'contentsync')}
 							</Button>
@@ -301,9 +299,10 @@
 								</p>
 								<Button
 									isSecondary
-									onClick={(e) => contentSync.unexportPost(e.target, post.gid)}
+									isDestructive
+									onClick={(e) => contentSync.unlinkRoot.openModal(post)}
 								>
-									{__('Unlink', 'contentsync')}
+									{__('Disable global sync', 'contentsync')}
 								</Button>
 							</div>
 							<hr />
@@ -391,7 +390,7 @@
 									})}
 								<div className="contentsync-save-button-container">
 									<Button
-										isPrimary
+										isSecondary
 										disabled={!optionsChanged}
 										onClick={() => {
 											contentSync.blockEditorTools.saveOptions(

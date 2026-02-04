@@ -418,8 +418,8 @@ class Modal {
 		const cancelButton = document.createElement( 'button' );
 		cancelButton.type = 'button';
 		cancelButton.className = 'components-button components-flex-item is-tertiary';
-		if ( this.config?.buttons?.cancel?.classNames ) {
-			cancelButton.className = `components-button components-flex-item ${this.config?.buttons?.cancel?.classNames}`;
+		if ( this.config?.buttons?.cancel?.className ) {
+			cancelButton.className = `components-button components-flex-item ${this.config?.buttons?.cancel?.className}`;
 		}
 
 		if ( this.config?.buttons?.cancel?.attributes ) {
@@ -436,8 +436,8 @@ class Modal {
 		const submitButton = document.createElement( 'button' );
 		submitButton.type = 'button';
 		submitButton.className = 'components-button components-flex-item is-primary';
-		if ( this.config?.buttons?.submit?.classNames ) {
-			submitButton.className = `components-button components-flex-item ${this.config?.buttons?.submit?.classNames}`;
+		if ( this.config?.buttons?.submit?.className ) {
+			submitButton.className = `components-button components-flex-item ${this.config?.buttons?.submit?.className}`;
 		}
 
 		if ( this.config?.buttons?.submit?.attributes ) {
@@ -470,7 +470,7 @@ class Modal {
 		document.body.appendChild( this.modalElement );
 
 		// Focus modal frame
-		const frame = this.modalElement.querySelector( '.components-modal__frame' );
+		const frame = this.modalElement?.querySelector( '.components-modal__frame' );
 		if ( frame ) {
 			frame.focus();
 		}
@@ -524,7 +524,7 @@ class Modal {
 
 		// Overlay click handler (close when clicking outside frame)
 		this.boundHandlers.handleOverlayClick = ( e ) => {
-			const frame = this.modalElement.querySelector( '.components-modal__frame' );
+			const frame = this.modalElement?.querySelector( '.components-modal__frame' );
 			if ( frame && !frame.contains( e.target ) ) {
 				this.close();
 			}
@@ -533,14 +533,14 @@ class Modal {
 		this.modalElement.addEventListener( 'click', this.boundHandlers.handleOverlayClick );
 
 		// Close button handler
-		const closeButton = this.modalElement.querySelector( '[data-action="close"]' );
+		const closeButton = this.modalElement?.querySelector( '[data-action="close"]' );
 		if ( closeButton ) {
 			this.boundHandlers.handleClose = () => this.close();
 			closeButton.addEventListener( 'click', this.boundHandlers.handleClose );
 		}
 
 		// Cancel button handler
-		const cancelButton = this.modalElement.querySelector( '[data-action="cancel"]' );
+		const cancelButton = this.modalElement?.querySelector( '[data-action="cancel"]' );
 		if ( cancelButton ) {
 			this.boundHandlers.handleCancel = () => {
 				if ( this.config.onCancel && typeof this.config.onCancel === 'function' ) {
@@ -554,7 +554,7 @@ class Modal {
 		}
 
 		// Submit button handler
-		const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
+		const submitButton = this.modalElement?.querySelector( '[data-action="submit"]' );
 		if ( submitButton ) {
 			this.boundHandlers.handleSubmit = () => {
 				if ( this.config.onSubmit && typeof this.config.onSubmit === 'function' ) {
@@ -581,17 +581,17 @@ class Modal {
 				this.modalElement.removeEventListener( 'click', this.boundHandlers.handleOverlayClick );
 			}
 
-			const closeButton = this.modalElement.querySelector( '[data-action="close"]' );
+			const closeButton = this.modalElement?.querySelector( '[data-action="close"]' );
 			if ( closeButton && this.boundHandlers.handleClose ) {
 				closeButton.removeEventListener( 'click', this.boundHandlers.handleClose );
 			}
 
-			const cancelButton = this.modalElement.querySelector( '[data-action="cancel"]' );
+			const cancelButton = this.modalElement?.querySelector( '[data-action="cancel"]' );
 			if ( cancelButton && this.boundHandlers.handleCancel ) {
 				cancelButton.removeEventListener( 'click', this.boundHandlers.handleCancel );
 			}
 
-			const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
+			const submitButton = this.modalElement?.querySelector( '[data-action="submit"]' );
 			if ( submitButton && this.boundHandlers.handleSubmit ) {
 				submitButton.removeEventListener( 'click', this.boundHandlers.handleSubmit );
 			}
@@ -610,14 +610,14 @@ class Modal {
 			return;
 		}
 
-		const descriptionParagraph = this.modalElement.querySelector( '.components-modal__description' );
+		const descriptionParagraph = this.modalElement?.querySelector( '.components-modal__description' );
 		if ( descriptionParagraph ) {
 			descriptionParagraph.innerHTML = text;
 		}
 		else {
 			const description = this.renderDescription();
 			description.innerHTML = text;
-			const mainContent = this.modalElement.querySelector( '.components-modal__main-content' );
+			const mainContent = this.modalElement?.querySelector( '.components-modal__main-content' );
 			// append as first child
 			mainContent.insertBefore( description, mainContent.firstChild );
 		}
@@ -632,7 +632,7 @@ class Modal {
 			return {};
 		}
 
-		const form = this.modalElement.querySelector( `#${this.config.id}__form` );
+		const form = this.modalElement?.querySelector( `#${this.config.id}__form` );
 		if ( !form ) {
 			return {};
 		}
@@ -666,7 +666,7 @@ class Modal {
 	 * Toggle the busy state of the submit button
 	 */
 	toggleSubmitButtonBusy( busy = true ) {
-		const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
+		const submitButton = this.modalElement?.querySelector( '[data-action="submit"]' );
 		if ( submitButton ) {
 			submitButton.disabled = busy;
 			if ( busy ) {
@@ -681,7 +681,7 @@ class Modal {
 	 * Toggle the disabled state of the submit button
 	 */
 	toggleSubmitButtonDisabled( disabled = true ) {
-		const submitButton = this.modalElement.querySelector( '[data-action="submit"]' );
+		const submitButton = this.modalElement?.querySelector( '[data-action="submit"]' );
 		if ( !submitButton ) {
 			return;
 		}

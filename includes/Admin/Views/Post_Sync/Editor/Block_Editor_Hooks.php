@@ -28,7 +28,7 @@ class Block_Editor_Hooks extends Hooks_Base {
 	 */
 	public function enqueue_assets() {
 
-		if ( ! Admin_Render::is_current_edit_screen_supported() ) {
+		if ( ! Admin_Render::is_current_post_screen_supported() ) {
 			return;
 		}
 
@@ -57,14 +57,14 @@ class Block_Editor_Hooks extends Hooks_Base {
 		 */
 
 		Build_Scripts::enqueue_build_script(
-			'contentsync-block-editor-tools',
+			'contentSync-blockEditorTools',
 			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/Editor/assets/js/src/contentSync.blockEditorTools.jsx',
 			array( 'wp-data', 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'lodash' ),
 			true
 		);
 
 		wp_localize_script(
-			'contentsync-block-editor-tools',
+			'contentSync-blockEditorTools',
 			'contentSyncEditorData',
 			array(
 				'restBasePath' => CONTENTSYNC_REST_NAMESPACE . '/admin',
@@ -72,7 +72,7 @@ class Block_Editor_Hooks extends Hooks_Base {
 		);
 
 		Build_Scripts::enqueue_build_script(
-			'contentsync-block-editor-plugin',
+			'contentSync-blockEditorPlugin',
 			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/Editor/assets/js/src/blockEditorPlugin.jsx',
 			array( 'wp-data', 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'lodash' ),
 			true
@@ -86,5 +86,25 @@ class Block_Editor_Hooks extends Hooks_Base {
 		// CONTENTSYNC_PLUGIN_PATH . '/languages'
 		// );
 		// }
+
+		/**
+		 * Modal scripts
+		 */
+		wp_register_script(
+			'contentSync-makeRoot',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.makeRoot.js',
+			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
+			CONTENTSYNC_VERSION,
+			true
+		);
+		wp_enqueue_script( 'contentSync-makeRoot' );
+		wp_register_script(
+			'contentSync-unlinkRoot',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.unlinkRoot.js',
+			array( 'contentSync-blockEditorTools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
+			CONTENTSYNC_VERSION,
+			true
+		);
+		wp_enqueue_script( 'contentSync-unlinkRoot' );
 	}
 }

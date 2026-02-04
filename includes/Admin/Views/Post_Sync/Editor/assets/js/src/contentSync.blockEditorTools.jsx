@@ -90,7 +90,6 @@ contentSync.blockEditorTools = new (function () {
 					}
 
 					contentSync.blockEditorTools.setNotice(response?.data?.notice);
-					console.log('setData:', response?.data);
 					contentSync.blockEditorTools.setData({
 						postReference: postReference,
 						post: response?.data?.post,

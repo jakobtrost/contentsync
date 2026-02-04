@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
 class Admin_Render {
 
 	/**
-	 * Check if current screen supports content sync functionality
+	 * Check if current edit.php screen supports content sync functionality
 	 *
 	 * @return bool
 	 */
@@ -30,14 +30,9 @@ class Admin_Render {
 			if (
 				$screen->base === 'edit' // edit (overview) screen
 				|| $screen->base === 'upload' // media (overview) screen
-				|| $screen->base === 'post' // post editor screen
 			) {
 				$current_post_type = isset( $screen->post_type ) ? $screen->post_type : 'post';
 				$supported         = in_array( $current_post_type, Post_Transfer_Service::get_supported_post_types() );
-			}
-			// on site editor screen
-			elseif ( $screen->base === 'site-editor' ) {
-				$supported = true;
 			}
 		}
 
@@ -57,6 +52,50 @@ class Admin_Render {
 		 * @return bool           Whether the current screen supports export/import.
 		 */
 		return apply_filters( 'contentsync_is_current_edit_screen_supported', $supported, $screen );
+	}
+
+	/**
+	 * Check if current post.php screen supports content sync functionality
+	 *
+	 * @return bool
+	 */
+	public static function is_current_post_screen_supported() {
+
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return false;
+		}
+
+		$supported = false;
+		$screen    = get_current_screen();
+
+		if ( is_object( $screen ) && isset( $screen->base ) ) {
+
+			if ( $screen->base === 'post' ) {
+				$current_post_type = isset( $screen->post_type ) ? $screen->post_type : 'post';
+				$supported         = in_array( $current_post_type, Post_Transfer_Service::get_supported_post_types() );
+			}
+			// on site editor screen
+			elseif ( $screen->base === 'site-editor' ) {
+				$supported = true;
+			}
+		}
+
+		/**
+		 * Filter to customize whether the current screen supports content sync functionality.
+		 *
+		 * This filter allows developers to extend or modify the logic that determines
+		 * which admin screens should display content sync options. It's useful
+		 * for adding support to custom post type screens or implementing custom
+		 * screen detection logic.
+		 *
+		 * @filter contentsync_is_current_post_screen_supported
+		 *
+		 * @param bool  $supported Whether the current screen supports export/import.
+		 * @param object $screen   The current WP_Screen object.
+		 *
+		 * @return bool           Whether the current screen supports export/import.
+		 */
+		return apply_filters( 'contentsync_is_current_post_screen_supported', $supported, $screen );
 	}
 
 	/**

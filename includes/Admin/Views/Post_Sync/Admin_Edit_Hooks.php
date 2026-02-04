@@ -141,13 +141,15 @@ class Admin_Edit_Hooks extends Hooks_Base {
 		if ( Synced_Post_Service::current_user_can_edit_synced_posts( 'root' ) ) {
 
 			printf(
-				'<button role="button" class="button button-tertiary contentsync-make-global-button" onclick="%2$s" data-title="%1$s" data-post_id="%3$s" data-post_title="%4$s">' .
+				'<button role="button" class="button button-tertiary contentsync-make-global-button" onclick="%2$s" data-title="%1$s">' .
 					'<span class="dashicons dashicons-plus-alt2"></span>' .
 				'</button>',
-				/* title    */ __( 'Convert to synced post', 'contentsync' ),
-				/* onclick  */ 'contentSync.makeRoot.openModal(this); return false;',
-				/* post_id  */ esc_attr( $post_id ),
-				/* post_title */ esc_html( get_the_title( $post_id ) ),
+				__( 'Convert to synced post', 'contentsync' ),
+				sprintf(
+					'contentSync.makeRoot.openModal( %s, %s, this ); return false;',
+					esc_attr( $post_id ),
+					esc_html( get_the_title( $post_id ) )
+				)
 			);
 		}
 	}

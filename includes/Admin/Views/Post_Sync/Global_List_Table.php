@@ -538,8 +538,8 @@ class Global_List_Table extends WP_List_Table {
 			'edit'     => $item->local_post || $item->error ? "<a href='" . $item->post_links['edit'] . "'>" . __( 'Edit', 'contentsync' ) . '</a>' : '',
 			// import by gid
 			'linked'   => $this->ajax_link( 'checkImport', __( 'Import', 'contentsync' ), $data ),
-			// unexport if this is the root
-			'unexport' => $item->relationship == 'root' ? $this->ajax_link( 'unexportPost', __( 'Unlink', 'contentsync' ), $data ) : '',
+			// unlink if this is the root
+			'unlink'   => $item->relationship == 'root' ? $this->ajax_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data ) : '',
 			// unimport if local post exists
 			'unimport' => $item->local_post ? $this->ajax_link( 'unimportPost', __( 'Unlink', 'contentsync' ), $data ) : '',
 			// trash the local post
@@ -551,8 +551,8 @@ class Global_List_Table extends WP_List_Table {
 		);
 
 		if ( is_network_admin() ) {
-			// unexport by gid
-			$item->actions['unexport'] = $this->ajax_link( 'unexportPost', __( 'Unlink', 'contentsync' ), $data );
+			// unlink by gid
+			$item->actions['unlink'] = $this->ajax_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data );
 			// delete all by gid
 			$item->actions['delete'] = $this->ajax_link( 'deletePost', __( 'Delete everywhere', 'contentsync' ), $data );
 		}
@@ -676,12 +676,12 @@ class Global_List_Table extends WP_List_Table {
 
 				if ( is_network_admin() ) {
 					if ( empty( $root_net_url ) ) {
-						$actions = array( 'root', 'unexport', 'delete' );
+						$actions = array( 'root', 'unlink', 'delete' );
 					} else {
 						$actions = array( 'root' );
 					}
 				} elseif ( $item->relationship === 'root' ) {
-					$actions = array( 'edit', 'unexport', 'trash' );
+					$actions = array( 'edit', 'unlink', 'trash' );
 				} elseif ( $item->relationship === 'linked' ) {
 					$actions = array( 'root', 'edit', 'trash', 'unimport' );
 				} elseif ( $item->relationship === 'unlinked' ) {
@@ -923,8 +923,8 @@ class Global_List_Table extends WP_List_Table {
 	public function get_bulk_actions() {
 		if ( is_network_admin() ) {
 			$actions = array(
-				'unexport' => __( 'Unlink', 'contentsync' ),
-				'delete'   => __( 'Delete everywhere', 'contentsync' ),
+				'unlink' => __( 'Unlink', 'contentsync' ),
+				'delete' => __( 'Delete everywhere', 'contentsync' ),
 			);
 		} else {
 			$actions = array(
@@ -1013,7 +1013,7 @@ class Global_List_Table extends WP_List_Table {
 					$post_titles[] = get_post( $root_post_id )->post_title;
 				}
 
-				// unexport root posts from this stage
+				// unlink root posts from this stage
 				elseif ( $root_blog_id === get_current_blog_id() && empty( $root_net_url ) ) {
 					$status = get_post_meta( $root_post_id, 'synced_post_status', true );
 					if ( $status === 'root' ) {
@@ -1029,8 +1029,8 @@ class Global_List_Table extends WP_List_Table {
 				}
 			}
 
-			// unexport (network)
-			elseif ( $bulk_action === 'unexport' ) {
+			// unlink (network)
+			elseif ( $bulk_action === 'unlink' ) {
 				if ( ! is_network_admin() ) {
 					return false;
 				}

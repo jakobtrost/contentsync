@@ -117,8 +117,7 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function make_root( $request ) {
-		$post_id   = (int) $request->get_param( 'post_id' );
-		$form_data = (array) ( $request->get_param( 'form_data' ) ?? array() );
+		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( empty( $post_id ) ) {
 			return $this->respond( false, __( 'post_id is not defined.', 'contentsync' ), 400 );
@@ -127,9 +126,11 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 		$args = Post_Meta::get_default_export_options();
 
 		foreach ( $args as $k => $v ) {
-			if ( isset( $form_data[ $k ] ) ) {
-				$args[ $k ] = true;
+			$form_value = $request->get_param( $k ) ?? null;
+			if ( $form_value === null ) {
+				continue;
 			}
+			$args[ $k ] = boolval( $form_value );
 		}
 
 		$gid = Synced_Post_Service::make_root_post( $post_id, $args );

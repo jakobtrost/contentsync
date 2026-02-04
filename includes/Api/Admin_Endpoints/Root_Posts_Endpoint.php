@@ -53,11 +53,11 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 	private static $trash_route_param_names = array( 'post_id', 'blog_id' );
 
 	/**
-	 * Param names for the unexport route.
+	 * Param names for the unlink route.
 	 *
 	 * @var array
 	 */
-	private static $unexport_route_param_names = array( 'gid' );
+	private static $unlink_route_param_names = array( 'gid' );
 
 	/**
 	 * Register REST API routes
@@ -113,19 +113,19 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 			)
 		);
 
-		// POST /root-posts/unexport — params: gid
-		$unexport_args = array_intersect_key(
+		// POST /root-posts/unlink — params: gid
+		$unlink_args = array_intersect_key(
 			$all_args,
-			array_flip( self::$unexport_route_param_names )
+			array_flip( self::$unlink_route_param_names )
 		);
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/unexport',
+			'/' . $this->rest_base . '/unlink',
 			array(
 				'methods'             => $this->method,
-				'callback'            => array( $this, 'unexport' ),
+				'callback'            => array( $this, 'unlink' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $unexport_args,
+				'args'                => $unlink_args,
 			)
 		);
 	}
@@ -206,12 +206,12 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 	}
 
 	/**
-	 * Unlink root post (unexport).
+	 * Unlink root post (unlink).
 	 *
 	 * @param \WP_REST_Request $request Full request object.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public function unexport( $request ) {
+	public function unlink( $request ) {
 		$gid = (string) ( $request->get_param( 'gid' ) ?? '' );
 
 		if ( empty( $gid ) ) {

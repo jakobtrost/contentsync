@@ -94,7 +94,7 @@ class Post_Meta {
 
 	/**
 	 * Delete all global meta infos.
-	 * Used to unimport & unexport posts.
+	 * Used to unimport & unlink posts.
 	 */
 	public static function delete_values( $post_id ) {
 		$return = true;
