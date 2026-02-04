@@ -32,7 +32,7 @@ class Menu_Hooks extends Hooks_Base {
 			'manage_options', // capability
 			'contentsync', // slug
 			array( $this, 'render_main_plugin_page' ), // function
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Menu/assets/contentsync-menu-icon-alternate.svg', // icon url
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Menu/assets/admin-menu-icon.svg', // icon url
 			is_network_admin() ? 10 : 65 // position
 		);
 	}
