@@ -1,6 +1,6 @@
 var contentSync = contentSync || {};
 
-contentSync.unlinkRoot = new function() {	
+contentSync.unlinkLinkedPost = new function() {
 
 	/**
 	 * i18n function
@@ -11,25 +11,15 @@ contentSync.unlinkRoot = new function() {
 	 * Modal instance
 	 */
 	this.Modal = new contentSync.Modal( {
-		id: 'unlink-root-post-modal',
-		title: __( 'Disable sync', 'contentsync' ),
-		description: __( 'Do you want to disable global synchronization for the post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
-		formInputs: [
-			{
-				type: 'checkbox',
-				name: 'unlink_connected_posts',
-				label: __( 'Unlink connected posts', 'contentsync' ),
-				description: __( 'All posts that are connected to this post will be converted to local posts.', 'contentsync' ),
-				value: 1
-			}
-		],
+		id: 'unlink-linked-post-modal',
+		title: __( 'Convert to local post', 'contentsync' ),
+		description: __( 'Do you want to convert the post %s to a local post and thereafter disable synchronization?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
 		buttons: {
 			cancel: {
 				text: __( 'Cancel', 'contentsync' )
 			},
 			submit: {
-				text: __( 'Disable sync', 'contentsync' ),
-				className: 'is-primary is-destructive'
+				text: __( 'Unlink post', 'contentsync' )
 			}
 		},
 		onSubmit: () => this.onModalSubmit()
@@ -39,7 +29,7 @@ contentSync.unlinkRoot = new function() {
 	 * REST handler instance
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
-		restPath: 'root-posts/unlink',
+		restPath: 'linked-posts/unlink',
 		onSuccess: ( data, fullResponse ) => this.onSuccess( data, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
@@ -74,7 +64,7 @@ contentSync.unlinkRoot = new function() {
 		this.Modal.toggleSubmitButtonBusy( true );
 
 		const data = {
-			gid: this.post.gid
+			post_id: this.post.id
 		};
 
 		this.RestHandler.send( data );
@@ -83,7 +73,7 @@ contentSync.unlinkRoot = new function() {
 	/**
 	 * When the REST request is successful
 	 *
-	 * @param {string} responseData - Global post ID (from response.data)
+	 * @param {string} responseData - Local post ID (from response.data)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
 	this.onSuccess = ( responseData, fullResponse ) => {
@@ -91,17 +81,17 @@ contentSync.unlinkRoot = new function() {
 		this.Modal.close();
 		
 		if ( ! responseData ) {
-			return this.onError( __( 'Error disabling global synchronization: No global post ID found', 'contentsync' ), fullResponse );
+			return this.onError( __( 'Error converting to local post: No local post ID found', 'contentsync' ), fullResponse );
 		}
 
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
 			contentSync.blockEditorTools.getData( this.post.id, true, ( post ) => {
 				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), 'success' );
+					contentSync.blockEditorTools.showSnackbar( __( 'The post was converted to a local post and synchronization was disabled successfully.', 'contentsync' ), 'success' );
 				}
 			} );
 		} else {
-			contentSync.tools.addSnackBar( __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), 'success' );
+			contentSync.tools.addSnackBar( __( 'The post was converted to a local post and synchronization was disabled successfully.', 'contentsync' ), 'success' );
 		}
 	};
 
@@ -114,9 +104,9 @@ contentSync.unlinkRoot = new function() {
 	this.onError = ( message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
-			contentSync.blockEditorTools.showSnackbar( __( 'Error disabling global synchronization: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+			contentSync.blockEditorTools.showSnackbar( __( 'Error converting to local post: %s', 'contentsync' ).replace( '%s', message ), 'error' );
 		} else {
-			contentSync.tools.addSnackBar( __( 'Error disabling global synchronization: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+			contentSync.tools.addSnackBar( __( 'Error converting to local post: %s', 'contentsync' ).replace( '%s', message ), 'error' );
 		}
 	};
 };

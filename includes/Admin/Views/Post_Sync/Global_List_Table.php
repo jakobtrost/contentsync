@@ -535,19 +535,19 @@ class Global_List_Table extends WP_List_Table {
 		}
 		$item->actions = array(
 			// edit the local post
-			'edit'     => $item->local_post || $item->error ? "<a href='" . $item->post_links['edit'] . "'>" . __( 'Edit', 'contentsync' ) . '</a>' : '',
+			'edit'   => $item->local_post || $item->error ? "<a href='" . $item->post_links['edit'] . "'>" . __( 'Edit', 'contentsync' ) . '</a>' : '',
 			// import by gid
-			'linked'   => $this->build_rest_api_link( 'importGlobalPost.openModal', __( 'Import', 'contentsync' ), $data ),
+			'linked' => $this->build_rest_api_link( 'importGlobalPost.openModal', __( 'Import', 'contentsync' ), $data ),
 			// unlink if this is the root
-			'unlink'   => $item->relationship == 'root' ? $this->build_rest_api_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data ) : '',
-			// unimport if local post exists
-			'unimport' => $item->local_post ? $this->build_rest_api_link( 'unimportPost', __( 'Unlink', 'contentsync' ), $data ) : '',
+			'unlink' => $item->relationship == 'root' ? $this->build_rest_api_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data ) : '',
+			// unlink if local post exists
+			'unlink' => $item->local_post ? $this->build_rest_api_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data ) : '',
 			// trash the local post
-			'trash'    => $item->local_post ? $this->build_rest_api_link( 'trashPost', __( 'Trash', 'contentsync' ), $data ) : '',
+			'trash'  => $item->local_post ? $this->build_rest_api_link( 'trashPost', __( 'Trash', 'contentsync' ), $data ) : '',
 			// edit the root
-			'root'     => "<a href='" . $item->post_links['root'] . "'>" . __( 'Go to the original post', 'contentsync' ) . '</a>',
+			'root'   => "<a href='" . $item->post_links['root'] . "'>" . __( 'Go to the original post', 'contentsync' ) . '</a>',
 			// repair if error
-			'repair'   => $this->build_rest_api_link( 'repairPost', __( 'Repair', 'contentsync' ), $data ),
+			'repair' => $this->build_rest_api_link( 'repairPost', __( 'Repair', 'contentsync' ), $data ),
 		);
 
 		if ( is_network_admin() ) {
@@ -683,7 +683,7 @@ class Global_List_Table extends WP_List_Table {
 				} elseif ( $item->relationship === 'root' ) {
 					$actions = array( 'edit', 'unlink', 'trash' );
 				} elseif ( $item->relationship === 'linked' ) {
-					$actions = array( 'root', 'edit', 'trash', 'unimport' );
+					$actions = array( 'root', 'edit', 'trash', 'unlink' );
 				} elseif ( $item->relationship === 'unlinked' ) {
 					$actions = array( 'linked', 'root' );
 				}
@@ -1022,7 +1022,7 @@ class Global_List_Table extends WP_List_Table {
 					}
 				}
 
-				// unimport linked posts from this stage
+				// unlink linked posts from this stage
 				elseif ( $post = Synced_Post_Query::get_local_post_by_gid( $gid ) ) {
 					$result        = Synced_Post_Service::unlink_synced_post( $post->ID );
 					$post_titles[] = $post->post_title;

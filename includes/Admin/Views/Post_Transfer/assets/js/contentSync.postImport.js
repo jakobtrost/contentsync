@@ -73,7 +73,7 @@ contentSync.postImport = new function() {
 	 */
 	this.init = () => {
 		contentSync.tools.addPageTitleAction(
-			'⬇&nbsp;' + __( 'Import', 'contentsync' ),
+			'⬇ ' + __( 'Import', 'contentsync' ),
 			{
 				onclick: 'contentSync.postImport.startUploadFileDialog( this );'
 			}

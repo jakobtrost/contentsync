@@ -52,11 +52,11 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 	private static $import_route_param_names = array( 'gid', 'form_data' );
 
 	/**
-	 * Param names for the unimport route.
+	 * Param names for the unlink route.
 	 *
 	 * @var array
 	 */
-	private static $unimport_route_param_names = array( 'post_id' );
+	private static $unlink_route_param_names = array( 'post_id' );
 
 	/**
 	 * Register REST API routes
@@ -112,19 +112,19 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 			)
 		);
 
-		// POST /linked-posts/unimport — params: post_id
-		$unimport_args = array_intersect_key(
+		// POST /linked-posts/unlink — params: post_id
+		$unlink_args = array_intersect_key(
 			$all_args,
-			array_flip( self::$unimport_route_param_names )
+			array_flip( self::$unlink_route_param_names )
 		);
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/unimport',
+			'/' . $this->rest_base . '/unlink',
 			array(
 				'methods'             => $this->method,
-				'callback'            => array( $this, 'unimport' ),
+				'callback'            => array( $this, 'unlink' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $unimport_args,
+				'args'                => $unlink_args,
 			)
 		);
 	}
@@ -217,7 +217,7 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 	 * @param \WP_REST_Request $request Full request object.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public function unimport( $request ) {
+	public function unlink( $request ) {
 		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( empty( $post_id ) ) {

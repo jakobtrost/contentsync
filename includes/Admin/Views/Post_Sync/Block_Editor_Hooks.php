@@ -6,7 +6,7 @@
  * This class handles hooks for the Block Editor integration.
  */
 
-namespace Contentsync\Admin\Views\Post_Sync\Editor;
+namespace Contentsync\Admin\Views\Post_Sync;
 
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Admin\Utils\Build_Scripts;
@@ -37,20 +37,20 @@ class Block_Editor_Hooks extends Hooks_Base {
 		 */
 
 		wp_register_style(
+			'contentsync-post-edit-screen',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/post-edit-screen.css',
+			array(),
+			CONTENTSYNC_VERSION,
+		);
+		wp_enqueue_style( 'contentsync-post-edit-screen' );
+
+		wp_register_style(
 			'contentsync-block-editor-controls',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/Editor/assets/css/block-editor-controls.css',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/block-editor-controls.css',
 			array(),
 			CONTENTSYNC_VERSION,
 		);
 		wp_enqueue_style( 'contentsync-block-editor-controls' );
-
-		wp_register_style(
-			'contentsync-block-editor-notice',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/Editor/assets/css/editor-notice.css',
-			array(),
-			CONTENTSYNC_VERSION,
-		);
-		wp_enqueue_style( 'contentsync-block-editor-notice' );
 
 		/**
 		 * Scripts
@@ -58,7 +58,7 @@ class Block_Editor_Hooks extends Hooks_Base {
 
 		Build_Scripts::enqueue_build_script(
 			'contentSync-blockEditorTools',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/Editor/assets/js/src/contentSync.blockEditorTools.jsx',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/src/contentSync.blockEditorTools.jsx',
 			array( 'wp-data', 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'lodash' ),
 			true
 		);
@@ -73,7 +73,7 @@ class Block_Editor_Hooks extends Hooks_Base {
 
 		Build_Scripts::enqueue_build_script(
 			'contentSync-blockEditorPlugin',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/Editor/assets/js/src/blockEditorPlugin.jsx',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/src/blockEditorPlugin.jsx',
 			array( 'wp-data', 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'lodash' ),
 			true
 		);
@@ -98,14 +98,25 @@ class Block_Editor_Hooks extends Hooks_Base {
 			true
 		);
 		wp_enqueue_script( 'contentSync-makeRoot' );
+
 		wp_register_script(
-			'contentSync-unlinkRoot',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.unlinkRoot.js',
+			'contentSync-unlinkRootPost',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.unlinkRootPost.js',
 			array( 'contentSync-blockEditorTools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
 			CONTENTSYNC_VERSION,
 			true
 		);
-		wp_enqueue_script( 'contentSync-unlinkRoot' );
+		wp_enqueue_script( 'contentSync-unlinkRootPost' );
+
+		wp_register_script(
+			'contentSync-unlinkLinkedPost',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.unlinkLinkedPost.js',
+			array( 'contentSync-blockEditorTools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
+			CONTENTSYNC_VERSION,
+			true
+		);
+		wp_enqueue_script( 'contentSync-unlinkLinkedPost' );
+
 		wp_register_script(
 			'contentSync-overwriteLocalPost',
 			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.overwriteLocalPost.js',

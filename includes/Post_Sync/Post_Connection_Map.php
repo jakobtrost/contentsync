@@ -314,7 +314,7 @@ class Post_Connection_Map {
 
 		$post_links = array();
 
-		$synced_post = get_synced_post( $gid );
+		$synced_post = Synced_Post_Query::get_synced_post( $gid );
 
 		if ( ! $synced_post ) {
 			return $post_links;

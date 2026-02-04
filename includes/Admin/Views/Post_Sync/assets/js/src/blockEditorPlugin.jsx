@@ -311,7 +311,7 @@
 								<Button
 									isSecondary
 									isDestructive
-									onClick={(e) => contentSync.unlinkRoot.openModal(post)}
+									onClick={(e) => contentSync.unlinkRootPost.openModal(post)}
 								>
 									{__('Disable global sync', 'contentsync')}
 								</Button>
@@ -463,7 +463,7 @@
 								<Button
 									className="contentsync-action-button"
 									isSecondary
-									onClick={(e) => contentSync.unimportPost(e.target, post.id)}
+									onClick={(e) => contentSync.unlinkLinkedPost.openModal(post)}
 								>
 									{__('Convert to local post', 'contentsync')}
 								</Button>

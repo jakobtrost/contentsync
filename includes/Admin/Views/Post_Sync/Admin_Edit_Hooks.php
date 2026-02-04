@@ -39,13 +39,13 @@ class Admin_Edit_Hooks extends Hooks_Base {
 
 		// CSS
 		wp_register_style(
-			'contentsync-post-sync-admin-edit',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/admin-edit.css',
+			'contentsync-post-list-table',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/post-list-table.css',
 			array(),
 			CONTENTSYNC_VERSION,
 			'all'
 		);
-		wp_enqueue_style( 'contentsync-post-sync-admin-edit' );
+		wp_enqueue_style( 'contentsync-post-list-table' );
 
 		// JS
 		wp_register_script(
@@ -100,7 +100,7 @@ class Admin_Edit_Hooks extends Hooks_Base {
 		unset( $columns['date'] );
 
 		// register custom column
-		$columns['contentsync_status'] = Admin_Render::make_dashicon( 'admin-site-alt' );
+		$columns['contentsync_status'] = '<img src="' . CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/icon/admin-column-icon.svg" alt="' . __( 'Content Sync', 'contentsync' ) . '" style="height: 20px; width: 20px; padding-top: 4px;" />';
 
 		// re-insert date column after our column
 		$columns['date'] = esc_html__( 'Date' );
