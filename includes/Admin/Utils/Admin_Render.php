@@ -124,10 +124,11 @@ class Admin_Render {
 
 		// generate the title based on the status
 		$titles = array(
-			'root'   => __( 'Global synced post', 'contentsync' ),
-			'linked' => __( 'Global linked post', 'contentsync' ),
-			'error'  => __( 'Error', 'contentsync' ),
-			'info'   => __( 'Info', 'contentsync' ),
+			'root'     => __( 'Global synced post', 'contentsync' ),
+			'linked'   => __( 'Global linked post', 'contentsync' ),
+			'unlinked' => __( 'Local post', 'contentsync' ),
+			'error'    => __( 'Error', 'contentsync' ),
+			'info'     => __( 'Info', 'contentsync' ),
 		);
 		$title  = isset( $titles[ $status ] ) ? $titles[ $status ] : null;
 
@@ -142,6 +143,7 @@ class Admin_Render {
 			'success' => 'green',
 			'import'  => 'green',
 			'green'   => 'green',
+			'linked'  => 'green',
 			// blue
 			'info'    => 'blue',
 			'started' => 'blue',
@@ -175,7 +177,7 @@ class Admin_Render {
 
 		return sprintf(
 			'<span %1$s class="contentsync-info-box %2$s contentsync-status">%3$s%4$s</span>',
-			/* title    */ $title ? 'data-title="' . preg_replace( '/\s{1}/', '&nbsp;', $title ) . '"' : '',
+			/* title    */ ( $title && empty( $text ) ) ? 'data-tooltip="' . preg_replace( '/\s{1}/', '&nbsp;', $title ) . '"' : '',
 			/* color    */ $color,
 			/* icon     */ $icon,
 			/* text     */ ! empty( $text ) ? '<span>' . $text . '</span>' : ''

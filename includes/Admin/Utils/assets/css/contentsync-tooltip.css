@@ -1,3 +1,6 @@
+/**
+ * Tooltip wrapper (for complex tooltips)
+ */
 .contentsync-tooltip-wrapper {
 	position: relative;
 	font-size: 14px;

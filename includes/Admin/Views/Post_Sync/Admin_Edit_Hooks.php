@@ -141,7 +141,7 @@ class Admin_Edit_Hooks extends Hooks_Base {
 		if ( Synced_Post_Service::current_user_can_edit_synced_posts( 'root' ) ) {
 
 			printf(
-				'<button role="button" class="button button-tertiary contentsync-make-global-button" onclick="%2$s" data-title="%1$s">' .
+				'<button role="button" class="button button-tertiary contentsync-make-global-button" onclick="%2$s" data-tooltip="%1$s">' .
 					'<span class="dashicons dashicons-plus-alt2"></span>' .
 				'</button>',
 				__( 'Convert to synced post', 'contentsync' ),
