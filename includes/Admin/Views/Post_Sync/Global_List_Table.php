@@ -537,24 +537,24 @@ class Global_List_Table extends WP_List_Table {
 			// edit the local post
 			'edit'     => $item->local_post || $item->error ? "<a href='" . $item->post_links['edit'] . "'>" . __( 'Edit', 'contentsync' ) . '</a>' : '',
 			// import by gid
-			'linked'   => $this->ajax_link( 'checkImport', __( 'Import', 'contentsync' ), $data ),
+			'linked'   => $this->build_rest_api_link( 'importGlobalPost.openModal', __( 'Import', 'contentsync' ), $data ),
 			// unlink if this is the root
-			'unlink'   => $item->relationship == 'root' ? $this->ajax_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data ) : '',
+			'unlink'   => $item->relationship == 'root' ? $this->build_rest_api_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data ) : '',
 			// unimport if local post exists
-			'unimport' => $item->local_post ? $this->ajax_link( 'unimportPost', __( 'Unlink', 'contentsync' ), $data ) : '',
+			'unimport' => $item->local_post ? $this->build_rest_api_link( 'unimportPost', __( 'Unlink', 'contentsync' ), $data ) : '',
 			// trash the local post
-			'trash'    => $item->local_post ? $this->ajax_link( 'trashPost', __( 'Trash', 'contentsync' ), $data ) : '',
+			'trash'    => $item->local_post ? $this->build_rest_api_link( 'trashPost', __( 'Trash', 'contentsync' ), $data ) : '',
 			// edit the root
 			'root'     => "<a href='" . $item->post_links['root'] . "'>" . __( 'Go to the original post', 'contentsync' ) . '</a>',
 			// repair if error
-			'repair'   => $this->ajax_link( 'repairPost', __( 'Repair', 'contentsync' ), $data ),
+			'repair'   => $this->build_rest_api_link( 'repairPost', __( 'Repair', 'contentsync' ), $data ),
 		);
 
 		if ( is_network_admin() ) {
 			// unlink by gid
-			$item->actions['unlink'] = $this->ajax_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data );
+			$item->actions['unlink'] = $this->build_rest_api_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data );
 			// delete all by gid
-			$item->actions['delete'] = $this->ajax_link( 'deletePost', __( 'Delete everywhere', 'contentsync' ), $data );
+			$item->actions['delete'] = $this->build_rest_api_link( 'deletePost', __( 'Delete everywhere', 'contentsync' ), $data );
 		}
 
 		if ( is_network_admin() ) {
@@ -575,7 +575,7 @@ class Global_List_Table extends WP_List_Table {
 	/**
 	 * Build ajax link
 	 */
-	public function ajax_link( $action, $text, $data = array() ) {
+	public function build_rest_api_link( $action, $text, $data = array() ) {
 		return "<a onclick='contentSync.{$action}(this);' " . implode(
 			' ',
 			array_map(

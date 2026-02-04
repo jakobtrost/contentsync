@@ -1,6 +1,6 @@
 var contentSync = contentSync || {};
 
-contentSync.postImport = new function() {
+contentSync.importGlobalPost = new function() {
 
 	/**
 	 * i18n function
@@ -11,19 +11,12 @@ contentSync.postImport = new function() {
 	 * Modal instance
 	 */
 	this.Modal = new contentSync.Modal( {
-		id: 'import-post-modal',
-		title: __( 'Post Import', 'contentsync' ),
+		id: 'import-global-post-modal',
+		title: __( 'Import Global Post', 'contentsync' ),
 		formInputs: [
 			{
-				type: 'file',
-				name: 'import_file',
-				label: __( 'Select file', 'contentsync' ),
-				description: __( 'Select the file to import.', 'contentsync' ),
-				value: ''
-			},
-			{
 				type: 'custom',
-				content: '<div id="import-post-conflicts" class="post-conflicts-container">' +
+				content: '<div id="import-global-post-conflicts" class="post-conflicts-container">' +
 					'<div class="posts-conflicts-inner-container">' +
 						'<span>' + __( 'Select a file to import', 'contentsync' ) + '</span>' +
 					'</div>' +
@@ -45,18 +38,30 @@ contentSync.postImport = new function() {
 	} );
 
 	/**
+	 * Button element that triggered the modal
+	 * @type {HTMLElement}
+	 */
+	this.buttonElement = null;
+
+	/**
+	 * Global post ID
+	 * @type {string}
+	 */
+	this.gid = '';
+
+	/**
 	 * ================================================
-	 * CHECK FILE
+	 * CHECK IMPORT
 	 * ================================================
 	 */
 
 	/**
 	 * REST handler instance
 	 */
-	this.checkFileRestHandler = new contentSync.RestHandler( {
-		restPath: 'post-import/check',
-		onSuccess: ( data, fullResponse ) => this.onCheckFileSuccess( data, fullResponse ),
-		onError: ( message, fullResponse ) => this.onCheckFileError( message, fullResponse ),
+	this.checkImportRestHandler = new contentSync.RestHandler( {
+		restPath: 'linked-posts/check-import',
+		onSuccess: ( data, fullResponse ) => this.onCheckImportSuccess( data, fullResponse ),
+		onError: ( message, fullResponse ) => this.onCheckImportError( message, fullResponse ),
 	} );
 
 	/**
@@ -65,55 +70,24 @@ contentSync.postImport = new function() {
 	 * @param {HTMLElement} elem - Element that triggered the modal
 	 */
 	this.openModal = ( elem ) => {
+		this.buttonElement = elem;
+		this.gid = elem.dataset.gid;
 		this.Modal.open();
+		this.checkImport();
 	};
 
 	/**
-	 * Add the page title action button
+	 * Check if the global post can be imported
 	 */
-	this.init = () => {
-		contentSync.tools.addPageTitleAction(
-			'⬇&nbsp;' + __( 'Import', 'contentsync' ),
-			{
-				onclick: 'contentSync.postImport.startUploadFileDialog( this );'
-			}
-		);
-	};
+	this.checkImport = () => {
 
-	/**
-	 * Start the client-side upload file dialog
-	 */
-	this.startUploadFileDialog = () => {
-		
-		this.Modal.open();
-
-		const fileInput = document.getElementById( 'import_file__input' );
-
-		fileInput.addEventListener( 'change', () => {
-			this.checkFile( fileInput );
-		} );
-
-		fileInput.click();
-	};
-
-	/**
-	 * After the user selected a file, check it' contents and validate it
-	 * @param {File} file - File object
-	 */
-	this.checkFile = ( fileInput ) => {
-
-		const conflictsContainer = document.getElementById( 'import-post-conflicts' );
+		const conflictsContainer = document.getElementById( 'import-global-post-conflicts' );
 		conflictsContainer.innerHTML = '<div class="components-flex">' +
-			'<span>' + __( 'Checking file...', 'contentsync' ) + '</span>' +
+			'<span>' + __( 'Checking import...', 'contentsync' ) + '</span>' +
 			'<span class="spinner is-active"></span>' +
 		'</div>';
 
-		// create FormData object
-		const formData = new FormData();
-		formData.append( 'file', fileInput.files[ 0 ] );
-		// console.log( 'formData: ', formData );
-
-		this.checkFileRestHandler.send( formData );
+		this.checkImportRestHandler.send( { gid: this.gid } );
 	};
 
 	/**
@@ -122,16 +96,16 @@ contentSync.postImport = new function() {
 	 * @param {Array} data - Array of posts with conflicts
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onCheckFileSuccess = ( data, fullResponse ) => {
-		console.log( 'postImport.onCheckFileSuccess: ', data, fullResponse );
+	this.onCheckImportSuccess = ( data, fullResponse ) => {
+		console.log( 'importGlobalPost.onCheckImportSuccess: ', data, fullResponse );
 
 		if ( data.length > 0 ) {
-			this.Modal.setDescription( __( 'Attention: Some content in the file already appears to exist on this site. Choose what to do with it.', 'contentsync' ) );
+			this.Modal.setDescription( fullResponse.message );
 			this.buildConflictOptions( data );
 		} else {
-			const conflictsContainer = document.getElementById( 'import-post-conflicts' );
+			const conflictsContainer = document.getElementById( 'import-global-post-conflicts' );
 			conflictsContainer.innerHTML = '';
-			this.Modal.setDescription( __( 'No conflicts found.', 'contentsync' ) );
+			this.Modal.setDescription( fullResponse.message );
 		}
 
 		this.Modal.toggleSubmitButtonDisabled( false );
@@ -142,9 +116,9 @@ contentSync.postImport = new function() {
 	 * @param {Array} posts - Array of posts with conflicts
 	 */
 	this.buildConflictOptions = ( posts ) => {
-		console.log( 'postImport.buildConflictOptions: ', posts );
+		console.log( 'importGlobalPost.buildConflictOptions: ', posts );
 
-		const conflictsContainer = document.getElementById( 'import-post-conflicts' );
+		const conflictsContainer = document.getElementById( 'import-global-post-conflicts' );
 		conflictsContainer.innerHTML = '';
 
 		const innerContainer = document.createElement( 'div' );
@@ -171,7 +145,7 @@ contentSync.postImport = new function() {
 	 * @param {string} message - Error message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onCheckFileError = ( message, fullResponse ) => {
+	this.onCheckImportError = ( message, fullResponse ) => {
 		contentSync.tools.addSnackBar( {
 			text: __( 'Error checking file: %s', 'contentsync' ).replace( '%s', message ),
 			type: 'error'
@@ -188,7 +162,7 @@ contentSync.postImport = new function() {
 	 * REST handler instance
 	 */
 	this.importRestHandler = new contentSync.RestHandler( {
-		restPath: 'post-import',
+		restPath: 'linked-posts/import',
 		onSuccess: ( data, fullResponse ) => this.onImportSuccess( data, fullResponse ),
 		onError: ( message, fullResponse ) => this.onImportError( message, fullResponse ),
 	} );
@@ -199,31 +173,28 @@ contentSync.postImport = new function() {
 	this.onModalSubmit = () => {
 		this.Modal.toggleSubmitButtonBusy( true );
 
-		const formData = this.Modal.getFormData();
+		const conflicts = this.Modal.getFormData();
+		console.log( 'importGlobalPost.onModalSubmit: ', conflicts );
 
-		let fileObject = formData.get( 'import_file' ); 
-		if ( fileObject ) {
-			let fileName = fileObject.name;
-			formData.append( 'filename', fileName );
-			formData.delete( 'import_file' );
-		}
-
-		this.importRestHandler.send( formData );
+		this.importRestHandler.send( {
+			gid: this.gid,
+			conflicts: conflicts
+		} );
 	};
 
 	/**
 	 * When the REST request is successful
 	 *
-	 * @param {string} responseData - Export file URL (from response.data)
+	 * @param {boolean} responseData - True if the global post was imported successfully (from response.data)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
 	this.onImportSuccess = ( responseData, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		this.Modal.close();
 
-		console.log( 'postImport.onImportSuccess: ', responseData, fullResponse );
+		console.log( 'importGlobalPost.onImportSuccess: ', responseData, fullResponse );
 		contentSync.tools.addSnackBar( {
-			text: fullResponse.message?.length > 0 ? fullResponse.message : __( 'Posts imported successfully', 'contentsync' ),
+			text: fullResponse.message?.length > 0 ? fullResponse.message : __( 'Global post imported successfully', 'contentsync' ),
 			type: 'success',
 			// add a refresh window link
 			link: {
@@ -244,7 +215,7 @@ contentSync.postImport = new function() {
 		this.Modal.toggleSubmitButtonBusy( false );
 
 		contentSync.tools.addSnackBar( {
-			text: __( 'Error importing posts: %s', 'contentsync' ).replace( '%s', message ),
+			text: __( 'Error importing global post: %s', 'contentsync' ).replace( '%s', message ),
 			type: 'error'
 		} );
 	};

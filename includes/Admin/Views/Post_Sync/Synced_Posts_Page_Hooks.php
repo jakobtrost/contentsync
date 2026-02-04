@@ -41,7 +41,6 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 	 * Add the first submenu item
 	 */
 	public function add_submenu_items() {
-
 		add_submenu_page(
 			'contentsync',
 			__( 'Synced Posts', 'contentsync' ),
@@ -59,6 +58,31 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 		$this->Global_List_Table->render_page(
 			__( 'Synced Posts', 'contentsync' )
 		);
+
+		$this->enqueue_assets();
+	}
+
+	/**
+	 * Enqueue assets for the sync overview page
+	 */
+	public function enqueue_assets() {
+		wp_register_style(
+			'contentsync-global-list-table',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/global-list-table.css',
+			array(),
+			CONTENTSYNC_VERSION,
+			'all'
+		);
+		wp_enqueue_style( 'contentsync-global-list-table' );
+
+		wp_register_script(
+			'contentSync-importGlobalPost',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.importGlobalPost.js',
+			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
+			CONTENTSYNC_VERSION,
+			true
+		);
+		wp_enqueue_script( 'contentSync-importGlobalPost' );
 	}
 
 	/**
