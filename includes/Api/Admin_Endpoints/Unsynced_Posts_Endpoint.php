@@ -103,7 +103,7 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 			'/' . $this->rest_base . '/similar',
 			array(
 				'methods'             => $this->method,
-				'callback'            => array( $this, 'similar' ),
+				'callback'            => array( $this, 'get_similar_posts' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 				'args'                => $similar_args,
 			)
@@ -182,7 +182,7 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 	 * @param \WP_REST_Request $request Full request object.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public function similar( $request ) {
+	public function get_similar_posts( $request ) {
 		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( empty( $post_id ) ) {
@@ -197,11 +197,13 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 
 		$similar_posts = $this->get_similar_synced_posts( $post );
 
-		if ( ! $similar_posts ) {
+		if ( is_array( $similar_posts ) && empty( $similar_posts ) ) {
+			return $this->respond( array(), __( 'No similar posts found.', 'contentsync' ), true, array( 'status' => 200 ) );
+		} elseif ( ! $similar_posts ) {
 			return $this->respond( false, __( 'No similar posts found.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( $similar_posts, __( 'Similar posts found.', 'contentsync' ), true );
+		return $this->respond( $similar_posts, __( 'Similar posts found.', 'contentsync' ), true, array( 'status' => 200 ) );
 	}
 
 	/**

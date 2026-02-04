@@ -194,39 +194,28 @@ contentSync.blockEditorTools = new (function () {
 	 * @param {function} callback
 	 */
 	this.getSimilarPosts = function (postId) {
-		$.post(
-			greyd.ajax_url,
-			{
-				action: 'contentsync_ajax',
-				_ajax_nonce: greyd.nonce,
-				mode: 'global_action',
-				data: {
-					action: 'contentsync_similar_posts',
-					post_id: postId,
-				},
-			},
-			function (response) {
-				// console.log(response);
-
-				let similarPosts = [];
-
-				// successfull
-				if (response.indexOf('success::') > -1) {
-					try {
-						similarPosts = Object.values(JSON.parse(response.split('success::')[1]));
-					} catch (e) {
-						console.error(e);
-
-						return;
-					}
+		let restHandler = new contentSync.RestHandler({
+			restPath: 'unsynced-posts/similar',
+			onSuccess: (data, fullResponse) => {
+				if (!data) {
+					return;
 				}
-
 				contentSync.blockEditorTools.setData({
 					...contentSync.blockEditorTools.data,
-					similarPosts: similarPosts,
+					similarPosts: data,
 				});
-			}
-		);
+			},
+			onError: (message, fullResponse) => {
+				contentSync.blockEditorTools.showSnackbar(message, 'error', true);
+				contentSync.blockEditorTools.setData({
+					...contentSync.blockEditorTools.data,
+					similarPosts: [],
+				});
+			},
+		});
+		restHandler.send({
+			post_id: postId,
+		});
 	};
 
 	/**
