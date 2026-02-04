@@ -18,25 +18,23 @@ class Post_Conflict_Handler {
 	 *
 	 * @param string $gid   Global ID.
 	 *
-	 * @return string   Encoded array of conflicts or post_title.
+	 * @return array Array of conflicts if any found, empty array if no conflicts found.
+	 *   - ID: ID of the conflicting post
+	 *   - post_link: Link to the conflicting post
+	 *   - post_type: Type of the conflicting post
+	 *   - post_title: Title of the conflicting post
 	 */
 	public static function check_synced_post_import( $gid ) {
 
 		$posts = Synced_Post_Query::prepare_synced_post_for_import( $gid );
 		if ( ! $posts ) {
-			return false;
+			return array();
 		}
 
 		// get conflicting posts
 		$conflicts = self::get_conflicting_post_options( $posts );
 
-		if ( $conflicts ) {
-			return $conflicts;
-		} else {
-			// return post title when no conflicts found
-			$root_post = array_shift( $posts );
-			return $root_post->post_title;
-		}
+		return $conflicts;
 	}
 
 	/**
@@ -45,7 +43,11 @@ class Post_Conflict_Handler {
 	 *
 	 * @param WP_Post[] $posts  WP_Posts keyed by ID
 	 *
-	 * @return string|bool  Decoded string when conflicts found, false otherwise.
+	 * @return array Array of conflicts:
+	 *   - ID: ID of the conflicting post
+	 *   - post_link: Link to the conflicting post
+	 *   - post_type: Type of the conflicting post
+	 *   - post_title: Title of the conflicting post
 	 */
 	public static function get_conflicting_post_options( $posts ) {
 
@@ -83,7 +85,7 @@ class Post_Conflict_Handler {
 			// we don't set keys to keep the order when decoding the array to JS
 			return array_values( $conflicts );
 		}
-		return false;
+		return array();
 	}
 
 	/**

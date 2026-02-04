@@ -112,9 +112,8 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 		}
 
 		$conflicts = Post_Conflict_Handler::get_conflicting_post_options( $post_data );
-		$data      = $conflicts ? $conflicts : array();
 
-		return $this->respond( $data, '', true );
+		return $this->respond( $conflicts, '', true );
 	}
 
 	/**

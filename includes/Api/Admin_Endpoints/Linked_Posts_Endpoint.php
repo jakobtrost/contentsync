@@ -148,7 +148,7 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 				continue;
 			}
 			$conflict = Post_Conflict_Handler::check_synced_post_import( $post['gid'] );
-			if ( $conflict ) {
+			if ( ! empty( $conflict ) ) {
 				$results[] = array(
 					'gid'      => $post['gid'],
 					'conflict' => $conflict,
@@ -176,13 +176,14 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
 		}
 
-		$result = Post_Conflict_Handler::check_synced_post_import( $gid );
+		$conflicts = Post_Conflict_Handler::check_synced_post_import( $gid );
+		error_log( 'Linked_Posts_Endpoint::check_import: ' . print_r( $conflicts, true ) );
 
-		if ( ! $result ) {
-			return $this->respond( false, __( 'post could not be checked for conflicts.', 'contentsync' ), 400 );
+		if ( empty( $conflicts ) ) {
+			return $this->respond( array(), __( 'No conflicts found. You can safely import the global post.', 'contentsync' ), true );
 		}
 
-		return $this->respond( $result, '', true );
+		return $this->respond( $conflicts, __( 'Attention: Some content in the file already appears to exist on this site. Choose what to do with it.', 'contentsync' ), true );
 	}
 
 	/**
@@ -193,7 +194,7 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 	 */
 	public function import( $request ) {
 		$gid       = (string) ( $request->get_param( 'gid' ) ?? '' );
-		$conflicts = (array) ( $request->get_param( 'form_data' ) ?? array() );
+		$conflicts = (array) ( $request->get_param( 'conflicts' ) ?? array() );
 
 		if ( empty( $gid ) ) {
 			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
