@@ -110,7 +110,7 @@ class SnackBar {
 		if ( icon ) {
 			content.classList.add( 'components-snackbar__content-with-icon' );
 			var iconSpan = document.createElement( 'span' );
-			iconSpan.className = 'components-snackbar__icon';
+			iconSpan.className = 'components-snackbar__icon contentsync-snackbar-icon';
 			iconSpan.textContent = icon;
 			content.appendChild( iconSpan );
 		}

@@ -8,8 +8,9 @@
 
 namespace Contentsync\Admin\Views\Post_Sync\Editor;
 
-use Contentsync\Admin\Utils\Build_Scripts;
 use Contentsync\Utils\Hooks_Base;
+use Contentsync\Admin\Utils\Build_Scripts;
+use Contentsync\Admin\Utils\Admin_Render;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -27,7 +28,14 @@ class Block_Editor_Hooks extends Hooks_Base {
 	 */
 	public function enqueue_assets() {
 
-		// editor styles
+		if ( ! Admin_Render::is_current_edit_screen_supported() ) {
+			return;
+		}
+
+		/**
+		 * Styles
+		 */
+
 		wp_register_style(
 			'contentsync-block-editor-controls',
 			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/Editor/assets/css/block-editor-controls.css',
@@ -36,7 +44,18 @@ class Block_Editor_Hooks extends Hooks_Base {
 		);
 		wp_enqueue_style( 'contentsync-block-editor-controls' );
 
-		// enqueue scripts (built from src/*.jsx via npm run build)
+		wp_register_style(
+			'contentsync-block-editor-notice',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/Editor/assets/css/editor-notice.css',
+			array(),
+			CONTENTSYNC_VERSION,
+		);
+		wp_enqueue_style( 'contentsync-block-editor-notice' );
+
+		/**
+		 * Scripts
+		 */
+
 		Build_Scripts::enqueue_build_script(
 			'contentsync-block-editor-tools',
 			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/Editor/assets/js/src/contentSync.blockEditorTools.jsx',

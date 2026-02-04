@@ -3,10 +3,8 @@
  */
 (function (wp) {
 	const { __, _n, sprintf } = wp.i18n;
-	const PanelBody = wp.components.PanelBody;
-	const Button = wp.components.Button;
-	const Spinner = wp.components.Spinner;
-	const Icon = wp.components.Icon;
+	const { PanelBody, Button, Spinner, Icon, BaseControl, TextControl, ToggleControl } =
+		wp.components;
 	const PluginSidebar = wp.editor?.PluginSidebar ?? wp.editSite.PluginSidebar;
 
 	const ContentSyncIcon = () => (
@@ -123,368 +121,350 @@
 			);
 		}
 
-		return (
-			<PanelBody>
-				{post.id < 0 && <Spinner />}
-				{post.id === 0 && <p>{__('No post found.', 'contentsync')}</p>}
-				{post.id > 0 && (
-					<>
-						{_.isEmpty(post.status) && (
-							<>
-								{post.currentUserCan && (
-									<>
-										<p>
-											{__(
-												'Do you want this post to be available throughout all connected sites?',
-												'contentsync'
-											)}
-										</p>
-										<Button
-											isPrimary
-											onClick={(e) =>
-												contentSync.exportPost(
-													e.target,
-													post.id,
-													post.title
-												)
-											}
-										>
-											{__('Convert to synced post', 'contentsync')}
-										</Button>
-										<hr />
-									</>
+		let pluginContent = null;
+		// post id is loading
+		if (post.id < 0) {
+			pluginContent = <Spinner />;
+		}
+		// post id is not found
+		else if (post.id === 0) {
+			pluginContent = <p>{__('No post found.', 'contentsync')}</p>;
+		}
+		// post is not synced yet
+		else if (_.isEmpty(post.status)) {
+			pluginContent = (
+				<>
+					{post.currentUserCan && (
+						<>
+							<p>
+								{__(
+									'Do you want this post to be available throughout all connected sites?',
+									'contentsync'
 								)}
-								{similarPosts === null && (
-									<Button
-										isSecondary
-										onClick={() =>
-											contentSync.blockEditorTools.getSimilarPosts(post.id)
-										}
-										data-post-id={post.id}
-									>
-										{__('Find similar posts', 'contentsync')}
-									</Button>
+							</p>
+							<Button
+								isPrimary
+								onClick={(e) =>
+									contentSync.exportPost(e.target, post.id, post.title)
+								}
+							>
+								{__('Convert to synced post', 'contentsync')}
+							</Button>
+							<hr />
+						</>
+					)}
+					{similarPosts === null && (
+						<Button
+							isSecondary
+							onClick={() => contentSync.blockEditorTools.getSimilarPosts(post.id)}
+							data-post-id={post.id}
+						>
+							{__('Find similar posts', 'contentsync')}
+						</Button>
+					)}
+					{similarPosts !== null && (
+						<>
+							{similarPosts.length === 0 && (
+								<p>{__('No similar posts found.', 'contentsync')}</p>
+							)}
+							{similarPosts.length > 0 && (
+								<>
+									<p>
+										{__('Similar posts are available globally:', 'contentsync')}
+									</p>
+									<ul className="contentsync_box_list">
+										{similarPosts.map((similarPost) => (
+											<li
+												key={
+													similarPost.meta?.synced_post_id ||
+													similarPost.post_title
+												}
+											>
+												<span className="flex">
+													<a
+														href={similarPost.post_links?.edit}
+														target="_blank"
+														rel="noopener noreferrer"
+													>
+														{similarPost.post_title}
+													</a>
+													<span
+														className="button button-ghost tiny"
+														onClick={(e) =>
+															contentSync.overwritePost(e.target)
+														}
+														data-post_id={post.id}
+														data-gid={similarPost.meta?.synced_post_id}
+													>
+														{__('Use', 'contentsync')}
+													</span>
+												</span>
+												<small>{similarPost.post_links?.nice}</small>
+											</li>
+										))}
+									</ul>
+								</>
+							)}
+						</>
+					)}
+				</>
+			);
+		}
+		// post has errors
+		else if (hasUnsolvedError) {
+			pluginContent = (
+				<>
+					<p>
+						{contentSync.blockEditorTools.renderStatusBox('error', post.error?.message)}
+					</p>
+					{post.currentUserCan && (
+						<Button
+							isSecondary
+							onClick={(e) => contentSync.repairPost(e.target, post.id)}
+						>
+							{__('Repair', 'contentsync')}
+						</Button>
+					)}
+				</>
+			);
+		}
+		// post is root
+		else if ('root' === post.status) {
+			pluginContent = (
+				<>
+					<p>
+						{contentSync.blockEditorTools.renderStatusBox(
+							post.status,
+							__('Root post', 'contentsync')
+						)}
+					</p>
+					{postConnectionCount === 0 ? (
+						<p>
+							{__(
+								'This post has not been published to other sites yet.',
+								'contentsync'
+							)}
+						</p>
+					) : (
+						<>
+							<p>
+								{sprintf(
+									_n(
+										'This post is in use on 1 other site.',
+										'This post is in use on %s other sites.',
+										postConnectionCount,
+										'contentsync'
+									),
+									postConnectionCount
 								)}
-								{similarPosts !== null && (
-									<>
-										{similarPosts.length === 0 && (
-											<p>{__('No similar posts found.', 'contentsync')}</p>
-										)}
-										{similarPosts.length > 0 && (
-											<>
-												<p>
-													{__(
-														'Similar posts are available globally:',
-														'contentsync'
-													)}
-												</p>
-												<ul className="contentsync_box_list">
-													{similarPosts.map((similarPost) => (
-														<li
-															key={
-																similarPost.meta?.synced_post_id ||
-																similarPost.post_title
-															}
+							</p>
+							{postConnectionList}
+						</>
+					)}
+					{post?.cluster && post?.cluster?.length > 0 && (
+						<>
+							<p>{__('This post is part of a cluster.', 'contentsync')}</p>
+							<ul className="contentsync_box_list">
+								{post.cluster.map((cluster) => (
+									<li key={cluster.title}>
+										<strong>{cluster.title}</strong>
+										<ul style={{ margin: '12px 0 0 4px' }}>
+											{cluster.destination_ids.map((destination) => {
+												if (!destination) return null;
+												return (
+													<li key={destination?.blogname}>
+														{sprintf(__('Site: %s', 'contentsync'), '')}
+														<a
+															href={destination?.site_url}
+															target="_blank"
+															rel="noopener noreferrer"
 														>
-															<span className="flex">
-																<a
-																	href={
-																		similarPost.post_links?.edit
-																	}
-																	target="_blank"
-																	rel="noopener noreferrer"
-																>
-																	{similarPost.post_title}
-																</a>
-																<span
-																	className="button button-ghost tiny"
-																	onClick={(e) =>
-																		contentSync.overwritePost(
-																			e.target
-																		)
-																	}
-																	data-post_id={post.id}
-																	data-gid={
-																		similarPost.meta
-																			?.synced_post_id
-																	}
-																>
-																	{__('Use', 'contentsync')}
-																</span>
-															</span>
-															<small>
-																{similarPost.post_links?.nice}
-															</small>
-														</li>
-													))}
-												</ul>
-											</>
-										)}
-									</>
-								)}
-							</>
-						)}
-						{hasUnsolvedError && (
-							<>
-								{contentSync.blockEditorTools.renderStatusBox(
-									'error',
-									post.error?.message
-								)}
-								{post.currentUserCan && (
-									<Button
-										isSecondary
-										onClick={(e) => contentSync.repairPost(e.target, post.id)}
-									>
-										{__('Repair', 'contentsync')}
-									</Button>
-								)}
-							</>
-						)}
-						{'root' === post.status && !hasUnsolvedError && (
-							<>
-								{contentSync.blockEditorTools.renderStatusBox(
-									post.status,
-									__('Root post', 'contentsync')
-								)}
-								{post.currentUserCan && (
-									<div className="contentsync-options-section">
-										<div className="contentsync-options-list">
-											<div className="contentsync-canonical-section">
-												<label className="contentsync-canonical-label">
-													{__('Global Canonical URL', 'contentsync')}
-												</label>
-												<input
-													type="text"
-													value={
-														contentSync.blockEditorTools.data
-															.canonicalUrl
-													}
-													onChange={(e) => {
+															{destination?.blogname}
+														</a>
+													</li>
+												);
+											})}
+										</ul>
+									</li>
+								))}
+							</ul>
+						</>
+					)}
+					{post.currentUserCan && (
+						<>
+							<div className="contentsync-gray-box">
+								<p>
+									{__(
+										'No longer make this post available globally?',
+										'contentsync'
+									)}
+								</p>
+								<Button
+									isSecondary
+									onClick={(e) => contentSync.unexportPost(e.target, post.gid)}
+								>
+									{__('Unlink', 'contentsync')}
+								</Button>
+							</div>
+							<hr />
+							<h2>{__('Options', 'contentsync')}</h2>
+							<div className="contentsync-options-section">
+								<BaseControl label={__('Global Canonical URL', 'contentsync')}>
+									<TextControl
+										type="url"
+										className="contentsync-canonical-input"
+										value={contentSync.blockEditorTools.data.canonicalUrl}
+										onChange={(value) => {
+											setOptionsChanged(true);
+											contentSync.blockEditorTools.setData((prev) => ({
+												...prev,
+												canonicalUrl: value,
+											}));
+										}}
+									/>
+								</BaseControl>
+								{post?.availableOptions &&
+									Object.keys(post.availableOptions).map((key) => {
+										const option = post.availableOptions[key];
+										const optionValue =
+											contentSync.blockEditorTools.data.options[
+												option.name
+											] || false;
+										return (
+											<BaseControl key={option.name}>
+												<ToggleControl
+													label={option.title}
+													help={option.descr}
+													checked={optionValue}
+													onChange={(value) => {
 														setOptionsChanged(true);
 														contentSync.blockEditorTools.setData(
 															(prev) => ({
 																...prev,
-																canonicalUrl: e.target.value,
+																options: {
+																	...prev.options,
+																	[option.name]: value,
+																},
 															})
 														);
 													}}
-													className="contentsync-canonical-input"
 												/>
-											</div>
-											{post?.availableOptions &&
-												Object.keys(post.availableOptions).map((key) => {
-													const option = post.availableOptions[key];
-													const optionValue =
-														contentSync.blockEditorTools.data.options[
-															option.name
-														] || false;
-													return (
-														<div
-															key={option.name}
-															className="contentsync-option-item"
-														>
-															<label className="contentsync-option-label">
-																<input
-																	type="checkbox"
-																	checked={optionValue}
-																	onChange={(e) => {
-																		setOptionsChanged(true);
-																		contentSync.blockEditorTools.setData(
-																			(prev) => ({
-																				...prev,
-																				options: {
-																					...prev.options,
-																					[option.name]:
-																						e.target
-																							.checked,
-																				},
-																			})
-																		);
-																	}}
-																	className="contentsync-option-checkbox"
-																/>
-																<div className="contentsync-option-content">
-																	<div className="contentsync-option-title">
-																		{option.title}
-																	</div>
-																	{option.descr && (
-																		<div className="contentsync-option-description">
-																			{option.descr}
-																		</div>
-																	)}
-																</div>
-															</label>
-														</div>
-													);
-												})}
-											{optionsChanged && (
-												<div className="contentsync-save-button-container">
-													<Button
-														isPrimary
-														onClick={() => {
-															contentSync.blockEditorTools.saveOptions(
-																post.id,
-																contentSync.blockEditorTools.data
-																	.options,
-																contentSync.blockEditorTools.data
-																	.canonicalUrl
+											</BaseControl>
+										);
+										return (
+											<div
+												key={option.name}
+												className="contentsync-option-item"
+											>
+												<label className="contentsync-option-label">
+													<input
+														type="checkbox"
+														checked={optionValue}
+														onChange={(e) => {
+															setOptionsChanged(true);
+															contentSync.blockEditorTools.setData(
+																(prev) => ({
+																	...prev,
+																	options: {
+																		...prev.options,
+																		[option.name]:
+																			e.target.checked,
+																	},
+																})
 															);
 														}}
-														className="contentsync-save-button"
-													>
-														{__('Save Options', 'contentsync')}
-													</Button>
-												</div>
-											)}
-										</div>
-									</div>
-								)}
-								{postConnectionCount === 0 ? (
-									<p>
-										{__(
-											'This post has not been published to other sites yet.',
-											'contentsync'
-										)}
-									</p>
-								) : (
-									<>
-										<p>
-											{sprintf(
-												_n(
-													'This post is in use on 1 other site.',
-													'This post is in use on %s other sites.',
-													postConnectionCount,
-													'contentsync'
-												),
-												postConnectionCount
-											)}
-										</p>
-										{postConnectionList}
-									</>
-								)}
-								{post?.cluster && post?.cluster?.length > 0 && (
-									<>
-										<p>
-											{__('This post is part of a cluster.', 'contentsync')}
-										</p>
-										<ul className="contentsync_box_list">
-											{post.cluster.map((cluster) => (
-												<li key={cluster.title}>
-													<strong>{cluster.title}</strong>
-													<ul style={{ margin: '12px 0 0 4px' }}>
-														{cluster.destination_ids.map(
-															(destination) => {
-																if (!destination) return null;
-																return (
-																	<li key={destination?.blogname}>
-																		{sprintf(
-																			__(
-																				'Site: %s',
-																				'contentsync'
-																			),
-																			''
-																		)}
-																		<a
-																			href={
-																				destination?.site_url
-																			}
-																			target="_blank"
-																			rel="noopener noreferrer"
-																		>
-																			{destination?.blogname}
-																		</a>
-																	</li>
-																);
-															}
+														className="contentsync-option-checkbox"
+													/>
+													<div className="contentsync-option-content">
+														<div className="contentsync-option-title">
+															{option.title}
+														</div>
+														{option.descr && (
+															<div className="contentsync-option-description">
+																{option.descr}
+															</div>
 														)}
-													</ul>
-												</li>
-											))}
-										</ul>
-									</>
-								)}
-								{post.currentUserCan && (
-									<div className="contentsync-gray-box">
-										<p>
-											{__(
-												'No longer make this post available globally?',
-												'contentsync'
-											)}
-										</p>
-										<Button
-											isSecondary
-											onClick={(e) =>
-												contentSync.unexportPost(e.target, post.gid)
-											}
-										>
-											{__('Unlink', 'contentsync')}
-										</Button>
-									</div>
-								)}
-							</>
+													</div>
+												</label>
+											</div>
+										);
+									})}
+								<div className="contentsync-save-button-container">
+									<Button
+										isPrimary
+										disabled={!optionsChanged}
+										onClick={() => {
+											contentSync.blockEditorTools.saveOptions(
+												post.id,
+												contentSync.blockEditorTools.data.options,
+												contentSync.blockEditorTools.data.canonicalUrl
+											);
+										}}
+										className="contentsync-save-button"
+									>
+										{__('Save Options', 'contentsync')}
+									</Button>
+								</div>
+							</div>
+						</>
+					)}
+				</>
+			);
+		}
+		// post is linked
+		else if ('linked' === post.status) {
+			pluginContent = (
+				<>
+					<p>
+						{contentSync.blockEditorTools.renderStatusBox(
+							post.status,
+							__('Linked post', 'contentsync')
 						)}
-						{'linked' === post.status && !hasUnsolvedError && (
-							<>
-								{contentSync.blockEditorTools.renderStatusBox(
-									post.status,
-									__('Linked post', 'contentsync')
-								)}
-								<p>
-									{sprintf(
-										__('This post is synced from the site %s', 'contentsync'),
-										''
-									)}
-									<strong>{post?.links?.nice}</strong>
-								</p>
-								{post?.canonical?.length > 0 && (
-									<p>
-										{sprintf(
-											__(
-												'The canonical URL of this post was also set in the source post: %s',
-												'contentsync'
-											),
-											''
-										)}
-										<code style={{ wordBreak: 'break-word' }}>
-											{post?.canonical}
-										</code>
-									</p>
-								)}
-								{post.currentUserCan && (
-									<p>
-										<a
-											href={post?.links?.edit}
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											{__('Go to the original post', 'contentsync')}
-										</a>
-									</p>
-								)}
-								{post.currentUserCan && (
-									<div className="contentsync-gray-box">
-										<p>{__('Edit this post?', 'contentsync')}</p>
-										<Button
-											className="contentsync-action-button"
-											isSecondary
-											onClick={(e) =>
-												contentSync.unimportPost(e.target, post.id)
-											}
-										>
-											{__('Convert to local post', 'contentsync')}
-										</Button>
-									</div>
-								)}
-							</>
-						)}
-						<hr />
-						<p>{__('Status: ' + post.status, 'contentsync')}</p>
-						<p>{__('Global ID: ' + post.gid, 'contentsync')}</p>
-						<p>{__('Post ID: ' + post.id, 'contentsync')}</p>
-					</>
-				)}
-			</PanelBody>
-		);
+					</p>
+					<p>
+						{sprintf(__('This post is synced from the site %s', 'contentsync'), '')}
+						<strong>{post?.links?.nice}</strong>
+					</p>
+					{post?.canonical?.length > 0 && (
+						<p>
+							{sprintf(
+								__(
+									'The canonical URL of this post was also set in the source post: %s',
+									'contentsync'
+								),
+								''
+							)}
+							<code style={{ wordBreak: 'break-word' }}>{post?.canonical}</code>
+						</p>
+					)}
+					{post.currentUserCan && (
+						<>
+							<p>
+								<a
+									href={post?.links?.edit}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{__('Go to the original post', 'contentsync')}
+								</a>
+							</p>
+							<div className="contentsync-gray-box">
+								<p>{__('Edit this post?', 'contentsync')}</p>
+								<Button
+									className="contentsync-action-button"
+									isSecondary
+									onClick={(e) => contentSync.unimportPost(e.target, post.id)}
+								>
+									{__('Convert to local post', 'contentsync')}
+								</Button>
+							</div>
+						</>
+					)}
+				</>
+			);
+		}
+
+		return <PanelBody>{pluginContent}</PanelBody>;
 	};
 
 	wp.plugins.registerPlugin('contentsync', {

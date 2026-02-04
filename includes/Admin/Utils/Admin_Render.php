@@ -23,13 +23,21 @@ class Admin_Render {
 		}
 
 		$supported = false;
+		$screen    = get_current_screen();
 
-		$screen = get_current_screen();
 		if ( is_object( $screen ) && isset( $screen->base ) ) {
-			if ( $screen->base === 'edit' || $screen->base === 'upload' ) {
 
+			if (
+				$screen->base === 'edit' // edit (overview) screen
+				|| $screen->base === 'upload' // media (overview) screen
+				|| $screen->base === 'post' // post editor screen
+			) {
 				$current_post_type = isset( $screen->post_type ) ? $screen->post_type : 'post';
 				$supported         = in_array( $current_post_type, Post_Transfer_Service::get_supported_post_types() );
+			}
+			// on site editor screen
+			elseif ( $screen->base === 'site-editor' ) {
+				$supported = true;
 			}
 		}
 

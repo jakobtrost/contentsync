@@ -1,0 +1,109 @@
+.synced_post_notice.notice-purple {
+	border-left-color: #9b51e0;
+}
+
+.synced_post_notice > div {
+	padding: 24px 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+@media (max-width: 782px) {
+	.synced_post_notice > div {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}
+
+.synced_post_notice > div > div {
+	margin: 0 5px;
+}
+
+.synced_post_notice .dashicons {
+	width: 32px;
+	height: 32px;
+	font-size: 32px;
+}
+
+.synced_post_notice p {
+	max-width: 50em;
+}
+
+.synced_post_notice .buttons {
+	white-space: nowrap;
+}
+
+.synced_post_notice .buttons .button:not(:last-child) {
+	margin-right: 6px;
+}
+
+/* style block admin notice */
+.components-notice__actions {
+	align-items: center;
+}
+
+.contentsync_components_notice.is-purple {
+	border-left-color: #9b51e0;
+	background-color: #f6edff;
+}
+
+.contentsync_components_notice p {
+	font-size: 14px;
+}
+
+.contentsync_components_notice .components-button.contentsync-notice__action {
+	height: 46px;
+	padding: 10px 20px;
+	margin-right: 16px;
+}
+
+.contentsync_components_notice .components-button.contentsync-notice__action.is-primary {
+	color: #fff;
+	background-color: #000;
+	border-color: #000;
+}
+
+.contentsync_components_notice .components-button.contentsync-notice__action.is-secondary {
+	color: #000;
+	box-shadow: inset 0 0 0 1px #000;
+}
+
+.contentsync_components_notice .heading {
+	display: flex;
+	align-items: center;
+}
+
+.synced_post_notice .status_pill,
+.contentsync_components_notice .status_pill {
+	display: inline-block;
+	padding: 1px 5px 1px 6px;
+	background: #9b51e0;
+	color: #fff;
+	margin-left: 8px;
+	border-radius: 4px;
+	text-transform: uppercase;
+	font-size: smaller;
+	letter-spacing: 1px;
+}
+
+.synced_post_notice .status_pill_neutral,
+.contentsync_components_notice .status_pill_neutral {
+	background: #000;
+	color: #fff;
+}
+
+.synced_post_notice .status_pill_error,
+.contentsync_components_notice .status_pill_error {
+	background: #cd0000;
+	color: #fff;
+}
+
+.contentsync_components_notice em {
+	display: block;
+	font-weight: bold;
+	margin: 1rem 0 1rem 2rem;
+	padding: 0.5rem 0 0.5rem 1rem;
+	border-left: 2px solid currentColor;
+}

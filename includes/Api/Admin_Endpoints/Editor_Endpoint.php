@@ -2,8 +2,7 @@
 /**
  * Editor Admin REST Endpoint
  *
- * Handles REST requests for the Site Editor: get post data and save options.
- * Formerly Rest_Api_Hooks in Admin/Views/Post_Sync/Editor.
+ * Handles REST requests for the Block & Site Editor: get post data and save options.
  *
  * @package Contentsync
  * @subpackage Api\Admin_Endpoints
@@ -21,7 +20,7 @@ use Contentsync\Theme_Posts\Theme_Posts_Service;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Editor Endpoint Class
+ * Block & Site Editor Endpoint Class
  */
 class Editor_Endpoint extends Admin_Endpoint_Base {
 
