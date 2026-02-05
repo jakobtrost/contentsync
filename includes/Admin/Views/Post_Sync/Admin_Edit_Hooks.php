@@ -148,7 +148,7 @@ class Admin_Edit_Hooks extends Hooks_Base {
 				sprintf(
 					'contentSync.makeRoot.openModal( %s, %s, this ); return false;',
 					esc_attr( $post_id ),
-					esc_html( get_the_title( $post_id ) )
+					'\'' . esc_html( get_the_title( $post_id ) ) . '\''
 				)
 			);
 		}

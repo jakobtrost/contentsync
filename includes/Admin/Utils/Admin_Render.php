@@ -33,6 +33,8 @@ class Admin_Render {
 			) {
 				$current_post_type = isset( $screen->post_type ) ? $screen->post_type : 'post';
 				$supported         = in_array( $current_post_type, Post_Transfer_Service::get_supported_post_types() );
+			} elseif ( $screen->base === 'content-sync_page_theme-posts' ) {
+				$supported = true;
 			}
 		}
 

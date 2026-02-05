@@ -30,10 +30,10 @@ contentSync.postExport = new function() {
 				value: 1
 			}
 		],
-		notice: {
-			text: __( 'Posts in query loops are not included in the import and must be exported separately.', 'contentsync' ),
-			type: 'info',
-		},
+		// notice: {
+		// 	text: __( 'Posts in query loops are not included in the import and must be exported separately.', 'contentsync' ),
+		// 	type: 'info',
+		// },
 		buttons: {
 			cancel: {
 				text: __( 'Cancel', 'contentsync' )
