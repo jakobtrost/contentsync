@@ -119,15 +119,23 @@ contentSync.postImport = new function() {
 	/**
 	 * When the REST request is successful
 	 *
-	 * @param {Array} data - Array of posts with conflicts
+	 * @param {Object} data - Object of posts with conflicts (PHP Array keyed by post ID)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
 	this.onCheckFileSuccess = ( data, fullResponse ) => {
 		console.log( 'postImport.onCheckFileSuccess: ', data, fullResponse );
 
-		if ( data.length > 0 ) {
-			this.Modal.setDescription( __( 'Attention: Some content in the file already appears to exist on this site. Choose what to do with it.', 'contentsync' ) );
-			this.buildConflictOptions( data );
+		// Convert the data to an array of posts
+		let posts = [];
+		if ( typeof data === 'object' && Object.keys( data ).length > 0 ) {
+			posts = Object.values( data );
+		} else if ( Array.isArray( data ) ) {
+			posts = data;
+		}
+
+		if ( posts.length > 0 ) {
+			this.Modal.setDescription( __( 'The following posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ) );
+			this.buildConflictOptions( posts );
 		} else {
 			const conflictsContainer = document.getElementById( 'import-post-conflicts' );
 			conflictsContainer.innerHTML = '';
@@ -138,7 +146,27 @@ contentSync.postImport = new function() {
 	};
 
 	/**
-	 * Build the conflict options
+	 * Build the conflict options.
+	 * 
+	 * This build form inputs that create this data structure:
+	 * 
+	 * conflicts: [
+	 *   0 => array(
+	 *     'existing_post_id' => 123,
+	 *     'original_post_id' => 456,
+	 *     'conflict_action' => 'keep'
+	 *   ),
+	 *   1 => array(
+	 *     'existing_post_id' => 789,
+	 *     'original_post_id' => 101,
+	 *     'conflict_action' => 'replace'
+	 *   )
+	 * ]
+	 * 
+	 * This data structure is then sent to the server in the POST request.
+	 * 
+	 * @see \Contentsync\Api\Admin_Endpoints\Post_Import_Endpoint::import()
+	 * 
 	 * @param {Array} posts - Array of posts with conflicts
 	 */
 	this.buildConflictOptions = ( posts ) => {
@@ -150,16 +178,53 @@ contentSync.postImport = new function() {
 		const innerContainer = document.createElement( 'div' );
 		innerContainer.className = 'posts-conflicts-inner-container';
 
-		posts.forEach( ( post ) => {
-			conflictPost = document.createElement( 'div' );
-			conflictPost.className = 'post-conflict';
-			conflictPost.innerHTML = '<span>' + post.post_link + '</span>' +
-				'<select name="conflicts[' + post.ID + ']">' +
+		if ( posts.length > 1 ) {
+			let multiOptionContainer = document.createElement( 'div' );
+			multiOptionContainer.className = 'post-conflict multiselect';
+			multiOptionContainer.innerHTML = '<div class="post-conflict-title">' + __( 'Multiselect' ) + '</div>' +
+				'<select class="post-conflict-action">' +
 					'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
 					'<option value="replace">' + __( 'Overwrite existing', 'contentsync' ) + '</option>' +
 					'<option value="skip">' + __( 'Use existing', 'contentsync' ) + '</option>' +
 				'</select>';
-			innerContainer.appendChild( conflictPost );
+
+			innerContainer.appendChild( multiOptionContainer );
+
+			// on change, change the value of all the other select elements
+			multiOptionContainer.addEventListener( 'change', ( e ) => {
+				const value = e.target.value;
+				const selectElements = innerContainer.querySelectorAll( 'select.post-conflict-action[name^="conflicts' );
+				selectElements.forEach( ( select ) => {
+					select.value = value;
+				} );
+			} );
+		}
+
+		let i = 0;
+		posts.forEach( ( post ) => {
+			
+			let optionContainer = document.createElement( 'div' );
+			optionContainer.className = 'post-conflict';
+
+			if ( post?.existing_post ) {
+				optionContainer.innerHTML = '<div class="post-conflict-title">' + post.existing_post.post_link + '</div>' +
+					'<input type="hidden" name="conflicts[' + i + '][existing_post_id]" value="' + post.existing_post.ID + '" />' +
+					'<input type="hidden" name="conflicts[' + i + '][original_post_id]" value="' + post.existing_post.original_post_id + '" />' +
+					'<select class="post-conflict-action" name="conflicts[' + i + '][conflict_action]">' +
+						'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
+						'<option value="replace">' + __( 'Overwrite existing', 'contentsync' ) + '</option>' +
+						'<option value="skip">' + __( 'Use existing', 'contentsync' ) + '</option>' +
+					'</select>';
+			} else {
+				const postLink = post?.post_link ?? ( post?.post_title + ' (' + post?.post_type + ')' );
+				optionContainer.innerHTML = '<div class="post-conflict-title">' + postLink + '</div>' +
+					'<div class="post-conflict-action no-conflict">' +
+						'<i>' + __( 'No conflict', 'contentsync' ) + '</i>' +
+					'</div>';
+			}
+
+			innerContainer.appendChild( optionContainer );
+			i++;
 		} );
 
 		conflictsContainer.appendChild( innerContainer );

@@ -20,7 +20,7 @@ class Post_Transfer_Hooks extends Hooks_Base {
 	public function register() {
 		add_filter( 'contentsync_filter_post_content_before_post_import', array( $this, 'filter_block_content_on_import' ), 10, 3 );
 		add_action( 'contentsync_before_import_synced_posts', array( $this, 'before_import_synced_posts' ), 10, 2 );
-		add_action( 'contentsync_after_import_synced_posts', array( $this, 'after_import_synced_posts' ), 10, 2 );
+		add_action( 'contentsync_after_import_synced_posts', array( $this, 'after_import_synced_posts' ), 10 );
 	}
 
 	/**
@@ -42,25 +42,15 @@ class Post_Transfer_Hooks extends Hooks_Base {
 
 	/**
 	 * Before import synced posts: Filter the HTML tags that are allowed for a given context.
-	 *
-	 * @param array $posts            The posts to import.
-	 * @param array $conflict_actions The conflict actions.
-	 *
-	 * @return void
 	 */
-	public function before_import_synced_posts( $posts, $conflict_actions ) {
+	public function before_import_synced_posts() {
 		add_filter( 'wp_kses_allowed_html', array( $this, 'filter_allowed_html_tags_during_distribution' ), 98, 2 );
 	}
 
 	/**
 	 * After import synced posts: Remove the filter for the HTML tags that are allowed for a given context.
-	 *
-	 * @param array $posts            The posts to import.
-	 * @param array $conflict_actions The conflict actions.
-	 *
-	 * @return void
 	 */
-	public function after_import_synced_posts( $posts, $conflict_actions ) {
+	public function after_import_synced_posts() {
 		remove_filter( 'wp_kses_allowed_html', array( $this, 'filter_allowed_html_tags_during_distribution' ), 98 );
 	}
 

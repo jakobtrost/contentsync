@@ -267,8 +267,9 @@ class Post_Review_Service {
 				array(
 					'conflict_actions' => array(
 						$post_id => array(
-							'post_id' => $post_id,
-							'action'  => 'replace',
+							'existing_post_id' => $post_id,
+							'conflict_action'  => 'replace',
+							'original_post_id' => $post_id,
 						),
 					),
 				)

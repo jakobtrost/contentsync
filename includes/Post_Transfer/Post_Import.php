@@ -73,7 +73,19 @@ class Post_Import extends Post_Transfer_Base {
 		 *
 		 * @filter contentsync_import_conflict_actions
 		 *
-		 * @param array $conflict_actions   Array of existing posts with conflicts, keyed by post ID.
+		 * @param array $conflict_actions   Array of existing posts with conflicts, keyed by original post ID. Example:
+		 * [
+		 *   456 => array(
+		 *     'existing_post_id' => 123,
+		 *     'conflict_action'  => 'replace',
+		 *     'original_post_id' => 456,
+		 *   ),
+		 *   789 => array(
+		 *     'existing_post_id' => 101,
+		 *     'conflict_action'  => 'skip',
+		 *     'original_post_id' => 789,
+		 *   ),
+		 * ]
 		 * @param array $posts              Array of posts to be imported, keyed by post ID.
 		 *
 		 * @return array $conflict_actions  Modified array of conflict actions.
@@ -104,7 +116,7 @@ class Post_Import extends Post_Transfer_Base {
 
 			// handle the post language
 			// Analyze whether this translation should be imported
-			$translation_analysis = Translation_Manager::analyze_translation_import( $post, $this->posts );
+			$translation_analysis = Translation_Manager::analyze_translation_import( $post, $this->post_id_map );
 
 			// Handle the decision based on the analysis
 			if ( ! $translation_analysis['should_import'] ) {
@@ -204,8 +216,8 @@ class Post_Import extends Post_Transfer_Base {
 			// this usually is a user decision from the backend form.
 			if ( isset( $conflict_actions[ $post_id ] ) ) {
 				$conflict_data    = (array) $conflict_actions[ $post_id ];
-				$existing_post_id = $conflict_data['post_id'];
-				$conflict_action  = $conflict_data['action'];
+				$existing_post_id = $conflict_data['existing_post_id'];
+				$conflict_action  = $conflict_data['conflict_action'];
 			} else {
 				$existing_post_id = $existing_post_id ? $existing_post_id : Post_Transfer_Service::get_existing_post_id( $post );
 			}
@@ -912,7 +924,7 @@ class Post_Import extends Post_Transfer_Base {
 
 		// post imported: use the imported post-ID
 		if ( isset( $this->posts[ $nested_id ] ) ) {
-			$replace_string = $this->posts[ $nested_id ];
+			$replace_string = $this->posts[ $nested_id ]->ID;
 		}
 		// no postarr set: use the initial post-ID
 		elseif ( ! $nested_postarr || ! is_array( $nested_postarr ) ) {
@@ -1418,7 +1430,7 @@ class Post_Import extends Post_Transfer_Base {
 		return Translation_Manager::set_translations_from_import(
 			$post_id,
 			$post->language,
-			$this->posts
+			$this->post_id_map
 		);
 	}
 
@@ -1476,7 +1488,7 @@ class Post_Import extends Post_Transfer_Base {
 
 					// if the parent post is part of the posts that are being imported, use the new post ID
 					if ( isset( $this->posts[ $post_parent_info['id'] ] ) ) {
-						$new_parent_post_id = $this->posts[ $post_parent_info['id'] ];
+						$new_parent_post_id = $this->posts[ $post_parent_info['id'] ]->ID;
 					} else {
 						$parent_posts = get_posts(
 							array(
@@ -1536,7 +1548,7 @@ class Post_Import extends Post_Transfer_Base {
 
 					// if the child post is part of the posts that are being imported, use the new post ID
 					if ( isset( $this->posts[ $child_post_info['id'] ] ) ) {
-						$new_child_post_id = $this->posts[ $child_post_info['id'] ];
+						$new_child_post_id = $this->posts[ $child_post_info['id'] ]->ID;
 					} else {
 						// if the child post is not part of the posts that are being imported, try to find it by name and type
 						// we only look for posts that do not have a parent yet to not overwrite existing hierarchies.
@@ -1586,7 +1598,7 @@ class Post_Import extends Post_Transfer_Base {
 		// set post_parent (old way)
 		elseif ( isset( $post->post_parent ) && ! empty( $post->post_parent ) ) {
 
-			$old_parent_post_id = isset( $this->posts[ $post->post_parent ] ) ? $this->posts[ $post->post_parent ] : null;
+			$old_parent_post_id = isset( $this->posts[ $post->post_parent ] ) ? $this->posts[ $post->post_parent ]->ID : null;
 			if ( $old_parent_post_id ) {
 				$result = wp_update_post(
 					array(

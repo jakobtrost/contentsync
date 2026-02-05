@@ -15,6 +15,7 @@ namespace Contentsync\Api\Admin_Endpoints;
 
 use Contentsync\Admin\Views\Post_Transfer\Post_Conflict_Handler;
 use Contentsync\Post_Sync\Synced_Post_Service;
+use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -142,25 +143,39 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'global IDs are not defined.', 'contentsync' ), 400 );
 		}
 
-		$results = array();
+		$all_posts = array();
 		foreach ( $posts as $post ) {
 			if ( ! isset( $post['gid'] ) ) {
 				continue;
 			}
-			$conflict = Post_Conflict_Handler::check_synced_post_import( $post['gid'] );
-			if ( ! empty( $conflict ) ) {
-				$results[] = array(
-					'gid'      => $post['gid'],
-					'conflict' => $conflict,
-				);
-			}
+			$posts = $this->check_synced_post_import( $post['gid'] );
+
+			$all_posts = array_merge( $all_posts, $posts );
 		}
 
-		if ( empty( $results ) ) {
+		if ( empty( $all_posts ) ) {
 			return $this->respond( false, __( 'posts could not be checked for conflicts.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( $results, __( 'Conflicts found.', 'contentsync' ), true );
+		return $this->respond( $all_posts, __( 'Conflicts found.', 'contentsync' ), true );
+	}
+
+	/**
+	 * Check synced posts for conflicts on this page
+	 *
+	 * @param string $gid   Global ID.
+	 *
+	 * @return Prepared_Post[]   The prepared posts, keyed by ID, with some properties added:
+	 *   @property object $existing_post        The conflicting post
+	 *      @property string $post_link         The link to the conflicting post
+	 *      @property string $original_post_id  The original post ID
+	 */
+	public function check_synced_post_import( $gid ) {
+
+		$posts = Synced_Post_Query::prepare_synced_post_for_import( $gid );
+		$posts = Post_Conflict_Handler::get_import_posts_with_conflicts( $posts );
+
+		return $posts;
 	}
 
 	/**
@@ -176,8 +191,8 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
 		}
 
-		$conflicts = Post_Conflict_Handler::check_synced_post_import( $gid );
-		error_log( 'Linked_Posts_Endpoint::check_import: ' . print_r( $conflicts, true ) );
+		$conflicts = $this->check_synced_post_import( $gid );
+		Logger::add( 'Linked_Posts_Endpoint::check_import', $conflicts );
 
 		if ( empty( $conflicts ) ) {
 			return $this->respond( array(), __( 'No conflicts found. You can safely import the global post.', 'contentsync' ), true );
@@ -193,12 +208,43 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function import( $request ) {
-		$gid       = (string) ( $request->get_param( 'gid' ) ?? '' );
-		$conflicts = (array) ( $request->get_param( 'conflicts' ) ?? array() );
+		$gid = (string) ( $request->get_param( 'gid' ) ?? '' );
 
 		if ( empty( $gid ) ) {
 			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
 		}
+
+		/**
+		 * Get the conflicts from the request. If done right, the conflicts array will be like this:
+		 *
+		 * conflicts: [
+		 *   0 => array(
+		 *     'existing_post_id' => 123,
+		 *     'original_post_id' => 456,
+		 *     'conflict_action' => 'keep'
+		 *   ),
+		 *   1 => array(
+		 *     'existing_post_id' => 789,
+		 *     'original_post_id' => 101,
+		 *     'conflict_action' => 'replace'
+		 *   )
+		 * ]
+		 */
+		$conflicts = (array) ( $request->get_param( 'conflicts' ) ?? array() );
+
+		// foreach ( $conflicts as $conflict ) {
+		// if ( isset( $conflict['post_id'] ) ) {
+		// **
+		// * Set the @property conflict_action for the post in the post_data array
+		// *
+		// * @see \Contentsync\Post_Transfer\Post_Import::import_posts()
+		// *      -> "Get conflicting post and action." section
+		// */
+		// $post_data[ $conflict['post_id'] ]['conflict_action'] = $conflict['conflict_action'];
+		// }
+		// }
+
+		// Logger::add( 'post_data', $post_data );
 
 		$conflict_actions = Post_Conflict_Handler::get_conflicting_post_selections( $conflicts );
 		$result           = Synced_Post_Service::import_synced_post( $gid, $conflict_actions );

@@ -3,7 +3,6 @@
 namespace Contentsync\Admin\Views\Post_Transfer;
 
 use Contentsync\Post_Transfer\Post_Transfer_Service;
-use Contentsync\Post_Sync\Synced_Post_Query;
 use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
@@ -14,114 +13,41 @@ defined( 'ABSPATH' ) || exit;
 class Post_Conflict_Handler {
 
 	/**
-	 * Check synced posts for conflicts on this page
+	 * Get posts with conflicts.
 	 *
-	 * @param string $gid   Global ID.
+	 * @param Prepared_Post[]|WP_Post[] $posts  Prepared posts keyed by ID
 	 *
-	 * @return array Array of conflicts if any found, empty array if no conflicts found.
-	 *   - ID: ID of the conflicting post
-	 *   - post_link: Link to the conflicting post
-	 *   - post_type: Type of the conflicting post
-	 *   - post_title: Title of the conflicting post
+	 * @return array   The original posts, keyed by ID, with some properties added:
+	 *   @property object $existing_post        The conflicting post
+	 *      @property string $post_link         The link to the conflicting post
+	 *      @property string $original_post_id  The original post ID
 	 */
-	public static function check_synced_post_import( $gid ) {
+	public static function get_import_posts_with_conflicts( $posts ) {
 
-		$posts = Synced_Post_Query::prepare_synced_post_for_import( $gid );
-		if ( ! $posts ) {
+		if ( ! $posts || ! is_array( $posts ) ) {
 			return array();
 		}
 
-		// get conflicting posts
-		$conflicts = self::get_conflicting_post_options( $posts );
-
-		return $conflicts;
-	}
-
-	/**
-	 * Get conflicting posts as decoded array to be read and displayed
-	 * in the backend 'check-import' overlay-form via backend.js.
-	 *
-	 * @param WP_Post[] $posts  WP_Posts keyed by ID
-	 *
-	 * @return array Array of conflicts:
-	 *   - ID: ID of the conflicting post
-	 *   - post_link: Link to the conflicting post
-	 *   - post_type: Type of the conflicting post
-	 *   - post_title: Title of the conflicting post
-	 */
-	public static function get_conflicting_post_options( $posts ) {
-
-		// get conflicting posts
-		$conflicts = self::get_conflicting_posts( $posts );
-
-		if ( count( $conflicts ) > 0 ) {
-			foreach ( $conflicts as $post_id => $post ) {
-
-				// get the post link to display in the backend
-				$conflicts[ $post_id ]->post_link = self::get_post_link_html( $post );
-				/**
-				 * We add the original ID of the import to the existing post ID.
-				 *
-				 * In the backend the dropdowns to decide what to do with existing
-				 * posts get named by the ID. So their name will be something
-				 * like '12-54'
-				 *
-				 * On the import we have form-data like array('12-54' => 'replace').
-				 * We later convert this data via the function
-				 * get_conflicting_post_selections()
-				 */
-				$conflicts[ $post_id ]->ID = $post_id . '-' . $conflicts[ $post_id ]->ID;
-			}
-			if ( count( $conflicts ) > 1 ) {
-				array_unshift(
-					$conflicts,
-					(object) array(
-						'ID'        => 'multioption',
-						'post_link' => __( 'Multiselect', 'contentsync' ),
-						'post_type' => '',
-					)
-				);
-			}
-			// we don't set keys to keep the order when decoding the array to JS
-			return array_values( $conflicts );
-		}
-		return array();
-	}
-
-	/**
-	 * Check if there are existing posts in conflict with posts to be imported.
-	 *
-	 * @param Prepared_Post[] $posts  Posts keyed by ID
-	 *
-	 * @return WP_Post[]        Returns WP_Posts keyed by the original IDs. Contains
-	 *                          post object and full html link object.
-	 */
-	public static function get_conflicting_posts( $posts ) {
-
-		$conflicts = array();
 		foreach ( $posts as $post_id => $post ) {
 			if ( $existing_post = Post_Transfer_Service::get_post_by_name_and_type( $post ) ) {
-				$conflicts[ $post_id ] = $existing_post;
+
+				$existing_post->original_post_id = $post_id;
+				$existing_post->post_link        = self::get_post_link_html( $post );
+
+				$posts[ $post_id ]->existing_post = $existing_post;
 			}
 		}
 
 		/**
-		 * Filter to modify the list of conflicting posts before returning them.
+		 * Filter to modify the list of posts with conflicts.
 		 *
-		 * This filter allows developers to customize the list of posts that conflict
-		 * with posts being imported. It's useful for adding custom conflict detection
-		 * logic or filtering out certain types of conflicts.
+		 * @param array   $posts  Array of posts with conflicts.
 		 *
-		 * @filter import_synced_post_conflicts
-		 *
-		 * @param array $conflicts  Array of conflicting posts, keyed by post ID.
-		 * @param array $posts      Array of posts being imported, keyed by post ID.
-		 *
-		 * @return array            Modified array of conflicting posts.
+		 * @return array
 		 */
-		return apply_filters( 'import_synced_post_conflicts', $conflicts, $posts );
+		$posts = apply_filters( 'contentsync_import_posts_with_conflicts', $posts );
+		return $posts;
 	}
-
 	/**
 	 * Get link to post as html object.
 	 * Example: <a>Example page (Page)</a>
@@ -152,29 +78,44 @@ class Post_Conflict_Handler {
 	}
 
 	/**
-	 * Get all conflicting post actions from the backend 'check-import' overlay-form.
+	 * Get all conflicting post actions from the modal-form data.
 	 *
-	 * We have form data from the backend like array( '43-708' => 'skip' )
-	 * and we convert this to a proper array that can be used for the function
-	 * Post_Import->import_posts() (See function doc for details)
+	 * We have form data from the backend 'check-import' modal-form (see example below).
+	 * We convert this to a proper array that can be used for the function
+	 * Synced_Post_Service::import_synced_post() (See function doc for details)
 	 *
-	 * @param array $conflicts  The conflicts.
+	 * @param array $conflicts
+	 * conflicts: [
+	 *   0 => array(
+	 *     'existing_post_id' => 123, // ID of the existing post on the current blog
+	 *     'original_post_id' => 456, // ID of the original post
+	 *     'conflict_action' => 'keep', // action to be done (skip|replace|keep)
+	 *   ),
+	 *   1 => array(
+	 *     'existing_post_id' => 101,
+	 *     'original_post_id' => 789,
+	 *     'conflict_action' => 'replace',
+	 *   )
+	 * ]
 	 *
-	 * @return array
+	 * @return array The conflicting posts keyed by original post ID. Example:
+	 * [
+	 *   456 => array(
+	 *     'existing_post_id' => 123, // ID of the existing post on the current blog
+	 *     'conflict_action'  => 'keep', // action to be done (skip|replace|keep)
+	 *     'original_post_id' => 456, // ID of the original post
+	 *   ),
+	 *   789 => array(
+	 *     'existing_post_id' => 101,
+	 *     'conflict_action'  => 'replace',
+	 *     'original_post_id' => 789,
+	 *   ),
+	 * ]
 	 */
 	public static function get_conflicting_post_selections( $conflicts ) {
 		$conflict_actions = array();
-		foreach ( (array) $conflicts as $ids => $action ) {
-			if ( strpos( $ids, '-' ) !== false ) {
-				// original format: '43-708' => 'skip'
-				$ids                          = explode( '-', $ids );
-				$post_id                      = $ids[0];
-				$conflict_actions[ $post_id ] = array(
-					'post_id' => $ids[1],
-					'action'  => $action,
-				);
-				// new format: 43 => array( 'post_id' => '708', 'action' => 'skip' )
-			}
+		foreach ( (array) $conflicts as $conflict ) {
+			$conflict_actions[ $conflict['original_post_id'] ] = $conflict;
 		}
 		return $conflict_actions;
 	}

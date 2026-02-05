@@ -162,8 +162,9 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 
 		if ( $synced_post ) {
 			$current_posts[ $synced_post->ID ] = array(
-				'post_id' => $post_id,
-				'action'  => 'replace',
+				'existing_post_id' => $post_id,
+				'conflict_action'  => 'replace',
+				'original_post_id' => $synced_post->ID,
 			);
 		}
 

@@ -23,7 +23,7 @@ class Synced_Post_Hooks extends Hooks_Base {
 	 *
 	 * @filter 'contentsync_import_conflict_actions'
 	 *
-	 * @param array $conflict_actions   Keyed by orig. ID, values contain 'post_id' & 'action'
+	 * @param array $conflict_actions   Keyed by orig. ID, values contain 'existing_post_id' & 'conflict_action'
 	 * @param array $all_posts          All posts to be imported.
 	 */
 	public function match_synced_posts_before_import( $conflict_actions, $all_posts ) {
@@ -68,8 +68,9 @@ class Synced_Post_Hooks extends Hooks_Base {
 				$action = isset( $post->is_root_post ) && $post->is_root_post ? 'replace' : 'skip';
 
 				$conflict_actions[ $post->ID ] = array(
-					'post_id' => $existing_post->ID,
-					'action'  => $action,
+					'existing_post_id' => $existing_post->ID,
+					'conflict_action'  => $action,
+					'original_post_id' => $post->ID,
 				);
 				Logger::add( sprintf( "Matching local post found with GID '%s' and post-type '%s'.", $gid, $post->post_type ) );
 			}

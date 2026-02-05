@@ -15,6 +15,7 @@ namespace Contentsync\Api\Admin_Endpoints;
 use Contentsync\Admin\Views\Post_Transfer\Post_Conflict_Handler;
 use Contentsync\Post_Transfer\Post_Import;
 use Contentsync\Utils\Files;
+use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -104,16 +105,16 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'Failed to save the uploaded file.', 'contentsync' ), 400 );
 		}
 
-		error_log( 'new_file: ' . $new_file );
+		Logger::add( 'new_file', $new_file );
 		$post_data = Files::get_posts_json_file_contents_from_zip( $new_file );
 
 		if ( ! is_array( $post_data ) ) {
 			return $this->respond( false, is_string( $post_data ) ? $post_data : __( 'Invalid or missing posts.json in ZIP.', 'contentsync' ), 400 );
 		}
 
-		$conflicts = Post_Conflict_Handler::get_conflicting_post_options( $post_data );
+		$posts = Post_Conflict_Handler::get_import_posts_with_conflicts( $post_data );
 
-		return $this->respond( $conflicts, '', true );
+		return $this->respond( $posts, '', true );
 	}
 
 	/**
@@ -124,8 +125,7 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 	 */
 	public function import( $request ) {
 		set_time_limit( 5000 );
-
-		error_log( 'import params: ' . print_r( $request->get_params(), true ) );
+		// Logger::add( 'import params', $request->get_params() );
 
 		$filename = sanitize_file_name( $request->get_param( 'filename' ) ?? '' );
 
@@ -133,8 +133,7 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'The file name is empty.', 'contentsync' ), 400 );
 		}
 
-		$zip_file = Files::get_wp_content_folder_path( 'tmp' ) . $filename;
-		error_log( 'zip_file: ' . $zip_file );
+		$zip_file  = Files::get_wp_content_folder_path( 'tmp' ) . $filename;
 		$post_data = Files::get_posts_json_file_contents_from_zip( $zip_file );
 
 		if ( ! is_array( $post_data ) ) {
@@ -142,14 +141,40 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, $message, 400 );
 		}
 
-		$conflicts        = (array) ( $request->get_param( 'conflicts' ) ?? array() );
-		$conflict_actions = Post_Conflict_Handler::get_conflicting_post_selections( $conflicts );
+		/**
+		 * Get the conflicts from the request. If done right, the conflicts array will be like this:
+		 *
+		 * conflicts: [
+		 *   0 => array(
+		 *     'existing_post_id' => 123,
+		 *     'original_post_id' => 456,
+		 *     'conflict_action' => 'keep'
+		 *   ),
+		 *   1 => array(
+		 *     'existing_post_id' => 789,
+		 *     'original_post_id' => 101,
+		 *     'conflict_action' => 'replace'
+		 *   )
+		 * ]
+		 */
+		$conflicts = (array) ( $request->get_param( 'conflicts' ) ?? array() );
+		foreach ( $conflicts as $conflict ) {
+			$original_post_id = $conflict['original_post_id'] ?? 0;
+			if ( isset( $post_data[ $original_post_id ] ) ) {
+				/**
+				 * Set the @property conflict_action for the post in the post_data array
+				 *
+				 * @see \Contentsync\Post_Transfer\Post_Import::import_posts()
+				 *      -> "Get conflicting post and action." section
+				 */
+				$post_data[ $original_post_id ]->conflict_action = $conflict['conflict_action'];
+			}
+		}
 
 		$post_import   = new Post_Import(
 			$post_data,
 			array(
-				'zip_file'         => $zip_file,
-				'conflict_actions' => $conflict_actions,
+				'zip_file' => $zip_file,
 			)
 		);
 		$import_result = $post_import->import_posts();

@@ -119,8 +119,9 @@ class Synced_Post_Service {
 	 * @param string $gid               The global ID. Format {{blog_id}}-{{post_id}}
 	 * @param array  $conflict_actions   Array of posts that already exist on the current blog.
 	 *                                   Keyed by the same ID as in the @param $posts.
-	 *                                  @property post_id: ID of the current post.
-	 *                                  @property action: Action to be done (skip|replace|keep)
+	 *                                  @property existing_post_id: ID of the current post.
+	 *                                  @property conflict_action: Action to be done (skip|replace|keep)
+	 *                                  @property original_post_id: ID of the original post.
 	 *
 	 * @return bool|string  True on success. False or error message on failure.
 	 */

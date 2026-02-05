@@ -172,8 +172,9 @@ class Connected_Posts_Endpoint extends Remote_Endpoint_Base {
 					 */
 					$conflict_actions = array(
 						$root_post_id => array(
-							'post_id' => $post_id,
-							'action'  => 'replace',
+							'existing_post_id' => $post_id,
+							'conflict_action'  => 'replace',
+							'original_post_id' => $root_post_id,
 						),
 					);
 
