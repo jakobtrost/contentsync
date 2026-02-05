@@ -11,15 +11,17 @@ use Contentsync\Database\Database_Tables_Hooks;
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 class Bootstrap {
+
 	public function __construct() {
+
 		register_activation_hook( CONTENTSYNC_PLUGIN_FILE, array( $this, 'contentsync_plugin_activated' ) );
 		register_deactivation_hook( CONTENTSYNC_PLUGIN_FILE, array( $this, 'contentsync_plugin_deactivated' ) );
 
+		// Initialize all loader classes (which will load their respective resources).
+		$this->init_loaders();
+
 		// Initialize plugin update checker.
 		$this->init_update_checker();
-
-		// Load all loader classes (which will load their respective resources).
-		$this->load_all_loaders();
 	}
 
 	/**
@@ -30,8 +32,6 @@ class Bootstrap {
 	 * will only create missing tables.
 	 */
 	public function contentsync_plugin_activated() {
-		Logger::add( 'Contentsync plugin activated' );
-
 		( new Database_Tables_Hooks() )->maybe_add_tables();
 	}
 
@@ -42,13 +42,13 @@ class Bootstrap {
 	 * be added here in the future without touching the main plugin loader.
 	 */
 	public function contentsync_plugin_deactivated() {
-		Logger::add( 'Contentsync plugin deactivated' );
+		// Silent for now.
 	}
 
 	/**
 	 * Scan includes/ directory and instantiate all loader classes.
 	 */
-	private function load_all_loaders() {
+	private function init_loaders() {
 		$includes_dir = CONTENTSYNC_PLUGIN_PATH . '/includes';
 		$iterator     = new \RecursiveIteratorIterator(
 			new \RecursiveDirectoryIterator( $includes_dir )
@@ -93,8 +93,11 @@ class Bootstrap {
 	 *
 	 * This sets up automatic update notifications and one-click upgrades
 	 * from the GitHub repository.
+	 *
+	 * @link https://github.com/YahnisElsts/plugin-update-checker
 	 */
 	private function init_update_checker() {
+
 		$update_checker = PucFactory::buildUpdateChecker(
 			'https://github.com/jakobtrost/contentsync/',
 			CONTENTSYNC_PLUGIN_FILE,
@@ -104,10 +107,6 @@ class Bootstrap {
 		// Optional: Set the branch that contains the stable release.
 		// Uncomment and modify if you want to use a specific branch instead of releases/tags.
 		// $update_checker->setBranch( 'main' );
-
-		// Optional: If you're using a private repository, specify the access token.
-		// Uncomment and add your token if needed.
-		// $update_checker->setAuthentication( 'your-github-token-here' );
 
 		// Optional: Enable release assets if you want to use custom release assets.
 		// Uncomment if you want to use release assets instead of the default zip.

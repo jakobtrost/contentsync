@@ -1,9 +1,9 @@
 /**
  * Admin features for the 'distribution' feature
  */
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
 
-contentsync.distribution = new ( function () {
+contentSync.distribution = new ( function () {
 
 	this.debug = true;
 	this.stuckItems = distributionData.stuck_items || { count: 0, items: [] };
@@ -318,5 +318,5 @@ contentsync.distribution = new ( function () {
 } )();
 
 document.addEventListener( 'DOMContentLoaded', () => {
-	contentsync.distribution.init();
+	contentSync.distribution.init();
 } );

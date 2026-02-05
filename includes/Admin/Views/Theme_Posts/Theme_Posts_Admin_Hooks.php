@@ -2,7 +2,7 @@
 
 namespace Contentsync\Admin\Views\Theme_Posts;
 
-use Contentsync\Admin\Views\Theme_Posts\Theme_Posts_List_Table;
+use Contentsync\Admin\Views\Theme_Theme_Posts\Theme_Posts_Service_List_Table;
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Utils\Hooks_Base;
 
@@ -23,7 +23,7 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 	public function register_admin() {
 
 		add_action( 'admin_menu', array( $this, 'add_submenu_item' ), self::THEME_POSTS_PAGE_POSITION );
-		add_action( 'admin_menu', array( $this, 'add_theme_posts_admin_page' ) );
+		add_action( 'admin_menu', array( $this, 'add_themes_menu_item' ) );
 
 		add_filter( 'set-screen-option', array( $this, 'save_screen_options' ), 10, 3 );
 
@@ -47,8 +47,8 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 
 		$hook = add_submenu_page(
 			'contentsync',
-			__( 'Theme Posts', 'contentsync_hub' ), // page title
-			__( 'Theme Posts', 'contentsync_hub' ), // menu title
+			__( 'Theme Posts', 'contentsync' ), // page title
+			__( 'Theme Posts', 'contentsync' ), // menu title
 			'manage_options',
 			'theme-posts',
 			array( $this, 'render_theme_posts_admin_page' ),
@@ -61,7 +61,7 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 	/**
 	 * Add a menu item to the WordPress admin menu
 	 */
-	function add_theme_posts_admin_page() {
+	function add_themes_menu_item() {
 
 		// Only add the menu item if the current theme supports blocks
 		if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) {
@@ -69,8 +69,8 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 		}
 
 		$hook = add_theme_page(
-			__( 'Theme Posts', 'contentsync_hub' ), // page title
-			__( 'Theme Posts', 'contentsync_hub' ), // menu title
+			__( 'Theme Posts', 'contentsync' ), // page title
+			'→ ' . __( 'Theme Posts', 'contentsync' ), // menu title
 			'manage_options',
 			admin_url( 'admin.php?page=theme-posts' ),
 			null
@@ -84,7 +84,7 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 	 */
 	public function add_screen_options() {
 		$args = array(
-			'label'   => __( 'Posts per page:', 'contentsync_hub' ),
+			'label'   => __( 'Posts per page:', 'contentsync' ),
 			'default' => 20,
 			'option'  => 'theme_posts_per_page',
 		);
@@ -146,80 +146,80 @@ class Theme_Posts_Admin_Hooks extends Hooks_Base {
 
 		$contents['switch_template_theme'] = array(
 			'confirm' => array(
-				'title'   => __( 'Assign template to current theme', 'contentsync_hub' ),
-				'descr'   => __( 'This will switch the template to the current theme. Be careful, this could lead to errors, because the template might not be designed for your theme or does already exist.', 'contentsync_hub' ),
+				'title'   => __( 'Assign template to current theme', 'contentsync' ),
+				'descr'   => __( 'This will switch the template to the current theme. Be careful, this could lead to errors, because the template might not be designed for your theme or does already exist.', 'contentsync' ),
 				'content' => '<form id="switch_theme_form" class="inner_content">' .
 									'<label for="switch_references_in_content">' .
 										'<input type="checkbox" name="switch_references_in_content" id="switch_references_in_content" checked="checked" />' .
-										'<span>' . __( 'Switch references in content', 'contentsync_hub' ) . '</span>' .
-										'<small>' . __( 'All references to templates and template parts inside this post will be switched to your current theme. This way it uses the current templates, like your header or footer.', 'contentsync_hub' ) . '</small>' .
+										'<span>' . __( 'Switch references in content', 'contentsync' ) . '</span>' .
+										'<small>' . __( 'All references to templates and template parts inside this post will be switched to your current theme. This way it uses the current templates, like your header or footer.', 'contentsync' ) . '</small>' .
 									'</label>' .
 								'</form>',
-				'button'  => __( 'Assign now', 'contentsync_hub' ),
+				'button'  => __( 'Assign now', 'contentsync' ),
 			),
 			'loading' => array(
-				'descr' => __( 'Template is assigned to the current theme.', 'contentsync_hub' ),
+				'descr' => __( 'Template is assigned to the current theme.', 'contentsync' ),
 			),
 			'reload'  => array(
-				'title' => __( 'Switch successful', 'contentsync_hub' ),
-				'descr' => __( 'Template was assigned to the current theme.', 'contentsync_hub' ),
+				'title' => __( 'Switch successful', 'contentsync' ),
+				'descr' => __( 'Template was assigned to the current theme.', 'contentsync' ),
 			),
 			'fail'    => array(
-				'title' => __( 'Switch failed.', 'contentsync_hub' ),
-				'descr' => __( 'Template could not be assigned to the current theme.', 'contentsync_hub' ),
+				'title' => __( 'Switch failed.', 'contentsync' ),
+				'descr' => __( 'Template could not be assigned to the current theme.', 'contentsync' ),
 			),
 		);
 
 		$contents['switch_global_styles'] = array(
 			'confirm' => array(
-				'title'   => __( 'Assign styles to current theme', 'contentsync_hub' ),
+				'title'   => __( 'Assign styles to current theme', 'contentsync' ),
 				'descr'   => sprintf(
-					__( 'This will assign the styles from the theme %s to your current theme. Be careful, this could lead to errors, because the styles might not be compatible with your theme.', 'contentsync_hub' ),
+					__( 'This will assign the styles from the theme %s to your current theme. Be careful, this could lead to errors, because the styles might not be compatible with your theme.', 'contentsync' ),
 					'<strong class="replace"></strong>'
 				),
 				'content' => Admin_Render::make_admin_info_box(
 					array(
-						'text'  => __( 'You are overwriting the global styles of your current theme. This cannot be made undone. Make sure to make a backup of the current styles beforehand.', 'contentsync_hub' ),
+						'text'  => __( 'You are overwriting the global styles of your current theme. This cannot be made undone. Make sure to make a backup of the current styles beforehand.', 'contentsync' ),
 						'style' => 'warning',
 					)
 				),
-				'button'  => __( 'Assign now', 'contentsync_hub' ),
+				'button'  => __( 'Assign now', 'contentsync' ),
 			),
 			'loading' => array(
-				'descr' => __( 'Styles are assigned to the current theme.', 'contentsync_hub' ),
+				'descr' => __( 'Styles are assigned to the current theme.', 'contentsync' ),
 			),
 			'reload'  => array(
-				'title' => __( 'Switch successful', 'contentsync_hub' ),
-				'descr' => __( 'Styles were assigned to the current theme.', 'contentsync_hub' ),
+				'title' => __( 'Switch successful', 'contentsync' ),
+				'descr' => __( 'Styles were assigned to the current theme.', 'contentsync' ),
 			),
 			'fail'    => array(
-				'title' => __( 'Switch failed.', 'contentsync_hub' ),
-				'descr' => __( 'Styles could not be assigned to the current theme.', 'contentsync_hub' ),
+				'title' => __( 'Switch failed.', 'contentsync' ),
+				'descr' => __( 'Styles could not be assigned to the current theme.', 'contentsync' ),
 			),
 		);
 
 		$contents['rename_template'] = array(
 			'confirm' => array(
-				'title'   => __( 'Rename template', 'contentsync_hub' ),
-				'descr'   => __( 'This might lead to errors in your theme, because the template name is used to identify the template and assign it to a page, post or taxonomy.', 'contentsync_hub' ),
+				'title'   => __( 'Rename template', 'contentsync' ),
+				'descr'   => __( 'This might lead to errors in your theme, because the template name is used to identify the template and assign it to a page, post or taxonomy.', 'contentsync' ),
 				'content' => '<form id="rename_template_form" class="inner_content">' .
-									'<div style="margin-bottom:4px">' . __( 'New title', 'contentsync_hub' ) . '</div>' .
-									'<input style="margin-bottom:14px;width:100%" type="text" name="new_post_title" id="new_post_title" value="" placeholder="' . __( 'New title', 'contentsync_hub' ) . '" />' .
-									'<div style="margin-bottom:4px">' . __( 'New slug', 'contentsync_hub' ) . '</div>' .
-									'<input style="margin-bottom:14px;width:100%" type="text" name="new_post_name" id="new_post_name" value="" placeholder="' . __( 'New slug', 'contentsync_hub' ) . '" />' .
+									'<div style="margin-bottom:4px">' . __( 'New title', 'contentsync' ) . '</div>' .
+									'<input style="margin-bottom:14px;width:100%" type="text" name="new_post_title" id="new_post_title" value="" placeholder="' . __( 'New title', 'contentsync' ) . '" />' .
+									'<div style="margin-bottom:4px">' . __( 'New slug', 'contentsync' ) . '</div>' .
+									'<input style="margin-bottom:14px;width:100%" type="text" name="new_post_name" id="new_post_name" value="" placeholder="' . __( 'New slug', 'contentsync' ) . '" />' .
 								'</form>',
-				'button'  => __( 'Confirm', 'contentsync_hub' ),
+				'button'  => __( 'Confirm', 'contentsync' ),
 			),
 			'loading' => array(
-				'descr' => __( 'Template is renamed.', 'contentsync_hub' ),
+				'descr' => __( 'Template is renamed.', 'contentsync' ),
 			),
 			'reload'  => array(
-				'title' => __( 'Rename successful', 'contentsync_hub' ),
-				'descr' => __( 'Template was renamed.', 'contentsync_hub' ),
+				'title' => __( 'Rename successful', 'contentsync' ),
+				'descr' => __( 'Template was renamed.', 'contentsync' ),
 			),
 			'fail'    => array(
-				'title' => __( 'Rename failed.', 'contentsync_hub' ),
-				'descr' => __( 'Template could not be renamed.', 'contentsync_hub' ),
+				'title' => __( 'Rename failed.', 'contentsync' ),
+				'descr' => __( 'Template could not be renamed.', 'contentsync' ),
 			),
 		);
 

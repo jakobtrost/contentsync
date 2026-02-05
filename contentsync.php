@@ -5,7 +5,7 @@ Description:    Synchronize content on any number of websites and benefit from m
 Plugin URI:     https://github.com/jakobtrost/contentsync
 Author:         Jakob Trost
 Author URI:     https://jakobtrost.de
-Version:        0.1
+Version:        0.1.0
 Text Domain:    contentsync
 Domain Path:    /languages/
 */
@@ -14,7 +14,7 @@ namespace Contentsync;
 defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'CONTENTSYNC_VERSION' ) ) {
-	define( 'CONTENTSYNC_VERSION', '2.17.4' );
+	define( 'CONTENTSYNC_VERSION', '0.1.0' );
 }
 
 if ( ! defined( 'CONTENTSYNC_PLUGIN_PATH' ) ) {
@@ -32,9 +32,6 @@ if ( ! defined( 'CONTENTSYNC_PLUGIN_URL' ) ) {
 if ( ! defined( 'CONTENTSYNC_REST_NAMESPACE' ) ) {
 	define( 'CONTENTSYNC_REST_NAMESPACE', 'contentsync/v1' );
 }
-
-// require_once __DIR__ . '/includes/Utils/File_Loader_Logger.php';
-// Utils\File_Loader_Logger::init();
 
 // Load Composer autoloader for PSR-4 autoloading.
 require_once __DIR__ . '/vendor/autoload.php';

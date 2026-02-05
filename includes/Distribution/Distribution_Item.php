@@ -2,7 +2,7 @@
 /**
  * Distribution item class.
  *
- * The `Distribution_Item` class represents a unit of work within the global content
+ * The `Distribution_Item` class represents a unit of work within the Content Sync
  * distribution system. Each instance encapsulates the posts being distributed and the
  * destination to which they are sent. It also stores metadata about the origin and
  * status of the distribution. This class is used when saving and updating distribution

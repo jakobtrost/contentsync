@@ -1,6 +1,6 @@
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
 
-contentsync.reviews = new function () {
+contentSync.reviews = new function () {
 	/**
 	 * Approve post review
 	 */
@@ -8,11 +8,11 @@ contentsync.reviews = new function () {
 
 		const action = 'contentsync_review_approve';
 
-		contentsync.checkUnsavedChanges();
-		contentsync.overlay.confirm(
+		contentSync.checkUnsavedChanges();
+		contentSync.overlay.confirm(
 			action,
 			'',
-			contentsync.ajax,
+			contentSync.ajax,
 			[
 				action,
 				{
@@ -30,11 +30,11 @@ contentsync.reviews = new function () {
 
 		const action = 'contentsync_review_deny';
 
-		contentsync.checkUnsavedChanges();
-		contentsync.overlay.confirm(
+		contentSync.checkUnsavedChanges();
+		contentSync.overlay.confirm(
 			action,
 			'',
-			contentsync.reviews.reviewDeny,
+			contentSync.reviews.reviewDeny,
 			[ postId, reviewId ]
 		);
 	};
@@ -47,7 +47,7 @@ contentsync.reviews = new function () {
 
 		const message = document.getElementById( 'review_message_deny' ).value;
 
-		contentsync.ajax( action, {
+		contentSync.ajax( action, {
 			'review_id': reviewId,
 			'post_id': postId,
 			'message': message
@@ -61,8 +61,8 @@ contentsync.reviews = new function () {
 
 		var action = 'contentsync_review_revert';
 
-		contentsync.checkUnsavedChanges();
-		contentsync.overlay.confirm( action, '', contentsync.revertReview, [ postId, reviewId ] );
+		contentSync.checkUnsavedChanges();
+		contentSync.overlay.confirm( action, '', contentSync.revertReview, [ postId, reviewId ] );
 	};
 
 	this.revertReview = function ( postId, reviewId ) {
@@ -73,7 +73,7 @@ contentsync.reviews = new function () {
 
 		const message = document.getElementById( 'review_message_revert' ).value;
 
-		contentsync.ajax( action, {
+		contentSync.ajax( action, {
 			'review_id': reviewId,
 			'post_id': postId,
 			'message': message

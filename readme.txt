@@ -3,7 +3,7 @@ Contributors: jakobtrost
 Donate link: https://jakobtrost.de
 Tags: content-sync, synchronization, multi-site, content-management, sync
 Requires at least: 5.0
-Tested up to: 6.4
+Tested up to: 6.9
 Stable tag: 0.1
 Requires PHP: 7.4
 License: GPLv2 or later

@@ -14,7 +14,7 @@
 
 namespace Contentsync\Api;
 
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Urls;
 
@@ -61,8 +61,16 @@ class Remote_Request {
 	 * @return mixed
 	 */
 	public static function get_remote_blogs( $connection_or_site_url ) {
-		$cache_key = 'contentsync_remote_blogs_' . $connection_or_site_url;
-		$cache     = wp_cache_get( $cache_key );
+
+		if ( is_string( $connection_or_site_url ) ) {
+			$cache_key = 'contentsync_remote_blogs_' . $connection_or_site_url;
+		} elseif ( is_array( $connection_or_site_url ) ) {
+			$cache_key = 'contentsync_remote_blogs_' . key( $connection_or_site_url );
+		} else {
+			return new \WP_Error( 'invalid_argument', __( 'Invalid argument', 'contentsync' ) );
+		}
+
+		$cache = wp_cache_get( $cache_key );
 		if ( $cache ) {
 			return $cache;
 		}
@@ -161,7 +169,7 @@ class Remote_Request {
 	/**
 	 * Delete all connected posts of a synced post from a certain connection
 	 *
-	 * @see \Contentsync\Posts\Sync\delete_root_post_and_connected_posts()
+	 * @see \Contentsync\Post_Sync\delete_root_post_and_connected_posts()
 	 *
 	 * @param array|string $connection_or_site_url
 	 * @param string       $gid               Global ID of the root post with an appended network_url.
@@ -345,7 +353,7 @@ class Remote_Request {
 		$success = $success !== null ? boolval( $success ) : boolval( $data );
 		$status  = $status ? absint( $status ) : ( $success ? 200 : 400 );
 		$data    = array(
-			'message' => empty( $message ) ? 'Your global content request ' . ( $success ? 'was successful.' : 'has failed.' ) : strval( $message ),
+			'message' => empty( $message ) ? 'Your Content Sync request ' . ( $success ? 'was successful.' : 'has failed.' ) : strval( $message ),
 			'code'    => $success ? 'gc_success' : 'gc_error',
 			'data'    => array(
 				'status'       => $status,
@@ -366,8 +374,8 @@ class Remote_Request {
 	 * @return mixed Decoded response data on success, false or WP_Error on failure.
 	 */
 	public static function handle_response( $response, $args = array() ) {
-		Logger::add( 'handle_response', $response );
-		Logger::add( 'handle_response - args', $args );
+		// Logger::add( 'handle_response', $response );
+		// Logger::add( 'handle_response - args', $args );
 
 		// parse arguments
 		$args = wp_parse_args(
@@ -448,7 +456,7 @@ class Remote_Request {
 	 * @return string Encoded GID safe for use in URLs.
 	 */
 	public static function prepare_gid_for_url( $gid ) {
-		// list( $blog_id, $post_id, $net_url ) = \Contentsync\Posts\Sync\explode_gid( $gid );
+		// list( $blog_id, $post_id, $net_url ) = \Contentsync\Post_Sync\explode_gid( $gid );
 		// $_gid  = $blog_id . '-' . $post_id;
 		return urlencode( str_replace( '/', '-', $gid ) );
 	}

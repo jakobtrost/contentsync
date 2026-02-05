@@ -5,10 +5,11 @@
 namespace Contentsync\Admin\Views\Connections;
 
 use Contentsync\Admin\Utils\Admin_Render;
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Utils\Urls;
 use Contentsync\Api\Remote_Request;
+use Contentsync\Admin\Utils\Notice\Admin_Notice_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -46,17 +47,17 @@ class Connections_Page_Hooks extends Hooks_Base {
 	 */
 	public function add_submenu_item() {
 
-		if ( is_multisite() && ! is_super_admin() ) {
-			return;
+		if ( is_multisite() && ! is_network_admin() ) {
+			return; // dont add the normal admin link in multisites if not on the network admin
 		}
 
 		$page_slug = add_submenu_page(
 			'contentsync', // parent slug
-			__( 'Connections', 'contentsync_hub' ),  // page title
-			( is_network_admin() ? '' : '→ ' ) . __( 'Connections', 'contentsync_hub' ), // menu title
+			__( 'Connections', 'contentsync' ),  // page title
+			__( 'Connections', 'contentsync' ), // menu title
 			'manage_options', // capability
-			is_network_admin() ? 'site_connections' : network_admin_url( 'admin.php?page=site_connections' ), // slug
-			is_network_admin() ? array( $this, 'render_admin_page' ) : '', // function
+			'site_connections', // slug
+			array( $this, 'render_admin_page' ), // function
 			self::CONNECTIONS_PAGE_POSITION // position
 		);
 	}
@@ -67,11 +68,11 @@ class Connections_Page_Hooks extends Hooks_Base {
 	public function render_admin_page() {
 
 		// start of wrapper
-		echo "<div class='wrap'><h1>" . __( 'Connections to other WordPress websites', 'contentsync_hub' ) . '</h1>';
+		echo '<div class="wrap"><h1>' . __( 'Connections to other WordPress websites', 'contentsync' ) . '</h1>';
 
 		// connection declined -> add error
 		if ( isset( $_GET['success'] ) && $_GET['success'] === 'false' ) {
-			Admin_Render::render_admin_notice( __( 'The connection was not approved.', 'contentsync_hub' ), 'error' );
+			Admin_Render::render_admin_notice( __( 'The connection was not approved.', 'contentsync' ), 'error' );
 		}
 
 		// display the table
@@ -79,30 +80,28 @@ class Connections_Page_Hooks extends Hooks_Base {
 		$Connections_List_Table->render_table();
 
 		// add connection form
-		echo "<h1 style='margin-top:2em;'>" . __( 'Add connection', 'contentsync_hub' ) . "</h1>
-		<form method='post' class='add_site_connection'>
-			<input type='hidden' name='_nonce' value='" . wp_create_nonce( Site_Connection::get_option_name() ) . "' />
-
-			" . ( is_ssl() ? '' : Admin_Render::make_admin_info_box(
+		echo '<h1 style="margin-top:2em;">' . __( 'Add connection', 'contentsync' ) . '</h1>' .
+		'<form method="post" class="add_site_connection">' .
+			'<input type="hidden" name="_nonce" value="' . wp_create_nonce( Site_Connection::get_option_name() ) . '" />' .
+			( is_ssl() ? '' : Admin_Render::make_admin_info_box(
 				array(
 					'style' => 'warning',
-					'above' => __( 'Missing SSL certificate', 'contentsync_hub' ),
-					'text'  => __( 'We noticed that this site does not have a valid SSL certificate. This can lead to problems when setting up a link, as this requires a secure and encrypted connection.', 'contentsync_hub' ),
+					'above' => __( 'Missing SSL certificate', 'contentsync' ),
+					'text'  => __( 'We noticed that this site does not have a valid SSL certificate. This can lead to problems when setting up a link, as this requires a secure and encrypted connection.', 'contentsync' ),
 				)
-			) ) . "
-			
-			<label for='page_url'>" . __( 'URL of the website or main page', 'contentsync_hub' ) . "</label>
-			<div class='flex'>
-				<input class='large' type='text' name='page_url' id='page_url' value='' placeholder='" . __( 'https://www.multsite-parent.com', 'contentsync_hub' ) . "' />
-				<button type='submit' name='submit' class='button button-primary large'>" . __( 'Request connection', 'contentsync_hub' ) . '</button>
-			</div>
-			<p>' . __( 'In order to connect to another site, you must have valid admin access to that site. For multisites you need super admin access.', 'contentsync_hub' ) . '</p>
-			<p>' . __( 'In addition, a valid SSL certificate should be available on both sides and the Content Sync Plugin should be active and up-to-date.', 'contentsync_hub' ) . '</p>
-			<p>' . sprintf(
-				__( 'To add a connection to this page on another page, enter the URL %s.', 'contentsync_hub' ),
+			) ) .
+			'<p>' . __( 'In order to connect to another site, you must have valid admin access to that site. For multisites you need super admin access.', 'contentsync' ) . '</p>' .
+			'<p>' . __( 'In addition, a valid SSL certificate should be available on both sides and the Content Sync Plugin should be active and up-to-date.', 'contentsync' ) . '</p>' .
+			'<p>' . sprintf(
+				__( 'To add a connection to this page on another page, enter the URL %s.', 'contentsync' ),
 				'<code>' . Urls::get_network_url() . '</code>'
-			) . '</p>
-		</form>';
+			) . '</p>' .
+			'<!-- <label for="page_url">' . __( 'URL of the website or main page', 'contentsync' ) . '</label> -->' .
+			'<div class="flex">' .
+				'<input class="regular-text" type="text" name="page_url" id="page_url" value="" placeholder="' . __( 'https://www.multsite-parent.com', 'contentsync' ) . '" />' .
+				'<button type="submit" name="submit" class="button button-primary large">' . __( 'Request connection', 'contentsync' ) . '</button>' .
+			'</div>' .
+		'</form>';
 
 		// end of wrapper
 		echo '</div>';
@@ -122,7 +121,7 @@ class Connections_Page_Hooks extends Hooks_Base {
 		}
 
 		// only on this page
-		if ( $_GET['page'] === 'site_connections' || ( $_GET['page'] === 'contentsync_hub' && isset( $_GET['tab'] ) && $_GET['tab'] === 'connections' ) ) {
+		if ( $_GET['page'] === 'site_connections' || ( $_GET['page'] === 'contentsync' && isset( $_GET['tab'] ) && $_GET['tab'] === 'connections' ) ) {
 			// I think it's better to read this way...
 		} else {
 			return;
@@ -131,7 +130,7 @@ class Connections_Page_Hooks extends Hooks_Base {
 		// verify the nonce
 		$nonce = isset( $_POST['_nonce'] ) ? $_POST['_nonce'] : null;
 		if ( ! $nonce || wp_verify_nonce( $nonce, Site_Connection::get_option_name() ) !== 1 ) {
-			self::add_error( __( 'The request could not be verified.', 'contentsync_hub' ) );
+			self::add_error( __( 'The request could not be verified.', 'contentsync' ) );
 		}
 
 		// get the input url
@@ -139,9 +138,9 @@ class Connections_Page_Hooks extends Hooks_Base {
 
 		// check for errors
 		if ( empty( $input_url ) ) {
-			self::add_error( __( "You didn't enter a URL.", 'contentsync_hub' ) );
+			self::add_error( __( "You didn't enter a URL.", 'contentsync' ) );
 		} elseif ( ! preg_match( '/((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z0-9\&\.\/\?\:@\-_=#])*/', $input_url ) ) {
-			self::add_error( sprintf( __( '%s is not a valid URL.', 'contentsync_hub' ), '<strong>' . $input_url . '</strong>' ) );
+			self::add_error( sprintf( __( '%s is not a valid URL.', 'contentsync' ), '<strong>' . $input_url . '</strong>' ) );
 		}
 		if ( count( self::get_errors() ) ) {
 			return;
@@ -149,10 +148,10 @@ class Connections_Page_Hooks extends Hooks_Base {
 
 		// generate the final request url
 		$input_auth_url = preg_replace( '/\/$/', '', $input_url ) . '/wp-admin/authorize-application.php';
-		$success_path   = $_GET['page'] === 'site_connections' ? 'admin.php?page=site_connections' : 'admin.php?page=contentsync_hub&tab=connections';
+		$success_path   = $_GET['page'] === 'site_connections' ? 'admin.php?page=site_connections' : 'admin.php?page=contentsync&tab=connections';
 		$success_url    = is_network_admin() ? network_admin_url( $success_path ) : admin_url( $success_path );
 
-		$app_name   = urlencode( sprintf( __( 'Connection for %s', 'contentsync_hub' ), Urls::get_network_url() ) );
+		$app_name   = urlencode( sprintf( __( 'Connection for %s', 'contentsync' ), Urls::get_network_url() ) );
 		$query_args = array(
 			'app_name'    => $app_name,
 			'app_id'      => urlencode( wp_generate_uuid4() ),
@@ -189,27 +188,23 @@ class Connections_Page_Hooks extends Hooks_Base {
 
 		// update successfull
 		if ( $update ) {
-			set_transient(
-				'contentsync_transient_notice',
-				'success::' . sprintf(
-					__( 'The connection to the %s page has been saved. Be sure to add the connection in the other direction as well.', 'contentsync_hub' ),
+			Admin_Notice_Service::add(
+				sprintf(
+					__( 'The connection to the %s page has been saved. Be sure to add the connection in the other direction as well.', 'contentsync' ),
 					"<strong>$nice_url</strong>"
 				) . '<br><br>' .
-				sprintf(
-					__( 'To do this, go to the admin or network admin area of the page %1$s and enter the URL %2$s at "Add Connection".', 'contentsync_hub' ),
-					"<a href='" . esc_url( $site_url ) . "' target='_blank'>$nice_url</a>",
-					'<strong>' . Urls::get_network_url() . '</strong>'
-				)
+				sprintf( __( 'To do this, go to the admin or network admin area of the page %1$s and enter the URL %2$s at "Add Connection".', 'contentsync' ), "<a href='" . esc_url( $site_url ) . "' target='_blank'>$nice_url</a>", '<strong>' . Urls::get_network_url() . '</strong>' ),
+				'success'
 			);
 		}
 		// update failed
 		elseif ( $update === false ) {
-			set_transient(
-				'contentsync_transient_notice',
-				'error::' . sprintf(
-					__( 'The connection to the %s page could not be saved. Please try again.', 'contentsync_hub' ),
+			Admin_Notice_Service::add(
+				sprintf(
+					__( 'The connection to the %s page could not be saved. Please try again.', 'contentsync' ),
 					'<strong>' . $nice_url . '</strong>'
-				)
+				),
+				'error'
 			);
 		}
 
@@ -234,7 +229,7 @@ class Connections_Page_Hooks extends Hooks_Base {
 		if ( strpos( $current_screen->base, 'site_connections' ) === false &&
 			strpos( $current_screen->base, 'global-content' ) !== 0 &&
 			strpos( $current_screen->base, 'contentsync' ) === false &&
-			strpos( $current_screen->base, 'contentsync_hub' ) === false
+			strpos( $current_screen->base, 'contentsync' ) === false
 		) {
 			return;
 		}
@@ -249,12 +244,12 @@ class Connections_Page_Hooks extends Hooks_Base {
 		if ( isset( $_SERVER['PHP_AUTH_USER'] ) ) {
 			self::add_error(
 				'<strong>' . sprintf(
-					__( 'This page uses server-side authentication, such as HTTP password protection.', 'contentsync_hub' ),
+					__( 'This page uses server-side authentication, such as HTTP password protection.', 'contentsync' ),
 					''
 				) .
 				'</strong><br><br>' .
 				sprintf(
-					__( 'However, the link already sends the WordPress application password as "Basic Authorization" to the other server. Multiple authorizations are not allowed according to %s. We recommend that you disable HTTP authentication or whitelist the IP addresses of all other connections. It is best to contact your hoster or administrator for this.', 'contentsync_hub' ),
+					__( 'However, the link already sends the WordPress application password as "Basic Authorization" to the other server. Multiple authorizations are not allowed according to %s. We recommend that you disable HTTP authentication or whitelist the IP addresses of all other connections. It is best to contact your hoster or administrator for this.', 'contentsync' ),
 					"<a href='https://www.rfc-editor.org/rfc/rfc7230#section-3.2.2' target='_blank'>RFC7230</a>"
 				)
 			);
@@ -286,19 +281,19 @@ class Connections_Page_Hooks extends Hooks_Base {
 					case 'incorrect_password':
 					case 'rest_not_authorized':
 						$response_help_text = sprintf(
-							__( 'The status %s indicates that the app permission on the target page has been revoked or is not working correctly.', 'contentsync_hub' ),
+							__( 'The status %s indicates that the app permission on the target page has been revoked or is not working correctly.', 'contentsync' ),
 							"<code>$response</code>"
 						);
 						break;
 					case 'rest_not_connected':
 						$response_help_text = sprintf(
-							__( 'The status %s usually means that no connection to this page has yet been stored on the target page.', 'contentsync_hub' ),
+							__( 'The status %s usually means that no connection to this page has yet been stored on the target page.', 'contentsync' ),
 							"<code>$response</code>"
 						);
 						break;
 					case '401':
 						$response_help_text = sprintf(
-							__( 'The status %1$s usually means that additional authentication is required on the target page, e.g. an HTTP password. However, the link already sends the WordPress application password to the server as "Basic Authorization". Multiple authorizations are not allowed according to %2$s. We recommend you to disable HTTP authentication or whitelist the IP address of this server (%3$s). It is best to contact your hoster or administrator for this.', 'contentsync_hub' ),
+							__( 'The status %1$s usually means that additional authentication is required on the target page, e.g. an HTTP password. However, the link already sends the WordPress application password to the server as "Basic Authorization". Multiple authorizations are not allowed according to %2$s. We recommend you to disable HTTP authentication or whitelist the IP address of this server (%3$s). It is best to contact your hoster or administrator for this.', 'contentsync' ),
 							"<code>$response</code>",
 							"<a href='https://www.rfc-editor.org/rfc/rfc7230#section-3.2.2' target='_blank'>RFC7230</a>",
 							"<code>{$_SERVER['SERVER_ADDR']}</code>"
@@ -311,19 +306,19 @@ class Connections_Page_Hooks extends Hooks_Base {
 				self::add_error(
 					'<strong>' .
 						sprintf(
-							__( 'The connection to the %1$s page is inactive (status: %2$s).', 'contentsync_hub' ),
+							__( 'The connection to the %1$s page is inactive (status: %2$s).', 'contentsync' ),
 							"<a href='{$connection["site_url"]}'>{$connection["site_url"]}</a>",
 							"<code>{$response}</code>"
 						) .
 					'</strong><br><br><strong>' .
 						sprintf(
-							__( 'Please make sure that the connection is created from both sides. This means that you must also request and confirm the connection on the site %s.', 'contentsync_hub' ),
+							__( 'Please make sure that the connection is created from both sides. This means that you must also request and confirm the connection on the site %s.', 'contentsync' ),
 							"<a href='{$connection["site_url"]}'>{$connection["site_url"]}</a>"
 						) .
 					'</strong><br><br>' .
-					__( 'Please also check whether the app authorization is created on this and the target page for the respective stored user. In case of doubt, delete the links and the respective permissions and create them again.', 'contentsync_hub' ) .
+					__( 'Please also check whether the app authorization is created on this and the target page for the respective stored user. In case of doubt, delete the links and the respective permissions and create them again.', 'contentsync' ) .
 					"<br><br>{$response_help_text}<br><br>" .
-					__( 'The stored app permissions can be found in the respective user profile via "Application Passwords".', 'contentsync_hub' )
+					__( 'The stored app permissions can be found in the respective user profile via "Application Passwords".', 'contentsync' )
 				);
 			}
 

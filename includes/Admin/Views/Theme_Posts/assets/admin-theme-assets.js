@@ -1,6 +1,6 @@
-var contentsync = contentsync || {};
+var contentSync = contentSync || {};
 
-contentsync.themeAssets = new function() {
+contentSync.themeAssets = new function() {
 
 
 	/**
@@ -9,7 +9,7 @@ contentsync.themeAssets = new function() {
 	 * @param {object} elem 
 	 */
 	this.openSwitchTemplateTheme = function( elem ) {
-		contentsync.overlay.confirm( 'switch_template_theme', '', contentsync.themeAssets.switchTemplateTheme, [ elem ] );
+		contentSync.overlay.confirm( 'switch_template_theme', '', contentSync.themeAssets.switchTemplateTheme, [ elem ] );
 	};
 
 	/**
@@ -39,17 +39,17 @@ contentsync.themeAssets = new function() {
 				if ( response.indexOf( 'success::' ) > -1 ) {
 
 					// use for development
-					// contentsync.overlay.triggerOverlay( true, { "type": "success", "css": mode } );return;
+					// contentSync.overlay.triggerOverlay( true, { "type": "success", "css": mode } );return;
 
 					// trigger overlay
-					contentsync.overlay.triggerOverlay( true, { 'type': 'reload', 'css': mode } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'reload', 'css': mode } );
 				}
 				else if ( response.indexOf( 'error::' ) > -1 ) {
 					const msg = response.split( 'error::' )[ 1 ];
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
 				}
 				else {
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
 				}
 			}
 		);
@@ -62,7 +62,7 @@ contentsync.themeAssets = new function() {
 	 * @param {object} elem 
 	 */
 	this.openSwitchGlobalStyles = function( elem, templateTheme ) {
-		contentsync.overlay.confirm( 'switch_global_styles', templateTheme, contentsync.themeAssets.switchGlobalStyles, [ elem ] );
+		contentSync.overlay.confirm( 'switch_global_styles', templateTheme, contentSync.themeAssets.switchGlobalStyles, [ elem ] );
 	};
 
 	/**
@@ -91,17 +91,17 @@ contentsync.themeAssets = new function() {
 				if ( response.indexOf( 'success::' ) > -1 ) {
 
 					// use for development
-					// contentsync.overlay.triggerOverlay( true, { "type": "success", "css": mode } );return;
+					// contentSync.overlay.triggerOverlay( true, { "type": "success", "css": mode } );return;
 
 					// trigger overlay
-					contentsync.overlay.triggerOverlay( true, { 'type': 'reload', 'css': mode } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'reload', 'css': mode } );
 				}
 				else if ( response.indexOf( 'error::' ) > -1 ) {
 					const msg = response.split( 'error::' )[ 1 ];
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
 				}
 				else {
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
 				}
 			}
 		);
@@ -121,7 +121,7 @@ contentsync.themeAssets = new function() {
 		$( '#rename_template_form input[name="new_post_title"]' ).val( postTitle );
 		$( '#rename_template_form input[name="new_post_name"]' ).val( postName );
 
-		contentsync.overlay.confirm( 'rename_template', '', contentsync.themeAssets.renameTemplate, [ elem ] );
+		contentSync.overlay.confirm( 'rename_template', '', contentSync.themeAssets.renameTemplate, [ elem ] );
 	};
 
 	/**
@@ -155,17 +155,17 @@ contentsync.themeAssets = new function() {
 				if ( response.indexOf( 'success::' ) > -1 ) {
 
 					// use for development
-					// contentsync.overlay.triggerOverlay( true, { "type": "success", "css": mode } );return;
+					// contentSync.overlay.triggerOverlay( true, { "type": "success", "css": mode } );return;
 
 					// trigger overlay
-					contentsync.overlay.triggerOverlay( true, { 'type': 'reload', 'css': mode } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'reload', 'css': mode } );
 				}
 				else if ( response.indexOf( 'error::' ) > -1 ) {
 					const msg = response.split( 'error::' )[ 1 ];
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': msg } );
 				}
 				else {
-					contentsync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
+					contentSync.overlay.triggerOverlay( true, { 'type': 'fail', 'css': mode, 'replace': response } );
 				}
 			}
 		);

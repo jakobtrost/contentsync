@@ -8,7 +8,7 @@
 namespace Contentsync\Admin\Views\Connections;
 
 use Contentsync\Admin\Utils\Admin_Render;
-use Contentsync\Api\Site_Connection;
+use Contentsync\Connections\Site_Connection;
 use Contentsync\Utils\Urls;
 use Contentsync\Api\Remote_Request;
 
@@ -81,7 +81,7 @@ class Connections_List_Table extends \WP_List_Table {
 	 * Display text when no items found
 	 */
 	public function no_items() {
-		echo "<div style='margin: 4px 0;''><strong>" . __( 'No connections found.', 'contentsync_hub' ) . '</strong> ' . __( 'Create your first shortcuts now to manage content across pages.', 'contentsync_hub' ) . '</div>';
+		echo "<div style='margin: 4px 0;''><strong>" . __( 'No connections found.', 'contentsync' ) . '</strong> ' . __( 'Create your first shortcuts now to manage content across pages.', 'contentsync' ) . '</div>';
 	}
 
 	/**
@@ -108,12 +108,12 @@ class Connections_List_Table extends \WP_List_Table {
 	function get_columns() {
 		$columns = array(
 			'cb'         => '<input type="checkbox" />',
-			'site_name'  => __( 'Title', 'contentsync_hub' ),
-			'site_url'   => __( 'URL', 'contentsync_hub' ),
-			'user_login' => __( 'User', 'contentsync_hub' ),
-			'active'     => __( 'State', 'contentsync_hub' ),
-			// 'password'       => __( "Password", 'contentsync_hub' ),
-			// 'options'    => __( 'Settings', 'contentsync_hub' ),
+			'site_name'  => __( 'Title', 'contentsync' ),
+			'site_url'   => __( 'URL', 'contentsync' ),
+			'user_login' => __( 'User', 'contentsync' ),
+			'active'     => __( 'State', 'contentsync' ),
+			// 'password'       => __( "Password", 'contentsync' ),
+			// 'options'    => __( 'Settings', 'contentsync' ),
 			// 'debug'          => 'Debug',
 		);
 
@@ -142,8 +142,8 @@ class Connections_List_Table extends \WP_List_Table {
 				$network_url = Urls::get_nice_url( $site_url );
 				$delete_url  = remove_query_arg( array( 'user_login', 'password', 'site_url', 'success' ), add_query_arg( 'delete', $network_url ) );
 				$actions     = array(
-					'view'   => "<a href='$site_url' target='_blank'>" . __( 'View website', 'contentsync_hub' ) . '</a>',
-					'delete' => "<a href='$delete_url'>" . __( 'Delete connection', 'contentsync_hub' ) . '</a>',
+					'view'   => "<a href='$site_url' target='_blank'>" . __( 'View website', 'contentsync' ) . '</a>',
+					'delete' => "<a href='$delete_url'>" . __( 'Delete connection', 'contentsync' ) . '</a>',
 				);
 				return $site_name . $this->row_actions( $actions );
 				break;
@@ -159,7 +159,7 @@ class Connections_List_Table extends \WP_List_Table {
 					return Admin_Render::make_admin_info_box(
 						array(
 							'style' => '',
-							'text'  => __( 'Connection not used', 'contentsync_hub' ),
+							'text'  => __( 'Connection not used', 'contentsync' ),
 						)
 					);
 				} else {
@@ -167,7 +167,7 @@ class Connections_List_Table extends \WP_List_Table {
 					return Admin_Render::make_admin_info_box(
 						array(
 							'style' => $active ? 'green' : 'red',
-							'text'  => $active ? __( 'Connection active', 'contentsync_hub' ) : __( 'Connection inactive', 'contentsync_hub' ),
+							'text'  => $active ? __( 'Connection active', 'contentsync' ) : __( 'Connection inactive', 'contentsync' ),
 						)
 					);
 				}
@@ -212,7 +212,7 @@ class Connections_List_Table extends \WP_List_Table {
 	public function get_bulk_actions() {
 
 		$actions = array(
-			'delete' => __( 'Delete connection', 'contentsync_hub' ),
+			'delete' => __( 'Delete connection', 'contentsync' ),
 		);
 
 		return $actions;
@@ -232,7 +232,7 @@ class Connections_List_Table extends \WP_List_Table {
 			if ( $deleted ) {
 				Admin_Render::render_admin_notice(
 					sprintf(
-						__( 'The connection to the %s page was successfully deleted.', 'contentsync_hub' ),
+						__( 'The connection to the %s page was successfully deleted.', 'contentsync' ),
 						'<strong>' . $delete_site_url . '</strong>'
 					),
 					'success'
@@ -242,7 +242,7 @@ class Connections_List_Table extends \WP_List_Table {
 			elseif ( $deleted === false ) {
 				Admin_Render::render_admin_notice(
 					sprintf(
-						__( "Errors occurred while deleting the connection to the '%s' page.", 'contentsync_hub' ),
+						__( "Errors occurred while deleting the connection to the '%s' page.", 'contentsync' ),
 						'<strong>' . $delete_site_url . '</strong>'
 					),
 					'error'

@@ -1,0 +1,16 @@
+/**
+ * make global button
+ */
+.contentsync-make-global-button.contentsync-make-global-button {
+	background: none;
+	padding: 6px 10px;
+	align-items: center;
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.contentsync-make-global-button:not(:hover) {
+	border-color: transparent;
+}

@@ -13,10 +13,10 @@ namespace Contentsync\Reviews;
 
 use Contentsync\Cluster\Cluster_Service;
 use Contentsync\Distribution\Distributor;
-use Contentsync\Posts\Sync\Post_Connection_Map;
-use Contentsync\Posts\Sync\Trigger_Hooks;
-use Contentsync\Posts\Transfer\Post_Export;
-use Contentsync\Posts\Transfer\Post_Import;
+use Contentsync\Post_Sync\Post_Connection_Map;
+use Contentsync\Post_Sync\Trigger_Hooks;
+use Contentsync\Post_Transfer\Post_Export;
+use Contentsync\Post_Transfer\Post_Import;
 use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
@@ -100,7 +100,7 @@ class Post_Review_Service {
 		}
 
 		if ( $send_mail ) {
-			Review_Mail::send_review_mail( $review_id, $state, 'reviewers' );
+			Review_Mail_Service::send_review_mail( $review_id, $state, 'reviewers' );
 		}
 	}
 
@@ -170,7 +170,7 @@ class Post_Review_Service {
 		);
 		$new_message->save();
 
-		Review_Mail::send_review_mail( $review_id, 'approved', 'editor' );
+		Review_Mail_Service::send_review_mail( $review_id, 'approved', 'editor' );
 
 		return true;
 	}
@@ -212,7 +212,7 @@ class Post_Review_Service {
 
 		$result = self::set_post_review_state( $review_id, 'denied' );
 
-		Review_Mail::send_review_mail( $review_id, 'denied', 'editor' );
+		Review_Mail_Service::send_review_mail( $review_id, 'denied', 'editor' );
 
 		return $result;
 	}
@@ -267,8 +267,9 @@ class Post_Review_Service {
 				array(
 					'conflict_actions' => array(
 						$post_id => array(
-							'post_id' => $post_id,
-							'action'  => 'replace',
+							'existing_post_id' => $post_id,
+							'conflict_action'  => 'replace',
+							'original_post_id' => $post_id,
 						),
 					),
 				)
@@ -279,7 +280,7 @@ class Post_Review_Service {
 			$result = Distributor::distribute_single_post( $post_id, $destination_ids );
 		}
 
-		Review_Mail::send_review_mail( $review_id, 'reverted', 'editor' );
+		Review_Mail_Service::send_review_mail( $review_id, 'reverted', 'editor' );
 
 		$result = self::set_post_review_state( $review_id, 'reverted' );
 

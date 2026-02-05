@@ -1,0 +1,32 @@
+.contentsync-snackbar-list:not(:empty) {
+	bottom: 16px;
+	padding-left: 16px;
+	padding-right: 16px;
+	position: fixed;
+	/* the admin bar is 160px wide */
+	left: 160px;
+}
+
+@media only screen and (max-width: 960px) {
+	/* on tablet the admin bar is 36px wide */
+	.contentsync-snackbar-list:not(:empty) {
+		left: 36px;
+	}
+}
+@media screen and (max-width: 782px) {
+	/* on mobile the admin bar is hidden */
+	.contentsync-snackbar-list:not(:empty) {
+		left: 0;
+	}
+}
+
+.contentsync-snackbar-list .components-snackbar .components-snackbar__content-with-icon,
+.components-snackbar__content-with-icon:has(.contentsync-snackbar-icon) {
+	position: static;
+}
+
+.components-snackbar__icon.contentsync-snackbar-icon,
+.components-snackbar__icon:has(.contentsync-snackbar-icon) {
+	left: 18px;
+	top: 12px;
+}
