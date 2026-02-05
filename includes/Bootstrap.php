@@ -106,7 +106,7 @@ class Bootstrap {
 
 		// Optional: Set the branch that contains the stable release.
 		// Uncomment and modify if you want to use a specific branch instead of releases/tags.
-		// $update_checker->setBranch( 'main' );
+		$update_checker->setBranch( 'main' );
 
 		// Optional: Enable release assets if you want to use custom release assets.
 		// Uncomment if you want to use release assets instead of the default zip.
