@@ -239,8 +239,8 @@ class Distribution_Endpoint extends Remote_Endpoint_Base {
 		if ( is_array( $value ) ) {
 			return true;
 		}
-		error_log( 'is_array_or_object: The value is neither an array nor an object.' );
-		error_log( print_r( $value, true ) );
+		Logger::add( 'is_array_or_object', 'The value is neither an array nor an object.' );
+		Logger::add( 'is_array_or_object', $value );
 		return false;
 	}
 

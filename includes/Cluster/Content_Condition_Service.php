@@ -15,6 +15,7 @@ namespace Contentsync\Cluster;
 
 use Contentsync\Utils\Post_Query;
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -272,7 +273,7 @@ final class Content_Condition_Service {
 	 */
 	public static function post_meets_cluster_content_condition( $post_or_post_id, $condition_or_condition_id ) {
 
-		// error_log( "post_meets_cluster_content_condition" );
+		// Logger::add( "post_meets_cluster_content_condition" );
 
 		if ( ! $condition_or_condition_id instanceof Content_Condition ) {
 			$condition = self::get_cluster_content_condition_by_id( $condition_or_condition_id );
@@ -439,8 +440,8 @@ final class Content_Condition_Service {
 						$date_phrase = $type == 'days' ? '-' . ( $count_back + 1 ) . ' ' . $type : '-' . $count_back . ' ' . $type . ' - 1 day';
 						$date_since  = strtotime( $date_phrase );
 
-						// error_log( "date_phrase: ".$date_phrase );
-						// error_log( "date_since: ".date( 'Y-m-d', $date_since ) );
+						// Logger::add( "date_phrase", $date_phrase );
+						// Logger::add( "date_since", date( 'Y-m-d', $date_since ) );
 
 						$query_args['date_query'] = array(
 							array(
@@ -487,7 +488,7 @@ final class Content_Condition_Service {
 	 */
 	public static function get_cluster_content_conditions_including_post( $post, $with_filter = null ) {
 
-		// error_log( "get_cluster_content_conditions_including_post" );
+		// Logger::add( "get_cluster_content_conditions_including_post" );
 
 		if ( ! is_object( $post ) ) {
 			$post = get_post( $post );

@@ -14,6 +14,8 @@
  */
 namespace Contentsync\Cluster;
 
+use Contentsync\Utils\Logger;
+
 defined( 'ABSPATH' ) || exit;
 
 final class Content_Condition {
@@ -190,7 +192,7 @@ final class Content_Condition {
 			}
 		}
 
-		// error_log( "get conditions by: " . print_r( $sql_args, true ) );
+		// Logger::add( "get conditions by", $sql_args );
 
 		// prepare sql phrase to be like: {{key}} = %s AND {{key}} = %s AND ...
 		$sql_phrase = implode( ' = %s AND ', array_keys( $sql_args ) ) . ' = %s';

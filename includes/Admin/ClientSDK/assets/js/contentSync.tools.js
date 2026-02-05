@@ -14,26 +14,17 @@ contentSync.tools = new function() {
 	 * @param {string} args.onclick - The onclick of the action
 	 */
 	this.addPageTitleAction = function( label, args ) {
-		
-		const hr = document.querySelector( 'hr.wp-header-end' );
-		if ( ! hr ) { return; }
 
-		const button = document.createElement( 'button' );
-		button.className = 'button-ghost page-title-action';
-		if ( args.className ) {
-			button.className += ' ' + args.className;
+		const $hr = document.querySelector( 'hr.wp-header-end' );
+		if ( ! $hr ) { return; }
+
+		if ( typeof label === 'string' ) {
+			let className = args.className ? args.className : '';
+			let url       = args.url ? ` href='${args.url}'` : '';
+			let id        = args.id  ? ` id='${args.id}'` : '';
+			let onclick   = args.onclick ? ` onclick='${args.onclick}'` : '';
+			$hr.insertAdjacentHTML( 'beforebegin', `<button class='button-ghost page-title-action ${className}'${id}${url}${onclick}>${label}</button>` );
 		}
-
-		if ( args.id ) {
-			button.id = args.id;
-		}
-
-		if ( args.onclick ) {
-			button.onclick = args.onclick;
-		}
-
-		button.textContent = label;
-		hr.insertAdjacentElement( 'beforebegin', button );
 	};
 
 	/**

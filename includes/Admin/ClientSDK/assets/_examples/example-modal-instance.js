@@ -27,7 +27,7 @@ contentSync.exportPostModal = new function() {
 			}
 		],
 		notice: {
-			text: __( 'Posts in query loops are not included in the import. Posts and Post Types must be exported separately.', 'contentsync' ),
+			text: __( 'Posts in query loops are not included in the import and must be exported separately.', 'contentsync' ),
 			type: 'info',
 		},
 		buttons: {

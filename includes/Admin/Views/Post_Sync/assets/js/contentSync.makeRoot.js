@@ -31,7 +31,7 @@ contentSync.makeRoot = new function() {
 			}
 		],
 		notice: {
-			text: __( 'Posts in query loops are not included in the global sync. Posts and Post Types must be made global separately.', 'contentsync' ),
+			text: __( 'Posts in query loops are not included in the global sync. Posts must be made global separately.', 'contentsync' ),
 			type: 'info',
 		},
 		buttons: {
