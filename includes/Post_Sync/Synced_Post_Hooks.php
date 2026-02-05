@@ -13,8 +13,49 @@ class Synced_Post_Hooks extends Hooks_Base {
 	 * Register hooks that run everywhere.
 	 */
 	public function register() {
+		add_filter( 'contentsync_import_post_with_conflict', array( $this, 'adjust_conflict_action_on_import_check' ), 10, 2 );
 		add_filter( 'contentsync_import_conflict_actions', array( $this, 'match_synced_posts_before_import' ), 10, 2 );
-		add_filter( 'import_synced_post_conflicts', array( $this, 'remove_conflict_when_same_gid' ), 10, 2 );
+	}
+
+	/**
+	 * Adjust conflict action when same global ID is set. This usually means the posts
+	 * is already synced to this site - therefore this is not a conflict and we can
+	 * skip the import of this post.
+	 *
+	 * @see \Contentsync\Post_Transfer\Post_Import::import_posts()
+	 *
+	 * @filter 'contentsync_import_post_with_conflict'
+	 *
+	 * @param WP_Post       $existing_post  The existing post object.
+	 * @param Prepared_Post $importing_post     The prepared post object.
+	 *
+	 * @return WP_Post|null The existing post object or null if the conflict should be removed.
+	 */
+	public function adjust_conflict_action_on_import_check( $existing_post, $importing_post ) {
+
+		// check if the existing post is a synced post
+		$current_gid = Synced_Post_Utils::get_gid( $existing_post->ID );
+		if ( empty( $current_gid ) ) {
+			return $existing_post;
+		}
+
+		// check if the global post can be found
+		$global_post = Synced_Post_Query::get_synced_post( $current_gid );
+		if ( empty( $global_post ) ) {
+			return $existing_post;
+		}
+
+		$import_gid = Synced_Post_Utils::get_gid( $global_post );
+
+		// check if the global post is the same as the imported post
+		if ( $current_gid === $import_gid ) {
+
+			// set the conflict action to 'skip' and the conflict message to 'Already synced.'
+			$existing_post->conflict_action  = 'skip';
+			$existing_post->conflict_message = __( 'Already synced.', 'contentsync' );
+		}
+
+		return $existing_post;
 	}
 
 	/**
@@ -41,7 +82,14 @@ class Synced_Post_Hooks extends Hooks_Base {
 				$post = (object) $post;
 			}
 
-			// skip if already set
+			/**
+			 * Skip if already set. In general, this is only the case when the import is
+			 * started from the modal in the admin area. In these cases we do not need
+			 * additional conflict resolution.
+			 *
+			 * But whenever the import is started from the API, already imported synced
+			 * posts have not been checked for conflicts yet.
+			 */
 			if ( isset( $conflict_actions[ $post->ID ] ) ) {
 				continue;
 			}
@@ -77,29 +125,5 @@ class Synced_Post_Hooks extends Hooks_Base {
 		}
 
 		return $conflict_actions;
-	}
-
-	/**
-	 * Remove conflicts when same global ID is set. This means the posts
-	 * both depend on the same synced post.
-	 *
-	 * @filter 'contentsync_import_conflicts'
-	 *
-	 * @param array[WP_Post] $conflicts     WP_Post objects in conflict with importing posts.
-	 * @param array[WP_Post] $all_posts     All prepared WP_Post objects.
-	 */
-	public function remove_conflict_when_same_gid( $conflicts, $all_posts ) {
-
-		foreach ( $conflicts as $post_id => $post ) {
-
-			$current_gid = Synced_Post_Utils::get_gid( $post->ID );
-			$import_gid  = Synced_Post_Utils::get_gid( $all_posts[ $post_id ] );
-
-			// remove the conflict if it is the same synced post
-			if ( Synced_Post_Query::get_synced_post( $current_gid ) && $current_gid === $import_gid ) {
-				unset( $conflicts[ $post_id ] );
-			}
-		}
-		return $conflicts;
 	}
 }

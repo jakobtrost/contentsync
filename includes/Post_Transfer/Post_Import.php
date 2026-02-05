@@ -59,10 +59,10 @@ class Post_Import extends Post_Transfer_Base {
 		 */
 		do_action( 'contentsync_before_import_global_posts', $this->posts, $this->arguments );
 
+		$first_post = null;
+
 		// Get arguments from class properties
 		$conflict_actions = isset( $this->arguments['conflict_actions'] ) ? $this->arguments['conflict_actions'] : array();
-
-		$first_post = null;
 
 		/**
 		 * Filter to modify conflict actions before processing post imports.
@@ -97,7 +97,7 @@ class Post_Import extends Post_Transfer_Base {
 		 */
 		foreach ( $this->posts as $post_id => $post ) {
 
-			Logger::add( '========= INSERT POST =========' );
+			Logger::add( '--- INSERT POST ---' );
 
 			// typecasting $post arrays (eg. via remote requests)
 			$post = is_array( $post ) ? (object) $post : $post;
@@ -373,6 +373,10 @@ class Post_Import extends Post_Transfer_Base {
 				'  - try to insert post with the following data:',
 				array_map(
 					function ( $value ) {
+						// check if has html tags
+						if ( preg_match( '/<[^>]*>/', $value ) ) {
+							return '<!-- HTML content -->';
+						}
 						return is_string( $value ) ? esc_attr( $value ) : $value;
 					},
 					$postarr
@@ -568,14 +572,26 @@ class Post_Import extends Post_Transfer_Base {
 			'contentsync_import_default_arguments',
 			array(
 				/**
-				 * @property array $conflict_actions Array of posts that already exist on the current blog.
-				 *                                   Keyed by the same ID as in the @param $posts.
-				 *                                   @property post_id: ID of the current post.
-				 *                                   @property action: Action to be done (skip|replace|keep)
+				 * @property array $conflict_actions  Array of posts that already exist on the current blog.
+				 *                                    Keyed by the original post ID, which should be the same
+				 *                                    key as in the @param $posts.
+				 * @example
+				 * [
+				 *   456 => array(
+				 *     'existing_post_id' => 123,     ID of the existing post on the current blog
+				 *     'conflict_action'  => 'keep',  action to be done (skip|replace|keep)
+				 *     'original_post_id' => 456,     ID of the original post
+				 *   ),
+				 *   789 => array(
+				 *     'existing_post_id' => 101,
+				 *     'conflict_action'  => 'replace',
+				 *     'original_post_id' => 789,
+				 *   ),
+				 * ]
 				 */
 				'conflict_actions' => array(),
 				/**
-				 * @property string $zip_file        Path to imported ZIP archive.
+				 * @property string|null $zip_file  Path to imported ZIP archive.
 				 */
 				'zip_file'         => null,
 			)
@@ -624,7 +640,7 @@ class Post_Import extends Post_Transfer_Base {
 	 */
 	private function create_post( $postarr, $post ) {
 
-		Logger::add( '  - create post with the following attributes: ', $postarr );
+		// Logger::add( '  - create post with the following attributes: ', $postarr );
 
 		// normal post
 		if ( $postarr['post_type'] !== 'attachment' ) {
@@ -1023,41 +1039,33 @@ class Post_Import extends Post_Transfer_Base {
 	 *
 	 * @return string $subject
 	 */
-	private function replace_strings( $subject, $post_id, $log = true ) {
+	private function replace_strings( $subject, $post_id ) {
 
 		if ( empty( $subject ) ) {
 			return $subject;
 		}
 
-		if ( $log ) {
-			Logger::add( 'Replace strings.' );
-		}
+		Logger::add( 'Replace strings.' );
 
 		// get patterns
 		$replace_strings = (array) Nested_Content_Patterns::get_string_patterns( $subject, $post_id );
 		foreach ( $replace_strings as $name => $string ) {
 			$subject = str_replace( '{{' . $name . '}}', $string, $subject );
-			if ( $log ) {
-				Logger::add( sprintf( "  - '%s' was replaced with '%s'.", $name, $string ) );
-			}
+			// Logger::add( sprintf( "  - '%s' was replaced with '%s'.", $name, $string ) );
 		}
 
 		if ( ! empty( $this->collected_replace_strings ) ) {
 			foreach ( $this->collected_replace_strings as $original => $new ) {
 				if ( strpos( $subject, $original ) !== false ) {
 					$subject = str_replace( $original, $new, $subject );
-					if ( $log ) {
-						Logger::add( sprintf( "  - '%s' was replaced with '%s'.", $original, $new ) );
-					}
-				} elseif ( $log ) {
-						Logger::add( sprintf( "  - '%s' was not found.", $original ) );
+					Logger::add( sprintf( "  - '%s' was replaced with '%s'.", $original, $new ) );
+				} else {
+					Logger::add( sprintf( "  - '%s' was not found.", $original ) );
 				}
 			}
 		}
 
-		if ( $log ) {
-			Logger::add( '=> strings were replaced' );
-		}
+		Logger::add( '=> strings were replaced' );
 
 		return $subject;
 	}
@@ -1197,7 +1205,7 @@ class Post_Import extends Post_Transfer_Base {
 
 				if ( is_wp_error( $new_term_ids ) ) {
 					Logger::add( "  - term ids of taxonomy '$taxonomy' could not be set to post: " . $new_term_ids->get_error_message() );
-				} else {
+				} elseif ( ! empty( $new_term_ids ) ) {
 					Logger::add( "  - term ids '" . implode( ', ', $new_term_ids ) . "' of taxonomy '$taxonomy' set to post." );
 				}
 			}

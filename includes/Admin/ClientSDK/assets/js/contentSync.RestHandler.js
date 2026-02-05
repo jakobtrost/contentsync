@@ -146,6 +146,8 @@ class RestHandler {
 			}
 		};
 
+		console.log( 'json data: ', data );
+
 		if ( typeof wp !== 'undefined' && wp.apiFetch ) {
 			return wp.apiFetch( {
 				path,

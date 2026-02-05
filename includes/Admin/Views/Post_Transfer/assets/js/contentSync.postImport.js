@@ -178,8 +178,11 @@ contentSync.postImport = new function() {
 		const innerContainer = document.createElement( 'div' );
 		innerContainer.className = 'posts-conflicts-inner-container';
 
+		let hasConflict = false;
+		let multiOptionContainer;
+
 		if ( posts.length > 1 ) {
-			let multiOptionContainer = document.createElement( 'div' );
+			multiOptionContainer = document.createElement( 'div' );
 			multiOptionContainer.className = 'post-conflict multiselect';
 			multiOptionContainer.innerHTML = '<div class="post-conflict-title">' + __( 'Multiselect' ) + '</div>' +
 				'<select class="post-conflict-action">' +
@@ -207,6 +210,7 @@ contentSync.postImport = new function() {
 			optionContainer.className = 'post-conflict';
 
 			if ( post?.existing_post ) {
+				hasConflict = true;
 				optionContainer.innerHTML = '<div class="post-conflict-title">' + post.existing_post.post_link + '</div>' +
 					'<input type="hidden" name="conflicts[' + i + '][existing_post_id]" value="' + post.existing_post.ID + '" />' +
 					'<input type="hidden" name="conflicts[' + i + '][original_post_id]" value="' + post.existing_post.original_post_id + '" />' +
@@ -226,6 +230,10 @@ contentSync.postImport = new function() {
 			innerContainer.appendChild( optionContainer );
 			i++;
 		} );
+
+		if ( ! hasConflict && multiOptionContainer ) {
+			multiOptionContainer.remove();
+		}
 
 		conflictsContainer.appendChild( innerContainer );
 	};

@@ -121,8 +121,6 @@
 			);
 		}
 
-		console.log('similarPosts: ', similarPosts);
-
 		let pluginContent = null;
 		// post id is loading
 		if (post.id < 0) {

@@ -99,9 +99,17 @@ contentSync.importGlobalPost = new function() {
 	this.onCheckImportSuccess = ( data, fullResponse ) => {
 		console.log( 'importGlobalPost.onCheckImportSuccess: ', data, fullResponse );
 
-		if ( data.length > 0 ) {
+		// Convert the data to an array of posts
+		let posts = [];
+		if ( typeof data === 'object' && Object.keys( data ).length > 0 ) {
+			posts = Object.values( data );
+		} else if ( Array.isArray( data ) ) {
+			posts = data;
+		}
+
+		if ( posts.length > 0 ) {
 			this.Modal.setDescription( fullResponse.message );
-			this.buildConflictOptions( data );
+			this.buildConflictOptions( posts );
 		} else {
 			const conflictsContainer = document.getElementById( 'import-global-post-conflicts' );
 			conflictsContainer.innerHTML = '';
@@ -113,7 +121,17 @@ contentSync.importGlobalPost = new function() {
 
 	/**
 	 * Build the conflict options
-	 * @param {Array} posts - Array of posts with conflicts
+	 *
+	 * @param {Prepared_Post[]} posts            The prepared posts with conflicts
+	 *   @property {WP_Post} existing_post       The conflicting post, with some additional properties:
+	 *      @property {int} original_post_id     The original post ID
+	 *      @property {string} post_link         The link to the conflicting post
+	 *      @property {string} conflict_action   Optional: Predefined conflict action (skip|replace|keep)
+	 *                                           If a post is already synced to this site, the conflict action will be set to 'skip'.
+	 *                                           @see \Contentsync\Post_Sync\Synced_Post_Hooks::adjust_conflict_action_on_import_check()
+	 *      @property {string} conflict_message  Optional: Predefined conflict message
+	 *                                           If a post is already synced to this site, the conflict message will be set to 'Already synced.'.
+	 *                                           @see \Contentsync\Post_Sync\Synced_Post_Hooks::adjust_conflict_action_on_import_check()
 	 */
 	this.buildConflictOptions = ( posts ) => {
 		console.log( 'importGlobalPost.buildConflictOptions: ', posts );
@@ -124,17 +142,74 @@ contentSync.importGlobalPost = new function() {
 		const innerContainer = document.createElement( 'div' );
 		innerContainer.className = 'posts-conflicts-inner-container';
 
-		posts.forEach( ( post ) => {
-			conflictPost = document.createElement( 'div' );
-			conflictPost.className = 'post-conflict';
-			conflictPost.innerHTML = '<span>' + post.post_link + '</span>' +
-				'<select name="conflicts[' + post.ID + ']">' +
+		let hasConflict = false;
+		let multiOptionContainer;
+
+		if ( posts.length > 1 ) {
+			multiOptionContainer = document.createElement( 'div' );
+			multiOptionContainer.className = 'post-conflict multiselect';
+			multiOptionContainer.innerHTML = '<div class="post-conflict-title">' + __( 'Multiselect' ) + '</div>' +
+				'<select class="post-conflict-action">' +
 					'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
 					'<option value="replace">' + __( 'Overwrite existing', 'contentsync' ) + '</option>' +
-					'<option value="skip">' + __( 'Use existing', 'contentsync' ) + '</option>' +
 				'</select>';
-			innerContainer.appendChild( conflictPost );
+
+			innerContainer.appendChild( multiOptionContainer );
+
+			// on change, change the value of all the other select elements
+			multiOptionContainer.addEventListener( 'change', ( e ) => {
+				const value = e.target.value;
+				const selectElements = innerContainer.querySelectorAll( 'select.post-conflict-action[name^="conflicts' );
+				selectElements.forEach( ( select ) => {
+					select.value = value;
+				} );
+			} );
+		}
+
+		let i = 0;
+		posts.forEach( ( post ) => {
+			
+			let optionContainer = document.createElement( 'div' );
+			optionContainer.className = 'post-conflict';
+
+			// there is an existing post, the conflict action is already set
+			if ( post?.existing_post?.conflict_action ) {
+				optionContainer.innerHTML = '<div class="post-conflict-title">' + post.existing_post.post_link + '</div>' +
+				'<input type="hidden" name="conflicts[' + i + '][existing_post_id]" value="' + post.existing_post.ID + '" />' +
+				'<input type="hidden" name="conflicts[' + i + '][original_post_id]" value="' + post.existing_post.original_post_id + '" />' +
+				'<input type="hidden" name="conflicts[' + i + '][conflict_action]" value="' + post.existing_post?.conflict_action + '" />' +
+					'<div class="post-conflict-action no-conflict">' +
+						'<i>' + ( post.existing_post?.conflict_message ?? __( 'No conflict', 'contentsync' ) ) + '</i>' +
+					'</div>';
+				i++;
+			}
+			// there is an existing post, the conflict action needs to be set by the user
+			else if ( post?.existing_post ) {
+				hasConflict = true;
+				optionContainer.innerHTML = '<div class="post-conflict-title">' + post.existing_post.post_link + '</div>' +
+					'<input type="hidden" name="conflicts[' + i + '][existing_post_id]" value="' + post.existing_post.ID + '" />' +
+					'<input type="hidden" name="conflicts[' + i + '][original_post_id]" value="' + post.existing_post.original_post_id + '" />' +
+					'<select class="post-conflict-action" name="conflicts[' + i + '][conflict_action]">' +
+						'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
+						'<option value="replace">' + __( 'Overwrite existing', 'contentsync' ) + '</option>' +
+					'</select>';
+				i++;
+			}
+			// there is no existing post, no conflict action needed
+			else {
+				const postLink = post?.post_link ?? ( post?.post_title + ' (' + post?.post_type + ')' );
+				optionContainer.innerHTML = '<div class="post-conflict-title">' + postLink + '</div>' +
+					'<div class="post-conflict-action no-conflict">' +
+						'<i>' + ( post.existing_post?.conflict_message ?? __( 'No conflict', 'contentsync' ) ) + '</i>' +
+					'</div>';
+			}
+
+			innerContainer.appendChild( optionContainer );
 		} );
+
+		if ( ! hasConflict && multiOptionContainer ) {
+			multiOptionContainer.remove();
+		}
 
 		conflictsContainer.appendChild( innerContainer );
 	};
@@ -173,13 +248,10 @@ contentSync.importGlobalPost = new function() {
 	this.onModalSubmit = () => {
 		this.Modal.toggleSubmitButtonBusy( true );
 
-		const conflicts = this.Modal.getFormData();
-		console.log( 'importGlobalPost.onModalSubmit: ', conflicts );
+		const formData = this.Modal.getFormData();
+		formData.append( 'gid', this.gid );
 
-		this.importRestHandler.send( {
-			gid: this.gid,
-			conflicts: conflicts
-		} );
+		this.importRestHandler.send( formData );
 	};
 
 	/**

@@ -116,12 +116,22 @@ class Synced_Post_Service {
 	/**
 	 * Import a synced post to the current blog
 	 *
-	 * @param string $gid               The global ID. Format {{blog_id}}-{{post_id}}
+	 * @param string $gid                The global ID. Format {{blog_id}}-{{post_id}}
 	 * @param array  $conflict_actions   Array of posts that already exist on the current blog.
-	 *                                   Keyed by the same ID as in the @param $posts.
-	 *                                  @property existing_post_id: ID of the current post.
-	 *                                  @property conflict_action: Action to be done (skip|replace|keep)
-	 *                                  @property original_post_id: ID of the original post.
+	 *                                   Keyed by the original post ID.
+	 * @example
+	 * [
+	 *   456 => array(
+	 *     'existing_post_id' => 123,     ID of the existing post on the current blog
+	 *     'conflict_action'  => 'keep',  action to be done (skip|replace|keep)
+	 *     'original_post_id' => 456,     ID of the original post
+	 *   ),
+	 *   789 => array(
+	 *     'existing_post_id' => 101,
+	 *     'conflict_action'  => 'replace',
+	 *     'original_post_id' => 789,
+	 *   ),
+	 * ]
 	 *
 	 * @return bool|string  True on success. False or error message on failure.
 	 */
@@ -134,7 +144,12 @@ class Synced_Post_Service {
 
 		Logger::add( '========= ALL POSTS PREPARED. NOW WE INSERT THEM =========' );
 
-		$post_import = new Post_Import( $posts, $conflict_actions );
+		$post_import = new Post_Import(
+			$posts,
+			array(
+				'conflict_actions' => $conflict_actions,
+			)
+		);
 		$result      = $post_import->import_posts();
 
 		if ( is_wp_error( $result ) ) {

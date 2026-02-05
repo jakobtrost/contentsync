@@ -176,6 +176,23 @@ class Prepared_Post {
 	 */
 	public $post_hierarchy = array();
 
+	/**
+	 * Existing post: The existing post on the current blog.
+	 *
+	 * This property is only set when preparing posts for import, usually when checking
+	 * for conflicting posts. It contains the existing post on the current blog, if it
+	 * already exists.
+	 *
+	 * @see \Contentsync\Post_Transfer\Post_Conflict_Handler::get_import_posts_with_conflicts()
+	 *
+	 * @var WP_Post|null The existing post, with some additional properties:
+	 *    @property int $original_post_id     The original post ID.
+	 *    @property string $post_link         The link to the conflicting post.
+	 *    @property string $conflict_action   The conflict action (skip|replace|keep)
+	 *    @property string $conflict_message  The conflict message (optional)
+	 */
+	public $existing_post = null;
+
 
 	/**
 	 * =================================================================
@@ -268,7 +285,7 @@ class Prepared_Post {
 
 			$match_regex = '/' . implode( '([\da-z\-\_]+?)', $pattern['search'] ) . '/';
 			$regex_group = isset( $pattern['group'] ) ? (int) $pattern['group'] : 2;
-			Logger::add( '  - test regex: ' . esc_attr( $match_regex ) );
+			// Logger::add( '  - regex: ' . esc_attr( $match_regex ) );
 
 			// search for all occurrences
 			preg_match_all( $match_regex, $this->post_content, $matches );
@@ -392,11 +409,10 @@ class Prepared_Post {
 
 			Logger::add(
 				sprintf(
-					"  - nested post '%s' attached for export.\r\n     * ID: %s\r\n     * TYPE: %s\r\n     * URL: %s",
+					"  - nested post '%s' attached for export (ID: %s, post_type: %s)",
 					$nested_post->post_name,
 					$nested_id,
-					$nested_post->post_type,
-					$this->nested[ $nested_id ]['front_url']
+					$nested_post->post_type
 				)
 			);
 		}
@@ -435,7 +451,7 @@ class Prepared_Post {
 
 			$match_regex = '/' . implode( '([\da-z\-\_]+?)', $pattern['search'] ) . '/';
 			$regex_group = isset( $pattern['group'] ) ? (int) $pattern['group'] : 2;
-			Logger::add( '  - test regex: ' . esc_attr( $match_regex ) );
+			// Logger::add( '  - regex: ' . esc_attr( $match_regex ) );
 
 			// search for all occurrences
 			preg_match_all( $match_regex, $this->post_content, $matches );
@@ -801,7 +817,8 @@ class Prepared_Post {
 			$this->export_arguments['translations']
 		);
 
-		Logger::add( '=> post language info prepared', $this->language );
+		Logger::add( '=> post language info prepared' );
+		// Logger::add( 'language: ', $this->language );
 	}
 
 

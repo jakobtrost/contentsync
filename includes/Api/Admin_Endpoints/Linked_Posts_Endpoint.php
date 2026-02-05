@@ -13,8 +13,9 @@
 
 namespace Contentsync\Api\Admin_Endpoints;
 
-use Contentsync\Admin\Views\Post_Transfer\Post_Conflict_Handler;
+use Contentsync\Post_Transfer\Post_Conflict_Handler;
 use Contentsync\Post_Sync\Synced_Post_Service;
+use Contentsync\Post_Sync\Synced_Post_Query;
 use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
@@ -50,7 +51,7 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 	 *
 	 * @var array
 	 */
-	private static $import_route_param_names = array( 'gid', 'form_data' );
+	private static $import_route_param_names = array( 'gid', 'conflicts' );
 
 	/**
 	 * Param names for the unlink route.
@@ -65,22 +66,6 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 	public function register_routes() {
 		$all_args = $this->get_endpoint_args();
 
-		// POST /linked-posts/check-import-bulk — params: posts
-		$check_bulk_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$check_import_bulk_param_names )
-		);
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/check-import-bulk',
-			array(
-				'methods'             => $this->method,
-				'callback'            => array( $this, 'check_import_bulk' ),
-				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $check_bulk_args,
-			)
-		);
-
 		// POST /linked-posts/check-import — params: gid
 		$check_args = array_intersect_key(
 			$all_args,
@@ -94,6 +79,22 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 				'callback'            => array( $this, 'check_import' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 				'args'                => $check_args,
+			)
+		);
+
+		// POST /linked-posts/check-import-bulk — params: posts
+		$check_bulk_args = array_intersect_key(
+			$all_args,
+			array_flip( self::$check_import_bulk_param_names )
+		);
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/check-import-bulk',
+			array(
+				'methods'             => $this->method,
+				'callback'            => array( $this, 'check_import_bulk' ),
+				'permission_callback' => array( $this, 'permission_callback' ),
+				'args'                => $check_bulk_args,
 			)
 		);
 
@@ -128,6 +129,28 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 				'args'                => $unlink_args,
 			)
 		);
+	}
+
+	/**
+	 * Check a single synced post for import conflicts.
+	 *
+	 * @param \WP_REST_Request $request Full request object.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function check_import( $request ) {
+		$gid = (string) ( $request->get_param( 'gid' ) ?? '' );
+
+		if ( empty( $gid ) ) {
+			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
+		}
+
+		$conflicts = $this->check_synced_post_import( $gid );
+
+		if ( empty( $conflicts ) ) {
+			return $this->respond( array(), __( 'No conflicts found. You can safely import the global post.', 'contentsync' ), true );
+		}
+
+		return $this->respond( $conflicts, __( 'Attention: Some content in the file already appears to exist on this site. Choose what to do with it.', 'contentsync' ), true );
 	}
 
 	/**
@@ -166,9 +189,15 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 	 * @param string $gid   Global ID.
 	 *
 	 * @return Prepared_Post[]   The prepared posts, keyed by ID, with some properties added:
-	 *   @property object $existing_post        The conflicting post
+	 *   @property WP_Post $existing_post       The conflicting post, with some additional properties:
+	 *      @property int $original_post_id     The original post ID
 	 *      @property string $post_link         The link to the conflicting post
-	 *      @property string $original_post_id  The original post ID
+	 *      @property string $conflict_action   Optional: Predefined conflict action (skip|replace|keep)
+	 *                                          If a post is already synced to this site, the conflict action will be set to 'skip'.
+	 *                                          @see \Contentsync\Post_Sync\Synced_Post_Hooks::adjust_conflict_action_on_import_check()
+	 *      @property string $conflict_message  Optional: Predefined conflict message
+	 *                                          If a post is already synced to this site, the conflict message will be set to 'Already synced.'.
+	 *                                          @see \Contentsync\Post_Sync\Synced_Post_Hooks::adjust_conflict_action_on_import_check()
 	 */
 	public function check_synced_post_import( $gid ) {
 
@@ -176,29 +205,6 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 		$posts = Post_Conflict_Handler::get_import_posts_with_conflicts( $posts );
 
 		return $posts;
-	}
-
-	/**
-	 * Check a single synced post for import conflicts.
-	 *
-	 * @param \WP_REST_Request $request Full request object.
-	 * @return \WP_REST_Response|\WP_Error
-	 */
-	public function check_import( $request ) {
-		$gid = (string) ( $request->get_param( 'gid' ) ?? '' );
-
-		if ( empty( $gid ) ) {
-			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
-		}
-
-		$conflicts = $this->check_synced_post_import( $gid );
-		Logger::add( 'Linked_Posts_Endpoint::check_import', $conflicts );
-
-		if ( empty( $conflicts ) ) {
-			return $this->respond( array(), __( 'No conflicts found. You can safely import the global post.', 'contentsync' ), true );
-		}
-
-		return $this->respond( $conflicts, __( 'Attention: Some content in the file already appears to exist on this site. Choose what to do with it.', 'contentsync' ), true );
 	}
 
 	/**
@@ -232,22 +238,13 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 		 */
 		$conflicts = (array) ( $request->get_param( 'conflicts' ) ?? array() );
 
-		// foreach ( $conflicts as $conflict ) {
-		// if ( isset( $conflict['post_id'] ) ) {
-		// **
-		// * Set the @property conflict_action for the post in the post_data array
-		// *
-		// * @see \Contentsync\Post_Transfer\Post_Import::import_posts()
-		// *      -> "Get conflicting post and action." section
-		// */
-		// $post_data[ $conflict['post_id'] ]['conflict_action'] = $conflict['conflict_action'];
-		// }
-		// }
+		// Convert the conflicts array to a keyed array by original post ID.
+		$conflict_actions = array();
+		foreach ( $conflicts as $conflict ) {
+			$conflict_actions[ $conflict['original_post_id'] ] = $conflict;
+		}
 
-		// Logger::add( 'post_data', $post_data );
-
-		$conflict_actions = Post_Conflict_Handler::get_conflicting_post_selections( $conflicts );
-		$result           = Synced_Post_Service::import_synced_post( $gid, $conflict_actions );
+		$result = Synced_Post_Service::import_synced_post( $gid, $conflict_actions );
 
 		if ( $result !== true ) {
 			$message = is_wp_error( $result ) ? $result->get_error_message() : (string) $result;

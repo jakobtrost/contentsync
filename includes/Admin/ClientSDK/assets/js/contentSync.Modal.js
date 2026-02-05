@@ -643,20 +643,24 @@ class Modal {
 		if ( hasFileInput ) {
 			formData = new FormData( form );
 		} else {
-			formData = {};
-			const inputs = form.querySelectorAll( 'input, select, textarea' );
-			inputs.forEach( ( input ) => {
+			formData = new FormData( form );
+			
+			// this custom functionality doesn't do the same job creating multi-level objects from input 
+			// names like "conflicts[0][existing_post_id]". Therefore we use the native FormData object.
+			// formData = {};
+			// const inputs = form.querySelectorAll( 'input, select, textarea' );
+			// inputs.forEach( ( input ) => {
 
-				let value = input.value;
+			// 	let value = input.value;
 
-				if ( input.type === 'checkbox' ) {
-					value = input.checked;
-				} else if ( input.type === 'file' ) {
-					value = input.files && input.files[ 0 ];
-				}
+			// 	if ( input.type === 'checkbox' ) {
+			// 		value = input.checked;
+			// 	} else if ( input.type === 'file' ) {
+			// 		value = input.files && input.files[ 0 ];
+			// 	}
 
-				formData[ input.name ] = value;
-			} );
+			// 	formData[ input.name ] = value;
+			// } );
 		}
 
 		return formData;

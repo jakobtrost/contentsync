@@ -1143,17 +1143,20 @@ class Trigger_Hooks extends Hooks_Base {
 	 *
 	 * DEBUGGING:
 	 * ==========
-	 * Uncomment the error_log statements below to debug request patterns:
-	 * - error_log( 'request_uri: ' . $request_uri );
-	 * - error_log( 'http_referer: ' . $http_referer );
-	 * - error_log( ' --- IGNORED - because it comes from the post editor ---' );
-	 * - error_log( ' --- IGNORED - because it has already been processed ---' );
-	 * - error_log( ' --- VALID ---' );
+	 * Uncomment the Logger::add statements below to debug request patterns:
+	 * - Logger::add( 'request_uri:', $request_uri );
+	 * - Logger::add( 'http_referer:', $http_referer );
+	 * - Logger::add( ' --- IGNORED - because it comes from the post editor ---' );
+	 * - Logger::add( ' --- IGNORED - because it has already been processed ---' );
+	 * - Logger::add( ' --- VALID ---' );
 	 *
 	 * @param int $post_id The ID of the post being updated.
 	 * @return bool True if the update should be ignored, false if it should be processed.
 	 */
 	public function maybe_ignore_this_post_update_action( $post_id ) {
+
+		// we do not need this logic for now, as we do not have a metabox enabled for the post editor.
+		return false;
 
 		// Get the current request URI
 		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
@@ -1165,34 +1168,34 @@ class Trigger_Hooks extends Hooks_Base {
 		$wp_rest_prefix = '/' . trailingslashit( rest_get_url_prefix() ) . 'wp/';
 
 		// Debugging (uncomment to troubleshoot):
-		// error_log( 'request_uri: ' . $request_uri );
-		// error_log( 'http_referer: ' . $http_referer );
-		// error_log( 'wp_rest_prefix: ' . $wp_rest_prefix );
+		// Logger::add( 'request_uri:', $request_uri );
+		// Logger::add( 'http_referer:', $http_referer );
+		// Logger::add( 'wp_rest_prefix:', $wp_rest_prefix );
 
 		// Check if this is a REST API request
 		$is_rest_api_request = strpos( $request_uri, $wp_rest_prefix ) !== false;
 
 		if ( $is_rest_api_request ) {
 			// Check if the request originated from the Block Editor (post.php)
-			// This indicates it's the first call of a two-call sequence
+			// This indicates it's the first call of a two - call sequence
 			$is_post_editor_request = strpos( $http_referer, '/wp-admin/post.php' ) !== false || strpos( $http_referer, '/wp-admin/post-new.php' ) !== false;
 
 			if ( $is_post_editor_request ) {
 				// Ignore: This is the Block Editor's first call (without complete metadata)
 				// The second call with meta-box-loader will follow shortly
-				// error_log( 'action ignored because it comes from the post editor ---> will not be processed' );
+				// Logger::add( 'action ignored because it comes from the post editor ---> will not be processed' );
 				return true;
 			}
 		}
 
 		// Never process this call twice after the post update for the same post
 		if ( $this->already_processed( 'this_post_update_action', $post_id ) ) {
-			// error_log( 'action ignored because it has already been processed ---> will not be processed' );
+			// Logger::add( 'action ignored because it has already been processed ---> will not be processed' );
 			return true;
 		}
 
 		// Allow processing: This is a valid update that should be handled
-		// error_log( 'action valid ---> will be processed' );
+		// Logger::add( 'action valid ---> will be processed' );
 		return false;
 	}
 }
