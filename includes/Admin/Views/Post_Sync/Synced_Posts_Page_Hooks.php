@@ -83,6 +83,19 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 			true
 		);
 		wp_enqueue_script( 'contentSync-importGlobalPost' );
+
+		wp_register_script(
+			'contentSync-bulkImportGlobalPost',
+			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.bulkImportGlobalPost.js',
+			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
+			CONTENTSYNC_VERSION,
+			true
+		);
+		wp_add_inline_script(
+			'contentSync-bulkImportGlobalPost',
+			'document.addEventListener( "DOMContentLoaded", function() { contentSync.bulkImportGlobalPost.initSubmitListener(); } );'
+		);
+		wp_enqueue_script( 'contentSync-bulkImportGlobalPost' );
 	}
 
 	/**

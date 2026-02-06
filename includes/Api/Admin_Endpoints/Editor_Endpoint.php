@@ -32,20 +32,6 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 	protected $rest_base = 'editor';
 
 	/**
-	 * Param names for the get-post-data route.
-	 *
-	 * @var array
-	 */
-	private static $get_post_data_param_names = array( 'postReference' );
-
-	/**
-	 * Param names for the save_options route.
-	 *
-	 * @var array
-	 */
-	private static $save_options_param_names = array( 'post_id', 'options', 'canonical_url' );
-
-	/**
 	 * Possible arguments for editor endpoints.
 	 *
 	 * @return array Map of param names to validate_callback config.
@@ -86,10 +72,6 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 	public function register_routes() {
 		$all_args = $this->get_endpoint_args();
 
-		$get_post_data_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$get_post_data_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/get-post-data',
@@ -97,14 +79,13 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'get_post_data' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $get_post_data_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'postReference' ) )
+				),
 			)
 		);
 
-		$save_options_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$save_options_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/save-options',
@@ -112,7 +93,10 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'save_options' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $save_options_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id', 'options', 'canonical_url' ) )
+				),
 			)
 		);
 	}

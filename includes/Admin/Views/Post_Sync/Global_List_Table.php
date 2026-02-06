@@ -371,9 +371,9 @@ class Global_List_Table extends WP_List_Table {
 		$text = __( 'No synced post found.', 'contentsync' );
 		$rel  = isset( $_GET['rel'] ) && ! empty( $_GET['rel'] ) ? sanitize_key( $_GET['rel'] ) : 'all';
 		if ( $rel === 'root' ) {
-			$text = __( 'No synced post exported from here was found.', 'contentsync' );
+			$text = __( 'No synced root post from here was found.', 'contentsync' );
 		} elseif ( $rel === 'linked' ) {
-			$text = __( 'No synced post imported here was found.', 'contentsync' );
+			$text = __( 'No synced linked post here was found.', 'contentsync' );
 		} elseif ( $rel === 'errors' ) {
 			$text = __( 'No faulty synced post found.', 'contentsync' );
 		}
@@ -537,7 +537,7 @@ class Global_List_Table extends WP_List_Table {
 			// edit the local post
 			'edit'   => $item->local_post || $item->error ? "<a href='" . $item->post_links['edit'] . "'>" . __( 'Edit', 'contentsync' ) . '</a>' : '',
 			// import by gid
-			'linked' => $this->build_rest_api_link( 'importGlobalPost.openModal', __( 'Import', 'contentsync' ), $data ),
+			'import' => $this->build_rest_api_link( 'importGlobalPost.onImportButtonClick', __( 'Import', 'contentsync' ), $data ),
 			// unlink if this is the root
 			'unlink' => $item->relationship == 'root' ? $this->build_rest_api_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data ) : '',
 			// unlink if local post exists
@@ -685,7 +685,7 @@ class Global_List_Table extends WP_List_Table {
 				} elseif ( $item->relationship === 'linked' ) {
 					$actions = array( 'root', 'edit', 'trash', 'unlink' );
 				} elseif ( $item->relationship === 'unlinked' ) {
-					$actions = array( 'linked', 'root' );
+					$actions = array( 'import', 'root' );
 				}
 
 				if ( $item->error ) {
@@ -929,7 +929,7 @@ class Global_List_Table extends WP_List_Table {
 		} else {
 			$actions = array(
 				'unlink' => __( 'Unlink', 'contentsync' ),
-				'linked' => __( 'Import', 'contentsync' ),
+				'import' => __( 'Import', 'contentsync' ),
 				'trash'  => __( 'Trash', 'contentsync' ),
 			);
 
@@ -1039,7 +1039,7 @@ class Global_List_Table extends WP_List_Table {
 			}
 
 			// import
-			elseif ( $bulk_action === 'linked' ) {
+			elseif ( $bulk_action === 'import' ) {
 
 				/**
 				 * @todo not in use right now though...
@@ -1056,7 +1056,7 @@ class Global_List_Table extends WP_List_Table {
 				// }
 
 				// $result = \Contentsync\Post_Sync\import_synced_post( $gid );
-				// if ( $result === true && $post = get_post( $result ) ) {
+				// if ( $result === true || ( is_wp_error( $result ) && $result->get_error_message() === 'post_already_imported' ) && $post = get_post( $result ) ) {
 				// $post_titles[] = $post->post_title;
 				// }
 			}
@@ -1151,7 +1151,7 @@ class Global_List_Table extends WP_List_Table {
 				'success' => __( 'The link between the posts %s has been successfully resolved.', 'contentsync' ),
 				'fail'    => __( 'There were errors in resolving the links.', 'contentsync' ),
 			),
-			'linked'           => array(
+			'import'           => array(
 				'success' => __( 'The posts %s were successfully imported.', 'contentsync' ),
 				'fail'    => __( 'There were errors when importing the posts.', 'contentsync' ),
 			),

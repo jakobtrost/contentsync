@@ -33,44 +33,12 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 	protected $rest_base = 'linked-posts';
 
 	/**
-	 * Param names for the check-import-bulk route.
-	 *
-	 * @var array
-	 */
-	private static $check_import_bulk_param_names = array( 'posts' );
-
-	/**
-	 * Param names for the check-import route.
-	 *
-	 * @var array
-	 */
-	private static $check_import_param_names = array( 'gid' );
-
-	/**
-	 * Param names for the import route.
-	 *
-	 * @var array
-	 */
-	private static $import_route_param_names = array( 'gid', 'conflicts' );
-
-	/**
-	 * Param names for the unlink route.
-	 *
-	 * @var array
-	 */
-	private static $unlink_route_param_names = array( 'post_id' );
-
-	/**
 	 * Register REST API routes
 	 */
 	public function register_routes() {
 		$all_args = $this->get_endpoint_args();
 
 		// POST /linked-posts/check-import — params: gid
-		$check_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$check_import_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/check-import',
@@ -78,31 +46,14 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'check_import' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $check_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'gid' ) )
+				),
 			)
 		);
 
-		// POST /linked-posts/check-import-bulk — params: posts
-		$check_bulk_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$check_import_bulk_param_names )
-		);
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/check-import-bulk',
-			array(
-				'methods'             => $this->method,
-				'callback'            => array( $this, 'check_import_bulk' ),
-				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $check_bulk_args,
-			)
-		);
-
-		// POST /linked-posts/import — params: gid, form_data (optional)
-		$import_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$import_route_param_names )
-		);
+		// POST /linked-posts/import — params: gid, conflicts
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/import',
@@ -110,15 +61,44 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'import' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $import_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'gid', 'conflicts' ) )
+				),
+			)
+		);
+
+		// POST /linked-posts/check-import-bulk — params: posts
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/check-import-bulk',
+			array(
+				'methods'             => $this->method,
+				'callback'            => array( $this, 'check_import_bulk' ),
+				'permission_callback' => array( $this, 'permission_callback' ),
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'posts' ) )
+				),
+			)
+		);
+
+		// POST /linked-posts/import-bulk — params: gids, conflicts
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/import-bulk',
+			array(
+				'methods'             => $this->method,
+				'callback'            => array( $this, 'import_bulk' ),
+				'permission_callback' => array( $this, 'permission_callback' ),
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'gids', 'conflicts' ) )
+				),
 			)
 		);
 
 		// POST /linked-posts/unlink — params: post_id
-		$unlink_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$unlink_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/unlink',
@@ -126,7 +106,10 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'unlink' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $unlink_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id' ) )
+				),
 			)
 		);
 	}
@@ -144,43 +127,14 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
 		}
 
-		$conflicts = $this->check_synced_post_import( $gid );
+		$post_with_conflicts = $this->check_synced_post_import( $gid );
 
-		if ( empty( $conflicts ) ) {
-			return $this->respond( array(), __( 'No conflicts found. You can safely import the global post.', 'contentsync' ), true );
+		if ( empty( $post_with_conflicts ) ) {
+
+			return $this->respond( false, __( 'No posts found to import.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( $conflicts, __( 'Attention: Some content in the file already appears to exist on this site. Choose what to do with it.', 'contentsync' ), true );
-	}
-
-	/**
-	 * Check multiple synced posts for import conflicts (bulk).
-	 *
-	 * @param \WP_REST_Request $request Full request object.
-	 * @return \WP_REST_Response|\WP_Error
-	 */
-	public function check_import_bulk( $request ) {
-		$posts = (array) ( $request->get_param( 'posts' ) ?? array() );
-
-		if ( empty( $posts ) ) {
-			return $this->respond( false, __( 'global IDs are not defined.', 'contentsync' ), 400 );
-		}
-
-		$all_posts = array();
-		foreach ( $posts as $post ) {
-			if ( ! isset( $post['gid'] ) ) {
-				continue;
-			}
-			$posts = $this->check_synced_post_import( $post['gid'] );
-
-			$all_posts = array_merge( $all_posts, $posts );
-		}
-
-		if ( empty( $all_posts ) ) {
-			return $this->respond( false, __( 'posts could not be checked for conflicts.', 'contentsync' ), 400 );
-		}
-
-		return $this->respond( $all_posts, __( 'Conflicts found.', 'contentsync' ), true );
+		return $this->respond( $post_with_conflicts, __( 'The following posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ), true );
 	}
 
 	/**
@@ -246,12 +200,79 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 
 		$result = Synced_Post_Service::import_synced_post( $gid, $conflict_actions );
 
-		if ( $result !== true ) {
-			$message = is_wp_error( $result ) ? $result->get_error_message() : (string) $result;
-			return $this->respond( false, $message, 400 );
+		if ( is_wp_error( $result ) ) {
+			return $this->respond( false, $result->get_error_message(), 400 );
 		}
 
 		return $this->respond( true, __( 'post was imported!', 'contentsync' ), true );
+	}
+
+	/**
+	 * Check multiple synced posts for import conflicts (bulk).
+	 *
+	 * @param \WP_REST_Request $request Full request object.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function check_import_bulk( $request ) {
+		$posts = (array) ( $request->get_param( 'posts' ) ?? array() );
+
+		if ( empty( $posts ) ) {
+			return $this->respond( false, __( 'global IDs are not defined.', 'contentsync' ), 400 );
+		}
+
+		$all_posts = array();
+		foreach ( $posts as $post ) {
+			if ( ! isset( $post['gid'] ) ) {
+				continue;
+			}
+			$posts = $this->check_synced_post_import( $post['gid'] );
+			foreach ( $posts as $post_id => $post ) {
+				$all_posts[ $post_id ] = $post;
+			}
+		}
+
+		if ( empty( $all_posts ) ) {
+			return $this->respond( false, __( 'No posts found to import.', 'contentsync' ), 400 );
+		}
+
+		return $this->respond( $all_posts, __( 'The following posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ), true );
+	}
+
+	/**
+	 * Import multiple synced posts.
+	 *
+	 * @param \WP_REST_Request $request Full request object.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function import_bulk( $request ) {
+		$gids = (array) ( $request->get_param( 'gids' ) ?? array() );
+
+		if ( empty( $gids ) ) {
+			return $this->respond( false, __( 'No global IDs found to import.', 'contentsync' ), 400 );
+		}
+
+		$conflicts = (array) ( $request->get_param( 'conflicts' ) ?? array() );
+
+		// Convert the conflicts array to a keyed array by original post ID.
+		$conflict_actions = array();
+		foreach ( $conflicts as $conflict ) {
+			$conflict_actions[ $conflict['original_post_id'] ] = $conflict;
+		}
+
+		$errors = array();
+
+		foreach ( $gids as $gid ) {
+			$result = Synced_Post_Service::import_synced_post( $gid, $conflict_actions );
+			if ( is_wp_error( $result ) ) {
+				$errors[] = $result->get_error_message();
+			}
+		}
+
+		if ( ! empty( $errors ) ) {
+			return $this->respond( false, __( 'Some posts could not be imported: ', 'contentsync' ) . implode( ', ', $errors ), 400 );
+		}
+
+		return $this->respond( true, __( 'Posts were successfully imported.', 'contentsync' ), true );
 	}
 
 	/**

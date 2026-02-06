@@ -167,6 +167,9 @@ abstract class Admin_Endpoint_Base {
 			'review_id'                    => array(
 				'validate_callback' => array( $this, 'is_number' ),
 			),
+			'gids'                         => array(
+				'validate_callback' => array( $this, 'is_array_or_object' ),
+			),
 			'posts'                        => array(
 				'validate_callback' => array( $this, 'is_array_or_object' ),
 			),

@@ -29,20 +29,6 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 	protected $rest_base = 'error-posts';
 
 	/**
-	 * Param names for the list route.
-	 *
-	 * @var array
-	 */
-	private static $list_route_param_names = array( 'mode', 'blog_id', 'post_type' );
-
-	/**
-	 * Param names for the repair route.
-	 *
-	 * @var array
-	 */
-	private static $repair_route_param_names = array( 'post_id', 'blog_id' );
-
-	/**
 	 * Get endpoint args, including mode for the list route.
 	 *
 	 * @return array
@@ -62,10 +48,6 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 		$all_args = $this->get_endpoint_args();
 
 		// POST /error-posts/list — params: mode, blog_id (optional), post_type (optional)
-		$list_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$list_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/list',
@@ -73,15 +55,14 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'list_posts' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $list_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'mode', 'blog_id', 'post_type' ) )
+				),
 			)
 		);
 
 		// POST /error-posts/repair — params: post_id, blog_id (optional)
-		$repair_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$repair_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/repair',
@@ -89,7 +70,10 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'repair' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $repair_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id', 'blog_id' ) )
+				),
 			)
 		);
 	}

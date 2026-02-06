@@ -35,37 +35,12 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 	protected $rest_base = 'unsynced-posts';
 
 	/**
-	 * Param names for the make_root route.
-	 *
-	 * @var array
-	 */
-	private static $make_root_route_param_names = array( 'post_id', 'form_data' );
-
-	/**
-	 * Param names for the overwrite route.
-	 *
-	 * @var array
-	 */
-	private static $overwrite_route_param_names = array( 'post_id', 'gid' );
-
-	/**
-	 * Param names for the similar route.
-	 *
-	 * @var array
-	 */
-	private static $similar_route_param_names = array( 'post_id' );
-
-	/**
 	 * Register REST API routes
 	 */
 	public function register_routes() {
 		$all_args = $this->get_endpoint_args();
 
 		// POST /unsynced-posts/make_root — params: post_id, form_data
-		$make_root_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$make_root_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/make_root',
@@ -73,15 +48,14 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'make_root' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $make_root_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id', 'form_data' ) )
+				),
 			)
 		);
 
 		// POST /unsynced-posts/overwrite — params: post_id, gid
-		$overwrite_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$overwrite_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/overwrite',
@@ -89,15 +63,14 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'overwrite' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $overwrite_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id', 'gid' ) )
+				),
 			)
 		);
 
 		// POST /unsynced-posts/similar — params: post_id
-		$similar_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$similar_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/similar',
@@ -105,7 +78,10 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'get_similar_posts' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $similar_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id' ) )
+				),
 			)
 		);
 	}
@@ -170,8 +146,8 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 
 		$result = Synced_Post_Service::import_synced_post( $gid, $current_posts );
 
-		if ( ! $result ) {
-			return $this->respond( false, __( 'post could not be overwritten with synced content.', 'contentsync' ), 400 );
+		if ( is_wp_error( $result ) ) {
+			return $this->respond( false, $result->get_error_message(), 400 );
 		}
 
 		return $this->respond( true, __( 'post was successfully overwritten with synced content.', 'contentsync' ), true );

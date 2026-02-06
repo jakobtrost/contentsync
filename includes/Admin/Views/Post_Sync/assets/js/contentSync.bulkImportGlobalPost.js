@@ -1,6 +1,6 @@
 var contentSync = contentSync || {};
 
-contentSync.importGlobalPost = new function() {
+contentSync.bulkImportGlobalPost = new function() {
 
 	/**
 	 * i18n function
@@ -11,12 +11,12 @@ contentSync.importGlobalPost = new function() {
 	 * Modal instance
 	 */
 	this.Modal = new contentSync.Modal( {
-		id: 'import-global-post-modal',
-		title: __( 'Import Global Post', 'contentsync' ),
+		id: 'bulk-import-global-post-modal',
+		title: __( 'Import Global Posts', 'contentsync' ),
 		formInputs: [
 			{
 				type: 'custom',
-				content: '<div id="import-global-post-conflicts" class="post-conflicts-container">' +
+				content: '<div id="bulk-import-global-post-conflicts" class="post-conflicts-container">' +
 					'<div class="posts-conflicts-inner-container"></div>' +
 				'</div>'
 			}
@@ -36,10 +36,14 @@ contentSync.importGlobalPost = new function() {
 	} );
 
 	/**
-	 * Global post ID
-	 * @type {string}
+	 * Array of posts
+	 * @type {array}
+	 *   @property {string} gid - Global post ID
+	 *   @property {string} post_title - Post title
+	 *   @property {string} post_type - Post type
+	 *   @property {string} relationship - Relationship
 	 */
-	this.gid = '';
+	this.posts = [];
 
 	/**
 	 * ================================================
@@ -51,27 +55,88 @@ contentSync.importGlobalPost = new function() {
 	 * REST handler instance
 	 */
 	this.checkImportRestHandler = new contentSync.RestHandler( {
-		restPath: 'linked-posts/check-import',
+		restPath: 'linked-posts/check-import-bulk',
 		onSuccess: ( data, fullResponse ) => this.onCheckImportSuccess( data, fullResponse ),
 		onError: ( message, fullResponse ) => this.onCheckImportError( message, fullResponse ),
 	} );
 
 	/**
-	 * On import button click
-	 * 
-	 * @param {HTMLElement} elem - Button element
+	 * Initialize the submit listener for the bulk import form
 	 */
-	this.onImportButtonClick = ( elem ) => {
-		this.openModal( elem.dataset.gid );
+	this.initSubmitListener = () => {
+
+		const filterForm = document.getElementById( 'posts-filter' );
+
+		if ( ! filterForm ) {
+			// escape
+			return;
+		}
+
+		console.log( 'bulkImportGlobalPost.initSubmitListener' );
+
+		// hook bulk submit
+		filterForm.addEventListener( 'submit', ( e ) => {
+			console.log( 'bulkImportGlobalPost.initSubmitListener', e );
+
+			const data = [ ...new FormData( e.target ).entries() ];
+			console.log( 'data', data );
+			
+			if (
+				Object.fromEntries( data ).action == 'import' ||
+				Object.fromEntries( data ).action2 == 'import'
+			) {
+				e.preventDefault();
+
+				var posts = [];
+				data.forEach( entry => {
+					if ( entry[ 0 ] == 'gids[]' ) {
+						const cb = document.querySelector( 'input[value=\''+entry[ 1 ]+'\']' );
+						const anchor = cb.parentElement.parentElement.querySelector( '.root a' );
+						const title = decodeURIComponent( cb.dataset.title );
+						posts.push( {
+							gid: entry[ 1 ],
+							post_title: title,
+							post_type: cb.dataset.pt,
+							relationship: cb.dataset.rel,
+						} );
+					}
+				} );
+				console.log( posts );
+				if ( posts.length == 0 ) {
+					console.info( 'no posts selected' );
+				}
+				else if ( posts.length == 1 ) {
+					if ( posts[ 0 ].relationship !== 'linked' ) {
+						console.log( 'import single post:', posts[ 0 ] );
+						contentSync.importGlobalPost.openModal( posts[ 0 ].gid );
+					}
+					else {
+						console.info( 'selected post is already imported:', posts[ 0 ] );
+						contentSync.tools.addSnackBar( {
+							text: __( 'Selected post "%s" is already imported', 'contentsync' ).replace( '%s', posts[ 0 ].post_title ),
+							type: 'info'
+						} );
+					}
+				}
+				else {
+					console.log( 'import posts:', posts );
+					this.openModal( posts );
+				}
+			}
+		} );
 	};
 
 	/**
 	 * Open modal
 	 * 
-	 * @param {string} gid - Global post ID
+	 * @param {array} posts - Array of posts
+	 *   @property {string} gid - Global post ID
+	 *   @property {string} post_title - Post title
+	 *   @property {string} post_type - Post type
+	 *   @property {string} relationship - Relationship
 	 */
-	this.openModal = ( gid ) => {
-		this.gid = gid;
+	this.openModal = ( posts ) => {
+		this.posts = posts;
 		this.Modal.open();
 		this.checkImport();
 	};
@@ -81,13 +146,13 @@ contentSync.importGlobalPost = new function() {
 	 */
 	this.checkImport = () => {
 
-		const conflictsContainer = document.getElementById( 'import-global-post-conflicts' );
+		const conflictsContainer = document.getElementById( 'bulk-import-global-post-conflicts' );
 		conflictsContainer.innerHTML = '<div class="components-flex">' +
 			'<span>' + __( 'Checking import...', 'contentsync' ) + '</span>' +
 			'<span class="spinner is-active"></span>' +
 		'</div>';
 
-		this.checkImportRestHandler.send( { gid: this.gid } );
+		this.checkImportRestHandler.send( { posts: this.posts } );
 	};
 
 	/**
@@ -111,7 +176,7 @@ contentSync.importGlobalPost = new function() {
 			this.Modal.setDescription( fullResponse.message );
 			this.buildConflictOptions( posts );
 		} else {
-			const conflictsContainer = document.getElementById( 'import-global-post-conflicts' );
+			const conflictsContainer = document.getElementById( 'bulk-import-global-post-conflicts' );
 			conflictsContainer.innerHTML = '';
 			this.Modal.setDescription( fullResponse.message );
 		}
@@ -136,7 +201,7 @@ contentSync.importGlobalPost = new function() {
 	this.buildConflictOptions = ( posts ) => {
 		console.log( 'importGlobalPost.buildConflictOptions: ', posts );
 
-		const conflictsContainer = document.getElementById( 'import-global-post-conflicts' );
+		const conflictsContainer = document.getElementById( 'bulk-import-global-post-conflicts' );
 		conflictsContainer.innerHTML = '';
 
 		const innerContainer = document.createElement( 'div' );
@@ -237,7 +302,7 @@ contentSync.importGlobalPost = new function() {
 	 * REST handler instance
 	 */
 	this.importRestHandler = new contentSync.RestHandler( {
-		restPath: 'linked-posts/import',
+		restPath: 'linked-posts/import-bulk',
 		onSuccess: ( data, fullResponse ) => this.onImportSuccess( data, fullResponse ),
 		onError: ( message, fullResponse ) => this.onImportError( message, fullResponse ),
 	} );
@@ -249,7 +314,10 @@ contentSync.importGlobalPost = new function() {
 		this.Modal.toggleSubmitButtonBusy( true );
 
 		const formData = this.Modal.getFormData();
-		formData.append( 'gid', this.gid );
+		// loop through the posts and add the gids to the form data
+		this.posts.forEach( post => {
+			formData.append( 'gids[]', post.gid );
+		} );
 
 		this.importRestHandler.send( formData );
 	};

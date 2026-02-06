@@ -240,6 +240,8 @@ class Connected_Posts_Endpoint extends Remote_Endpoint_Base {
 
 				if ( $result === true ) {
 					$message .= ' - post successfully imported';
+				} elseif ( is_wp_error( $result ) ) {
+					$message .= ' - post could not be imported: ' . $result->get_error_message();
 				} else {
 					$message .= ' - post could not be imported';
 				}
@@ -280,6 +282,8 @@ class Connected_Posts_Endpoint extends Remote_Endpoint_Base {
 
 		if ( $result === true ) {
 			$message .= ' - post successfully imported';
+		} elseif ( is_wp_error( $result ) ) {
+			$message .= ' - post could not be imported: ' . $result->get_error_message();
 		} else {
 			$message .= ' - post could not be imported';
 		}

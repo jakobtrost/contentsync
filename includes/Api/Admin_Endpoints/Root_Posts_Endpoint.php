@@ -32,44 +32,12 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 	protected $rest_base = 'root-posts';
 
 	/**
-	 * Param names for the check-connections route.
-	 *
-	 * @var array
-	 */
-	private static $check_connections_param_names = array( 'post_id' );
-
-	/**
-	 * Param names for the delete route.
-	 *
-	 * @var array
-	 */
-	private static $delete_route_param_names = array( 'gid' );
-
-	/**
-	 * Param names for the trash route.
-	 *
-	 * @var array
-	 */
-	private static $trash_route_param_names = array( 'post_id', 'blog_id' );
-
-	/**
-	 * Param names for the unlink route.
-	 *
-	 * @var array
-	 */
-	private static $unlink_route_param_names = array( 'gid' );
-
-	/**
 	 * Register REST API routes
 	 */
 	public function register_routes() {
 		$all_args = $this->get_endpoint_args();
 
 		// POST /root-posts/check-connections — params: post_id
-		$check_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$check_connections_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/check-connections',
@@ -77,15 +45,14 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'check_connections' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $check_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id' ) )
+				),
 			)
 		);
 
 		// POST /root-posts/delete — params: gid
-		$delete_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$delete_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/delete',
@@ -93,15 +60,14 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'delete' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $delete_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'gid' ) )
+				),
 			)
 		);
 
 		// POST /root-posts/trash — params: post_id, blog_id (optional)
-		$trash_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$trash_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/trash',
@@ -109,15 +75,14 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'trash' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $trash_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id', 'blog_id' ) )
+				),
 			)
 		);
 
 		// POST /root-posts/unlink — params: gid
-		$unlink_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$unlink_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/unlink',
@@ -125,7 +90,10 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'unlink' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $unlink_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'gid' ) )
+				),
 			)
 		);
 	}

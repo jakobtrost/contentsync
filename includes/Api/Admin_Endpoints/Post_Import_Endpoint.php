@@ -32,13 +32,6 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 	protected $rest_base = 'post-import';
 
 	/**
-	 * Param names for the import route.
-	 *
-	 * @var array
-	 */
-	private static $import_route_param_names = array( 'filename', 'conflicts' );
-
-	/**
 	 * Register REST API routes
 	 */
 	public function register_routes() {
@@ -55,10 +48,6 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 		);
 
 		// POST /post-import — params: filename, conflicts
-		$import_args = array_intersect_key(
-			$this->get_endpoint_args(),
-			array_flip( self::$import_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
@@ -66,7 +55,10 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'import' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $import_args,
+				'args'                => array_intersect_key(
+					$this->get_endpoint_args(),
+					array_flip( array( 'filename', 'conflicts' ) )
+				),
 			)
 		);
 	}
