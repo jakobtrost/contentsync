@@ -16,6 +16,7 @@ use Contentsync\Post_Transfer\Post_Export;
 use Contentsync\Post_Transfer\Post_Import;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Multisite_Manager;
+use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -133,13 +134,13 @@ class Synced_Post_Service {
 	 *   ),
 	 * ]
 	 *
-	 * @return bool|string  True on success. False or error message on failure.
+	 * @return true|WP_Error  True on success. WP_Error on failure.
 	 */
 	public static function import_synced_post( $gid, $conflict_actions = array() ) {
 
 		$posts = Synced_Post_Query::prepare_synced_post_for_import( $gid );
 		if ( ! $posts ) {
-			return false;
+			return new WP_Error( 'no_posts_prepared', __( 'No posts could be prepared for import.', 'contentsync' ) );
 		}
 
 		Logger::add( '========= ALL POSTS PREPARED. NOW WE INSERT THEM =========' );
@@ -150,10 +151,11 @@ class Synced_Post_Service {
 				'conflict_actions' => $conflict_actions,
 			)
 		);
-		$result      = $post_import->import_posts();
+
+		$result = $post_import->import_posts();
 
 		if ( is_wp_error( $result ) ) {
-			return $result->get_error_message();
+			return $result;
 		}
 		return true;
 	}
