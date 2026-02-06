@@ -271,7 +271,7 @@ class Synced_Post_Query {
 
 		$post_type = 'any';
 		if ( empty( $post_type ) || $post_type === 'any' ) {
-			$post_type = Synced_Post_Utils::is_rest_request() ? 'any' : Post_Transfer_Service::get_supported_post_types();
+			$post_type = Post_Transfer_Service::get_supported_post_types();
 		}
 
 		$args = array(
@@ -346,7 +346,7 @@ class Synced_Post_Query {
 		$local_post = false;
 
 		if ( empty( $post_type ) || $post_type === 'any' ) {
-			$post_type = Synced_Post_Utils::is_rest_request() ? 'any' : Post_Transfer_Service::get_supported_post_types();
+			$post_type = Post_Transfer_Service::get_supported_post_types();
 		}
 
 		$result = Post_Query::get_unfiltered_posts(
