@@ -553,7 +553,7 @@ class Synced_Posts_Table extends WP_List_Table {
 				)
 			),
 			// trash the local post
-			'trash'  => $item->local_post ? $this->build_rest_api_link( 'trashPost', __( 'Trash', 'contentsync' ), $data ) : '',
+			'trash'  => $item->local_post ? $this->build_rest_api_link( 'trashPost.onButtonClick', __( 'Trash', 'contentsync' ), $data ) : '',
 			// edit the root
 			'root'   => "<a href='" . $item->post_links['root'] . "'>" . __( 'Go to the original post', 'contentsync' ) . '</a>',
 			// repair if error

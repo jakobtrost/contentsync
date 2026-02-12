@@ -16,7 +16,6 @@ namespace Contentsync\Api\Admin_Endpoints;
 use Contentsync\Post_Transfer\Post_Conflict_Handler;
 use Contentsync\Post_Sync\Synced_Post_Service;
 use Contentsync\Post_Sync\Synced_Post_Query;
-use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
 

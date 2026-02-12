@@ -108,6 +108,14 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
 			)
 		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'trashPost',
+			'Views/Post_Sync/assets/js/contentSync.trashPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
+		);
 	}
 
 	/**
