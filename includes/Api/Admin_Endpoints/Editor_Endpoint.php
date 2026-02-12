@@ -16,7 +16,7 @@ use Contentsync\Utils\Post_Query;
 use Contentsync\Post_Sync\Post_Connection_Map;
 use Contentsync\Post_Sync\Synced_Post_Service;
 use Contentsync\Theme_Posts\Theme_Posts_Service;
-use Contentsync\Admin\Views\Post_Sync\Global_Notice;
+use Contentsync\Admin\Views\Post_Sync\Synced_Post_Notice;
 use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
@@ -100,7 +100,7 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 	 *
 	 * @return \WP_REST_Response Response object with post data and notice.
 	 *     @property array  post   Contentsync metadata for the current post @see build_post_data()
-	 *     @property Global_Notice  notice Notice to show in the editor @see Global_Notice::get_editor_notice_array()
+	 *     @property Synced_Post_Notice  notice Notice to show in the editor @see Synced_Post_Notice::get_editor_notice_array()
 	 */
 	public function get_post_data( $request ) {
 		$params         = $request->get_params();
@@ -117,7 +117,7 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 
 		$data = array(
 			'post'   => $this->build_post_data( $post_id ),
-			'notice' => ( new Global_Notice( $post_id ) )->get_editor_notice_array(),
+			'notice' => ( new Synced_Post_Notice( $post_id ) )->get_editor_notice_array(),
 		);
 
 		return $this->respond( $data, __( 'Post data retrieved.', 'contentsync' ), 200 );

@@ -19,8 +19,7 @@ use Contentsync\Post_Sync\Synced_Post_Utils;
 use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Translations\Translation_Manager;
-use Contentsync\Admin\Views\Post_Sync\Global_List_Table;
-use Contentsync\Admin\Views\Post_Sync\Global_Notice;
+use Contentsync\Admin\Views\Post_Sync\Synced_Post_Notice;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -115,7 +114,7 @@ class Classic_Editor_Hooks extends Hooks_Base {
 		if ( $screen->base === 'post' && $screen->action !== 'add' ) {
 			$post_id = isset( $_GET['post'] ) ? $_GET['post'] : null;
 			if ( ! empty( $post_id ) ) {
-				$notice         = new Global_Notice( $post_id );
+				$notice         = new Synced_Post_Notice( $post_id );
 				$notice_content = $notice->get_classic_editor_html();
 				if ( ! empty( $notice_content ) ) {
 					echo $notice_content;

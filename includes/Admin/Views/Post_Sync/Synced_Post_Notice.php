@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
  * Constructs notice properties from a post ID. Exposes output methods for
  * editor (REST/JS) and classic editor (PHP HTML) contexts.
  */
-class Global_Notice {
+class Synced_Post_Notice {
 
 	/**
 	 * Post ID.
