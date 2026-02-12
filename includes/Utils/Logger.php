@@ -81,7 +81,7 @@ class Logger {
 	public static function add( $message, $context = 'do_not_log', $type = 'info' ) {
 
 		if ( ! is_string( $message ) ) {
-			error_log( 'Logger::log() $message must be a string' );
+			error_log( 'Logger::add() $message must be a string' );
 			return;
 		}
 

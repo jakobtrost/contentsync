@@ -52,13 +52,13 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 			)
 		);
 
-		// POST /root-posts/delete — params: gid
+		// POST /root-posts/unlink — params: gid
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/delete',
+			'/' . $this->rest_base . '/unlink',
 			array(
 				'methods'             => $this->method,
-				'callback'            => array( $this, 'delete' ),
+				'callback'            => array( $this, 'unlink' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 				'args'                => array_intersect_key(
 					$all_args,
@@ -82,13 +82,13 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 			)
 		);
 
-		// POST /root-posts/unlink — params: gid
+		// POST /root-posts/delete — params: gid
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/unlink',
+			'/' . $this->rest_base . '/delete',
 			array(
 				'methods'             => $this->method,
-				'callback'            => array( $this, 'unlink' ),
+				'callback'            => array( $this, 'delete' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 				'args'                => array_intersect_key(
 					$all_args,
@@ -121,25 +121,25 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 	}
 
 	/**
-	 * Delete root post and all connected posts.
+	 * Unlink root post (unlink).
 	 *
 	 * @param \WP_REST_Request $request Full request object.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public function delete( $request ) {
+	public function unlink( $request ) {
 		$gid = (string) ( $request->get_param( 'gid' ) ?? '' );
 
 		if ( empty( $gid ) ) {
 			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
 		}
 
-		$result = Synced_Post_Service::delete_root_post_and_connected_posts( $gid );
+		$result = Synced_Post_Service::unlink_root_post( $gid );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'post could not be deleted...', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'exported post could not be unlinked globally...', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'post was successfully deleted', 'contentsync' ), true );
+		return $this->respond( true, __( 'post was unlinked and the synced post was removed', 'contentsync' ), true );
 	}
 
 	/**
@@ -174,24 +174,24 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 	}
 
 	/**
-	 * Unlink root post (unlink).
+	 * Delete root post and all connected posts.
 	 *
 	 * @param \WP_REST_Request $request Full request object.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public function unlink( $request ) {
+	public function delete( $request ) {
 		$gid = (string) ( $request->get_param( 'gid' ) ?? '' );
 
 		if ( empty( $gid ) ) {
 			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
 		}
 
-		$result = Synced_Post_Service::unlink_root_post( $gid );
+		$result = Synced_Post_Service::delete_root_post_and_connected_posts( $gid );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'exported post could not be unlinked globally...', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'post could not be deleted...', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'post was unlinked and the synced post was removed', 'contentsync' ), true );
+		return $this->respond( true, __( 'post was successfully deleted', 'contentsync' ), true );
 	}
 }

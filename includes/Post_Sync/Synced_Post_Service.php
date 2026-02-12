@@ -342,11 +342,11 @@ class Synced_Post_Service {
 		if ( ! $connection_map ) {
 			$connection_map = Post_Connection_Map::get( $post_id );
 		}
-		Logger::log( 'delete_connected_posts', $post_id );
-		Logger::log( 'connection_map', $connection_map );
+		Logger::add( 'delete_connected_posts', $post_id );
+		Logger::add( 'connection_map', $connection_map );
 
 		$destination_ids = Post_Connection_Map::to_destination_ids( $connection_map );
-		Logger::log( 'destination_ids', $destination_ids );
+		Logger::add( 'destination_ids', $destination_ids );
 
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
@@ -354,7 +354,7 @@ class Synced_Post_Service {
 				'import_action' => 'delete',
 			);
 		}
-		Logger::log( 'destination_arrays', $destination_arrays );
+		Logger::add( 'destination_arrays', $destination_arrays );
 
 		$result = Distributor::distribute_single_post( $post_id, $destination_arrays );
 
@@ -402,11 +402,11 @@ class Synced_Post_Service {
 		if ( ! $connection_map ) {
 			$connection_map = Post_Connection_Map::get( $post );
 		}
-		Logger::log( 'delete_unlinked_posts', $post );
-		Logger::log( 'connection_map', $connection_map );
+		Logger::add( 'delete_unlinked_posts', $post );
+		Logger::add( 'connection_map', $connection_map );
 
 		$destination_ids = Post_Connection_Map::to_destination_ids( $connection_map );
-		Logger::log( 'destination_ids', $destination_ids );
+		Logger::add( 'destination_ids', $destination_ids );
 
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
@@ -414,7 +414,7 @@ class Synced_Post_Service {
 				'import_action' => 'delete',
 			);
 		}
-		Logger::log( 'destination_arrays', $destination_arrays );
+		Logger::add( 'destination_arrays', $destination_arrays );
 
 		$result = Distributor::distribute_single_post( $post, $destination_arrays );
 
@@ -453,11 +453,11 @@ class Synced_Post_Service {
 
 		// delete imported posts
 		$connection_map = Post_Connection_Map::get( $synced_post->ID );
-		Logger::log( 'delete_root_post_and_connected_posts', $synced_post->ID );
-		Logger::log( 'connection_map', $connection_map );
+		Logger::add( 'delete_root_post_and_connected_posts', $synced_post->ID );
+		Logger::add( 'connection_map', $connection_map );
 
 		$destination_ids = Post_Connection_Map::to_destination_ids( $connection_map );
-		Logger::log( 'destination_ids', $destination_ids );
+		Logger::add( 'destination_ids', $destination_ids );
 
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
@@ -465,14 +465,14 @@ class Synced_Post_Service {
 				'import_action' => 'delete',
 			);
 		}
-		Logger::log( 'destination_arrays', $destination_arrays );
+		Logger::add( 'destination_arrays', $destination_arrays );
 
-		$result = Distributor::distribute_single_post( $post, $destination_arrays );
+		$result = Distributor::distribute_single_post( $synced_post, $destination_arrays );
 
-		// delete the root post
-		if ( ! $keep_root_post ) {
-			$result = wp_delete_post( $root_post_id, true );
-		}
+		// // delete the root post
+		// if ( ! $keep_root_post ) {
+		// $result = wp_delete_post( $root_post_id, true );
+		// }
 
 		// restore blog
 		Multisite_Manager::restore_blog();

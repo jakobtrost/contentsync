@@ -564,7 +564,7 @@ class Synced_Posts_Table extends WP_List_Table {
 			// unlink by gid
 			$item->actions['unlink'] = $this->build_rest_api_link( 'unlinkRootPost.onButtonClick', __( 'Disable sync', 'contentsync' ), $data );
 			// delete all by gid
-			$item->actions['delete'] = $this->build_rest_api_link( 'deletePost', __( 'Delete everywhere', 'contentsync' ), $data );
+			$item->actions['delete'] = $this->build_rest_api_link( 'deleteRootPost.onButtonClick', __( 'Delete everywhere', 'contentsync' ), $data );
 		}
 
 		if ( is_network_admin() ) {

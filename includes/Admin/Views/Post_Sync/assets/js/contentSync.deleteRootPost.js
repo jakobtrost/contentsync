@@ -1,6 +1,6 @@
 var contentSync = contentSync || {};
 
-contentSync.trashPost = new function() {
+contentSync.deleteRootPost = new function() {
 
 	/**
 	 * i18n function
@@ -11,15 +11,19 @@ contentSync.trashPost = new function() {
 	 * Modal instance
 	 */
 	this.Modal = new contentSync.Modal( {
-		id: 'trash-post-modal',
-		title: __( 'Move post to the trash', 'contentsync' ),
-		description: __( 'Do you want to move the post %s to the trash?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
+		id: 'delete-root-post-modal',
+		title: __( 'Delete synced post', 'contentsync' ),
+		description: __( 'Do you want to delete the synced post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
+		notice: {
+			text: __( 'The synced post is permanently deleted on all sites. This cannot be undone. If you want to make the posts static instead, select "Unlink".', 'contentsync' ),
+			type: 'info',
+		},
 		buttons: {
 			cancel: {
 				text: __( 'Cancel', 'contentsync' )
 			},
 			submit: {
-				text: __( 'Trash post', 'contentsync' ),
+				text: __( 'Delete everywhere', 'contentsync' ),
 				className: 'is-primary is-destructive',
 			}
 		},
@@ -30,7 +34,7 @@ contentSync.trashPost = new function() {
 	 * REST handler instance
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
-		restPath: 'root-posts/trash',
+		restPath: 'root-posts/delete',
 		onSuccess: ( data, fullResponse ) => this.onSuccess( data, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
@@ -96,7 +100,7 @@ contentSync.trashPost = new function() {
 		this.Modal.toggleSubmitButtonBusy( true );
 
 		const data = {
-			post_id: this.post.id
+			gid: this.post.gid
 		};
 
 		this.RestHandler.send( data );
@@ -113,18 +117,18 @@ contentSync.trashPost = new function() {
 		this.Modal.close();
 		
 		if ( ! responseData ) {
-			return this.onError( __( 'Error moving post to the trash: No post ID found', 'contentsync' ), fullResponse );
+			return this.onError( __( 'Error deleting synced post: No global post ID found', 'contentsync' ), fullResponse );
 		}
 
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
 			contentSync.blockEditorTools.getData( this.post.id, true, ( post ) => {
 				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( __( 'The post was moved to the trash successfully.', 'contentsync' ), 'success' );
+					contentSync.blockEditorTools.showSnackbar( __( 'The synced post was permanently deleted on all sites successfully.', 'contentsync' ), 'success' );
 				}
 			} );
 		} else {
 			contentSync.tools.addSnackBar( {
-				text: __( 'The post was moved to the trash successfully.', 'contentsync' ),
+				text: __( 'The synced post was permanently deleted on all sites successfully.', 'contentsync' ),
 				type: 'success'
 			} );
 
@@ -147,9 +151,9 @@ contentSync.trashPost = new function() {
 	this.onError = ( message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
-			contentSync.blockEditorTools.showSnackbar( __( 'Error moving post to the trash: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+			contentSync.blockEditorTools.showSnackbar( __( 'Error deleting synced post: %s', 'contentsync' ).replace( '%s', message ), 'error' );
 		} else {
-			contentSync.tools.addSnackBar( __( 'Error moving post to the trash: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+			contentSync.tools.addSnackBar( __( 'Error deleting synced post: %s', 'contentsync' ).replace( '%s', message ), 'error' );
 		}
 	};
 };

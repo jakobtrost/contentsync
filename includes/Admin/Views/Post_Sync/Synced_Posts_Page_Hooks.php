@@ -116,6 +116,14 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
 			)
 		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'deleteRootPost',
+			'Views/Post_Sync/assets/js/contentSync.deleteRootPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
+		);
 	}
 
 	/**
