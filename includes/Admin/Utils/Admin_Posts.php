@@ -97,7 +97,6 @@ class Admin_Posts {
 		return apply_filters( 'get_delete_post_link', wp_nonce_url( $delete_link, "$action-post_{$post->ID}" ), $post->ID, $force_delete );
 	}
 
-
 	/**
 	 * Retrieves the restore (untrash) post link for a post.
 	 * Mirrors core behavior while supporting FSE post types (e.g., wp_template) and Site Editor URLs.

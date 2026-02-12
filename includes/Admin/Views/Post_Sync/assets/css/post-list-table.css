@@ -14,3 +14,8 @@
 .contentsync-make-global-button:not(:hover) {
 	border-color: transparent;
 }
+
+.fixed .column-contentsync_status {
+	width: 40px;
+	text-align: center;
+}

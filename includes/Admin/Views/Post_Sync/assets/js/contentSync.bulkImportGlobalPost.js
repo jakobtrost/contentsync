@@ -215,8 +215,8 @@ contentSync.bulkImportGlobalPost = new function() {
 			multiOptionContainer.className = 'post-conflict multiselect';
 			multiOptionContainer.innerHTML = '<div class="post-conflict-title">' + __( 'Multiselect' ) + '</div>' +
 				'<select class="post-conflict-action">' +
-					'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
 					'<option value="replace">' + __( 'Overwrite existing', 'contentsync' ) + '</option>' +
+					'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
 				'</select>';
 
 			innerContainer.appendChild( multiOptionContainer );
@@ -255,8 +255,8 @@ contentSync.bulkImportGlobalPost = new function() {
 					'<input type="hidden" name="conflicts[' + i + '][existing_post_id]" value="' + post.existing_post.ID + '" />' +
 					'<input type="hidden" name="conflicts[' + i + '][original_post_id]" value="' + post.existing_post.original_post_id + '" />' +
 					'<select class="post-conflict-action" name="conflicts[' + i + '][conflict_action]">' +
-						'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
 						'<option value="replace">' + __( 'Overwrite existing', 'contentsync' ) + '</option>' +
+						'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
 					'</select>';
 				i++;
 			}

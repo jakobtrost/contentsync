@@ -46,7 +46,7 @@ class Admin_Edit_Hooks extends Hooks_Base {
 
 		// CSS
 		Enqueue_Service::enqueue_admin_style(
-			'post_list_table',
+			'post-list-table',
 			'Views/Post_Sync/assets/css/post-list-table.css'
 		);
 
