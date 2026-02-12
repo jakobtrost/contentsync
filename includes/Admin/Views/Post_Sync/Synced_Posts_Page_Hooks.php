@@ -3,7 +3,7 @@
 namespace Contentsync\Admin\Views\Post_Sync;
 
 use Contentsync\Utils\Hooks_Base;
-use Contentsync\Admin\Views\Post_Sync\Global_List_Table;
+use Contentsync\Admin\Views\Post_Sync\Synced_Posts_Table;
 use Contentsync\Admin\Utils\Enqueue_Service;
 
 defined( 'ABSPATH' ) || exit;
@@ -19,11 +19,11 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 	const SYNCED_POSTS_PAGE_POSITION = 4;
 
 	/**
-	 * Holds instance of Global_List_Table when screen options are loaded.
+	 * Holds instance of Synced_Posts_Table when screen options are loaded.
 	 *
-	 * @var Global_List_Table|null
+	 * @var Synced_Posts_Table|null
 	 */
-	public $Global_List_Table = null;
+	public $Synced_Posts_Table = null;
 
 	/**
 	 * Register admin-only hooks.
@@ -56,7 +56,7 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 	 * Render the sync overview page
 	 */
 	public function render_sync_overview_page() {
-		$this->Global_List_Table->render_page(
+		$this->Synced_Posts_Table->render_page(
 			__( 'Synced Posts', 'contentsync' )
 		);
 
@@ -125,7 +125,7 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 
 		add_screen_option( 'per_page', $args );
 
-		$this->Global_List_Table = new Global_List_Table( $default_posts_per_page );
+		$this->Synced_Posts_Table = new Synced_Posts_Table( $default_posts_per_page );
 	}
 
 	/**

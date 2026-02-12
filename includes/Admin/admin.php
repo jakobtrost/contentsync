@@ -24,7 +24,6 @@ use Contentsync\Post_Sync\Synced_Post_Utils;
 use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Reviews\Post_Review_Service;
 use Contentsync\Translations\Translation_Manager;
-use Contentsync\Admin\Views\Post_Sync\Global_List_Table;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,11 +36,6 @@ class Admin {
 	 * set via function 'init_args'
 	 */
 	public static $args = array();
-
-	/**
-	 * Holds instance of Global_List_Table
-	 */
-	public $Global_List_Table = null;
 
 	/**
 	 * holds the overlay contents

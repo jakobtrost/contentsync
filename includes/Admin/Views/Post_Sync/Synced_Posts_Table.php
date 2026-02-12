@@ -25,12 +25,12 @@ use Contentsync\Utils\Urls;
 
 defined( 'ABSPATH' ) || exit;
 
-class Global_List_Table extends WP_List_Table {
+class Synced_Posts_Table extends WP_List_Table {
 
 	/**
 	 * Page Title
 	 */
-	private $title = 'Content Sync';
+	private $title = 'Synced Posts';
 
 	/**
 	 * Posts per page
