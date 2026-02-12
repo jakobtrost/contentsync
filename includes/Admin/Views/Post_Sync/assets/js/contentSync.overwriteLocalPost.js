@@ -47,16 +47,20 @@ contentSync.overwriteLocalPost = new function() {
 	/**
 	 * Open modal
 	 * 
-	 * @param {string} gid - Global post ID
-	 * @param {Object} post - Post object
+	 * @param {Object} globalPost - Global post object
+	 *   @property {string} gid - Global post ID
+	 *   @property {string} post_title - Post title
+	 *   @property {string} post_links?.edit - Post edit link
+	 * @param {Object} currentPost - Current post object
+	 *   @property {number} ID - Post ID
 	 */
-	this.openModal = ( gid, post ) => {
-		this.postId = parseInt( post.ID ?? post.id );
-		this.gid = gid;
+	this.openModal = ( globalPost, currentPost ) => {
+		this.gid = globalPost.meta?.synced_post_id;
+		this.postId = parseInt( currentPost.ID ?? currentPost.id );
 		this.Modal.open();
 		this.Modal.setDescription( this.Modal.config.description.replace(
 			'%s',
-			'<a href="' + post.post_links?.edit + '" target="_blank" rel="noopener noreferrer">' + post.post_title + '</a>'
+			'<a href="' + globalPost.post_links?.edit + '" target="_blank" rel="noopener noreferrer">' + globalPost.post_title + '</a>'
 		) );
 	};
 
