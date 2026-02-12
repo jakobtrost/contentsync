@@ -3,6 +3,7 @@
 namespace Contentsync\Admin\Views\Post_Transfer;
 
 use Contentsync\Admin\Utils\Admin_Render;
+use Contentsync\Admin\Utils\Enqueue_Service;
 use Contentsync\Utils\Hooks_Base;
 
 defined( 'ABSPATH' ) || exit;
@@ -30,13 +31,12 @@ class Post_Export_Enqueue_Hooks extends Hooks_Base {
 			return;
 		}
 
-		wp_register_script(
-			'contentSync-postExport',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Transfer/assets/js/contentSync.postExport.js',
-			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
-			CONTENTSYNC_VERSION,
-			true
+		Enqueue_Service::enqueue_admin_script(
+			'postExport',
+			'Views/Post_Transfer/assets/js/contentSync.postExport.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
 		);
-		wp_enqueue_script( 'contentSync-postExport' );
 	}
 }

@@ -3,6 +3,7 @@
 namespace Contentsync\Admin\Utils;
 
 use Contentsync\Post_Transfer\Post_Transfer_Service;
+use Contentsync\Admin\Utils\Enqueue_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -174,8 +175,8 @@ class Admin_Render {
 		$icon_url = CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/icon/icon-' . $status . '.svg';
 		$icon     = $show_icon ? '<img src="' . esc_url( $icon_url ) . '" style="width:auto;height:16px;">' : '';
 
-		self::maybe_enqueue_stylesheet( 'contentsync-info-box', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-info-box.css' );
-		self::maybe_enqueue_stylesheet( 'contentsync-status', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-status.css' );
+		Enqueue_Service::enqueue_admin_style( 'info_box', 'Utils/assets/css/contentsync-info-box.css' );
+		Enqueue_Service::enqueue_admin_style( 'status', 'Utils/assets/css/contentsync-status.css' );
 
 		return sprintf(
 			'<span %1$s class="contentsync-info-box %2$s contentsync-status">%3$s%4$s</span>',
@@ -215,7 +216,7 @@ class Admin_Render {
 			$info_icon = 'dashicons-info';
 		}
 
-		self::maybe_enqueue_stylesheet( 'contentsync-info-box', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-info-box.css' );
+		Enqueue_Service::enqueue_admin_style( 'info_box', 'Utils/assets/css/contentsync-info-box.css' );
 
 		return "<div class='contentsync-info-box {$styling} {$class}'><span class='dashicons {$info_icon}'></span><div>{$above}{$text}</div></div>";
 	}
@@ -234,7 +235,7 @@ class Admin_Render {
 			return false;
 		}
 
-		self::maybe_enqueue_stylesheet( 'contentsync-tooltip', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-tooltip.css' );
+		Enqueue_Service::enqueue_admin_style( 'tooltip', 'Utils/assets/css/contentsync-tooltip.css' );
 
 		return "<span class='contentsync-tooltip-wrapper'>" .
 			"<span class='toggle dashicons dashicons-{$toggle_icon}'></span>" .
@@ -253,7 +254,7 @@ class Admin_Render {
 			return false;
 		}
 
-		self::maybe_enqueue_stylesheet( 'contentsync-tooltip', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-tooltip.css' );
+		Enqueue_Service::enqueue_admin_style( 'tooltip', 'Utils/assets/css/contentsync-tooltip.css' );
 
 		return "<span class='contentsync-tooltip-wrapper'>" .
 			"<span class='toggle dashicons dashicons-info'></span>" .
@@ -286,7 +287,7 @@ class Admin_Render {
 			return '';
 		}
 
-		self::maybe_enqueue_stylesheet( 'contentsync-tabs', CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/css/contentsync-tabs.css' );
+		Enqueue_Service::enqueue_admin_style( 'tabs', 'Utils/assets/css/contentsync-tabs.css' );
 
 		return "<div class='contentsync-tabs' id='{$anchor}'>" . implode(
 			'',
@@ -297,22 +298,5 @@ class Admin_Render {
 				$tabs
 			)
 		) . '</div>';
-	}
-
-	/**
-	 * Checks if a stylesheet is already enqueued. If not, enqueues it.
-	 *
-	 * @param string $stylesheet The stylesheet slug.
-	 * @param string $url        The URL of the stylesheet.
-	 */
-	public static function maybe_enqueue_stylesheet( $stylesheet, $url ) {
-		if ( ! wp_style_is( $stylesheet, 'enqueued' ) ) {
-			wp_enqueue_style(
-				$stylesheet,
-				$url,
-				array(),
-				CONTENTSYNC_VERSION
-			);
-		}
 	}
 }

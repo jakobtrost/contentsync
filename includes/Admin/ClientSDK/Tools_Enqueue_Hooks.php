@@ -9,6 +9,7 @@
 namespace Contentsync\Admin\ClientSDK;
 
 use Contentsync\Utils\Hooks_Base;
+use Contentsync\Admin\Utils\Enqueue_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -25,21 +26,16 @@ class Tools_Enqueue_Hooks extends Hooks_Base {
 	 * Enqueue Tools Script.
 	 */
 	public function enqueue_tools() {
-
-		wp_register_script(
-			'contentSync-tools',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/js/contentSync.tools.js',
-			array(),
-			CONTENTSYNC_VERSION,
-			true
-		);
-		wp_enqueue_script( 'contentSync-tools' );
-
-		wp_localize_script(
-			'contentSync-tools',
-			'contentSyncToolsData',
+		Enqueue_Service::enqueue_admin_script(
+			'tools',
+			'ClientSDK/assets/js/contentSync.tools.js',
 			array(
-				'iconsPath' => CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/icon/',
+				'localization' => array(
+					'var'    => 'contentSyncToolsData',
+					'values' => array(
+						'iconsPath' => CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/icon/',
+					),
+				),
 			)
 		);
 	}

@@ -12,6 +12,7 @@
 
 namespace Contentsync\Admin\Views\Distribution;
 
+use Contentsync\Admin\Utils\Enqueue_Service;
 use Contentsync\Admin\Views\Distribution\Queue_List_Table;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Distribution\Distribution_Item_Service;
@@ -124,26 +125,8 @@ class Queue_Admin_Page_Hooks extends Hooks_Base {
 			return;
 		}
 
-		// Enqueue CSS
-		wp_enqueue_style(
-			'contentsync-admin-distribution',
-			plugins_url( 'assets/css/admin-distribution.css', __FILE__ ),
-			array(),
-			filemtime( plugin_dir_path( __FILE__ ) . 'assets/css/admin-distribution.css' )
-		);
-
-		wp_enqueue_script(
-			'greyd-admin-distribution',
-			plugins_url( 'assets/js/admin-distribution.js', __FILE__ ),
-			array( 'jquery' ), // or your dependencies
-			CONTENTSYNC_VERSION,
-			true
-		);
-
 		if ( $this->has_stuck_items() ) {
-			// Get stuck items data
-			$stuck_items = $this->get_stuck_items();
-
+			$stuck_items      = $this->get_stuck_items();
 			$stuck_items_data = array(
 				'count' => count( $stuck_items ),
 				'items' => array(),
@@ -161,23 +144,34 @@ class Queue_Admin_Page_Hooks extends Hooks_Base {
 			);
 		}
 
-		wp_localize_script(
-			'greyd-admin-distribution',
-			'distributionData',
+		Enqueue_Service::enqueue_admin_style(
+			'admin_distribution',
+			'Views/Distribution/assets/css/admin-distribution.css'
+		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'adminDistribution',
+			'Views/Distribution/assets/js/admin-distribution.js',
 			array(
-				'ajax_url'    => admin_url( 'admin-ajax.php' ),
-				'nonce'       => wp_create_nonce( 'contentsync_run_all_stuck' ),
-				'stuck_items' => $stuck_items_data,
-				'i18n'        => array(
-					'progressLabel'       => __( 'Processed %1$s out of %2$s items', 'contentsync' ),
-					'resume'              => __( 'Resume', 'contentsync' ),
-					'pause'               => __( 'Pause', 'contentsync' ),
-					'summaryAllSuccess'   => __( 'All %s items were processed successfully.', 'contentsync' ),
-					'summarySomeFailed'   => __( '%1$s of %2$s items were processed successfully. %3$s items failed.', 'contentsync' ),
-					'failedToProcess'     => __( 'Failed to process', 'contentsync' ),
-					'errorProcessingItem' => __( 'Error processing item', 'contentsync' ),
-					'completed'           => __( 'Completed', 'contentsync' ),
-					'failed'              => __( 'Failed', 'contentsync' ),
+				'external'     => array( 'jquery' ),
+				'localization' => array(
+					'var'    => 'distributionData',
+					'values' => array(
+						'ajax_url'    => admin_url( 'admin-ajax.php' ),
+						'nonce'       => wp_create_nonce( 'contentsync_run_all_stuck' ),
+						'stuck_items' => $stuck_items_data,
+						'i18n'        => array(
+							'progressLabel'       => __( 'Processed %1$s out of %2$s items', 'contentsync' ),
+							'resume'              => __( 'Resume', 'contentsync' ),
+							'pause'               => __( 'Pause', 'contentsync' ),
+							'summaryAllSuccess'   => __( 'All %s items were processed successfully.', 'contentsync' ),
+							'summarySomeFailed'   => __( '%1$s of %2$s items were processed successfully. %3$s items failed.', 'contentsync' ),
+							'failedToProcess'     => __( 'Failed to process', 'contentsync' ),
+							'errorProcessingItem' => __( 'Error processing item', 'contentsync' ),
+							'completed'           => __( 'Completed', 'contentsync' ),
+							'failed'              => __( 'Failed', 'contentsync' ),
+						),
+					),
 				),
 			)
 		);

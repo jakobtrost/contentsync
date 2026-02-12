@@ -3,6 +3,7 @@
 namespace Contentsync\Admin\Menu;
 
 use Contentsync\Utils\Hooks_Base;
+use Contentsync\Admin\Utils\Enqueue_Service;
 
 class Menu_Hooks extends Hooks_Base {
 
@@ -96,11 +97,9 @@ class Menu_Hooks extends Hooks_Base {
 	 * Enqueue css
 	 */
 	public function enqueue_css() {
-		wp_enqueue_style(
-			'contentsync-menu',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Menu/assets/admin-menu.css',
-			array(),
-			CONTENTSYNC_VERSION
+		Enqueue_Service::enqueue_admin_style(
+			'menu',
+			'Menu/assets/admin-menu.css'
 		);
 	}
 }

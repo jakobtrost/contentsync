@@ -10,6 +10,7 @@
 namespace Contentsync\Admin\ClientSDK;
 
 use Contentsync\Utils\Hooks_Base;
+use Contentsync\Admin\Utils\Enqueue_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -26,29 +27,25 @@ class RestHandler_Enqueue_Hooks extends Hooks_Base {
 	 * Enqueue REST Handler Script.
 	 */
 	public function enqueue_rest_handler_script() {
-
 		// wp-api-fetch is optional; RestHandler falls back to fetch when wp.apiFetch is missing.
 		$deps = array( 'jquery' );
 		if ( wp_script_is( 'wp-api-fetch', 'registered' ) ) {
 			$deps[] = 'wp-api-fetch';
 		}
 
-		wp_register_script(
-			'contentSync-RestHandler',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/js/contentSync.RestHandler.js',
-			$deps,
-			CONTENTSYNC_VERSION,
-			true
-		);
-		wp_enqueue_script( 'contentSync-RestHandler' );
-
-		wp_localize_script(
-			'contentSync-RestHandler',
-			'contentSyncRestData',
+		Enqueue_Service::enqueue_admin_script(
+			'RestHandler',
+			'ClientSDK/assets/js/contentSync.RestHandler.js',
 			array(
-				'basePath' => CONTENTSYNC_REST_NAMESPACE . '/admin',
-				'restRoot' => esc_url( rest_url() ),
-				'nonce'    => wp_create_nonce( 'wp_rest' ),
+				'external'     => $deps,
+				'localization' => array(
+					'var'    => 'contentSyncRestData',
+					'values' => array(
+						'basePath' => CONTENTSYNC_REST_NAMESPACE . '/admin',
+						'restRoot' => esc_url( rest_url() ),
+						'nonce'    => wp_create_nonce( 'wp_rest' ),
+					),
+				),
 			)
 		);
 	}

@@ -4,6 +4,7 @@ namespace Contentsync\Admin\Views\Post_Sync;
 
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Admin\Views\Post_Sync\Global_List_Table;
+use Contentsync\Admin\Utils\Enqueue_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -66,36 +67,31 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 	 * Enqueue assets for the sync overview page
 	 */
 	public function enqueue_assets() {
-		wp_register_style(
-			'contentsync-global-list-table',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/global-list-table.css',
-			array(),
-			CONTENTSYNC_VERSION,
-			'all'
+		Enqueue_Service::enqueue_admin_style(
+			'global_list_table',
+			'Views/Post_Sync/assets/css/global-list-table.css',
+			array( 'media' => 'all' )
 		);
-		wp_enqueue_style( 'contentsync-global-list-table' );
 
-		wp_register_script(
-			'contentSync-importGlobalPost',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.importGlobalPost.js',
-			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
-			CONTENTSYNC_VERSION,
-			true
+		Enqueue_Service::enqueue_admin_script(
+			'importGlobalPost',
+			'Views/Post_Sync/assets/js/contentSync.importGlobalPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
 		);
-		wp_enqueue_script( 'contentSync-importGlobalPost' );
 
-		wp_register_script(
-			'contentSync-bulkImportGlobalPost',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.bulkImportGlobalPost.js',
-			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
-			CONTENTSYNC_VERSION,
-			true
+		Enqueue_Service::enqueue_admin_script(
+			'bulkImportGlobalPost',
+			'Views/Post_Sync/assets/js/contentSync.bulkImportGlobalPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+				'inline'   => array(
+					'content'  => 'document.addEventListener( "DOMContentLoaded", function() { contentSync.bulkImportGlobalPost.initSubmitListener(); } );',
+					'position' => 'after',
+				),
+			)
 		);
-		wp_add_inline_script(
-			'contentSync-bulkImportGlobalPost',
-			'document.addEventListener( "DOMContentLoaded", function() { contentSync.bulkImportGlobalPost.initSubmitListener(); } );'
-		);
-		wp_enqueue_script( 'contentSync-bulkImportGlobalPost' );
 	}
 
 	/**

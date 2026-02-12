@@ -22,6 +22,7 @@ use Contentsync\Distribution\Distributor;
 use Contentsync\Post_Sync\Synced_Post_Service;
 use Contentsync\Post_Sync\Synced_Post_Utils;
 use Contentsync\Admin\Utils\Admin_Render;
+use Contentsync\Admin\Utils\Enqueue_Service;
 use Contentsync\Admin\Views\Cluster\Cluster_List_Table;
 use Contentsync\Connections\Site_Connection;
 
@@ -158,31 +159,24 @@ class Cluster_Page_Hooks extends Hooks_Base {
 		}
 
 		// Styles
-		wp_register_style(
-			'contentsync_admin_clusters',
-			CONTENTSYNC_PLUGIN_URL . '/inc/cluster/assets/css/admin-clusters.css',
-			null,
-			CONTENTSYNC_VERSION,
-			'all'
+		Enqueue_Service::enqueue_admin_style(
+			'admin_clusters',
+			'Views/Cluster/assets/css/admin-clusters.css',
+			array( 'media' => 'all' )
 		);
-		wp_enqueue_style( 'contentsync_admin_clusters' );
 
 		// Scripts
-		wp_register_script(
-			'contentsync_admin_clusters',
-			CONTENTSYNC_PLUGIN_URL . '/inc/cluster/assets/js/admin-clusters.js',
-			array( 'wp-i18n', 'jquery', 'jquery-ui-sortable' ),
-			CONTENTSYNC_VERSION,
-			true
-		);
-		wp_enqueue_script( 'contentsync_admin_clusters' );
-
-		// Localize the script with admin URL base
-		wp_localize_script(
-			'contentsync_admin_clusters',
-			'contentsync_admin',
+		Enqueue_Service::enqueue_admin_script(
+			'admin_clusters',
+			'Views/Cluster/assets/js/admin-clusters.js',
 			array(
-				'admin_url_base' => is_multisite() ? 'wp-admin/network/admin.php' : 'wp-admin/admin.php',
+				'external'     => array( 'wp-i18n', 'jquery', 'jquery-ui-sortable' ),
+				'localization' => array(
+					'var'    => 'contentsync_admin',
+					'values' => array(
+						'admin_url_base' => is_multisite() ? 'wp-admin/network/admin.php' : 'wp-admin/admin.php',
+					),
+				),
 			)
 		);
 	}

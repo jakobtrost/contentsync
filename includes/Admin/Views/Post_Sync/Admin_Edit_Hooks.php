@@ -10,6 +10,7 @@ namespace Contentsync\Admin\Views\Post_Sync;
 
 use Contentsync\Utils\Hooks_Base;
 use Contentsync\Admin\Utils\Admin_Render;
+use Contentsync\Admin\Utils\Enqueue_Service;
 use Contentsync\Post_Transfer\Post_Transfer_Service;
 use Contentsync\Post_Sync\Post_Meta;
 use Contentsync\Post_Sync\Synced_Post_Service;
@@ -44,24 +45,19 @@ class Admin_Edit_Hooks extends Hooks_Base {
 		}
 
 		// CSS
-		wp_register_style(
-			'contentsync-post-list-table',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/post-list-table.css',
-			array(),
-			CONTENTSYNC_VERSION,
-			'all'
+		Enqueue_Service::enqueue_admin_style(
+			'post_list_table',
+			'Views/Post_Sync/assets/css/post-list-table.css'
 		);
-		wp_enqueue_style( 'contentsync-post-list-table' );
 
 		// JS
-		wp_register_script(
-			'contentSync-makeRoot',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.makeRoot.js',
-			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
-			CONTENTSYNC_VERSION,
-			true
+		Enqueue_Service::enqueue_admin_script(
+			'makeRoot',
+			'Views/Post_Sync/assets/js/contentSync.makeRoot.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
 		);
-		wp_enqueue_script( 'contentSync-makeRoot' );
 	}
 
 

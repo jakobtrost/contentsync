@@ -9,7 +9,7 @@
 namespace Contentsync\Admin\Views\Post_Sync;
 
 use Contentsync\Utils\Hooks_Base;
-use Contentsync\Admin\Utils\Build_Scripts;
+use Contentsync\Admin\Utils\Enqueue_Service;
 use Contentsync\Admin\Utils\Admin_Render;
 
 defined( 'ABSPATH' ) || exit;
@@ -36,94 +36,74 @@ class Block_Editor_Hooks extends Hooks_Base {
 		 * Styles
 		 */
 
-		wp_register_style(
-			'contentsync-post-edit-screen',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/post-edit-screen.css',
-			array(),
-			CONTENTSYNC_VERSION,
+		Enqueue_Service::enqueue_admin_style(
+			'post_edit_screen',
+			'Views/Post_Sync/assets/css/post-edit-screen.css'
 		);
-		wp_enqueue_style( 'contentsync-post-edit-screen' );
 
-		wp_register_style(
-			'contentsync-block-editor-controls',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/block-editor-controls.css',
-			array(),
-			CONTENTSYNC_VERSION,
+		Enqueue_Service::enqueue_admin_style(
+			'block_editor_controls',
+			'Views/Post_Sync/assets/css/block-editor-controls.css'
 		);
-		wp_enqueue_style( 'contentsync-block-editor-controls' );
 
 		/**
 		 * Scripts
 		 */
 
-		Build_Scripts::enqueue_build_script(
-			'contentSync-blockEditorTools',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/src/contentSync.blockEditorTools.jsx',
-			array( 'wp-data', 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'lodash' ),
-			true
-		);
-
-		wp_localize_script(
-			'contentSync-blockEditorTools',
-			'contentSyncEditorData',
+		Enqueue_Service::enqueue_build_script(
+			'block_editor_tools',
+			'Views/Post_Sync/assets/js/src/contentSync.blockEditorTools.jsx',
 			array(
-				'restBasePath' => CONTENTSYNC_REST_NAMESPACE . '/admin',
+				'external'     => array( 'wp-data', 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'lodash' ),
+				'localization' => array(
+					'var'    => 'contentSyncEditorData',
+					'values' => array( 'restBasePath' => CONTENTSYNC_REST_NAMESPACE . '/admin' ),
+				),
 			)
 		);
 
-		Build_Scripts::enqueue_build_script(
-			'contentSync-blockEditorPlugin',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/src/blockEditorPlugin.jsx',
-			array( 'wp-data', 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'lodash' ),
-			true
+		Enqueue_Service::enqueue_build_script(
+			'blockEditorPlugin',
+			'Views/Post_Sync/assets/js/src/blockEditorPlugin.jsx',
+			array(
+				'external' => array( 'wp-data', 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components', 'wp-i18n', 'lodash' ),
+			)
 		);
-
-		// // script translations
-		// if ( function_exists( 'wp_set_script_translations' ) ) {
-		// wp_set_script_translations(
-		// 'contentsync-site-editor-plugin',
-		// 'contentsync',
-		// CONTENTSYNC_PLUGIN_PATH . '/languages'
-		// );
-		// }
 
 		/**
 		 * Modal scripts
 		 */
-		wp_register_script(
-			'contentSync-makeRoot',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.makeRoot.js',
-			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
-			CONTENTSYNC_VERSION,
-			true
-		);
-		wp_enqueue_script( 'contentSync-makeRoot' );
 
-		wp_register_script(
-			'contentSync-unlinkRootPost',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.unlinkRootPost.js',
-			array( 'contentSync-blockEditorTools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
-			CONTENTSYNC_VERSION,
-			true
+		Enqueue_Service::enqueue_admin_script(
+			'makeRoot',
+			'Views/Post_Sync/assets/js/contentSync.makeRoot.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
 		);
-		wp_enqueue_script( 'contentSync-unlinkRootPost' );
 
-		wp_register_script(
-			'contentSync-unlinkLinkedPost',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.unlinkLinkedPost.js',
-			array( 'contentSync-blockEditorTools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
-			CONTENTSYNC_VERSION,
-			true
+		Enqueue_Service::enqueue_admin_script(
+			'unlinkRootPost',
+			'Views/Post_Sync/assets/js/contentSync.unlinkRootPost.js',
+			array(
+				'internal' => array( 'block_editor_tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
 		);
-		wp_enqueue_script( 'contentSync-unlinkLinkedPost' );
 
-		wp_register_script(
-			'contentSync-overwriteLocalPost',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.overwriteLocalPost.js',
-			array( 'contentSync-blockEditorTools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
-			CONTENTSYNC_VERSION,
-			true
+		Enqueue_Service::enqueue_admin_script(
+			'unlinkLinkedPost',
+			'Views/Post_Sync/assets/js/contentSync.unlinkLinkedPost.js',
+			array(
+				'internal' => array( 'block_editor_tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
 		);
-		wp_enqueue_script( 'contentSync-overwriteLocalPost' );
+
+		Enqueue_Service::enqueue_admin_script(
+			'overwriteLocalPost',
+			'Views/Post_Sync/assets/js/contentSync.overwriteLocalPost.js',
+			array(
+				'internal' => array( 'block_editor_tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
+		);
 	}
 }
