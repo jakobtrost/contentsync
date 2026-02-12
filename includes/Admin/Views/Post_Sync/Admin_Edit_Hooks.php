@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Content Sync Admin Edit Hooks
+ *
+ * This class handles hooks for the admin edit.php (Post List Table) screen.
+ */
+
 namespace Contentsync\Admin\Views\Post_Sync;
 
 use Contentsync\Utils\Hooks_Base;

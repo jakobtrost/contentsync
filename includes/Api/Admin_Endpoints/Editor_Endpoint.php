@@ -16,6 +16,8 @@ use Contentsync\Utils\Post_Query;
 use Contentsync\Post_Sync\Post_Connection_Map;
 use Contentsync\Post_Sync\Synced_Post_Service;
 use Contentsync\Theme_Posts\Theme_Posts_Service;
+use Contentsync\Admin\Views\Post_Sync\Classic_Editor_Hooks;
+use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -200,8 +202,10 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 					'error'     => Post_Error_Handler::get_post_error( $post_id ),
 				) : array() ),
 			),
-			'notice' => \Contentsync\Admin\Admin::get_global_notice_content( $post_id, 'site_editor' ),
+			'notice' => Classic_Editor_Hooks::get_global_notice_content( $post_id, 'site_editor' ),
 		);
+
+		Logger::add( 'get_post_data', $data );
 
 		return $this->respond( $data, __( 'Post data retrieved.', 'contentsync' ), 200 );
 	}
