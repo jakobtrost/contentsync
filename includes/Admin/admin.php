@@ -530,13 +530,13 @@ class Admin {
 	public static function get_contentsync_export_options_for_post( $post_id_or_object = null ) {
 
 		$contentsync_export_options = array(
-			'nested' => array(
+			'append_nested' => array(
 				'name'    => 'append_nested',
 				'title'   => __( 'Include nested content', 'contentsync' ),
 				'descr'   => __( 'Templates, media, etc. are also made available globally, so that used images, backgrounds, etc. are displayed correctly on the target site.', 'contentsync' ),
 				'checked' => true,
 			),
-			'menus'  => array(
+			'resolve_menus' => array(
 				'name'  => 'resolve_menus',
 				'title' => __( 'Resolve menus', 'contentsync' ),
 				'descr' => __( 'All menus will be converted to static links.', 'contentsync' ),
@@ -547,7 +547,7 @@ class Admin {
 		if ( $post ) {
 
 			if ( $post->post_type === 'attachment' ) {
-				unset( $contentsync_export_options['nested'], $contentsync_export_options['menus'] );
+				unset( $contentsync_export_options['append_nested'], $contentsync_export_options['resolve_menus'] );
 			}
 
 			/**

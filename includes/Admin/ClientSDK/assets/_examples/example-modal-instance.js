@@ -13,14 +13,14 @@ contentSync.exportPostModal = new function() {
 		formInputs: [
 			{
 				type: 'checkbox',
-				name: 'nested',
+				name: 'append_nested',
 				label: __( 'Export nested content', 'contentsync' ),
 				description: __( 'Templates, media, etc. are added to the download so that used images, backgrounds, etc. will be displayed correctly on the target website.', 'contentsync' ),
 				value: 1
 			},
 			{
 				type: 'checkbox',
-				name: 'menus',
+				name: 'resolve_menus',
 				label: __( 'Resolve menus', 'contentsync' ),
 				description: __( 'All menus will be converted to static links.', 'contentsync' ),
 				value: 1

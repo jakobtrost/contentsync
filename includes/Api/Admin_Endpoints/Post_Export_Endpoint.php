@@ -41,7 +41,7 @@ class Post_Export_Endpoint extends Admin_Endpoint_Base {
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array_intersect_key(
 						$this->get_endpoint_args(),
-						array_flip( array( 'post_id', 'append_nested', 'nested', 'resolve_menus', 'translations' ) )
+						array_flip( array( 'post_id', 'append_nested', 'resolve_menus', 'translations' ) )
 					),
 				),
 			)
@@ -61,7 +61,7 @@ class Post_Export_Endpoint extends Admin_Endpoint_Base {
 			return $this->respond( false, __( 'No valid post ID could be found.', 'contentsync' ), 400 );
 		}
 
-		$append_nested = $request->get_param( 'append_nested' ) || $request->get_param( 'nested' );
+		$append_nested = $request->get_param( 'append_nested' );
 		$args          = array(
 			'append_nested' => (bool) $append_nested,
 			'resolve_menus' => (bool) $request->get_param( 'resolve_menus' ),

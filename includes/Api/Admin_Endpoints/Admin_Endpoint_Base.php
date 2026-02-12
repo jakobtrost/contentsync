@@ -203,9 +203,6 @@ abstract class Admin_Endpoint_Base {
 			'post_type'                    => array(
 				'validate_callback' => array( $this, 'is_string' ),
 			),
-			'nested'                       => array(
-				'validate_callback' => array( $this, 'is_bool' ),
-			),
 		);
 	}
 
