@@ -16,7 +16,7 @@ use Contentsync\Utils\Post_Query;
 use Contentsync\Post_Sync\Post_Connection_Map;
 use Contentsync\Post_Sync\Synced_Post_Service;
 use Contentsync\Theme_Posts\Theme_Posts_Service;
-use Contentsync\Admin\Views\Post_Sync\Classic_Editor_Hooks;
+use Contentsync\Admin\Views\Post_Sync\Global_Notice;
 use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
@@ -100,7 +100,7 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 	 *
 	 * @return \WP_REST_Response Response object with post data and notice.
 	 *     @property array  post   Contentsync metadata for the current post @see build_post_data()
-	 *     @property array  notice Notice to show in the editor @see Classic_Editor_Hooks::get_global_notice_content()
+	 *     @property Global_Notice  notice Notice to show in the editor @see Global_Notice::get_editor_notice_array()
 	 */
 	public function get_post_data( $request ) {
 		$params         = $request->get_params();
@@ -117,7 +117,7 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 
 		$data = array(
 			'post'   => $this->build_post_data( $post_id ),
-			'notice' => Classic_Editor_Hooks::get_global_notice_content( $post_id, 'site_editor' ),
+			'notice' => ( new Global_Notice( $post_id ) )->get_editor_notice_array(),
 		);
 
 		return $this->respond( $data, __( 'Post data retrieved.', 'contentsync' ), 200 );
@@ -161,11 +161,13 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 		$available_options = \Contentsync\Admin\Admin::get_contentsync_export_options_for_post( $post_id );
 		$export_options    = $this->get_merged_export_options_for_post( $post_id, $available_options );
 
-		$post = array_merge(
+		$post_data = array_merge(
 			$this->build_base_post_data( $post_id, $gid, $status ),
 			$status === 'root' ? $this->build_root_post_data( $post_id, $connection_map, $export_options, $canonical_url, $available_options ) : array(),
 			$status === 'linked' ? $this->build_linked_post_data( $post_id, $gid ) : array(),
 		);
+
+		return $post_data;
 	}
 
 	/**
