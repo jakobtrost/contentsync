@@ -67,10 +67,10 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 	 * Enqueue assets for the sync overview page
 	 */
 	public function enqueue_assets() {
+
 		Enqueue_Service::enqueue_admin_style(
-			'global_list_table',
-			'Views/Post_Sync/assets/css/global-list-table.css',
-			array( 'media' => 'all' )
+			'global-list-table',
+			'Views/Post_Sync/assets/css/global-list-table.css'
 		);
 
 		Enqueue_Service::enqueue_admin_script(
@@ -90,6 +90,22 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 					'content'  => 'document.addEventListener( "DOMContentLoaded", function() { contentSync.bulkImportGlobalPost.initSubmitListener(); } );',
 					'position' => 'after',
 				),
+			)
+		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'unlinkRootPost',
+			'Views/Post_Sync/assets/js/contentSync.unlinkRootPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
+		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'unlinkLinkedPost',
+			'Views/Post_Sync/assets/js/contentSync.unlinkLinkedPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
 			)
 		);
 	}

@@ -488,10 +488,12 @@ class Global_List_Table extends WP_List_Table {
 
 		// links
 		$data = array(
-			'gid'       => $gid,
-			'post_id'   => $item->ID,
-			'post_type' => $item->post_type,
-			'blog_id'   => $item->blog_id,
+			'gid'        => $gid,
+			'post_id'    => $item->ID,
+			'post_title' => $item->post_title,
+			'post_type'  => $item->post_type,
+			'blog_id'    => $item->blog_id,
+			'status'     => $item->relationship,
 		);
 		if ( $item->local_post && isset( $item->local_post->ID ) ) {
 			$data['post_id'] = $item->local_post->ID;
@@ -539,9 +541,17 @@ class Global_List_Table extends WP_List_Table {
 			// import by gid
 			'import' => $this->build_rest_api_link( 'importGlobalPost.onImportButtonClick', __( 'Import', 'contentsync' ), $data ),
 			// unlink if this is the root
-			'unlink' => $item->relationship == 'root' ? $this->build_rest_api_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data ) : '',
-			// unlink if local post exists
-			'unlink' => $item->local_post ? $this->build_rest_api_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data ) : '',
+			'unlink' => (
+				// unlink if this is the root
+				$item->relationship == 'root'
+				? $this->build_rest_api_link( 'unlinkRootPost.onButtonClick', __( 'Disable sync', 'contentsync' ), $data )
+				: (
+					$item->local_post
+					// unlink if local post exists
+					? $this->build_rest_api_link( 'unlinkLinkedPost.onButtonClick', __( 'Unlink', 'contentsync' ), $data )
+					: ''
+				)
+			),
 			// trash the local post
 			'trash'  => $item->local_post ? $this->build_rest_api_link( 'trashPost', __( 'Trash', 'contentsync' ), $data ) : '',
 			// edit the root
@@ -552,7 +562,7 @@ class Global_List_Table extends WP_List_Table {
 
 		if ( is_network_admin() ) {
 			// unlink by gid
-			$item->actions['unlink'] = $this->build_rest_api_link( 'unlinkPost', __( 'Unlink', 'contentsync' ), $data );
+			$item->actions['unlink'] = $this->build_rest_api_link( 'unlinkRootPost.onButtonClick', __( 'Disable sync', 'contentsync' ), $data );
 			// delete all by gid
 			$item->actions['delete'] = $this->build_rest_api_link( 'deletePost', __( 'Delete everywhere', 'contentsync' ), $data );
 		}
@@ -613,6 +623,11 @@ class Global_List_Table extends WP_List_Table {
 			'post_date'    => __( 'Date', 'contentsync' ),
 			'gid'          => 'GID',
 		);
+
+		// only show language column if translation tool is active... or in the network admin area
+		if ( ! Translation_Manager::is_translation_tool_active() && ! is_network_admin() ) {
+			unset( $columns['language'] );
+		}
 
 		if ( is_multisite() ) {
 			if ( is_network_admin() ) {
@@ -832,7 +847,7 @@ class Global_List_Table extends WP_List_Table {
 	 *
 	 * @param Synced_Post $post
 	 *
-	 * @return string
+	 * @return string root|linked|unlinked|error
 	 */
 	public function get_contentsync_relationship( $post ) {
 

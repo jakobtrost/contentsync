@@ -35,6 +35,11 @@ contentSync.unlinkLinkedPost = new function() {
 	} );
 
 	/**
+	 * @type {HTMLElement|null}
+	 */
+	this.buttonElement = null;
+
+	/**
 	 * Current selected post
 	 * 
 	 * @type {Object}
@@ -47,9 +52,35 @@ contentSync.unlinkLinkedPost = new function() {
 	};
 
 	/**
+	 * On button click, usually triggered from the global list table
+	 * 
+	 * @param {HTMLElement} elem - Element that triggered the button
+	 *   @property {string} dataset.post_id - Post ID
+	 *   @property {string} dataset.post_title - Post title
+	 *   @property {string} dataset.gid - Global post ID
+	 *   @property {string} dataset.status - Synced status
+	 */
+	this.onButtonClick = ( elem ) => {
+		this.buttonElement = elem;
+
+		let post = {
+			id: elem.dataset.post_id,
+			title: elem.dataset.post_title,
+			gid: elem.dataset.gid,
+			status: elem.dataset.status,
+		};
+
+		this.openModal( post );
+	};
+
+	/**
 	 * Open modal
 	 * 
-	 * @param {HTMLElement} elem - Element that triggered the modal
+	 * @param {Object} post - Post data
+	 *   @property {number} id - Post ID
+	 *   @property {string} title - Post title
+	 *   @property {string} gid - Global post ID
+	 *   @property {string} status - Synced status
 	 */
 	this.openModal = ( post ) => {
 		this.post = post;
@@ -91,7 +122,18 @@ contentSync.unlinkLinkedPost = new function() {
 				}
 			} );
 		} else {
-			contentSync.tools.addSnackBar( __( 'The post was converted to a local post and synchronization was disabled successfully.', 'contentsync' ), 'success' );
+			contentSync.tools.addSnackBar( {
+				text: __( 'The post was converted to a local post and synchronization was disabled successfully.', 'contentsync' ),
+				type: 'success'
+			} );
+
+			if ( this.buttonElement ) {
+				// find closest 'tr' element
+				const tr = this.buttonElement.closest( 'tr' );
+				if ( tr ) {
+					tr.remove();
+				}
+			}
 		}
 	};
 
