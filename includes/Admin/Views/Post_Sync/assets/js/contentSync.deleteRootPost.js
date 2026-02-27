@@ -35,7 +35,7 @@ contentSync.deleteRootPost = new function() {
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
 		restPath: 'root-posts/delete',
-		onSuccess: ( data, fullResponse ) => this.onSuccess( data, fullResponse ),
+		onSuccess: ( data, message, fullResponse ) => this.onSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
 
@@ -110,38 +110,41 @@ contentSync.deleteRootPost = new function() {
 	 * When the REST request is successful
 	 *
 	 * @param {string} responseData - Local post ID (from response.data)
+	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onSuccess = ( responseData, fullResponse ) => {
+	this.onSuccess = ( responseData, message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		this.Modal.close();
 		
 		if ( ! responseData ) {
-			return this.onError( __( 'Error deleting synced post: No global post ID found', 'contentsync' ), fullResponse );
+			return this.onError( message?.length > 0 ? message : __( 'Error deleting synced post: No global post ID found', 'contentsync' ), fullResponse );
 		}
 
-		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
-			contentSync.blockEditorTools.getData( this.post.id, true, ( post ) => {
-				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( __( 'The synced post was scheduled for permanent deletion on all sites successfully.', 'contentsync' ), 'success' );
-				}
-			} );
-		} else {
-			contentSync.tools.addSnackBar( {
-				text: __( 'The synced post was scheduled for permanent deletion on all sites successfully.', 'contentsync' ),
-				type: 'success'
-			} );
-
-			// do not remove the row, as success only indicates that the deletion was scheduled,
-			// not that it was successful.
-			// if ( this.buttonElement ) {
-			// 	// find closest 'tr' element
-			// 	const tr = this.buttonElement.closest( 'tr' );
-			// 	if ( tr ) {
-			// 		tr.remove();
-			// 	}
-			// }
+		let link = null;
+		if ( responseData?.url ) {
+			link = {
+				text: responseData?.text ?? __( 'View queue', 'contentsync' ),
+				url: responseData?.url,
+			};
 		}
+
+		
+		contentSync.tools.addSnackBar( {
+			text: message?.length > 0 ? message : __( 'The synced post was scheduled for permanent deletion on all sites successfully.', 'contentsync' ),
+			type: 'success',
+			link: link
+		} );
+
+		// do not remove the row, as success only indicates that the deletion was scheduled,
+		// not that it was successful.
+		// if ( this.buttonElement ) {
+		// 	// find closest 'tr' element
+		// 	const tr = this.buttonElement.closest( 'tr' );
+		// 	if ( tr ) {
+		// 		tr.remove();
+		// 	}
+		// }
 	};
 
 	/**
@@ -152,10 +155,6 @@ contentSync.deleteRootPost = new function() {
 	 */
 	this.onError = ( message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
-		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
-			contentSync.blockEditorTools.showSnackbar( __( 'Error deleting synced post: %s', 'contentsync' ).replace( '%s', message ), 'error' );
-		} else {
-			contentSync.tools.addSnackBar( __( 'Error deleting synced post: %s', 'contentsync' ).replace( '%s', message ), 'error' );
-		}
+		contentSync.tools.addSnackBar( message, 'error' );
 	};
 };

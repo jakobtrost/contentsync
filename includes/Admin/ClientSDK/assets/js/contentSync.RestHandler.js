@@ -4,7 +4,7 @@
  * Sends requests to the Content Sync admin REST API (contentsync/v1/admin/*).
  * Uses wp.apiFetch when available, otherwise fetch. For FormData (file uploads)
  * uses jQuery.ajax. Expects response shape: { status, message, data }.
- * Calls onSuccess( data, fullResponse ) or onError( message, fullResponse ).
+ * Calls onSuccess( data, message, fullResponse ) or onError( message, fullResponse ).
  */
 class RestHandler {
 
@@ -49,7 +49,7 @@ class RestHandler {
 	 * @param {Object} config - Configuration object
 	 * @param {string} config.restPath - Required: path under contentsync/v1/admin (e.g. 'post-export')
 	 * @param {Function} [config.onSend] - Optional: callback before sending (data)
-	 * @param {Function} [config.onSuccess] - Optional: (responseData, fullResponse)
+	 * @param {Function} [config.onSuccess] - Optional: (responseData, message, fullResponse)
 	 * @param {Function} [config.onError] - Optional: (message, fullResponse)
 	 * @param {Object} [config.request] - Optional: extra fetch/ajax options
 	 */
@@ -127,12 +127,11 @@ class RestHandler {
 
 			if ( isSuccess ) {
 				if ( this.config.onSuccess && typeof this.config.onSuccess === 'function' ) {
-					this.config.onSuccess.call( this, data, body );
+					this.config.onSuccess.call( this, data, ( body && body.message ) || '', body );
 				}
 			} else {
-				const msg = ( body && body.message ) ? body.message : 'Request failed';
 				if ( this.config.onError && typeof this.config.onError === 'function' ) {
-					this.config.onError.call( this, msg, body );
+					this.config.onError.call( this, ( body && body.message ) || 'Request failed', body );
 				}
 			}
 		};
@@ -229,12 +228,11 @@ class RestHandler {
 			const isSuccess = status >= 200 && status < 300;
 			if ( isSuccess ) {
 				if ( self.config.onSuccess && typeof self.config.onSuccess === 'function' ) {
-					self.config.onSuccess.call( self, data, body );
+					self.config.onSuccess.call( self, data, ( body && body.message ) || '', body );
 				}
 			} else {
-				const msg = ( body && body.message ) ? body.message : 'Request failed';
 				if ( self.config.onError && typeof self.config.onError === 'function' ) {
-					self.config.onError.call( self, msg, body );
+					self.config.onError.call( self, ( body && body.message ) || 'Request failed', body );
 				}
 			}
 		} ).fail( function( jqXHR ) {

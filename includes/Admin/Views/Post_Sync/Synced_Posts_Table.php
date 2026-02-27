@@ -565,6 +565,8 @@ class Synced_Posts_Table extends WP_List_Table {
 			$item->actions['unlink'] = $this->build_rest_api_link( 'unlinkRootPost.onButtonClick', __( 'Disable sync', 'contentsync' ), $data );
 			// delete all by gid
 			$item->actions['delete'] = $this->build_rest_api_link( 'deleteRootPost.onButtonClick', __( 'Delete everywhere', 'contentsync' ), $data );
+		} elseif ( is_multisite() && is_super_admin() ) {
+			$item->actions['delete'] = $this->build_rest_api_link( 'deleteRootPost.onButtonClick', __( 'Delete everywhere', 'contentsync' ), $data );
 		}
 
 		if ( is_network_admin() ) {
@@ -697,6 +699,9 @@ class Synced_Posts_Table extends WP_List_Table {
 					}
 				} elseif ( $item->relationship === 'root' ) {
 					$actions = array( 'edit', 'unlink', 'trash' );
+					if ( is_multisite() && is_super_admin() ) {
+						$actions[] = 'delete';
+					}
 				} elseif ( $item->relationship === 'linked' ) {
 					$actions = array( 'root', 'edit', 'trash', 'unlink' );
 				} elseif ( $item->relationship === 'unlinked' ) {

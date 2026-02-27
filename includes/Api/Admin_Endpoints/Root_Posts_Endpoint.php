@@ -16,6 +16,7 @@ namespace Contentsync\Api\Admin_Endpoints;
 use Contentsync\Post_Sync\Post_Connection_Map;
 use Contentsync\Post_Sync\Synced_Post_Service;
 use Contentsync\Utils\Multisite_Manager;
+use Contentsync\Admin\Views\Distribution\Queue_Admin_Page_Hooks;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -108,20 +109,20 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'post_id is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error checking post connections: post_id is not defined.', 'contentsync' ), 400 );
 		}
 
 		$result = Post_Connection_Map::check( $post_id );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'some corrupted connections were detected and fixed.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error checking post connections: some corrupted connections were detected and fixed.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'there were no corrupted connections.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Error checking post connections: there were no corrupted connections.', 'contentsync' ), true );
 	}
 
 	/**
-	 * Unlink root post (unlink).
+	 * Disable global synchronization for a root post (unlink).
 	 *
 	 * @param \WP_REST_Request $request Full request object.
 	 * @return \WP_REST_Response|\WP_Error
@@ -130,20 +131,20 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 		$gid = (string) ( $request->get_param( 'gid' ) ?? '' );
 
 		if ( empty( $gid ) ) {
-			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error disabling global synchronization: global ID is not defined.', 'contentsync' ), 400 );
 		}
 
 		$result = Synced_Post_Service::unlink_root_post( $gid );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'exported post could not be unlinked globally...', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error disabling global synchronization: post could not be disabled.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'post was unlinked and the synced post was removed', 'contentsync' ), true );
+		return $this->respond( true, __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), true );
 	}
 
 	/**
-	 * Trash a post, optionally in another blog.
+	 * Trash a post, optionally on another blog.
 	 *
 	 * @param \WP_REST_Request $request Full request object.
 	 * @return \WP_REST_Response|\WP_Error
@@ -153,7 +154,7 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 		$blog_id = $request->get_param( 'blog_id' );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'post_id is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error moving post to the trash: post_id is not defined.', 'contentsync' ), 400 );
 		}
 
 		if ( $blog_id ) {
@@ -167,10 +168,10 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 		}
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'post could not be trashed...', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error moving post to the trash: post could not be moved to the trash.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'post was successfully trashed', 'contentsync' ), true );
+		return $this->respond( true, __( 'The post was moved to the trash successfully.', 'contentsync' ), true );
 	}
 
 	/**
@@ -183,15 +184,20 @@ class Root_Posts_Endpoint extends Admin_Endpoint_Base {
 		$gid = (string) ( $request->get_param( 'gid' ) ?? '' );
 
 		if ( empty( $gid ) ) {
-			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error deleting synced post: global ID is not defined.', 'contentsync' ), 400 );
 		}
 
 		$result = Synced_Post_Service::delete_root_post_and_connected_posts( $gid );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'post could not be deleted...', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error deleting synced post: post could not be deleted.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'post was successfully deleted', 'contentsync' ), true );
+		$link = array(
+			'text' => __( 'View queue', 'contentsync' ),
+			'url'  => Queue_Admin_Page_Hooks::get_queue_admin_url(),
+		);
+
+		return $this->respond( $link, __( 'The synced post was scheduled for permanent deletion on all sites successfully. This process may take a few minutes to complete.', 'contentsync' ), true );
 	}
 }

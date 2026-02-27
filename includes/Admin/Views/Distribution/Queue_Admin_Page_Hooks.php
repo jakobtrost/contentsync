@@ -54,6 +54,18 @@ class Queue_Admin_Page_Hooks extends Hooks_Base {
 	}
 
 	/**
+	 * Get the admin URL for the queue page
+	 *
+	 * @return string
+	 */
+	public static function get_queue_admin_url() {
+		if ( is_multisite() ) {
+			return network_admin_url( 'admin.php?page=contentsync_queue' );
+		}
+		return admin_url( 'admin.php?page=contentsync_queue' );
+	}
+
+	/**
 	 * Add a menu item to the WordPress admin menu
 	 */
 	public function add_submenu_item() {

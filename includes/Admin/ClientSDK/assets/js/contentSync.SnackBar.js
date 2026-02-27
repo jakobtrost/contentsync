@@ -113,6 +113,8 @@ class SnackBar {
 
 		var content = document.createElement( 'div' );
 		content.className = 'components-snackbar__content';
+
+		// icon
 		if ( icon ) {
 			content.classList.add( 'components-snackbar__content-with-icon' );
 			var iconSpan = document.createElement( 'span' );
@@ -123,6 +125,7 @@ class SnackBar {
 
 		content.appendChild( document.createTextNode( this.text ) );
 
+		// link
 		if ( this.link && ( this.link.url || this.link.onclick ) ) {
 			var a = document.createElement( 'a' );
 			a.className = 'components-external-link components-snackbar__action';
