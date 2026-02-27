@@ -93,11 +93,12 @@ contentSync.makeRoot = new function() {
 	this.onModalSubmit = () => {
 		this.Modal.toggleSubmitButtonBusy( true );
 
-		const fd = this.Modal.getFormData();
+		const formData = this.Modal.getFormData();
+		console.log( 'formData:', formData );
 		const data = {
 			post_id: this.postId,
-			append_nested: fd.append_nested || 0,
-			resolve_menus: fd.resolve_menus || 0,
+			append_nested: formData.get( 'append_nested' ) || 0,
+			resolve_menus: formData.get( 'resolve_menus' ) || 0,
 			translations: 0,
 		};
 
