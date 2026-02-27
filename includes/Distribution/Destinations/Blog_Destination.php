@@ -49,6 +49,29 @@ class Blog_Destination extends Destination_Base {
 	 */
 	public $posts = array();
 
+	/**
+	 * Import action: What to do with a post on/after import.
+	 *
+	 * This will be passed to the Prepared_Post object:
+	 *
+	 * @see Prepared_Post->import_action
+	 *
+	 * @var string 'insert|draft|trash|delete'
+	 *    @default 'update'  Insert or update the post if it already exists.
+	 *    @value   'draft'   Set the post to draft.
+	 *    @value   'trash'   Move the post to trash.
+	 *    @value   'delete'  Delete the post permanently.
+	 */
+	public $import_action;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param int   $ID         Blog ID.
+	 * @param array $properties Optional associative array of additional properties.
+	 *
+	 * @return void
+	 */
 	public function __construct( $ID, $properties = array() ) {
 		parent::__construct( $ID, $properties );
 

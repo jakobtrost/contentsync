@@ -465,14 +465,20 @@ class Synced_Post_Service {
 				'import_action' => 'delete',
 			);
 		}
+
+		if ( ! $keep_root_post ) {
+			// if the stage of the root post is not already in the destination arrays, add it
+			// this ensures that the root post is deleted as well
+			if ( ! isset( $destination_arrays[ $root_blog_id ] ) ) {
+				$destination_arrays[ $root_blog_id ] = array(
+					'import_action' => 'delete',
+				);
+			}
+		}
+
 		Logger::add( 'destination_arrays', $destination_arrays );
 
 		$result = Distributor::distribute_single_post( $synced_post, $destination_arrays );
-
-		// // delete the root post
-		// if ( ! $keep_root_post ) {
-		// $result = wp_delete_post( $root_post_id, true );
-		// }
 
 		// restore blog
 		Multisite_Manager::restore_blog();

@@ -125,16 +125,6 @@ class Admin_Render {
 	 */
 	public static function make_admin_icon_status_box( $status = 'root', $text = '', $show_icon = true ) {
 
-		// generate the title based on the status
-		$titles = array(
-			'root'     => __( 'Global synced post', 'contentsync' ),
-			'linked'   => __( 'Global linked post', 'contentsync' ),
-			'unlinked' => __( 'Local post', 'contentsync' ),
-			'error'    => __( 'Error', 'contentsync' ),
-			'info'     => __( 'Info', 'contentsync' ),
-		);
-		$title  = isset( $titles[ $status ] ) ? $titles[ $status ] : null;
-
 		// generate the color based on the status
 		$color  = '';
 		$colors = array(
@@ -161,16 +151,15 @@ class Admin_Render {
 		);
 		$color  = isset( $colors[ $status ] ) ? $colors[ $status ] : $color;
 
-		// add fallback text based on the status
-		if ( empty( $text ) ) {
-			$texts = array(
-				'failed'  => __( 'Failed', 'contentsync' ),
-				'success' => __( 'Completed', 'contentsync' ),
-				'started' => __( 'Started', 'contentsync' ),
-				'init'    => __( 'Scheduled', 'contentsync' ),
-			);
-			$text  = isset( $texts[ $status ] ) ? $texts[ $status ] : $text;
-		}
+		// generate the title based on the status
+		$titles = array(
+			'root'     => __( 'Global synced post', 'contentsync' ),
+			'linked'   => __( 'Global linked post', 'contentsync' ),
+			'unlinked' => __( 'Local post', 'contentsync' ),
+			'error'    => __( 'Error', 'contentsync' ),
+			'info'     => __( 'Info', 'contentsync' ),
+		);
+		$title  = isset( $titles[ $status ] ) ? $titles[ $status ] : null;
 
 		$icon_url = CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Utils/assets/icon/icon-' . $status . '.svg';
 		$icon     = $show_icon ? '<img src="' . esc_url( $icon_url ) . '" style="width:auto;height:16px;">' : '';

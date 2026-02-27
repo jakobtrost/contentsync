@@ -123,22 +123,24 @@ contentSync.deleteRootPost = new function() {
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
 			contentSync.blockEditorTools.getData( this.post.id, true, ( post ) => {
 				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( __( 'The synced post was permanently deleted on all sites successfully.', 'contentsync' ), 'success' );
+					contentSync.blockEditorTools.showSnackbar( __( 'The synced post was scheduled for permanent deletion on all sites successfully.', 'contentsync' ), 'success' );
 				}
 			} );
 		} else {
 			contentSync.tools.addSnackBar( {
-				text: __( 'The synced post was permanently deleted on all sites successfully.', 'contentsync' ),
+				text: __( 'The synced post was scheduled for permanent deletion on all sites successfully.', 'contentsync' ),
 				type: 'success'
 			} );
 
-			if ( this.buttonElement ) {
-				// find closest 'tr' element
-				const tr = this.buttonElement.closest( 'tr' );
-				if ( tr ) {
-					tr.remove();
-				}
-			}
+			// do not remove the row, as success only indicates that the deletion was scheduled,
+			// not that it was successful.
+			// if ( this.buttonElement ) {
+			// 	// find closest 'tr' element
+			// 	const tr = this.buttonElement.closest( 'tr' );
+			// 	if ( tr ) {
+			// 		tr.remove();
+			// 	}
+			// }
 		}
 	};
 

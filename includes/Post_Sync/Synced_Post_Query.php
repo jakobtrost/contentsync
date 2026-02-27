@@ -333,11 +333,13 @@ class Synced_Post_Query {
 	/**
 	 * Get post from current blog by global ID
 	 *
-	 * @param string $gid
+	 * @param string   $gid         Global ID of the post.
+	 * @param string   $post_type   Post type of the post. Default is all supported post types.
+	 * @param string[] $post_status Post status of the post. Default is all post statuses, except 'trash'.
 	 *
 	 * @return WP_Post|bool
 	 */
-	public static function get_local_post_by_gid( $gid, $post_type = 'any' ) {
+	public static function get_local_post_by_gid( $gid, $post_type = 'any', array $post_status = array() ) {
 
 		if ( ! $gid || empty( $gid ) ) {
 			return false;
@@ -349,13 +351,17 @@ class Synced_Post_Query {
 			$post_type = Post_Transfer_Service::get_supported_post_types();
 		}
 
+		if ( empty( $post_status ) ) {
+			$post_status = array( 'publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit' );
+		}
+
 		$result = Post_Query::get_unfiltered_posts(
 			array(
 				'posts_per_page' => 1,
 				'post_type'      => $post_type,
 				'meta_key'       => 'synced_post_id',
 				'meta_value'     => $gid,
-				'post_status'    => array( 'publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit' ),
+				'post_status'    => $post_status,
 			)
 		);
 

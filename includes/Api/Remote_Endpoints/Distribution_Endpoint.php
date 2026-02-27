@@ -35,7 +35,7 @@ namespace Contentsync\Api\Remote_Endpoints;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Distribution\Distribution_Item_Service;
 use Contentsync\Utils\Logger;
-use Contentsync\Distribution\Distributor_Item;
+use Contentsync\Distribution\Distribution_Item;
 use Contentsync\Distribution\Destinations\Remote_Destination;
 use Contentsync\Distribution\Destinations\Blog_Destination;
 use Contentsync\Utils\Urls;

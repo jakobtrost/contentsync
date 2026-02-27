@@ -28,7 +28,7 @@ class Distribution_Item_Service {
 	 */
 	public static function save( $distribution_item ) {
 
-		if ( ! is_a( $distribution_item, 'Contentsync\Distribution\Distributor_Item' ) ) {
+		if ( ! is_a( $distribution_item, 'Contentsync\Distribution\Distribution_Item' ) ) {
 			return new \WP_Error( 'invalid_data', __( 'Invalid data.', 'global-contents' ) );
 		}
 
