@@ -56,7 +56,7 @@ contentSync.bulkImportGlobalPost = new function() {
 	 */
 	this.checkImportRestHandler = new contentSync.RestHandler( {
 		restPath: 'linked-posts/check-import-bulk',
-		onSuccess: ( data, fullResponse ) => this.onCheckImportSuccess( data, fullResponse ),
+		onSuccess: ( data, message, fullResponse ) => this.onCheckImportSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onCheckImportError( message, fullResponse ),
 	} );
 
@@ -159,9 +159,10 @@ contentSync.bulkImportGlobalPost = new function() {
 	 * When the REST request is successful
 	 *
 	 * @param {Array} data - Array of posts with conflicts
+	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onCheckImportSuccess = ( data, fullResponse ) => {
+	this.onCheckImportSuccess = ( data, message, fullResponse ) => {
 		console.log( 'importGlobalPost.onCheckImportSuccess: ', data, fullResponse );
 
 		// Convert the data to an array of posts
@@ -173,12 +174,12 @@ contentSync.bulkImportGlobalPost = new function() {
 		}
 
 		if ( posts.length > 0 ) {
-			this.Modal.setDescription( fullResponse.message );
+			this.Modal.setDescription( message?.length > 0 ? message : __( 'The following synced posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ) );
 			this.buildConflictOptions( posts );
 		} else {
 			const conflictsContainer = document.getElementById( 'bulk-import-global-post-conflicts' );
 			conflictsContainer.innerHTML = '';
-			this.Modal.setDescription( fullResponse.message );
+			this.Modal.setDescription( message?.length > 0 ? message : __( 'The following synced posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ) );
 		}
 
 		this.Modal.toggleSubmitButtonDisabled( false );
@@ -287,7 +288,7 @@ contentSync.bulkImportGlobalPost = new function() {
 	 */
 	this.onCheckImportError = ( message, fullResponse ) => {
 		contentSync.tools.addSnackBar( {
-			text: __( 'Error checking file: %s', 'contentsync' ).replace( '%s', message ),
+			text: message,
 			type: 'error'
 		} );
 	};
@@ -303,7 +304,7 @@ contentSync.bulkImportGlobalPost = new function() {
 	 */
 	this.importRestHandler = new contentSync.RestHandler( {
 		restPath: 'linked-posts/import-bulk',
-		onSuccess: ( data, fullResponse ) => this.onImportSuccess( data, fullResponse ),
+		onSuccess: ( data, message, fullResponse ) => this.onImportSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onImportError( message, fullResponse ),
 	} );
 
@@ -325,16 +326,17 @@ contentSync.bulkImportGlobalPost = new function() {
 	/**
 	 * When the REST request is successful
 	 *
-	 * @param {boolean} responseData - True if the global post was imported successfully (from response.data)
+	 * @param {boolean} responseData - True if the synced post was imported successfully (from response.data)
+	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onImportSuccess = ( responseData, fullResponse ) => {
+	this.onImportSuccess = ( responseData, message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		this.Modal.close();
 
 		console.log( 'importGlobalPost.onImportSuccess: ', responseData, fullResponse );
 		contentSync.tools.addSnackBar( {
-			text: fullResponse.message?.length > 0 ? fullResponse.message : __( 'Global post imported successfully', 'contentsync' ),
+			text: message?.length > 0 ? message : __( 'Synced post imported successfully', 'contentsync' ),
 			type: 'success',
 			// add a refresh window link
 			link: {
@@ -355,7 +357,7 @@ contentSync.bulkImportGlobalPost = new function() {
 		this.Modal.toggleSubmitButtonBusy( false );
 
 		contentSync.tools.addSnackBar( {
-			text: __( 'Error importing global post: %s', 'contentsync' ).replace( '%s', message ),
+			text: message,
 			type: 'error'
 		} );
 	};

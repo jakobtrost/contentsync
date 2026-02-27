@@ -101,7 +101,7 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 		}
 
 		if ( empty( $posts ) ) {
-			return $this->respond( false, __( 'No errors found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error listing synced posts with errors: no errors found.', 'contentsync' ), 400 );
 		}
 
 		$return = array_filter(
@@ -112,10 +112,10 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 		);
 
 		if ( empty( $return ) ) {
-			return $this->respond( false, __( 'No errors found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error listing synced posts with errors: no errors found.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( array_values( $return ), '', true );
+		return $this->respond( array_values( $return ), __( 'Synced posts with errors listed successfully.', 'contentsync' ), true );
 	}
 
 	/**
@@ -129,22 +129,22 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 		$blog_id = $request->get_param( 'blog_id' );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'post_id is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error repairing post: post_id is not defined.', 'contentsync' ), 400 );
 		}
 
 		$error = Post_Error_Handler::repair_post( $post_id, $blog_id ? (int) $blog_id : null, true );
 
 		if ( ! $error ) {
-			return $this->respond( false, __( 'post has no error.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error repairing post: post has no error.', 'contentsync' ), 400 );
 		}
 
 		$log = Post_Error_Handler::get_error_repaired_log( $error );
 
 		if ( Post_Error_Handler::is_error_repaired( $error ) ) {
-			return $this->respond( $log, __( 'post was successfully repaired', 'contentsync' ), true );
+			return $this->respond( $log, __( 'Post was successfully repaired', 'contentsync' ), true );
 		}
 
-		$message = is_object( $error ) && isset( $error->message ) ? $error->message : __( 'Repair failed.', 'contentsync' );
+		$message = is_object( $error ) && isset( $error->message ) ? $error->message : __( 'Error repairing post: repair failed.', 'contentsync' );
 		return $this->respond( false, $message, 400 );
 	}
 }

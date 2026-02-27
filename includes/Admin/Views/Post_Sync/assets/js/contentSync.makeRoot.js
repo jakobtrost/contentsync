@@ -46,7 +46,7 @@ contentSync.makeRoot = new function() {
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
 		restPath: 'unsynced-posts/make_root',
-		onSuccess: ( data, fullResponse ) => this.onSuccess( data, fullResponse ),
+		onSuccess: ( data, message, fullResponse ) => this.onSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
 
@@ -111,26 +111,27 @@ contentSync.makeRoot = new function() {
 	 * When the REST request is successful
 	 *
 	 * @param {string} responseData - Global post ID (from response.data)
+	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onSuccess = ( responseData, fullResponse ) => {
+	this.onSuccess = ( responseData, message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		this.Modal.close();
 
 		const gid = typeof responseData === 'string' ? responseData : false;
 		
 		if ( !gid ) {
-			return this.onError( __( 'Error making post global: No global post ID found', 'contentsync' ), fullResponse );
+			return this.onError( message?.length > 0 ? message : __( 'Error making post global: No global post ID found', 'contentsync' ), fullResponse );
 		}
 
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
 			contentSync.blockEditorTools.getData( this.postId, true, ( post ) => {
 				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( __( 'The post was made global successfully.', 'contentsync' ), 'success' );
+					contentSync.blockEditorTools.showSnackbar( message?.length > 0 ? message : __( 'The post was made global successfully.', 'contentsync' ), 'success' );
 				}
 			} );
 		} else {
-			contentSync.tools.addSnackBar( __( 'The post was made global successfully.', 'contentsync' ), 'success' );
+			contentSync.tools.addSnackBar( message?.length > 0 ? message : __( 'The post was made global successfully.', 'contentsync' ), 'success' );
 		}
 
 		if ( this.buttonElement ) {
@@ -152,11 +153,11 @@ contentSync.makeRoot = new function() {
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
 			contentSync.blockEditorTools.getData( this.postId, true, ( post ) => {
 				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( __( 'Error making post global: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+					contentSync.blockEditorTools.showSnackbar( message, 'error' );
 				}
 			} );
 		} else {
-			contentSync.tools.addSnackBar( __( 'Error making post global: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+			contentSync.tools.addSnackBar( message, 'error' );
 		}
 	};
 };

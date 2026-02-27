@@ -123,17 +123,17 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 		$gid = (string) ( $request->get_param( 'gid' ) ?? '' );
 
 		if ( empty( $gid ) ) {
-			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error importing synced post: global ID is not defined.', 'contentsync' ), 400 );
 		}
 
 		$post_with_conflicts = $this->check_synced_post_import( $gid );
 
 		if ( empty( $post_with_conflicts ) ) {
 
-			return $this->respond( false, __( 'No posts found to import.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error importing synced post: no posts found to import.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( $post_with_conflicts, __( 'The following posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ), true );
+		return $this->respond( $post_with_conflicts, __( 'The following synced posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ), true );
 	}
 
 	/**
@@ -170,7 +170,7 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 		$gid = (string) ( $request->get_param( 'gid' ) ?? '' );
 
 		if ( empty( $gid ) ) {
-			return $this->respond( false, __( 'global ID is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error importing synced post: global ID is not defined.', 'contentsync' ), 400 );
 		}
 
 		/**
@@ -200,10 +200,10 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 		$result = Synced_Post_Service::import_synced_post( $gid, $conflict_actions );
 
 		if ( is_wp_error( $result ) ) {
-			return $this->respond( false, $result->get_error_message(), 400 );
+			return $this->respond( false, __( 'Error importing synced post: ' . $result->get_error_message(), 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'post was imported!', 'contentsync' ), true );
+		return $this->respond( true, __( 'Synced post imported successfully', 'contentsync' ), true );
 	}
 
 	/**
@@ -216,7 +216,7 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 		$posts = (array) ( $request->get_param( 'posts' ) ?? array() );
 
 		if ( empty( $posts ) ) {
-			return $this->respond( false, __( 'global IDs are not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error importing synced posts: global IDs are not defined.', 'contentsync' ), 400 );
 		}
 
 		$all_posts = array();
@@ -231,10 +231,10 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 		}
 
 		if ( empty( $all_posts ) ) {
-			return $this->respond( false, __( 'No posts found to import.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error importing synced posts: no posts found to import.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( $all_posts, __( 'The following posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ), true );
+		return $this->respond( $all_posts, __( 'The following synced posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ), true );
 	}
 
 	/**
@@ -247,7 +247,7 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 		$gids = (array) ( $request->get_param( 'gids' ) ?? array() );
 
 		if ( empty( $gids ) ) {
-			return $this->respond( false, __( 'No global IDs found to import.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error importing synced posts: no global IDs found to import.', 'contentsync' ), 400 );
 		}
 
 		$conflicts = (array) ( $request->get_param( 'conflicts' ) ?? array() );
@@ -268,10 +268,10 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 		}
 
 		if ( ! empty( $errors ) ) {
-			return $this->respond( false, __( 'Some posts could not be imported: ', 'contentsync' ) . implode( ', ', $errors ), 400 );
+			return $this->respond( false, __( 'Error importing synced posts: some posts could not be imported: ' . implode( ', ', $errors ), 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Posts were successfully imported.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Synced posts were successfully imported.', 'contentsync' ), true );
 	}
 
 	/**
@@ -284,15 +284,15 @@ class Linked_Posts_Endpoint extends Admin_Endpoint_Base {
 		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'post_id is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error converting to local post: post_id is not defined.', 'contentsync' ), 400 );
 		}
 
 		$result = Synced_Post_Service::unlink_synced_post( $post_id );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'post could not be made static...', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error converting to local post: post could not be converted to a local post.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'post was successfully made static', 'contentsync' ), true );
+		return $this->respond( true, __( 'The post was converted to a local post and synchronization was disabled successfully.', 'contentsync' ), true );
 	}
 }

@@ -58,7 +58,7 @@ class Post_Export_Endpoint extends Admin_Endpoint_Base {
 		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( ! $post_id ) {
-			return $this->respond( false, __( 'No valid post ID could be found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error exporting post: no valid post ID could be found.', 'contentsync' ), 400 );
 		}
 
 		$append_nested = $request->get_param( 'append_nested' );
@@ -71,11 +71,11 @@ class Post_Export_Endpoint extends Admin_Endpoint_Base {
 		$filepath = ( new Post_Export( $post_id, $args ) )->export_to_zip();
 
 		if ( ! $filepath ) {
-			return $this->respond( false, __( 'The export file could not be written.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error exporting post: the export file could not be written.', 'contentsync' ), 400 );
 		}
 
 		$url_path = Files::convert_wp_content_dir_to_url( $filepath );
 
-		return $this->respond( $url_path, '', true );
+		return $this->respond( $url_path, __( 'The post was exported successfully. The file will download automatically. If not, click the link.', 'contentsync' ), true );
 	}
 }

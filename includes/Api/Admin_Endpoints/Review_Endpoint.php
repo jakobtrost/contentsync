@@ -106,10 +106,10 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 		$result = Post_Review_Service::approve_post_review( $review_id, $post_id );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Review could not be approved.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error approving review: review could not be approved.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Review was approved.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Review was successfully approved.', 'contentsync' ), true );
 	}
 
 	/**
@@ -126,10 +126,10 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 		$result = Post_Review_Service::deny_post_review( $review_id, $post_id, $message );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Review could not be denied.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error denying review: review could not be denied.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Review was denied.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Review was successfully denied.', 'contentsync' ), true );
 	}
 
 	/**
@@ -146,9 +146,9 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 		$result = Post_Review_Service::revert_post_review( $review_id, $post_id, $message );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Review could not be reverted.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error reverting review: review could not be reverted.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Review was reverted.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Review was successfully reverted.', 'contentsync' ), true );
 	}
 }

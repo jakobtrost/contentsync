@@ -107,12 +107,12 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 		$post_reference = isset( $params['postReference'] ) ? $params['postReference'] : 0;
 
 		if ( $post_reference === '' || $post_reference === null ) {
-			return $this->respond( false, __( 'Could not get post infos.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error getting post infos: post reference is not defined.', 'contentsync' ), 400 );
 		}
 
 		$post_id = $this->get_numeric_post_id( $post_reference );
 		if ( $post_id <= 0 ) {
-			return $this->respond( false, __( 'Could not get post infos.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error getting post infos: post ID could not be found.', 'contentsync' ), 400 );
 		}
 
 		$data = array(
@@ -120,7 +120,7 @@ class Editor_Endpoint extends Admin_Endpoint_Base {
 			'notice' => ( new Synced_Post_Notice( $post_id ) )->get_editor_notice_array(),
 		);
 
-		return $this->respond( $data, __( 'Post data retrieved.', 'contentsync' ), 200 );
+		return $this->respond( $data, __( 'Post data retrieved successfully.', 'contentsync' ), 200 );
 	}
 
 	/**

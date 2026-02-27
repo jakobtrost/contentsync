@@ -40,7 +40,7 @@ contentSync.unlinkRootPost = new function() {
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
 		restPath: 'root-posts/unlink',
-		onSuccess: ( data, fullResponse ) => this.onSuccess( data, fullResponse ),
+		onSuccess: ( data, message, fullResponse ) => this.onSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
 
@@ -115,25 +115,26 @@ contentSync.unlinkRootPost = new function() {
 	 * When the REST request is successful
 	 *
 	 * @param {string} responseData - Global post ID (from response.data)
+	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onSuccess = ( responseData, fullResponse ) => {
+	this.onSuccess = ( responseData, message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		this.Modal.close();
 		
 		if ( ! responseData ) {
-			return this.onError( __( 'Error disabling global synchronization: No global post ID found', 'contentsync' ), fullResponse );
+			return this.onError( message?.length > 0 ? message : __( 'Error disabling global synchronization: No global post ID found', 'contentsync' ), fullResponse );
 		}
 
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
 			contentSync.blockEditorTools.getData( this.post.id, true, ( post ) => {
 				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), 'success' );
+					contentSync.blockEditorTools.showSnackbar( message?.length > 0 ? message : __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), 'success' );
 				}
 			} );
 		} else {
 			contentSync.tools.addSnackBar( {
-				text: __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ),
+				text: message?.length > 0 ? message : __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ),
 				type: 'success'
 			} );
 
@@ -156,9 +157,9 @@ contentSync.unlinkRootPost = new function() {
 	this.onError = ( message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
-			contentSync.blockEditorTools.showSnackbar( __( 'Error disabling global synchronization: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+			contentSync.blockEditorTools.showSnackbar( message, 'error' );
 		} else {
-			contentSync.tools.addSnackBar( __( 'Error disabling global synchronization: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+			contentSync.tools.addSnackBar( message, 'error' );
 		}
 	};
 };

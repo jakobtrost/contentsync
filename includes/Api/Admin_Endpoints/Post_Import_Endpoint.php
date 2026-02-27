@@ -76,17 +76,17 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 		$file  = $this->get_uploaded_file( $files );
 
 		if ( ! $file ) {
-			return $this->respond( false, __( 'No file was uploaded.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error checking import file: no file was uploaded.', 'contentsync' ), 400 );
 		}
 
 		if ( ! empty( $file['error'] ) ) {
 			$message = $this->get_upload_error_message( (int) $file['error'] );
-			return $this->respond( false, $message, 400 );
+			return $this->respond( false, __( 'Error checking import file: ' . $message, 'contentsync' ), 400 );
 		}
 
 		$filetype = $file['type'] ?? '';
 		if ( $filetype !== 'application/zip' && $filetype !== 'application/x-zip-compressed' ) {
-			return $this->respond( false, __( 'Please select a valid ZIP archive.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error checking import file: please select a valid ZIP archive.', 'contentsync' ), 400 );
 		}
 
 		$filename = sanitize_file_name( $file['name'] ) ?? '';
@@ -94,19 +94,19 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 		$new_file = Files::get_wp_content_folder_path( 'tmp' ) . $filename;
 
 		if ( ! move_uploaded_file( $tmp_name, $new_file ) ) {
-			return $this->respond( false, __( 'Failed to save the uploaded file.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error checking import file: failed to save the uploaded file.', 'contentsync' ), 400 );
 		}
 
 		Logger::add( 'new_file', $new_file );
 		$post_data = Files::get_posts_json_file_contents_from_zip( $new_file );
 
 		if ( ! is_array( $post_data ) ) {
-			return $this->respond( false, is_string( $post_data ) ? $post_data : __( 'Invalid or missing posts.json in ZIP.', 'contentsync' ), 400 );
+			return $this->respond( false, is_string( $post_data ) ? $post_data : __( 'Error checking import file: invalid or missing posts.json in ZIP.', 'contentsync' ), 400 );
 		}
 
 		$posts = Post_Conflict_Handler::get_import_posts_with_conflicts( $post_data );
 
-		return $this->respond( $posts, '', true );
+		return $this->respond( $posts, __( 'Import file checked successfully.', 'contentsync' ), true );
 	}
 
 	/**
@@ -122,7 +122,7 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 		$filename = sanitize_file_name( $request->get_param( 'filename' ) ?? '' );
 
 		if ( empty( $filename ) ) {
-			return $this->respond( false, __( 'The file name is empty.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error importing posts: the file name is empty.', 'contentsync' ), 400 );
 		}
 
 		$zip_file  = Files::get_wp_content_folder_path( 'tmp' ) . $filename;
@@ -130,7 +130,7 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 
 		if ( ! is_array( $post_data ) ) {
 			$message = is_string( $post_data ) ? $post_data : __( 'Invalid or missing posts.json in ZIP.', 'contentsync' );
-			return $this->respond( false, $message, 400 );
+			return $this->respond( false, __( 'Error importing posts: ' . $message, 'contentsync' ), 400 );
 		}
 
 		/**
@@ -172,7 +172,7 @@ class Post_Import_Endpoint extends Admin_Endpoint_Base {
 		$import_result = $post_import->import_posts();
 
 		if ( is_wp_error( $import_result ) ) {
-			return $this->respond( false, $import_result->get_error_message(), 400 );
+			return $this->respond( false, __( 'Error importing posts: ' . $import_result->get_error_message(), 'contentsync' ), 400 );
 		}
 
 		$message = sprintf( __( "Post file '%s' has been imported successfully.", 'contentsync' ), $filename );

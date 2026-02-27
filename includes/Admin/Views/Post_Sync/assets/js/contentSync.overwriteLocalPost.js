@@ -13,7 +13,7 @@ contentSync.overwriteLocalPost = new function() {
 	this.Modal = new contentSync.Modal( {
 		id: 'overwrite-local-post-modal',
 		title: __( 'Overwrite post', 'contentsync' ),
-		description: __( 'Do you want to overwrite the current post with the global post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
+		description: __( 'Do you want to overwrite the current post with the synced post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
 		buttons: {
 			cancel: { text: __( 'Cancel', 'contentsync' ) },
 			submit: { text: __( 'Overwrite', 'contentsync' ) },
@@ -26,7 +26,7 @@ contentSync.overwriteLocalPost = new function() {
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
 		restPath: 'unsynced-posts/overwrite',
-		onSuccess: ( data, fullResponse ) => this.onSuccess( data, fullResponse ),
+		onSuccess: ( data, message, fullResponse ) => this.onSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
 
@@ -84,24 +84,25 @@ contentSync.overwriteLocalPost = new function() {
 	 * When the REST request is successful
 	 *
 	 * @param {boolean} responseData - True if the post was overwritten successfully (from response.data)
+	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onSuccess = ( responseData, fullResponse ) => {
+	this.onSuccess = ( responseData, message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		this.Modal.close();
 
 		if ( !responseData ) {
-			return this.onError( __( 'Error overwriting post: No response data', 'contentsync' ), fullResponse );
+			return this.onError( message?.length > 0 ? message : __( 'Error overwriting post: No response data', 'contentsync' ), fullResponse );
 		}
 
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
 			contentSync.blockEditorTools.getData( this.postId, true, ( post ) => {
 				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( __( 'The post was overwritten successfully.', 'contentsync' ), 'success' );
+					contentSync.blockEditorTools.showSnackbar( message?.length > 0 ? message : __( 'The local post was overwritten successfully.', 'contentsync' ), 'success' );
 				}
 			} );
 		} else {
-			contentSync.tools.addSnackBar( __( 'The post was overwritten successfully.', 'contentsync' ), 'success' );
+			contentSync.tools.addSnackBar( message?.length > 0 ? message : __( 'The local post was overwritten successfully.', 'contentsync' ), 'success' );
 		}
 	};
 
@@ -117,11 +118,11 @@ contentSync.overwriteLocalPost = new function() {
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
 			contentSync.blockEditorTools.getData( this.postId, true, ( post ) => {
 				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( __( 'Error overwriting post: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+					contentSync.blockEditorTools.showSnackbar( message, 'error' );
 				}
 			} );
 		} else {
-			contentSync.tools.addSnackBar( __( 'Error overwriting post: %s', 'contentsync' ).replace( '%s', message ), 'error' );
+			contentSync.tools.addSnackBar( message, 'error' );
 		}
 	};
 };

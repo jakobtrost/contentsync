@@ -93,13 +93,13 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 		$post_name  = (string) ( $request->get_param( 'post_name' ) ?? '' );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'No valid post ID found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error renaming template: no valid post ID found.', 'contentsync' ), 400 );
 		}
 
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
-			return $this->respond( false, __( 'Post not found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error renaming template: post not found.', 'contentsync' ), 400 );
 		}
 
 		$post->post_title = $post_title;
@@ -108,14 +108,14 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 		$result = wp_update_post( $post, true );
 
 		if ( is_wp_error( $result ) ) {
-			return $this->respond( false, $result->get_error_message(), 400 );
+			return $this->respond( false, __( 'Error renaming template: ' . $result->get_error_message(), 'contentsync' ), 400 );
 		}
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Template could not be renamed.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error renaming template: template could not be renamed.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Template was renamed.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Template was successfully renamed.', 'contentsync' ), true );
 	}
 
 	/**
@@ -128,26 +128,26 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'No valid post ID found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching global styles: no valid post ID found.', 'contentsync' ), 400 );
 		}
 
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
-			return $this->respond( false, __( 'Post not found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching global styles: post not found.', 'contentsync' ), 400 );
 		}
 
 		$result = Theme_Posts_Service::set_wp_global_styles_theme( $post );
 
 		if ( is_wp_error( $result ) ) {
-			return $this->respond( false, $result->get_error_message(), 400 );
+			return $this->respond( false, __( 'Error switching global styles: ' . $result->get_error_message(), 'contentsync' ), 400 );
 		}
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Styles could not be assigned to the current theme.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching global styles: styles could not be assigned to the current theme.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Styles were assigned to the current theme.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Styles were successfully assigned to the current theme.', 'contentsync' ), true );
 	}
 
 	/**
@@ -161,25 +161,25 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 		$switch_references_in_content = (bool) ( $request->get_param( 'switch_references_in_content' ) ?? false );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'No valid post ID found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching template: no valid post ID found.', 'contentsync' ), 400 );
 		}
 
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
-			return $this->respond( false, __( 'Post not found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching template: post not found.', 'contentsync' ), 400 );
 		}
 
 		$result = Theme_Posts_Service::set_wp_template_theme( $post, $switch_references_in_content );
 
 		if ( is_wp_error( $result ) ) {
-			return $this->respond( false, $result->get_error_message(), 400 );
+			return $this->respond( false, __( 'Error switching template: ' . $result->get_error_message(), 'contentsync' ), 400 );
 		}
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Template could not be assigned to the current theme.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching template: template could not be assigned to the current theme.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Template was assigned to the current theme.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Template was successfully assigned to the current theme.', 'contentsync' ), true );
 	}
 }
