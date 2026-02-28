@@ -51,6 +51,10 @@ class Urls {
 			$post = get_post( $post );
 		}
 
+		if ( ! $post ) {
+			return null;
+		}
+
 		switch ( $post->post_type ) {
 			case 'wp_global_styles':
 				// do not allow editing of global styles and font families from other themes

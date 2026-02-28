@@ -225,8 +225,9 @@
 					</p>
 					{post.currentUserCan && (
 						<Button
+							className="contentsync-action-button"
 							isSecondary
-							onClick={(e) => contentSync.repairPost(e.target, post.id)}
+							onClick={(e) => contentSync.repairPost.openModal(post)}
 						>
 							{__('Repair', 'contentsync')}
 						</Button>

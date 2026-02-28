@@ -255,12 +255,19 @@ class Synced_Post_Notice {
 		$this->text        = Post_Error_Handler::get_error_message( $this->error );
 
 		if ( Synced_Post_Service::current_user_can_edit_synced_posts() ) {
+
+			$post_data = array(
+				'id'     => $this->post_id,
+				'title'  => get_the_title( $this->post_id ),
+				'gid'    => $this->gid,
+				'status' => $this->status,
+			);
+
 			$this->actions = array(
 				array(
-					'label'   => __( 'Repair', 'contentsync' ),
+					'label'   => __( 'Repair error', 'contentsync' ),
 					'variant' => 'primary',
-					/** todo: to be replaced with contentSync.repairPost.openModal */
-					'onClick' => 'contentSync.repairPost(this, ' . esc_attr( $this->post_id ) . ')',
+					'onClick' => 'contentSync.repairPost.openModal( ' . json_encode( $post_data ) . ' )',
 				),
 			);
 		}

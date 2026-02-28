@@ -105,5 +105,13 @@ class Block_Editor_Hooks extends Hooks_Base {
 				'internal' => array( 'block_editor_tools', 'Modal', 'RestHandler', 'SnackBar' ),
 			)
 		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'repairPost',
+			'Views/Post_Sync/assets/js/contentSync.repairPost.js',
+			array(
+				'internal' => array( 'block_editor_tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
+		);
 	}
 }

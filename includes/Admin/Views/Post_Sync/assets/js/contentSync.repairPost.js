@@ -1,0 +1,149 @@
+var contentSync = contentSync || {};
+
+contentSync.repairPost = new function() {
+
+	/**
+	 * i18n function
+	 */
+	const __ = typeof wp?.i18n?.__ === 'function' ? wp.i18n.__ : ( text ) => text;
+
+	/**
+	 * Modal instance
+	 */
+	this.Modal = new contentSync.Modal( {
+		id: 'repair-post-modal',
+		title: __( 'Repair post', 'contentsync' ),
+		description: __( 'Do you want to repair the error for the post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
+		buttons: {
+			cancel: {
+				text: __( 'Cancel', 'contentsync' )
+			},
+			submit: {
+				text: __( 'Repair error', 'contentsync' )
+			}
+		},
+		onSubmit: () => this.onModalSubmit()
+	} );
+
+	/**
+	 * REST handler instance
+	 */
+	this.RestHandler = new contentSync.RestHandler( {
+		restPath: 'error-posts/repair',
+		onSuccess: ( data, message, fullResponse ) => this.onSuccess( data, message, fullResponse ),
+		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
+	} );
+
+	/**
+	 * @type {HTMLElement|null}
+	 */
+	this.buttonElement = null;
+
+	/**
+	 * Current selected post
+	 * 
+	 * @type {Object}
+	 */
+	this.post = {
+		id: -1,
+		title: '',
+		gid: '',
+		status: '',
+	};
+
+	/**
+	 * On button click, usually triggered from the global list table
+	 * 
+	 * @param {HTMLElement} elem - Element that triggered the button
+	 *   @property {string} dataset.post_id - Post ID
+	 *   @property {string} dataset.post_title - Post title
+	 *   @property {string} dataset.gid - Global post ID
+	 *   @property {string} dataset.status - Synced status
+	 */
+	this.onButtonClick = ( elem ) => {
+		this.buttonElement = elem;
+
+		let post = {
+			id: elem.dataset.post_id,
+			title: elem.dataset.post_title,
+			gid: elem.dataset.gid,
+			status: elem.dataset.status,
+		};
+
+		this.openModal( post );
+	};
+
+	/**
+	 * Open modal
+	 * 
+	 * @param {Object} post - Post data
+	 *   @property {number} id - Post ID
+	 *   @property {string} title - Post title
+	 *   @property {string} gid - Global post ID
+	 *   @property {string} status - Synced status
+	 */
+	this.openModal = ( post ) => {
+		this.post = post;
+		this.Modal.open();
+		this.Modal.setDescription( this.Modal.config.description.replace( '%s', '<u>' + post.title + '</u>' ) );
+	};
+
+	/**
+	 * On modal submit
+	 */
+	this.onModalSubmit = () => {
+		this.Modal.toggleSubmitButtonBusy( true );
+
+		const data = {
+			post_id: this.post.id
+		};
+
+		this.RestHandler.send( data );
+	};
+
+	/**
+	 * When the REST request is successful
+	 *
+	 * @param {boolean} responseData - Whether the error was repaired successfully
+	 * @param {string} message - Message (from response.message)
+	 * @param {Object} fullResponse - Full REST response { status, message, data }
+	 */
+	this.onSuccess = ( responseData, message, fullResponse ) => {
+		this.Modal.toggleSubmitButtonBusy( false );
+		this.Modal.close();
+		
+		if ( ! responseData ) {
+			return this.onError( message?.length > 0 ? message : __( 'Error repairing post: No post ID found', 'contentsync' ), fullResponse );
+		}
+
+		let textMessage = message?.length > 0 ? message : __( 'The error was repaired successfully.', 'contentsync' );
+
+		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
+			contentSync.blockEditorTools.getData( this.post.id, true, ( post ) => {
+				if ( post ) {
+					contentSync.blockEditorTools.showSnackbar( textMessage, 'success' );
+				}
+			} );
+		} else {
+			contentSync.tools.addSnackBar( {
+				text: textMessage,
+				type: 'success'
+			} );
+		}
+	};
+
+	/**
+	 * When the REST request is unsuccessful
+	 *
+	 * @param {string} message - Error message (from response.message)
+	 * @param {Object} fullResponse - Full REST response { status, message, data }
+	 */
+	this.onError = ( message, fullResponse ) => {
+		this.Modal.toggleSubmitButtonBusy( false );
+		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
+			contentSync.blockEditorTools.showSnackbar( message, 'error' );
+		} else {
+			contentSync.tools.addSnackBar( message, 'error' );
+		}
+	};
+};

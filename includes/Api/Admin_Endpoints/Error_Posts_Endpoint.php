@@ -126,25 +126,28 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 	 */
 	public function repair( $request ) {
 		$post_id = (int) $request->get_param( 'post_id' );
-		$blog_id = $request->get_param( 'blog_id' );
+		$blog_id = $request->get_param( 'blog_id' ) ?? 0;
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'Error repairing post: post_id is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error repairing post: the post ID is not defined.', 'contentsync' ), 400 );
 		}
 
-		$error = Post_Error_Handler::repair_post( $post_id, $blog_id ? (int) $blog_id : null, true );
+		$error = Post_Error_Handler::repair_post( $post_id, $blog_id, true );
 
 		if ( ! $error ) {
-			return $this->respond( false, __( 'Error repairing post: post has no error.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error repairing post: the post has no error.', 'contentsync' ), 400 );
 		}
-
-		$log = Post_Error_Handler::get_error_repaired_log( $error );
 
 		if ( Post_Error_Handler::is_error_repaired( $error ) ) {
-			return $this->respond( $log, __( 'Post was successfully repaired', 'contentsync' ), true );
+
+			$log = Post_Error_Handler::get_error_repaired_log( $error );
+
+			$message = empty( $log ) ? __( 'The error was repaired successfully.', 'contentsync' ) : sprintf( __( 'The error was repaired successfully: %s', 'contentsync' ), $log );
+
+			return $this->respond( true, $message, true );
 		}
 
-		$message = is_object( $error ) && isset( $error->message ) ? $error->message : __( 'Error repairing post: repair failed.', 'contentsync' );
+		$message = is_object( $error ) && isset( $error->message ) ? $error->message : __( 'Error repairing post: the error could not be repaired.', 'contentsync' );
 		return $this->respond( false, $message, 400 );
 	}
 }
