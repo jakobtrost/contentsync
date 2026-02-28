@@ -30,37 +30,12 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 	protected $rest_base = 'theme';
 
 	/**
-	 * Param names for the rename-template route.
-	 *
-	 * @var array
-	 */
-	private static $rename_route_param_names = array( 'post_id', 'post_title', 'post_name' );
-
-	/**
-	 * Param names for the switch-global-styles route.
-	 *
-	 * @var array
-	 */
-	private static $switch_global_styles_param_names = array( 'post_id' );
-
-	/**
-	 * Param names for the switch-template route.
-	 *
-	 * @var array
-	 */
-	private static $switch_template_param_names = array( 'post_id', 'switch_references_in_content' );
-
-	/**
 	 * Register REST API routes
 	 */
 	public function register_routes() {
 		$all_args = $this->get_endpoint_args();
 
 		// POST /theme/rename-template — params: post_id, post_title, post_name
-		$rename_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$rename_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/rename-template',
@@ -68,15 +43,14 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'rename_template' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $rename_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id', 'post_title', 'post_name' ) )
+				),
 			)
 		);
 
 		// POST /theme/switch-global-styles — params: post_id
-		$switch_global_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$switch_global_styles_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/switch-global-styles',
@@ -84,15 +58,14 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'switch_global_styles' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $switch_global_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id' ) )
+				),
 			)
 		);
 
 		// POST /theme/switch-template — params: post_id, switch_references_in_content
-		$switch_template_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$switch_template_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/switch-template',
@@ -100,7 +73,10 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'switch_template' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $switch_template_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id', 'switch_references_in_content' ) )
+				),
 			)
 		);
 	}
@@ -117,13 +93,13 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 		$post_name  = (string) ( $request->get_param( 'post_name' ) ?? '' );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'No valid post ID found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error renaming template: no valid post ID found.', 'contentsync' ), 400 );
 		}
 
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
-			return $this->respond( false, __( 'Post not found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error renaming template: post not found.', 'contentsync' ), 400 );
 		}
 
 		$post->post_title = $post_title;
@@ -132,14 +108,14 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 		$result = wp_update_post( $post, true );
 
 		if ( is_wp_error( $result ) ) {
-			return $this->respond( false, $result->get_error_message(), 400 );
+			return $this->respond( false, __( 'Error renaming template: ' . $result->get_error_message(), 'contentsync' ), 400 );
 		}
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Template could not be renamed.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error renaming template: template could not be renamed.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Template was renamed.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Template was successfully renamed.', 'contentsync' ), true );
 	}
 
 	/**
@@ -152,26 +128,26 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'No valid post ID found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching global styles: no valid post ID found.', 'contentsync' ), 400 );
 		}
 
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
-			return $this->respond( false, __( 'Post not found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching global styles: post not found.', 'contentsync' ), 400 );
 		}
 
 		$result = Theme_Posts_Service::set_wp_global_styles_theme( $post );
 
 		if ( is_wp_error( $result ) ) {
-			return $this->respond( false, $result->get_error_message(), 400 );
+			return $this->respond( false, __( 'Error switching global styles: ' . $result->get_error_message(), 'contentsync' ), 400 );
 		}
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Styles could not be assigned to the current theme.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching global styles: styles could not be assigned to the current theme.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Styles were assigned to the current theme.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Styles were successfully assigned to the current theme.', 'contentsync' ), true );
 	}
 
 	/**
@@ -185,25 +161,25 @@ class Theme_Endpoint extends Admin_Endpoint_Base {
 		$switch_references_in_content = (bool) ( $request->get_param( 'switch_references_in_content' ) ?? false );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'No valid post ID found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching template: no valid post ID found.', 'contentsync' ), 400 );
 		}
 
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
-			return $this->respond( false, __( 'Post not found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching template: post not found.', 'contentsync' ), 400 );
 		}
 
 		$result = Theme_Posts_Service::set_wp_template_theme( $post, $switch_references_in_content );
 
 		if ( is_wp_error( $result ) ) {
-			return $this->respond( false, $result->get_error_message(), 400 );
+			return $this->respond( false, __( 'Error switching template: ' . $result->get_error_message(), 'contentsync' ), 400 );
 		}
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Template could not be assigned to the current theme.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error switching template: template could not be assigned to the current theme.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Template was assigned to the current theme.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Template was successfully assigned to the current theme.', 'contentsync' ), true );
 	}
 }

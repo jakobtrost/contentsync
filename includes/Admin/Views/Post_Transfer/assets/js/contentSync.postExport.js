@@ -17,23 +17,23 @@ contentSync.postExport = new function() {
 		formInputs: [
 			{
 				type: 'checkbox',
-				name: 'nested',
+				name: 'append_nested',
 				label: __( 'Export nested content', 'contentsync' ),
 				description: __( 'Templates, media, etc. are added to the download so that used images, backgrounds, etc. will be displayed correctly on the target website.', 'contentsync' ),
 				value: 1
 			},
 			{
 				type: 'checkbox',
-				name: 'menus',
+				name: 'resolve_menus',
 				label: __( 'Resolve menus', 'contentsync' ),
 				description: __( 'All menus will be converted to static links.', 'contentsync' ),
 				value: 1
 			}
 		],
-		notice: {
-			text: __( 'Posts in query loops are not included in the import and must be exported separately.', 'contentsync' ),
-			type: 'info',
-		},
+		// notice: {
+		// 	text: __( 'Posts in query loops are not included in the import and must be exported separately.', 'contentsync' ),
+		// 	type: 'info',
+		// },
 		buttons: {
 			cancel: {
 				text: __( 'Cancel', 'contentsync' )
@@ -50,7 +50,7 @@ contentSync.postExport = new function() {
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
 		restPath: 'post-export',
-		onSuccess: ( data, fullResponse ) => this.onSuccess( data, fullResponse ),
+		onSuccess: ( data, message, fullResponse ) => this.onSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
 
@@ -87,11 +87,11 @@ contentSync.postExport = new function() {
 	this.onModalSubmit = () => {
 		this.Modal.toggleSubmitButtonBusy( true );
 
-		const fd = this.Modal.getFormData();
+		const formData = this.Modal.getFormData();
 		const data = {
 			post_id: this.postId,
-			nested: fd.nested || fd.append_nested || 0,
-			resolve_menus: fd.menus || 0,
+			append_nested: formData.get( 'append_nested' ) || 0,
+			resolve_menus: formData.get( 'resolve_menus' ) || 0,
 			translations: 0,
 		};
 
@@ -102,16 +102,17 @@ contentSync.postExport = new function() {
 	 * When the REST request is successful
 	 *
 	 * @param {string} responseData - Export file URL (from response.data)
+	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onSuccess = ( responseData, fullResponse ) => {
+	this.onSuccess = ( responseData, message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		this.Modal.close();
 
 		const downloadUrl = typeof responseData === 'string' ? responseData : false;
 		
 		if ( !downloadUrl ) {
-			return this.onError( __( 'Error exporting post: No download URL found', 'contentsync' ), fullResponse );
+			return this.onError( message?.length > 0 ? message : __( 'Error exporting post: No download URL found', 'contentsync' ), fullResponse );
 		}
 
 		// create a link element
@@ -123,7 +124,7 @@ contentSync.postExport = new function() {
 		link.click();
 
 		contentSync.tools.addSnackBar( {
-			text: __( 'The post was exported successfully. The file will download automatically. If not, click the link.', 'contentsync' ),
+			text: message?.length > 0 ? message : __( 'The post was exported successfully. The file will download automatically. If not, click the link.', 'contentsync' ),
 			link: {
 				text: __( 'Download file', 'contentsync' ),
 				url: downloadUrl,

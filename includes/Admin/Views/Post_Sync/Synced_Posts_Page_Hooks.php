@@ -3,7 +3,8 @@
 namespace Contentsync\Admin\Views\Post_Sync;
 
 use Contentsync\Utils\Hooks_Base;
-use Contentsync\Admin\Views\Post_Sync\Global_List_Table;
+use Contentsync\Admin\Views\Post_Sync\Synced_Posts_Table;
+use Contentsync\Admin\Utils\Enqueue_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -18,11 +19,11 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 	const SYNCED_POSTS_PAGE_POSITION = 4;
 
 	/**
-	 * Holds instance of Global_List_Table when screen options are loaded.
+	 * Holds instance of Synced_Posts_Table when screen options are loaded.
 	 *
-	 * @var Global_List_Table|null
+	 * @var Synced_Posts_Table|null
 	 */
-	public $Global_List_Table = null;
+	public $Synced_Posts_Table = null;
 
 	/**
 	 * Register admin-only hooks.
@@ -55,7 +56,7 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 	 * Render the sync overview page
 	 */
 	public function render_sync_overview_page() {
-		$this->Global_List_Table->render_page(
+		$this->Synced_Posts_Table->render_page(
 			__( 'Synced Posts', 'contentsync' )
 		);
 
@@ -66,23 +67,75 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 	 * Enqueue assets for the sync overview page
 	 */
 	public function enqueue_assets() {
-		wp_register_style(
-			'contentsync-global-list-table',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/css/global-list-table.css',
-			array(),
-			CONTENTSYNC_VERSION,
-			'all'
-		);
-		wp_enqueue_style( 'contentsync-global-list-table' );
 
-		wp_register_script(
-			'contentSync-importGlobalPost',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/Views/Post_Sync/assets/js/contentSync.importGlobalPost.js',
-			array( 'contentSync-tools', 'contentSync-Modal', 'contentSync-RestHandler', 'contentSync-SnackBar' ),
-			CONTENTSYNC_VERSION,
-			true
+		Enqueue_Service::enqueue_admin_style(
+			'global-list-table',
+			'Views/Post_Sync/assets/css/global-list-table.css'
 		);
-		wp_enqueue_script( 'contentSync-importGlobalPost' );
+
+		Enqueue_Service::enqueue_admin_script(
+			'importGlobalPost',
+			'Views/Post_Sync/assets/js/contentSync.importGlobalPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
+		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'bulkImportGlobalPost',
+			'Views/Post_Sync/assets/js/contentSync.bulkImportGlobalPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+				'inline'   => array(
+					'content'  => 'document.addEventListener( "DOMContentLoaded", function() { contentSync.bulkImportGlobalPost.initSubmitListener(); } );',
+					'position' => 'after',
+				),
+			)
+		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'unlinkRootPost',
+			'Views/Post_Sync/assets/js/contentSync.unlinkRootPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
+		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'unlinkLinkedPost',
+			'Views/Post_Sync/assets/js/contentSync.unlinkLinkedPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
+		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'trashPost',
+			'Views/Post_Sync/assets/js/contentSync.trashPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
+		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'deleteRootPost',
+			'Views/Post_Sync/assets/js/contentSync.deleteRootPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+			)
+		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'repairPost',
+			'Views/Post_Sync/assets/js/contentSync.repairPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+				'inline'   => array(
+					'content'  => 'document.addEventListener( "DOMContentLoaded", function() { contentSync.repairPost.onLoad(); } );',
+					'position' => 'after',
+				),
+			)
+		);
 	}
 
 	/**
@@ -100,7 +153,7 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 
 		add_screen_option( 'per_page', $args );
 
-		$this->Global_List_Table = new Global_List_Table( $default_posts_per_page );
+		$this->Synced_Posts_Table = new Synced_Posts_Table( $default_posts_per_page );
 	}
 
 	/**

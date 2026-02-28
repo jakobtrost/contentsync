@@ -81,7 +81,7 @@ class Logger {
 	public static function add( $message, $context = 'do_not_log', $type = 'info' ) {
 
 		if ( ! is_string( $message ) ) {
-			error_log( 'Logger::log() $message must be a string' );
+			error_log( 'Logger::add() $message must be a string' );
 			return;
 		}
 
@@ -196,7 +196,9 @@ class Logger {
 	 * @return void
 	 */
 	public static function clear_log_file() {
-		$log_file = WP_CONTENT_DIR . '/debug.log';
+		$debug_log_file = defined( 'WP_DEBUG_LOG' ) && is_string( WP_DEBUG_LOG ) ? WP_DEBUG_LOG : 'wp-content/debug.log';
+		error_log( 'debug_log_file: ' . $debug_log_file );
+		$log_file = ABSPATH . $debug_log_file;
 		if ( file_exists( $log_file ) ) {
 			file_put_contents( $log_file, '' );
 		}

@@ -1,6 +1,6 @@
 var contentSync = contentSync || {};
 
-contentSync.unlinkRootPost = new function() {
+contentSync.deleteRootPost = new function() {
 
 	/**
 	 * i18n function
@@ -11,25 +11,20 @@ contentSync.unlinkRootPost = new function() {
 	 * Modal instance
 	 */
 	this.Modal = new contentSync.Modal( {
-		id: 'unlink-root-post-modal',
-		title: __( 'Disable sync', 'contentsync' ),
-		description: __( 'Do you want to disable global synchronization for the post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
-		formInputs: [
-			{
-				type: 'checkbox',
-				name: 'unlink_connected_posts',
-				label: __( 'Unlink connected posts', 'contentsync' ),
-				description: __( 'All posts that are connected to this post will be converted to local posts.', 'contentsync' ),
-				value: 1
-			}
-		],
+		id: 'delete-root-post-modal',
+		title: __( 'Delete synced post', 'contentsync' ),
+		description: __( 'Do you want to delete the synced post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
+		notice: {
+			text: __( 'The synced post is permanently deleted on all sites. This cannot be undone. If you want to make the posts static instead, select "Unlink".', 'contentsync' ),
+			type: 'info',
+		},
 		buttons: {
 			cancel: {
 				text: __( 'Cancel', 'contentsync' )
 			},
 			submit: {
-				text: __( 'Disable sync', 'contentsync' ),
-				className: 'is-primary is-destructive'
+				text: __( 'Delete everywhere', 'contentsync' ),
+				className: 'is-primary is-destructive',
 			}
 		},
 		onSubmit: () => this.onModalSubmit()
@@ -39,7 +34,7 @@ contentSync.unlinkRootPost = new function() {
 	 * REST handler instance
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
-		restPath: 'root-posts/unlink',
+		restPath: 'root-posts/delete',
 		onSuccess: ( data, message, fullResponse ) => this.onSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
@@ -114,7 +109,7 @@ contentSync.unlinkRootPost = new function() {
 	/**
 	 * When the REST request is successful
 	 *
-	 * @param {string} responseData - Global post ID (from response.data)
+	 * @param {string} responseData - Local post ID (from response.data)
 	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
@@ -123,29 +118,33 @@ contentSync.unlinkRootPost = new function() {
 		this.Modal.close();
 		
 		if ( ! responseData ) {
-			return this.onError( message?.length > 0 ? message : __( 'Error disabling global synchronization: No global post ID found', 'contentsync' ), fullResponse );
+			return this.onError( message?.length > 0 ? message : __( 'Error deleting synced post: No global post ID found', 'contentsync' ), fullResponse );
 		}
 
-		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
-			contentSync.blockEditorTools.getData( this.post.id, true, ( post ) => {
-				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( message?.length > 0 ? message : __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), 'success' );
-				}
-			} );
-		} else {
-			contentSync.tools.addSnackBar( {
-				text: message?.length > 0 ? message : __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ),
-				type: 'success'
-			} );
-
-			if ( this.buttonElement ) {
-				// find closest 'tr' element
-				const tr = this.buttonElement.closest( 'tr' );
-				if ( tr ) {
-					tr.remove();
-				}
-			}
+		let link = null;
+		if ( responseData?.url ) {
+			link = {
+				text: responseData?.text ?? __( 'View queue', 'contentsync' ),
+				url: responseData?.url,
+			};
 		}
+
+		
+		contentSync.tools.addSnackBar( {
+			text: message?.length > 0 ? message : __( 'The synced post was scheduled for permanent deletion on all sites successfully.', 'contentsync' ),
+			type: 'success',
+			link: link
+		} );
+
+		// do not remove the row, as success only indicates that the deletion was scheduled,
+		// not that it was successful.
+		// if ( this.buttonElement ) {
+		// 	// find closest 'tr' element
+		// 	const tr = this.buttonElement.closest( 'tr' );
+		// 	if ( tr ) {
+		// 		tr.remove();
+		// 	}
+		// }
 	};
 
 	/**
@@ -156,10 +155,6 @@ contentSync.unlinkRootPost = new function() {
 	 */
 	this.onError = ( message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
-		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
-			contentSync.blockEditorTools.showSnackbar( message, 'error' );
-		} else {
-			contentSync.tools.addSnackBar( message, 'error' );
-		}
+		contentSync.tools.addSnackBar( message, 'error' );
 	};
 };

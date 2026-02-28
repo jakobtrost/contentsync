@@ -39,30 +39,23 @@ class Post_Error_Handler {
 	}
 
 	/**
-	 * Get error message
+	 * Repair possible errors
 	 *
-	 * @return string
+	 * @param int  $post_id       The post ID to repair.
+	 * @param int  $blog_id       The blog ID to repair (optional, defaults to the current blog).
+	 * @param bool $return_error  Whether to return the error object.
+	 *
+	 * @return bool|object True if the error was repaired successfully, false or an error object if not.
 	 */
-	public static function get_error_message( $error ) {
-		return is_object( $error ) ? $error->message : '';
-	}
+	public static function repair_post( $post_id, $blog_id = null, $return_error = false ) {
 
-	/**
-	 * Check if error is repaired
-	 *
-	 * @return bool Whether there was an error & it is repaired now.
-	 */
-	public static function is_error_repaired( $error ) {
-		return is_object( $error ) ? $error->repaired : true;
-	}
+		Multisite_Manager::switch_blog( $blog_id );
 
-	/**
-	 * Get error repaired message
-	 *
-	 * @return string
-	 */
-	public static function get_error_repaired_log( $error ) {
-		return self::is_error_repaired( $error ) ? $error->log : '';
+		$error = self::check_post_for_errors( $post_id, true, true );
+
+		Multisite_Manager::restore_blog();
+
+		return $return_error ? $error : self::is_error_repaired( $error );
 	}
 
 	/**
@@ -147,10 +140,6 @@ class Post_Error_Handler {
 				}
 			}
 		}
-
-		/**
-		 * Get the errors
-		 */
 
 		// switch blog to prevent errors
 		Multisite_Manager::switch_blog( $blog_id );
@@ -495,26 +484,6 @@ class Post_Error_Handler {
 	}
 
 	/**
-	 * Repair possible errors
-	 *
-	 * @param int  $post_id
-	 * @param int  $blog_id          Optional.
-	 * @param bool $return_error    Whether to return the error object.
-	 *
-	 * @return bool|object          True|False or Error-object.
-	 */
-	public static function repair_post( $post_id, $blog_id = null, $return_error = false ) {
-
-		Multisite_Manager::switch_blog( $blog_id );
-
-		$error = self::check_post_for_errors( $post_id, true, true );
-
-		Multisite_Manager::restore_blog();
-
-		return $return_error ? $error : self::is_error_repaired( $error );
-	}
-
-	/**
 	 * Get all synced posts with errors of a certain blog.
 	 *
 	 * @param int  $blog_id  ID of the blog, defaults to the current blog.
@@ -562,6 +531,39 @@ class Post_Error_Handler {
 	}
 
 	/**
+	 * ========================================================
+	 * Helper functions
+	 * ========================================================
+	 */
+
+	/**
+	 * Get error message
+	 *
+	 * @return string
+	 */
+	public static function get_error_message( $error ) {
+		return is_object( $error ) ? $error->message : '';
+	}
+
+	/**
+	 * Check if error is repaired
+	 *
+	 * @return bool Whether there was an error & it is repaired now.
+	 */
+	public static function is_error_repaired( $error ) {
+		return is_object( $error ) ? $error->repaired : true;
+	}
+
+	/**
+	 * Get error repaired message
+	 *
+	 * @return string
+	 */
+	public static function get_error_repaired_log( $error ) {
+		return self::is_error_repaired( $error ) ? $error->log : '';
+	}
+
+	/**
 	 * Convert a post to the new root post and add the new
 	 * gid to all linked posts.
 	 *
@@ -578,13 +580,11 @@ class Post_Error_Handler {
 			'translations'  => true,
 		);
 
-		if ( ! function_exists( 'make_root_post' ) ) {
-			return false;
-		}
-
 		$gid = Synced_Post_Service::make_root_post( $post_id, $options );
 
-		// loop through all blogs and change the gid
+		// Loop through all blogs, look for local posts with the old gid and
+		// update the gid to the new one. Simultaneously add the connections
+		// on the new root post.
 		foreach ( Multisite_Manager::get_all_blogs() as $blog_id => $blog_args ) {
 
 			if ( $blog_id == $current_blog ) {
@@ -600,7 +600,7 @@ class Post_Error_Handler {
 			Multisite_Manager::restore_blog();
 		}
 
-		// update meta
+		// update meta for the post
 		update_post_meta( $post_id, 'contentsync_export_options', $options );
 		update_post_meta( $post_id, 'contentsync_connection_map', $connection_map );
 

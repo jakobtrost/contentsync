@@ -35,37 +35,12 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 	protected $rest_base = 'unsynced-posts';
 
 	/**
-	 * Param names for the make_root route.
-	 *
-	 * @var array
-	 */
-	private static $make_root_route_param_names = array( 'post_id', 'form_data' );
-
-	/**
-	 * Param names for the overwrite route.
-	 *
-	 * @var array
-	 */
-	private static $overwrite_route_param_names = array( 'post_id', 'gid' );
-
-	/**
-	 * Param names for the similar route.
-	 *
-	 * @var array
-	 */
-	private static $similar_route_param_names = array( 'post_id' );
-
-	/**
 	 * Register REST API routes
 	 */
 	public function register_routes() {
 		$all_args = $this->get_endpoint_args();
 
 		// POST /unsynced-posts/make_root — params: post_id, form_data
-		$make_root_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$make_root_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/make_root',
@@ -73,15 +48,14 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'make_root' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $make_root_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id', 'form_data' ) )
+				),
 			)
 		);
 
 		// POST /unsynced-posts/overwrite — params: post_id, gid
-		$overwrite_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$overwrite_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/overwrite',
@@ -89,15 +63,14 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'overwrite' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $overwrite_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id', 'gid' ) )
+				),
 			)
 		);
 
 		// POST /unsynced-posts/similar — params: post_id
-		$similar_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$similar_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/similar',
@@ -105,7 +78,10 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'get_similar_posts' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $similar_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id' ) )
+				),
 			)
 		);
 	}
@@ -120,7 +96,7 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'post_id is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error making root post: post_id is not defined.', 'contentsync' ), 400 );
 		}
 
 		$args = Post_Meta::get_default_export_options();
@@ -136,10 +112,10 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 		$gid = Synced_Post_Service::make_root_post( $post_id, $args );
 
 		if ( ! $gid ) {
-			return $this->respond( false, __( 'post could not be made into a synced root post.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error making root post: post could not be made into a synced root post.', 'contentsync' ), 400 );
 		}
 
-		$message = sprintf( __( 'post was made into a synced root post with the global id of %s', 'contentsync' ), $gid );
+		$message = __( 'The post was made global successfully.', 'contentsync' );
 		return $this->respond( $gid, $message, true );
 	}
 
@@ -154,7 +130,7 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 		$gid     = (string) ( $request->get_param( 'gid' ) ?? '' );
 
 		if ( empty( $post_id ) || empty( $gid ) ) {
-			return $this->respond( false, __( 'post_id or gid is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error overwriting post: post_id or gid is not defined.', 'contentsync' ), 400 );
 		}
 
 		$current_posts = array();
@@ -170,11 +146,11 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 
 		$result = Synced_Post_Service::import_synced_post( $gid, $current_posts );
 
-		if ( ! $result ) {
-			return $this->respond( false, __( 'post could not be overwritten with synced content.', 'contentsync' ), 400 );
+		if ( is_wp_error( $result ) ) {
+			return $this->respond( false, __( 'Error overwriting post: ' . $result->get_error_message(), 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'post was successfully overwritten with synced content.', 'contentsync' ), true );
+		return $this->respond( true, __( 'The local post was overwritten successfully.', 'contentsync' ), true );
 	}
 
 	/**
@@ -187,24 +163,24 @@ class Unsynced_Posts_Endpoint extends Admin_Endpoint_Base {
 		$post_id = (int) $request->get_param( 'post_id' );
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'post_id is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error getting similar posts: post_id is not defined.', 'contentsync' ), 400 );
 		}
 
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
-			return $this->respond( false, sprintf( __( "Post with ID '%s' could not be found.", 'contentsync' ), $post_id ), 400 );
+			return $this->respond( false, sprintf( __( "Error getting similar posts: post with ID '%s' could not be found.", 'contentsync' ), $post_id ), 400 );
 		}
 
 		$similar_posts = $this->get_similar_synced_posts( $post );
 
 		if ( is_array( $similar_posts ) && empty( $similar_posts ) ) {
-			return $this->respond( array(), __( 'No similar posts found.', 'contentsync' ), true, array( 'status' => 200 ) );
+			return $this->respond( array(), __( 'Error getting similar posts: no similar posts found.', 'contentsync' ), true, array( 'status' => 200 ) );
 		} elseif ( ! $similar_posts ) {
-			return $this->respond( false, __( 'No similar posts found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error getting similar posts: no similar posts found.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( $similar_posts, __( 'Similar posts found.', 'contentsync' ), true, array( 'status' => 200 ) );
+		return $this->respond( $similar_posts, __( 'Similar posts found successfully.', 'contentsync' ), true, array( 'status' => 200 ) );
 	}
 
 	/**

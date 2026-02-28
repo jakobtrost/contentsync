@@ -59,8 +59,8 @@ class SnackBar {
 	/**
 	 * Creating a new SnackBar instance automatically adds the HTML to the DOM
 	 *
-	 * @param {Object} options                  SnackBar options object
-	 *   @param {string} options.text           Main text (alias: options.text)
+	 * @param {string|Object} options           SnackBar options object or text string
+	 *   @param {string} options.text           Main text (alias: options.text) if options is a string
 	 *   @param {Object} options.link           Optional link object:
 	 *     @param {string} options.link.text    Link text
 	 *     @param {string} options.link.url     Link URL
@@ -71,10 +71,16 @@ class SnackBar {
 	 *   @param {number} options.timeoutms      milliseconds after which to dismiss (default: 5000); 0 = no auto-dismiss
 	 */
 	constructor( options ) {
-		this.text = options.text || '';
-		this.link = options.link || {};
-		this.type = options.type || 'info';
-		this.timeout = options.timeout !== undefined ? options.timeout : 5000;
+
+		if ( typeof options === 'string' ) {
+			this.text = options;
+		}
+		else {
+			this.text = options.text || '';
+			this.link = options.link || {};
+			this.type = options.type || 'info';
+			this.timeout = options.timeout !== undefined ? options.timeout : 5000;
+		}
 
 		console.log( 'SnackBar constructor', options );
 
@@ -107,6 +113,8 @@ class SnackBar {
 
 		var content = document.createElement( 'div' );
 		content.className = 'components-snackbar__content';
+
+		// icon
 		if ( icon ) {
 			content.classList.add( 'components-snackbar__content-with-icon' );
 			var iconSpan = document.createElement( 'span' );
@@ -117,6 +125,7 @@ class SnackBar {
 
 		content.appendChild( document.createTextNode( this.text ) );
 
+		// link
 		if ( this.link && ( this.link.url || this.link.onclick ) ) {
 			var a = document.createElement( 'a' );
 			a.className = 'components-external-link components-snackbar__action';

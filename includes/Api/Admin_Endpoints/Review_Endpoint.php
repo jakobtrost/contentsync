@@ -29,20 +29,6 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 	protected $rest_base = 'review';
 
 	/**
-	 * Param names for the approve route.
-	 *
-	 * @var array
-	 */
-	private static $approve_route_param_names = array( 'review_id', 'post_id' );
-
-	/**
-	 * Param names for the deny and revert routes.
-	 *
-	 * @var array
-	 */
-	private static $deny_revert_route_param_names = array( 'review_id', 'post_id', 'message' );
-
-	/**
 	 * Get endpoint args, including message for deny/revert.
 	 *
 	 * @return array
@@ -62,10 +48,6 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 		$all_args = $this->get_endpoint_args();
 
 		// POST /review/approve — params: review_id, post_id
-		$approve_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$approve_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/approve',
@@ -73,15 +55,14 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'approve' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $approve_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'review_id', 'post_id' ) )
+				),
 			)
 		);
 
 		// POST /review/deny — params: review_id, post_id, message
-		$deny_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$deny_revert_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/deny',
@@ -89,15 +70,14 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'deny' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $deny_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'review_id', 'post_id', 'message' ) )
+				),
 			)
 		);
 
 		// POST /review/revert — params: review_id, post_id, message
-		$revert_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$deny_revert_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/revert',
@@ -105,7 +85,10 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'revert' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $revert_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'review_id', 'post_id', 'message' ) )
+				),
 			)
 		);
 	}
@@ -123,10 +106,10 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 		$result = Post_Review_Service::approve_post_review( $review_id, $post_id );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Review could not be approved.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error approving review: review could not be approved.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Review was approved.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Review was successfully approved.', 'contentsync' ), true );
 	}
 
 	/**
@@ -143,10 +126,10 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 		$result = Post_Review_Service::deny_post_review( $review_id, $post_id, $message );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Review could not be denied.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error denying review: review could not be denied.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Review was denied.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Review was successfully denied.', 'contentsync' ), true );
 	}
 
 	/**
@@ -163,9 +146,9 @@ class Review_Endpoint extends Admin_Endpoint_Base {
 		$result = Post_Review_Service::revert_post_review( $review_id, $post_id, $message );
 
 		if ( ! $result ) {
-			return $this->respond( false, __( 'Review could not be reverted.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error reverting review: review could not be reverted.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( true, __( 'Review was reverted.', 'contentsync' ), true );
+		return $this->respond( true, __( 'Review was successfully reverted.', 'contentsync' ), true );
 	}
 }

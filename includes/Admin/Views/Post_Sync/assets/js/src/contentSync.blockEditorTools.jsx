@@ -199,7 +199,7 @@ contentSync.blockEditorTools = new (function () {
 	this.getSimilarPosts = function (postId) {
 		let restHandler = new contentSync.RestHandler({
 			restPath: 'unsynced-posts/similar',
-			onSuccess: (data, fullResponse) => {
+			onSuccess: (data, message, fullResponse) => {
 				if (!data) {
 					return;
 				}
@@ -209,7 +209,13 @@ contentSync.blockEditorTools = new (function () {
 				});
 			},
 			onError: (message, fullResponse) => {
-				contentSync.blockEditorTools.showSnackbar(message, 'error', true);
+				contentSync.blockEditorTools.showSnackbar(
+					message?.length > 0
+						? message
+						: __('Error getting similar posts', 'contentsync'),
+					'error',
+					true
+				);
 				contentSync.blockEditorTools.setData({
 					...contentSync.blockEditorTools.data,
 					similarPosts: [],

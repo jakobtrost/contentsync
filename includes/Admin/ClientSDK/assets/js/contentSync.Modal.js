@@ -625,7 +625,7 @@ class Modal {
 
 	/**
 	 * Get form data
-	 * @returns {FormData|Object} Form data object with field names as keys
+	 * @returns {FormData} Form data object
 	 */
 	getFormData() {
 		if ( !this.modalElement ) {

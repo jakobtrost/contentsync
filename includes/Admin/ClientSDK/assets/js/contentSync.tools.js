@@ -47,7 +47,7 @@ contentSync.tools = new function() {
 	/**
 	 * Create a new SnackBar instance with the given options.
 	 *
-	 * @param {Object} options - Passed to contentSync.SnackBar: text|text, link, type, timeout
+	 * @param {Object} options - Passed to contentSync.SnackBar: text|string, link|Object, type|string, timeout|number
 	 */
 	this.addSnackBar = function( options ) {
 

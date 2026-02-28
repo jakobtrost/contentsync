@@ -882,8 +882,8 @@ class Post_Import extends Post_Transfer_Base {
 	/**
 	 * Replace all nested posts inside a subject, often the post content.
 	 *
-	 * @param  string $subject  The subject were the strings need to be replaced.
-	 * @param  object $post     Preparred post object with the @property 'nested'.
+	 * @param  string        $subject  The subject were the strings need to be replaced.
+	 * @param  Prepared_Post $post     Preparred post object.
 	 *
 	 * @return string $content  Content with all nested elements replaced.
 	 */
@@ -964,8 +964,8 @@ class Post_Import extends Post_Transfer_Base {
 	/**
 	 * Replace all nested terms inside a subject, often the post content.
 	 *
-	 * @param  string $subject  The subject were the strings need to be replaced.
-	 * @param  object $post     Preparred post object with the @property 'nested'.
+	 * @param  string        $subject  The subject were the strings need to be replaced.
+	 * @param  Prepared_Post $post     Preparred post object.
 	 *
 	 * @return string $content  Content with all nested elements replaced.
 	 */

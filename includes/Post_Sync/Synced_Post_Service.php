@@ -16,6 +16,7 @@ use Contentsync\Post_Transfer\Post_Export;
 use Contentsync\Post_Transfer\Post_Import;
 use Contentsync\Utils\Logger;
 use Contentsync\Utils\Multisite_Manager;
+use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -133,13 +134,13 @@ class Synced_Post_Service {
 	 *   ),
 	 * ]
 	 *
-	 * @return bool|string  True on success. False or error message on failure.
+	 * @return true|WP_Error  True on success. WP_Error on failure.
 	 */
 	public static function import_synced_post( $gid, $conflict_actions = array() ) {
 
 		$posts = Synced_Post_Query::prepare_synced_post_for_import( $gid );
 		if ( ! $posts ) {
-			return false;
+			return new WP_Error( 'no_posts_prepared', __( 'No posts could be prepared for import.', 'contentsync' ) );
 		}
 
 		Logger::add( '========= ALL POSTS PREPARED. NOW WE INSERT THEM =========' );
@@ -150,10 +151,11 @@ class Synced_Post_Service {
 				'conflict_actions' => $conflict_actions,
 			)
 		);
-		$result      = $post_import->import_posts();
+
+		$result = $post_import->import_posts();
 
 		if ( is_wp_error( $result ) ) {
-			return $result->get_error_message();
+			return $result;
 		}
 		return true;
 	}
@@ -340,11 +342,11 @@ class Synced_Post_Service {
 		if ( ! $connection_map ) {
 			$connection_map = Post_Connection_Map::get( $post_id );
 		}
-		Logger::log( 'delete_connected_posts', $post_id );
-		Logger::log( 'connection_map', $connection_map );
+		Logger::add( 'delete_connected_posts', $post_id );
+		Logger::add( 'connection_map', $connection_map );
 
 		$destination_ids = Post_Connection_Map::to_destination_ids( $connection_map );
-		Logger::log( 'destination_ids', $destination_ids );
+		Logger::add( 'destination_ids', $destination_ids );
 
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
@@ -352,7 +354,7 @@ class Synced_Post_Service {
 				'import_action' => 'delete',
 			);
 		}
-		Logger::log( 'destination_arrays', $destination_arrays );
+		Logger::add( 'destination_arrays', $destination_arrays );
 
 		$result = Distributor::distribute_single_post( $post_id, $destination_arrays );
 
@@ -400,11 +402,11 @@ class Synced_Post_Service {
 		if ( ! $connection_map ) {
 			$connection_map = Post_Connection_Map::get( $post );
 		}
-		Logger::log( 'delete_unlinked_posts', $post );
-		Logger::log( 'connection_map', $connection_map );
+		Logger::add( 'delete_unlinked_posts', $post );
+		Logger::add( 'connection_map', $connection_map );
 
 		$destination_ids = Post_Connection_Map::to_destination_ids( $connection_map );
-		Logger::log( 'destination_ids', $destination_ids );
+		Logger::add( 'destination_ids', $destination_ids );
 
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
@@ -412,7 +414,7 @@ class Synced_Post_Service {
 				'import_action' => 'delete',
 			);
 		}
-		Logger::log( 'destination_arrays', $destination_arrays );
+		Logger::add( 'destination_arrays', $destination_arrays );
 
 		$result = Distributor::distribute_single_post( $post, $destination_arrays );
 
@@ -451,11 +453,11 @@ class Synced_Post_Service {
 
 		// delete imported posts
 		$connection_map = Post_Connection_Map::get( $synced_post->ID );
-		Logger::log( 'delete_root_post_and_connected_posts', $synced_post->ID );
-		Logger::log( 'connection_map', $connection_map );
+		Logger::add( 'delete_root_post_and_connected_posts', $synced_post->ID );
+		Logger::add( 'connection_map', $connection_map );
 
 		$destination_ids = Post_Connection_Map::to_destination_ids( $connection_map );
-		Logger::log( 'destination_ids', $destination_ids );
+		Logger::add( 'destination_ids', $destination_ids );
 
 		$destination_arrays = array();
 		foreach ( $destination_ids as $destination_id ) {
@@ -463,14 +465,20 @@ class Synced_Post_Service {
 				'import_action' => 'delete',
 			);
 		}
-		Logger::log( 'destination_arrays', $destination_arrays );
 
-		$result = Distributor::distribute_single_post( $post, $destination_arrays );
-
-		// delete the root post
 		if ( ! $keep_root_post ) {
-			$result = wp_delete_post( $root_post_id, true );
+			// if the stage of the root post is not already in the destination arrays, add it
+			// this ensures that the root post is deleted as well
+			if ( ! isset( $destination_arrays[ $root_blog_id ] ) ) {
+				$destination_arrays[ $root_blog_id ] = array(
+					'import_action' => 'delete',
+				);
+			}
 		}
+
+		Logger::add( 'destination_arrays', $destination_arrays );
+
+		$result = Distributor::distribute_single_post( $synced_post, $destination_arrays );
 
 		// restore blog
 		Multisite_Manager::restore_blog();

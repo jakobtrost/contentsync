@@ -7,11 +7,12 @@
 
 namespace Contentsync\Admin\Views\Distribution;
 
+use WP_Error;
 use Contentsync\Admin\Utils\Admin_Render;
 use Contentsync\Distribution\Distributor;
 use Contentsync\Distribution\Distribution_Item_Service;
 use Contentsync\Connections\Site_Connection;
-use WP_Error;
+use Contentsync\Utils\Logger;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -438,7 +439,14 @@ class Queue_List_Table extends \WP_List_Table {
 		switch ( $column_name ) {
 
 			case 'status':
-				echo Admin_Render::make_admin_icon_status_box( $item->status );
+				$texts = array(
+					'failed'  => __( 'Failed', 'contentsync' ),
+					'success' => __( 'Completed', 'contentsync' ),
+					'started' => __( 'Started', 'contentsync' ),
+					'init'    => __( 'Scheduled', 'contentsync' ),
+				);
+				$text  = isset( $texts[ $item->status ] ) ? $texts[ $item->status ] : '';
+				echo Admin_Render::make_admin_icon_status_box( $item->status, $text, false );
 
 				if ( $item->status === 'failed' ) {
 

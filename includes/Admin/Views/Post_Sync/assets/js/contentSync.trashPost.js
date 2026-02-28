@@ -1,6 +1,6 @@
 var contentSync = contentSync || {};
 
-contentSync.unlinkRootPost = new function() {
+contentSync.trashPost = new function() {
 
 	/**
 	 * i18n function
@@ -11,25 +11,16 @@ contentSync.unlinkRootPost = new function() {
 	 * Modal instance
 	 */
 	this.Modal = new contentSync.Modal( {
-		id: 'unlink-root-post-modal',
-		title: __( 'Disable sync', 'contentsync' ),
-		description: __( 'Do you want to disable global synchronization for the post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
-		formInputs: [
-			{
-				type: 'checkbox',
-				name: 'unlink_connected_posts',
-				label: __( 'Unlink connected posts', 'contentsync' ),
-				description: __( 'All posts that are connected to this post will be converted to local posts.', 'contentsync' ),
-				value: 1
-			}
-		],
+		id: 'trash-post-modal',
+		title: __( 'Move post to the trash', 'contentsync' ),
+		description: __( 'Do you want to move the post %s to the trash?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
 		buttons: {
 			cancel: {
 				text: __( 'Cancel', 'contentsync' )
 			},
 			submit: {
-				text: __( 'Disable sync', 'contentsync' ),
-				className: 'is-primary is-destructive'
+				text: __( 'Trash post', 'contentsync' ),
+				className: 'is-primary is-destructive',
 			}
 		},
 		onSubmit: () => this.onModalSubmit()
@@ -39,7 +30,7 @@ contentSync.unlinkRootPost = new function() {
 	 * REST handler instance
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
-		restPath: 'root-posts/unlink',
+		restPath: 'root-posts/trash',
 		onSuccess: ( data, message, fullResponse ) => this.onSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
@@ -105,7 +96,7 @@ contentSync.unlinkRootPost = new function() {
 		this.Modal.toggleSubmitButtonBusy( true );
 
 		const data = {
-			gid: this.post.gid
+			post_id: this.post.id
 		};
 
 		this.RestHandler.send( data );
@@ -114,7 +105,7 @@ contentSync.unlinkRootPost = new function() {
 	/**
 	 * When the REST request is successful
 	 *
-	 * @param {string} responseData - Global post ID (from response.data)
+	 * @param {string} responseData - Local post ID (from response.data)
 	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
@@ -123,18 +114,18 @@ contentSync.unlinkRootPost = new function() {
 		this.Modal.close();
 		
 		if ( ! responseData ) {
-			return this.onError( message?.length > 0 ? message : __( 'Error disabling global synchronization: No global post ID found', 'contentsync' ), fullResponse );
+			return this.onError( message?.length > 0 ? message : __( 'Error moving post to the trash: No post ID found', 'contentsync' ), fullResponse );
 		}
 
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
 			contentSync.blockEditorTools.getData( this.post.id, true, ( post ) => {
 				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( message?.length > 0 ? message : __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), 'success' );
+					contentSync.blockEditorTools.showSnackbar( message?.length > 0 ? message : __( 'The post was moved to the trash successfully.', 'contentsync' ), 'success' );
 				}
 			} );
 		} else {
 			contentSync.tools.addSnackBar( {
-				text: message?.length > 0 ? message : __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ),
+				text: message?.length > 0 ? message : __( 'The post was moved to the trash successfully.', 'contentsync' ),
 				type: 'success'
 			} );
 

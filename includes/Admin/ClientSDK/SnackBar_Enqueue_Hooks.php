@@ -9,7 +9,7 @@
 namespace Contentsync\Admin\ClientSDK;
 
 use Contentsync\Utils\Hooks_Base;
-use Contentsync\Admin\Utils\Admin_Render;
+use Contentsync\Admin\Utils\Enqueue_Service;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -26,23 +26,14 @@ class SnackBar_Enqueue_Hooks extends Hooks_Base {
 	 * Enqueue SnackBar Scripts.
 	 */
 	public function enqueue_snackbar_assets() {
-
-		// Enqueue SnackBar (WordPress-style snackbars, vanilla JS)
-		wp_register_style(
-			'contentsync-snackbar',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/css/contentsync-snackbar.css',
-			array(),
-			CONTENTSYNC_VERSION
+		Enqueue_Service::enqueue_admin_style(
+			'snackbar',
+			'ClientSDK/assets/css/contentsync-snackbar.css'
 		);
-		wp_enqueue_style( 'contentsync-snackbar' );
 
-		wp_register_script(
-			'contentSync-SnackBar',
-			CONTENTSYNC_PLUGIN_URL . '/includes/Admin/ClientSDK/assets/js/contentSync.SnackBar.js',
-			array(),
-			CONTENTSYNC_VERSION,
-			true
+		Enqueue_Service::enqueue_admin_script(
+			'SnackBar',
+			'ClientSDK/assets/js/contentSync.SnackBar.js'
 		);
-		wp_enqueue_script( 'contentSync-SnackBar' );
 	}
 }

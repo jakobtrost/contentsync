@@ -55,7 +55,7 @@ contentSync.postImport = new function() {
 	 */
 	this.checkFileRestHandler = new contentSync.RestHandler( {
 		restPath: 'post-import/check',
-		onSuccess: ( data, fullResponse ) => this.onCheckFileSuccess( data, fullResponse ),
+		onSuccess: ( data, message, fullResponse ) => this.onCheckFileSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onCheckFileError( message, fullResponse ),
 	} );
 
@@ -70,8 +70,11 @@ contentSync.postImport = new function() {
 
 	/**
 	 * Add the page title action button
+	 * 
+	 * called via inline script while enqueuing the script:
+	 * @see \Contentsync\Admin\Views\Post_Transfer\Post_Import_Enqueue_Hooks::enqueue_scripts()
 	 */
-	this.init = () => {
+	this.onLoad = () => {
 		contentSync.tools.addPageTitleAction(
 			'⬇ ' + __( 'Import', 'contentsync' ),
 			{
@@ -120,9 +123,10 @@ contentSync.postImport = new function() {
 	 * When the REST request is successful
 	 *
 	 * @param {Object} data - Object of posts with conflicts (PHP Array keyed by post ID)
+	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onCheckFileSuccess = ( data, fullResponse ) => {
+	this.onCheckFileSuccess = ( data, message, fullResponse ) => {
 		console.log( 'postImport.onCheckFileSuccess: ', data, fullResponse );
 
 		// Convert the data to an array of posts
@@ -134,12 +138,12 @@ contentSync.postImport = new function() {
 		}
 
 		if ( posts.length > 0 ) {
-			this.Modal.setDescription( __( 'The following posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ) );
+			this.Modal.setDescription( message?.length > 0 ? message : __( 'The following posts will be imported to your site. Some might have conflicts with existing posts on your site. Choose what to do with them.', 'contentsync' ) );
 			this.buildConflictOptions( posts );
 		} else {
 			const conflictsContainer = document.getElementById( 'import-post-conflicts' );
 			conflictsContainer.innerHTML = '';
-			this.Modal.setDescription( __( 'No conflicts found.', 'contentsync' ) );
+			this.Modal.setDescription( message?.length > 0 ? message : __( 'No conflicts found.', 'contentsync' ) );
 		}
 
 		this.Modal.toggleSubmitButtonDisabled( false );
@@ -186,8 +190,8 @@ contentSync.postImport = new function() {
 			multiOptionContainer.className = 'post-conflict multiselect';
 			multiOptionContainer.innerHTML = '<div class="post-conflict-title">' + __( 'Multiselect' ) + '</div>' +
 				'<select class="post-conflict-action">' +
-					'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
 					'<option value="replace">' + __( 'Overwrite existing', 'contentsync' ) + '</option>' +
+					'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
 					'<option value="skip">' + __( 'Use existing', 'contentsync' ) + '</option>' +
 				'</select>';
 
@@ -215,8 +219,8 @@ contentSync.postImport = new function() {
 					'<input type="hidden" name="conflicts[' + i + '][existing_post_id]" value="' + post.existing_post.ID + '" />' +
 					'<input type="hidden" name="conflicts[' + i + '][original_post_id]" value="' + post.existing_post.original_post_id + '" />' +
 					'<select class="post-conflict-action" name="conflicts[' + i + '][conflict_action]">' +
-						'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
 						'<option value="replace">' + __( 'Overwrite existing', 'contentsync' ) + '</option>' +
+						'<option value="keep">' + __( 'Add as duplicate', 'contentsync' ) + '</option>' +
 						'<option value="skip">' + __( 'Use existing', 'contentsync' ) + '</option>' +
 					'</select>';
 			} else {
@@ -262,7 +266,7 @@ contentSync.postImport = new function() {
 	 */
 	this.importRestHandler = new contentSync.RestHandler( {
 		restPath: 'post-import',
-		onSuccess: ( data, fullResponse ) => this.onImportSuccess( data, fullResponse ),
+		onSuccess: ( data, message, fullResponse ) => this.onImportSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onImportError( message, fullResponse ),
 	} );
 
@@ -288,15 +292,16 @@ contentSync.postImport = new function() {
 	 * When the REST request is successful
 	 *
 	 * @param {string} responseData - Export file URL (from response.data)
+	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
-	this.onImportSuccess = ( responseData, fullResponse ) => {
+	this.onImportSuccess = ( responseData, message, fullResponse ) => {
 		this.Modal.toggleSubmitButtonBusy( false );
 		this.Modal.close();
 
 		console.log( 'postImport.onImportSuccess: ', responseData, fullResponse );
 		contentSync.tools.addSnackBar( {
-			text: fullResponse.message?.length > 0 ? fullResponse.message : __( 'Posts imported successfully', 'contentsync' ),
+			text: message?.length > 0 ? message : __( 'Posts imported successfully', 'contentsync' ),
 			type: 'success',
 			// add a refresh window link
 			link: {

@@ -29,20 +29,6 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 	protected $rest_base = 'error-posts';
 
 	/**
-	 * Param names for the list route.
-	 *
-	 * @var array
-	 */
-	private static $list_route_param_names = array( 'mode', 'blog_id', 'post_type' );
-
-	/**
-	 * Param names for the repair route.
-	 *
-	 * @var array
-	 */
-	private static $repair_route_param_names = array( 'post_id', 'blog_id' );
-
-	/**
 	 * Get endpoint args, including mode for the list route.
 	 *
 	 * @return array
@@ -62,10 +48,6 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 		$all_args = $this->get_endpoint_args();
 
 		// POST /error-posts/list — params: mode, blog_id (optional), post_type (optional)
-		$list_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$list_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/list',
@@ -73,15 +55,14 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'list_posts' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $list_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'mode', 'blog_id', 'post_type' ) )
+				),
 			)
 		);
 
 		// POST /error-posts/repair — params: post_id, blog_id (optional)
-		$repair_args = array_intersect_key(
-			$all_args,
-			array_flip( self::$repair_route_param_names )
-		);
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/repair',
@@ -89,7 +70,10 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 				'methods'             => $this->method,
 				'callback'            => array( $this, 'repair' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args'                => $repair_args,
+				'args'                => array_intersect_key(
+					$all_args,
+					array_flip( array( 'post_id', 'blog_id' ) )
+				),
 			)
 		);
 	}
@@ -101,9 +85,10 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function list_posts( $request ) {
+
 		$mode      = (string) ( $request->get_param( 'mode' ) ?? '' );
-		$blog_id   = $request->get_param( 'blog_id' );
-		$post_type = $request->get_param( 'post_type' );
+		$blog_id   = $request->get_param( 'blog_id' ) ?? 0;
+		$post_type = $request->get_param( 'post_type' ) ?? '';
 
 		$query_args = array();
 		if ( $post_type !== null && $post_type !== '' ) {
@@ -113,11 +98,11 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 		if ( $mode === 'network' ) {
 			$posts = Post_Error_Handler::get_network_synced_posts_with_errors( false, $query_args );
 		} else {
-			$posts = Post_Error_Handler::get_synced_posts_of_blog_with_errors( $blog_id ? (int) $blog_id : 0, false, $query_args );
+			$posts = Post_Error_Handler::get_synced_posts_of_blog_with_errors( $blog_id, false, $query_args );
 		}
 
 		if ( empty( $posts ) ) {
-			return $this->respond( false, __( 'No errors found.', 'contentsync' ), 400 );
+			return $this->respond( array(), __( 'No synced posts with errors found.', 'contentsync' ), true );
 		}
 
 		$return = array_filter(
@@ -128,10 +113,10 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 		);
 
 		if ( empty( $return ) ) {
-			return $this->respond( false, __( 'No errors found.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error listing synced posts with errors: no errors found.', 'contentsync' ), 400 );
 		}
 
-		return $this->respond( array_values( $return ), '', true );
+		return $this->respond( array_values( $return ), __( 'Synced posts with errors listed successfully.', 'contentsync' ), true );
 	}
 
 	/**
@@ -142,25 +127,28 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 	 */
 	public function repair( $request ) {
 		$post_id = (int) $request->get_param( 'post_id' );
-		$blog_id = $request->get_param( 'blog_id' );
+		$blog_id = $request->get_param( 'blog_id' ) ?? 0;
 
 		if ( empty( $post_id ) ) {
-			return $this->respond( false, __( 'post_id is not defined.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error repairing post: the post ID is not defined.', 'contentsync' ), 400 );
 		}
 
-		$error = Post_Error_Handler::repair_post( $post_id, $blog_id ? (int) $blog_id : null, true );
+		$error = Post_Error_Handler::repair_post( $post_id, $blog_id, true );
 
 		if ( ! $error ) {
-			return $this->respond( false, __( 'post has no error.', 'contentsync' ), 400 );
+			return $this->respond( false, __( 'Error repairing post: the post has no error.', 'contentsync' ), 400 );
 		}
-
-		$log = Post_Error_Handler::get_error_repaired_log( $error );
 
 		if ( Post_Error_Handler::is_error_repaired( $error ) ) {
-			return $this->respond( $log, __( 'post was successfully repaired', 'contentsync' ), true );
+
+			$log = Post_Error_Handler::get_error_repaired_log( $error );
+
+			$message = empty( $log ) ? __( 'The error was repaired successfully.', 'contentsync' ) : sprintf( __( 'The error was repaired successfully: %s', 'contentsync' ), $log );
+
+			return $this->respond( true, $message, true );
 		}
 
-		$message = is_object( $error ) && isset( $error->message ) ? $error->message : __( 'Repair failed.', 'contentsync' );
+		$message = is_object( $error ) && isset( $error->message ) ? $error->message : __( 'Error repairing post: the error could not be repaired.', 'contentsync' );
 		return $this->respond( false, $message, 400 );
 	}
 }

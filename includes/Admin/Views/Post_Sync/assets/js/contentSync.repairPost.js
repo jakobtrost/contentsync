@@ -1,6 +1,6 @@
 var contentSync = contentSync || {};
 
-contentSync.unlinkRootPost = new function() {
+contentSync.repairPost = new function() {
 
 	/**
 	 * i18n function
@@ -11,25 +11,15 @@ contentSync.unlinkRootPost = new function() {
 	 * Modal instance
 	 */
 	this.Modal = new contentSync.Modal( {
-		id: 'unlink-root-post-modal',
-		title: __( 'Disable sync', 'contentsync' ),
-		description: __( 'Do you want to disable global synchronization for the post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
-		formInputs: [
-			{
-				type: 'checkbox',
-				name: 'unlink_connected_posts',
-				label: __( 'Unlink connected posts', 'contentsync' ),
-				description: __( 'All posts that are connected to this post will be converted to local posts.', 'contentsync' ),
-				value: 1
-			}
-		],
+		id: 'repair-post-modal',
+		title: __( 'Repair post', 'contentsync' ),
+		description: __( 'Do you want to repair the error for the post %s?', 'contentsync' ).replace( '%s', '<u>%s</u>' ),
 		buttons: {
 			cancel: {
 				text: __( 'Cancel', 'contentsync' )
 			},
 			submit: {
-				text: __( 'Disable sync', 'contentsync' ),
-				className: 'is-primary is-destructive'
+				text: __( 'Repair error', 'contentsync' )
 			}
 		},
 		onSubmit: () => this.onModalSubmit()
@@ -39,7 +29,7 @@ contentSync.unlinkRootPost = new function() {
 	 * REST handler instance
 	 */
 	this.RestHandler = new contentSync.RestHandler( {
-		restPath: 'root-posts/unlink',
+		restPath: 'error-posts/repair',
 		onSuccess: ( data, message, fullResponse ) => this.onSuccess( data, message, fullResponse ),
 		onError: ( message, fullResponse ) => this.onError( message, fullResponse ),
 	} );
@@ -105,7 +95,7 @@ contentSync.unlinkRootPost = new function() {
 		this.Modal.toggleSubmitButtonBusy( true );
 
 		const data = {
-			gid: this.post.gid
+			post_id: this.post.id
 		};
 
 		this.RestHandler.send( data );
@@ -114,7 +104,7 @@ contentSync.unlinkRootPost = new function() {
 	/**
 	 * When the REST request is successful
 	 *
-	 * @param {string} responseData - Global post ID (from response.data)
+	 * @param {boolean} responseData - Whether the error was repaired successfully
 	 * @param {string} message - Message (from response.message)
 	 * @param {Object} fullResponse - Full REST response { status, message, data }
 	 */
@@ -123,28 +113,22 @@ contentSync.unlinkRootPost = new function() {
 		this.Modal.close();
 		
 		if ( ! responseData ) {
-			return this.onError( message?.length > 0 ? message : __( 'Error disabling global synchronization: No global post ID found', 'contentsync' ), fullResponse );
+			return this.onError( message?.length > 0 ? message : __( 'Error repairing post: No post ID found', 'contentsync' ), fullResponse );
 		}
+
+		let textMessage = message?.length > 0 ? message : __( 'The error was repaired successfully.', 'contentsync' );
 
 		if ( typeof contentSync.blockEditorTools !== 'undefined' ) {
 			contentSync.blockEditorTools.getData( this.post.id, true, ( post ) => {
 				if ( post ) {
-					contentSync.blockEditorTools.showSnackbar( message?.length > 0 ? message : __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ), 'success' );
+					contentSync.blockEditorTools.showSnackbar( textMessage, 'success' );
 				}
 			} );
 		} else {
 			contentSync.tools.addSnackBar( {
-				text: message?.length > 0 ? message : __( 'The global synchronization for the post was disabled successfully.', 'contentsync' ),
+				text: textMessage,
 				type: 'success'
 			} );
-
-			if ( this.buttonElement ) {
-				// find closest 'tr' element
-				const tr = this.buttonElement.closest( 'tr' );
-				if ( tr ) {
-					tr.remove();
-				}
-			}
 		}
 	};
 
@@ -161,5 +145,67 @@ contentSync.unlinkRootPost = new function() {
 		} else {
 			contentSync.tools.addSnackBar( message, 'error' );
 		}
+	};
+
+	/**
+	 * ================================================
+	 * CHECK FOR POSTS WITH ERRORS
+	 * ================================================
+	 */
+
+	/**
+	 * Check for posts with errors
+	 * 
+	 * called via inline script while enqueuing the script:
+	 * @see \Contentsync\Admin\Views\Post_Sync\Synced_Posts_Page_Hooks::enqueue_assets()
+	 */
+	this.onLoad = () => {
+		
+		const errorIndicator = document.getElementById( 'contentsync-check-errors-indicator' );
+		if ( ! errorIndicator ) {
+			return;
+		}
+
+		const removeIndicator = () => {
+			// remove the ' |'
+			const prevSibling = errorIndicator.parentElement.previousElementSibling;
+			if ( prevSibling && prevSibling.textContent.indexOf( ' |' ) !== -1 ) {
+				prevSibling.innerHTML = prevSibling.innerHTML.replace( ' |', '' );
+			}
+
+			// remove the indicator
+			errorIndicator.parentElement.remove();
+		};
+
+		const listErrorPostsHandler = new contentSync.RestHandler( {
+			restPath: 'error-posts/list',
+			onSuccess: ( data, message, fullResponse ) => {
+				
+				// at least one error found
+				if ( data && data?.length > 0 ) {
+
+					// add link to error posts page
+					const link = document.createElement( 'a' );
+					link.textContent = __( 'Errors', 'contentsync' ) + ' ';
+					link.href = errorIndicator.dataset.href;
+					errorIndicator.appendChild( link );
+
+					// add span with count of errors
+					const countSpan = document.createElement( 'span' );
+					countSpan.textContent = '(' + data.length + ')';
+					countSpan.classList.add( 'count' );
+					link.appendChild( countSpan );
+				}
+				// no errors found
+				else {
+					removeIndicator();
+				}
+			},
+			onError: ( message, fullResponse ) => {
+				removeIndicator();
+			}
+		} );
+
+		listErrorPostsHandler.send( errorIndicator.dataset );
 	};
 };

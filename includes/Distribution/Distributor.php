@@ -449,11 +449,18 @@ class Distributor {
 			else {
 				$blog_id = $destination_id;
 
-				// We never distribute posts to the blog they are coming from.
-				// This would potentially result in the root post being distributed to itself
-				// which could result in it being deleted.
+				// We only distribute posts to the blog they are coming from, if they have the
+				// import action 'delete' or 'trash', because otherwise it would potentially result
+				// in the root post being distributed to itself.
 				if ( $blog_id == get_current_blog_id() ) {
-					continue;
+					if ( ! isset( $destination_array['import_action'] ) ) {
+						// no import action set, so we skip this blog, as the default is 'update'
+						continue;
+					} elseif ( $destination_array['import_action'] != 'delete' && $destination_array['import_action'] != 'trash' ) {
+						// import action is not 'delete' or 'trash', so we skip this blog, as it would potentially result
+						// in the root post being distributed to itself.
+						continue;
+					}
 				}
 
 				if ( ! isset( $destinations[ $blog_id ] ) ) {
@@ -738,7 +745,9 @@ class Distributor {
 		// save it to the database
 		$ID = $distribution_item->save();
 
-		if ( ! $ID ) {
+		if ( is_wp_error( $ID ) ) {
+			return $ID;
+		} elseif ( ! $ID ) {
 			return new WP_Error( 'failed_to_save_distribution_item', __( 'Failed to save distribution item.', 'global-contents' ) );
 		}
 
@@ -795,7 +804,7 @@ class Distributor {
 		// get the distribution item from the database
 		$distribution_item = Distribution_Item_Service::get( $distribution_item_id );
 
-		if ( ! is_a( $distribution_item, 'Contentsync\Distribution\Distributor_Item' ) ) {
+		if ( ! is_a( $distribution_item, 'Contentsync\Distribution\Distribution_Item' ) ) {
 			return new WP_Error( 'invalid_distribution_item', __( 'Invalid distribution item.', 'global-contents' ) );
 		}
 
@@ -866,7 +875,7 @@ class Distributor {
 
 		$item = Distribution_Item_Service::get( $item_id );
 
-		if ( ! is_a( $item, 'Contentsync\Distribution\Distributor_Item' ) ) {
+		if ( ! is_a( $item, 'Contentsync\Distribution\Distribution_Item' ) ) {
 			return false;
 		}
 
@@ -1045,8 +1054,21 @@ class Distributor {
 						$errors[] = 'Error deleting local post with gid: ' . $gid . ' ';
 					}
 				} else {
-					Logger::add( 'Local post not found' );
-					$errors[] = 'Local post could not be deleted, not found by gid: ' . $gid . ' ';
+					// try to delete the post from the trash
+					$local_post = Synced_Post_Query::get_local_post_by_gid( $gid, $posttype, array( 'trash' ) );
+					if ( $local_post ) {
+						Logger::add( 'Deleting local post with id: ' . $local_post->ID );
+						$result = wp_delete_post( $local_post->ID, true );
+						if ( $result ) {
+							Logger::add( 'Local post deleted' );
+						} else {
+							Logger::add( 'Error deleting local post' );
+							$errors[] = 'Error deleting local post with gid: ' . $gid . ' ';
+						}
+					} else {
+						Logger::add( 'Local post not found' );
+						$errors[] = 'Local post could not be deleted, not found by gid: ' . $gid . ' ';
+					}
 				}
 			}
 		}
