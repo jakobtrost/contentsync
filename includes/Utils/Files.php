@@ -145,8 +145,10 @@ class Files {
 	public static function convert_wp_content_dir_to_url( $filepath ) {
 
 		$wp_content_url = WP_CONTENT_URL;
-		if ( is_ssl() && strpos( $wp_content_url, 'http://' ) === 0 ) {
-			$wp_content_url = str_replace( 'http://', 'https://', $wp_content_url );
+
+		// the WP_CONTENT_URL does not necessarily contain the protocol, so we need to add it if it's not there
+		if ( is_ssl() && strpos( $wp_content_url, 'http:' ) === 0 ) {
+			$wp_content_url = str_replace( 'http:', 'https:', $wp_content_url );
 		}
 
 		$url_path = str_replace( WP_CONTENT_DIR, $wp_content_url, $filepath );
