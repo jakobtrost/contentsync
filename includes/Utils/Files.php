@@ -143,7 +143,13 @@ class Files {
 	 * @return string URL.
 	 */
 	public static function convert_wp_content_dir_to_url( $filepath ) {
-		$url_path = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filepath );
+
+		$wp_content_url = WP_CONTENT_URL;
+		if ( is_ssl() && strpos( $wp_content_url, 'http://' ) === 0 ) {
+			$wp_content_url = str_replace( 'http://', 'https://', $wp_content_url );
+		}
+
+		$url_path = str_replace( WP_CONTENT_DIR, $wp_content_url, $filepath );
 		$url_path = str_replace( '\\', '/', $url_path );
 		return $url_path;
 	}
