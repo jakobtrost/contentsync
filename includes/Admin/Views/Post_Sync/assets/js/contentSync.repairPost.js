@@ -146,4 +146,66 @@ contentSync.repairPost = new function() {
 			contentSync.tools.addSnackBar( message, 'error' );
 		}
 	};
+
+	/**
+	 * ================================================
+	 * CHECK FOR POSTS WITH ERRORS
+	 * ================================================
+	 */
+
+	/**
+	 * Check for posts with errors
+	 * 
+	 * called via inline script while enqueuing the script:
+	 * @see \Contentsync\Admin\Views\Post_Sync\Synced_Posts_Page_Hooks::enqueue_assets()
+	 */
+	this.onLoad = () => {
+		
+		const errorIndicator = document.getElementById( 'contentsync-check-errors-indicator' );
+		if ( ! errorIndicator ) {
+			return;
+		}
+
+		const removeIndicator = () => {
+			// remove the ' |'
+			const prevSibling = errorIndicator.parentElement.previousElementSibling;
+			if ( prevSibling && prevSibling.textContent.indexOf( ' |' ) !== -1 ) {
+				prevSibling.innerHTML = prevSibling.innerHTML.replace( ' |', '' );
+			}
+
+			// remove the indicator
+			errorIndicator.parentElement.remove();
+		};
+
+		const listErrorPostsHandler = new contentSync.RestHandler( {
+			restPath: 'error-posts/list',
+			onSuccess: ( data, message, fullResponse ) => {
+				
+				// at least one error found
+				if ( data && data?.length > 0 ) {
+
+					// add link to error posts page
+					const link = document.createElement( 'a' );
+					link.textContent = __( 'Errors', 'contentsync' ) + ' ';
+					link.href = errorIndicator.dataset.href;
+					errorIndicator.appendChild( link );
+
+					// add span with count of errors
+					const countSpan = document.createElement( 'span' );
+					countSpan.textContent = '(' + data.length + ')';
+					countSpan.classList.add( 'count' );
+					link.appendChild( countSpan );
+				}
+				// no errors found
+				else {
+					removeIndicator();
+				}
+			},
+			onError: ( message, fullResponse ) => {
+				removeIndicator();
+			}
+		} );
+
+		listErrorPostsHandler.send( errorIndicator.dataset );
+	};
 };

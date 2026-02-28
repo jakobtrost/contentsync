@@ -85,9 +85,10 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function list_posts( $request ) {
+
 		$mode      = (string) ( $request->get_param( 'mode' ) ?? '' );
-		$blog_id   = $request->get_param( 'blog_id' );
-		$post_type = $request->get_param( 'post_type' );
+		$blog_id   = $request->get_param( 'blog_id' ) ?? 0;
+		$post_type = $request->get_param( 'post_type' ) ?? '';
 
 		$query_args = array();
 		if ( $post_type !== null && $post_type !== '' ) {
@@ -97,11 +98,11 @@ class Error_Posts_Endpoint extends Admin_Endpoint_Base {
 		if ( $mode === 'network' ) {
 			$posts = Post_Error_Handler::get_network_synced_posts_with_errors( false, $query_args );
 		} else {
-			$posts = Post_Error_Handler::get_synced_posts_of_blog_with_errors( $blog_id ? (int) $blog_id : 0, false, $query_args );
+			$posts = Post_Error_Handler::get_synced_posts_of_blog_with_errors( $blog_id, false, $query_args );
 		}
 
 		if ( empty( $posts ) ) {
-			return $this->respond( false, __( 'Error listing synced posts with errors: no errors found.', 'contentsync' ), 400 );
+			return $this->respond( array(), __( 'No synced posts with errors found.', 'contentsync' ), true );
 		}
 
 		$return = array_filter(

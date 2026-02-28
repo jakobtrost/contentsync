@@ -321,7 +321,7 @@ class Synced_Posts_Table extends WP_List_Table {
 
 		if ( $rel === 'errors' ) {
 			if ( count( $this->posts['errors'] ) ) {
-				$views['errors'] = '<span class="color_red"><span class="dashicons dashicons-warning"></span>&nbsp;' . __( 'Contents with errors', 'contentsync' ) . '</span>';
+				$views['errors'] = __( 'Errors', 'contentsync' ) . '</span>';
 			} else {
 				$views['errors'] = __( 'No errors found', 'contentsync' );
 			}
@@ -338,26 +338,16 @@ class Synced_Posts_Table extends WP_List_Table {
 		}
 
 		if ( $rel !== 'errors' ) {
-			$return['errors'] = sprintf(
-				'<span class="js_check_errors" data-mode="%s" data-blog_id="%s" data-post_type="%s">' .
-					'<span class="loading hidden">%s<span class="spinner is-active"></span></span>' .
-					'<span class="no_errors hidden">%s</span>' .
-					'<span class="errors_found hidden">' .
-						'<a href="%s" class="%s">' .
-							'<span class="color_red"><span class="dashicons dashicons-warning"></span>&nbsp;%s</span>' .
-							'<span class="count">(?)</span>' .
-						'</a>' .
-					'</span>' .
-				'</span>',
+
+			$error_indicator = sprintf(
+				'<span id="contentsync-check-errors-indicator" data-mode="%s" data-blog_id="%s" data-post_type="%s" data-href="%s"></span>',
 				is_network_admin() ? 'network' : 'site',
 				get_current_blog_id(),
 				isset( $_GET['post_type'] ) ? $_GET['post_type'] : '',
-				__( 'Search for errors...', 'contentsync' ),
-				__( 'No errors found', 'contentsync' ),
-				add_query_arg( 'rel', 'errors', remove_query_arg( array( 'paged' ) ) ),
-				$rel === 'errors' ? 'current' : '',
-				__( 'Contents with errors', 'contentsync' )
+				add_query_arg( 'rel', 'errors', remove_query_arg( array( 'paged' ) ) )
 			);
+
+			$return['errors'] = $error_indicator;
 		}
 
 		return $return;
@@ -375,7 +365,7 @@ class Synced_Posts_Table extends WP_List_Table {
 		} elseif ( $rel === 'linked' ) {
 			$text = __( 'No synced linked post here was found.', 'contentsync' );
 		} elseif ( $rel === 'errors' ) {
-			$text = __( 'No faulty synced post found.', 'contentsync' );
+			$text = __( 'No synced posts with errors found.', 'contentsync' );
 		}
 
 		echo '<div style="margin: 4px 0;">' . $text . '</div>';
@@ -557,7 +547,7 @@ class Synced_Posts_Table extends WP_List_Table {
 			// edit the root
 			'root'   => "<a href='" . $item->post_links['root'] . "'>" . __( 'Go to the original post', 'contentsync' ) . '</a>',
 			// repair if error
-			'repair' => $this->build_rest_api_link( 'repairPost', __( 'Repair', 'contentsync' ), $data ),
+			'repair' => $this->build_rest_api_link( 'repairPost.onButtonClick', __( 'Repair', 'contentsync' ), $data ),
 		);
 
 		if ( is_network_admin() ) {

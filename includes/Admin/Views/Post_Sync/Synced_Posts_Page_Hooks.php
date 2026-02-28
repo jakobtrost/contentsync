@@ -124,6 +124,18 @@ class Synced_Posts_Page_Hooks extends Hooks_Base {
 				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
 			)
 		);
+
+		Enqueue_Service::enqueue_admin_script(
+			'repairPost',
+			'Views/Post_Sync/assets/js/contentSync.repairPost.js',
+			array(
+				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+				'inline'   => array(
+					'content'  => 'document.addEventListener( "DOMContentLoaded", function() { contentSync.repairPost.onLoad(); } );',
+					'position' => 'after',
+				),
+			)
+		);
 	}
 
 	/**

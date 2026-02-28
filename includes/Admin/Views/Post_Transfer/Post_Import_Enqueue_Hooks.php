@@ -35,11 +35,11 @@ class Post_Import_Enqueue_Hooks extends Hooks_Base {
 			'postImport',
 			'Views/Post_Transfer/assets/js/contentSync.postImport.js',
 			array(
-				'external' => array( 'jquery' ),
-				'internal' => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
+				'external'  => array( 'jquery' ),
+				'internal'  => array( 'tools', 'Modal', 'RestHandler', 'SnackBar' ),
 				'in_footer' => false,
-				'inline'   => array(
-					'content'  => 'document.addEventListener( \'DOMContentLoaded\', () => contentSync.postImport.init() );',
+				'inline'    => array(
+					'content'  => 'document.addEventListener( \'DOMContentLoaded\', () => contentSync.postImport.onLoad() );',
 					'position' => 'after',
 				),
 			)

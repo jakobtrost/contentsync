@@ -70,8 +70,11 @@ contentSync.postImport = new function() {
 
 	/**
 	 * Add the page title action button
+	 * 
+	 * called via inline script while enqueuing the script:
+	 * @see \Contentsync\Admin\Views\Post_Transfer\Post_Import_Enqueue_Hooks::enqueue_scripts()
 	 */
-	this.init = () => {
+	this.onLoad = () => {
 		contentSync.tools.addPageTitleAction(
 			'⬇ ' + __( 'Import', 'contentsync' ),
 			{
