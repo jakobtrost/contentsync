@@ -47,10 +47,10 @@ class Bulk_Actions_Hooks extends Hooks_Base {
 	 */
 	public function add_post_export_bulk_action( $bulk_actions ) {
 
-		$bulk_actions['contentsync_export'] = __( 'Content Sync Export', 'contentsync' );
+		$bulk_actions['contentsync_export'] = __( 'Export (Content Sync)', 'contentsync' );
 
 		if ( ! empty( Translation_Manager::get_translation_tool() ) ) {
-			$bulk_actions['contentsync_export_multilanguage'] = __( 'Export including translations', 'contentsync' );
+			$bulk_actions['contentsync_export_multilanguage'] = __( 'Export including translations (Content Sync)', 'contentsync' );
 		}
 
 		return $bulk_actions;

@@ -175,7 +175,7 @@ class Admin_Edit_Hooks extends Hooks_Base {
 
 	public function bulk_action_make_global( $bulk_actions ) {
 		if ( Synced_Post_Service::current_user_can_edit_synced_posts( 'root' ) ) {
-			$bulk_actions['contentsync_make_posts_global'] = __( 'Content Sync: Make posts global', 'contentsync' );
+			$bulk_actions['contentsync_make_posts_global'] = __( 'Make posts global (Content Sync)', 'contentsync' );
 		}
 		return $bulk_actions;
 	}
